@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseDefinitionKeyLike(String caseDefinitionKeyLike);
     CaseInstanceQuery caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase);
     CaseInstanceQuery caseDefinitionKeys(Set<String> caseDefinitionKeys);
+    CaseInstanceQuery excludeCaseDefinitionKeys(Set<String> caseDefinitionKeys);
     CaseInstanceQuery caseDefinitionId(String caseDefinitionId);
     CaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds);
     CaseInstanceQuery caseDefinitionCategory(String caseDefinitionCategory);
@@ -59,7 +61,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceLastReactivatedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceLastReactivatedBy(String userId);
     CaseInstanceQuery caseInstanceCallbackId(String callbackId);
+    CaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
+    CaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
     CaseInstanceQuery caseInstanceReferenceId(String referenceId);
     CaseInstanceQuery caseInstanceReferenceType(String referenceType);
     CaseInstanceQuery caseInstanceIsCompleteable();
@@ -236,6 +240,11 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * @return caseInstanceQuery with the flag to retrieve case variables into the response.
      */
     CaseInstanceQuery includeCaseVariables();
+
+    /**
+     * Include the case variables with the given names into the query result.
+     */
+    CaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
 
     /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.

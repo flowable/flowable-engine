@@ -165,6 +165,12 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         if (xif.isPropertySupported(XMLInputFactory.SUPPORT_DTD)) {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_DTD)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        }
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        }
 
         if (encoding == null) {
             encoding = DEFAULT_ENCODING;
@@ -175,7 +181,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 if (!enableSafeBpmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
-                    validateModel(xif.createXMLStreamReader(in));
+                    validateModel(new FlowableXMLStreamReader(xif.createXMLStreamReader(in)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new CmmnXMLException("The CMMN 1.1 xml is not properly encoded", e);
@@ -489,8 +495,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
 
-        if (planFragment instanceof Stage) {
-            Stage stage = (Stage) planFragment;
+        if (planFragment instanceof Stage stage) {
             for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
                 if (planItemDefinition instanceof PlanFragment) {
                     processPlanFragment(cmmnModel, (PlanFragment) planItemDefinition);
@@ -529,13 +534,11 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             resolveExitCriteriaSentry(planItem);
         }
 
-        if (planItemDefinition instanceof Stage) {
-            Stage planItemStage = (Stage) planItemDefinition;
+        if (planItemDefinition instanceof Stage planItemStage) {
             planItemStage.setPlanItem(planItem);
             processPlanFragment(cmmnModel, planItemStage);
 
-        } else if (planItemDefinition instanceof ProcessTask) {
-            ProcessTask processTask = (ProcessTask) planItemDefinition;
+        } else if (planItemDefinition instanceof ProcessTask processTask) {
             if (processTask.getProcessRef() != null) {
                 org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
                 if (process != null) {
@@ -543,8 +546,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof DecisionTask) {
-            DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+        } else if (planItemDefinition instanceof DecisionTask decisionTask) {
             if (decisionTask.getDecisionRef() != null) {
                 org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
                 if (decision != null) {
@@ -552,8 +554,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+        } else if (planItemDefinition instanceof TimerEventListener timerEventListener) {
             String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
             PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
             if (startTriggerPlanItem != null) {

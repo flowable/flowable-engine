@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.history;
 
 import java.util.List;
 
+import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -23,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 /**
  * @author Tijs Rademakers
  */
-public class HistoricVariableInstanceQueryRequest {
+public class HistoricVariableInstanceQueryRequest extends PaginateRequest {
 
     private Boolean excludeTaskVariables;
     private String taskId;

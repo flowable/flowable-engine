@@ -16,6 +16,7 @@ package org.flowable.eventregistry.rest.service.api.runtime;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDefinitionQuery;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -42,7 +43,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Instances" }, description = "Manage Event Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventInstanceCollectionResource {
     
     @Autowired
@@ -87,6 +88,17 @@ public class EventInstanceCollectionResource {
             }
             
             eventDefinition = eventDefinitionQuery.latestVersion().singleResult();
+            
+            if (eventDefinition == null && eventRegistryEngineConfiguration.isFallbackToDefaultTenant()) {
+                String defaultTenant = eventRegistryEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(request.getTenantId(), ScopeTypes.EVENT_REGISTRY, request.getEventDefinitionKey());
+                if (StringUtils.isNotEmpty(defaultTenant)) {
+                    eventDefinitionQuery = repositoryService.createEventDefinitionQuery().eventDefinitionKey(request.getEventDefinitionKey()).tenantId(defaultTenant);
+                } else {
+                    eventDefinitionQuery = repositoryService.createEventDefinitionQuery().eventDefinitionKey(request.getEventDefinitionKey());
+                }
+                
+                eventDefinition = eventDefinitionQuery.latestVersion().singleResult();
+            }
         }
         
         if (eventDefinition == null) {

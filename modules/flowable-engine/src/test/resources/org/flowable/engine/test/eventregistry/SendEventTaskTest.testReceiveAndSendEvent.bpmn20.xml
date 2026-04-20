@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples"
+  xmlns:tns="Examples">
+  
+  <process id="sendAndReceiveProcess">
+
+    <startEvent id="theStart" />
+  	
+  	<sequenceFlow sourceRef="theStart" targetRef="ReceiveEventTask_1" />
+
+    <receiveTask id="ReceiveEventTask_1" name="Receive event task">
+      <extensionElements>
+          <flowable:eventType><![CDATA[myEvent]]></flowable:eventType>
+      </extensionElements>
+    </receiveTask>
+
+    <sequenceFlow sourceRef="ReceiveEventTask_1" targetRef="sendEventTask2" />
+
+    <serviceTask id="sendEventTask2" flowable:type="send-event">
+      <extensionElements>
+          <flowable:eventType>myEvent</flowable:eventType>
+          <flowable:channelKey>out-channel</flowable:channelKey>
+          <flowable:eventInParameter source="test" target="eventProperty" />
+      </extensionElements>
+    </serviceTask>
+  	
+  	<sequenceFlow sourceRef="sendEventTask2" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -143,16 +143,13 @@ public class EventSubscriptionManager {
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
-                if (element instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) element;
+                if (element instanceof StartEvent startEvent) {
                     if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
                         EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-                        if (eventDefinition instanceof SignalEventDefinition) {
-                            SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
+                        if (eventDefinition instanceof SignalEventDefinition signalEventDefinition) {
                             insertSignalEvent(signalEventDefinition, startEvent, processDefinition, bpmnModel);
                         
-                        } else if (eventDefinition instanceof MessageEventDefinition) {
-                            MessageEventDefinition messageEventDefinition = (MessageEventDefinition) eventDefinition;
+                        } else if (eventDefinition instanceof MessageEventDefinition messageEventDefinition) {
                             insertMessageEvent(messageEventDefinition, startEvent, processDefinition, bpmnModel);
                         }
                         
@@ -176,7 +173,7 @@ public class EventSubscriptionManager {
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         SignalEventSubscriptionEntity subscriptionEntity = eventSubscriptionService.createSignalEventSubscription();
 
-        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel,null);
+        String signalName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, processDefinition);
         subscriptionEntity.setEventName(signalName);
 
         subscriptionEntity.setActivityId(startEvent.getId());
@@ -194,8 +191,9 @@ public class EventSubscriptionManager {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+
         // look for subscriptions for the same name in db:
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
         List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
                 .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 

@@ -44,6 +44,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     protected ExecuteAsyncRunnableFactory executeAsyncRunnableFactory;
     
     protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
+    protected JobExecutionObservationProvider jobExecutionObservationProvider = JobExecutionObservationProvider.NOOP;
 
     protected boolean isAutoActivate;
     protected boolean isActive;
@@ -83,7 +84,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected Runnable createRunnableForJob(final JobInfo job) {
         if (executeAsyncRunnableFactory == null) {
-            return new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler);
+            return new ExecuteAsyncRunnable(job, jobServiceConfiguration, jobEntityManager, asyncRunnableExecutionExceptionHandler, jobExecutionObservationProvider);
         } else {
             return executeAsyncRunnableFactory.createExecuteAsyncRunnable(job, jobServiceConfiguration);
         }
@@ -425,6 +426,14 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     public void setAsyncRunnableExecutionExceptionHandler(AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+    }
+
+    public JobExecutionObservationProvider getJobExecutionObservationProvider() {
+        return jobExecutionObservationProvider;
+    }
+
+    public void setJobExecutionObservationProvider(JobExecutionObservationProvider jobExecutionObservationProvider) {
+        this.jobExecutionObservationProvider = jobExecutionObservationProvider;
     }
 
     public AcquireTimerJobsRunnable getTimerJobRunnable() {

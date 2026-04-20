@@ -29,7 +29,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decision" }, description = "Manage Decisions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Decision" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionModelResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision DMN (definition) model", tags = { "Decisions" }, nickname = "getDecisionModel")

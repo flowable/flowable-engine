@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -53,7 +54,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInitializin
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -89,6 +90,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected ExecutionEntityImpl superExecution;
 
     /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+    protected boolean isSubProcessInstanceInitialized;
     protected ExecutionEntityImpl subProcessInstance;
 
     /** The tenant identifier (if any) */
@@ -97,6 +99,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String description;
     protected String localizedName;
     protected String localizedDescription;
+
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
 
     protected Date lockTime;
     protected String lockOwner;
@@ -278,6 +284,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("isEventScope", this.isEventScope);
         persistentState.put("parentId", parentId);
         persistentState.put("name", name);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         persistentState.put("lockTime", lockTime);
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("superExecution", this.superExecutionId);
@@ -597,8 +606,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     protected void ensureSubProcessInstanceInitialized() {
-        if (subProcessInstance == null) {
-            subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+        if (!isSubProcessInstanceInitialized && activityId != null && subProcessInstance == null) {
+            isSubProcessInstanceInitialized = true;
+            FlowElement flowElement = getCurrentFlowElement();
+            if (flowElement != null && flowElement instanceof CallActivity) {
+                subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+            }
         }
     }
 
@@ -1232,6 +1245,36 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
@@ -1290,6 +1333,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return activityName;
     }
 
+    @Override
     public String getCurrentActivityName() {
         return activityName;
     }

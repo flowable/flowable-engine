@@ -12,15 +12,8 @@
  */
 package org.flowable.osgi.blueprint;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
-import org.flowable.common.engine.impl.scripting.ResolverFactory;
-import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
-import org.flowable.osgi.OsgiScriptingEngines;
+import org.flowable.osgi.OsgiJSR223FlowableScriptEngine;
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
@@ -37,14 +30,8 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
             configImpl.addPreDefaultELResolver(blueprintELResolver);
         }
 
-        List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
-        if (resolverFactories == null) {
-            resolverFactories = new ArrayList<>();
-            resolverFactories.add(new VariableScopeResolverFactory());
-            resolverFactories.add(new BeansResolverFactory());
-        }
+        configImpl.setScriptEngine(new OsgiJSR223FlowableScriptEngine());
 
-        configImpl.setScriptingEngines(new OsgiScriptingEngines(new ScriptBindingsFactory(configImpl, resolverFactories)));
         super.init();
     }
 

@@ -41,6 +41,12 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     protected PlanItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher planItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher =
         new PlanItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher();
 
+    protected PlanItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher planItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher =
+        new PlanItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher();
+    
+    protected PlanItemInstanceByReferenceIdCachedEntityMatcher planItemInstanceByReferenceIdCachedEntityMatcher =
+            new PlanItemInstanceByReferenceIdCachedEntityMatcher();
+
     protected PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher planItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher =
         new PlanItemInstanceByStagePlanItemInstanceIdCachedEntityMatcher();
     
@@ -98,6 +104,11 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         params.put("planItemId", planitemId);
         return getList("selectPlanItemInstancesByCaseInstanceIdAndPlanItemId", params, planItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher);
     }
+    
+    @Override
+    public List<PlanItemInstanceEntity> findByReferenceId(String referenceId) {
+        return getList("selectPlanItemInstancesByReferenceId", referenceId, planItemInstanceByReferenceIdCachedEntityMatcher, true);
+    }
 
     @Override
     public List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId) {
@@ -105,6 +116,18 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         params.put("stageInstanceId", stageInstanceId);
         params.put("planItemId", planItemId);
         return getList("selectPlanItemInstancesByStageInstanceIdAndPlanItemId", params, planItemInstanceByStageInstanceIdAndPlanItemIdCachedEntityMatcher);
+    }
+
+    @Override
+    public List<PlanItemInstanceEntity> findByCaseInstanceIdAndTypeAndState(String caseInstanceId, List<String> planItemDefinitionTypes,
+            List<String> states, boolean ended) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("caseInstanceId", caseInstanceId);
+        params.put("planItemDefinitionTypes", planItemDefinitionTypes);
+        params.put("states", states);
+        params.put("ended", ended);
+        return getList("selectPlanItemInstancesByCaseInstanceIdAndTypeAndState", params,
+                planItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher);
     }
 
     @Override
@@ -157,6 +180,16 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         }
         
     }
+    
+    public static class PlanItemInstanceByReferenceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            String referenceId = (String) param;
+            return referenceId.equals(entity.getReferenceId());
+        }
+        
+    }
 
     public static class PlanItemInstanceByCaseInstanceIdAndPlanItemIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
 
@@ -191,10 +224,32 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         }
 
     }
+
+    public static class PlanItemInstanceByCaseInstanceIdAndTypeAndStateCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            Map<String, Object> map = (Map<String, Object>) param;
+            String caseInstanceId = (String) map.get("caseInstanceId");
+            List<String> planItemDefinitionTypes = (List<String>) map.get("planItemDefinitionTypes");
+            List<String> states = (List<String>) map.get("states");
+            boolean ended = (boolean) map.get("ended");
+
+            return caseInstanceId.equals(entity.getCaseInstanceId())
+                    && (planItemDefinitionTypes == null || planItemDefinitionTypes.contains(entity.getPlanItemDefinitionType()))
+                    && (states == null || states.contains(entity.getState()))
+                    && (ended ? entity.getEndedTime() != null : entity.getEndedTime() == null);
+        }
+
+    }
     
     protected void setSafeInValueLists(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
+        }
+        if(planItemInstanceQuery.getCaseInstanceIds() != null) {
+            planItemInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(planItemInstanceQuery.getCaseInstanceIds()));
         }
 
         if (planItemInstanceQuery.getOrQueryObjects() != null && !planItemInstanceQuery.getOrQueryObjects().isEmpty()) {

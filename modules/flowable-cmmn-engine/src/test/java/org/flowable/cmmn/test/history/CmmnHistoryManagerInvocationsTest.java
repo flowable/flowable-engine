@@ -17,11 +17,14 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
@@ -31,15 +34,14 @@ public class CmmnHistoryManagerInvocationsTest extends CustomCmmnConfigurationFl
 
     private CmmnHistoryManager mockHistoryManager;
 
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
-        this.mockHistoryManager = Mockito.mock(CmmnHistoryManager.class);
-        cmmnEngineConfiguration.setCmmnHistoryManager(mockHistoryManager);
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.setCmmnHistoryManager(Mockito.mock(CmmnHistoryManager.class));
     }
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
+    @BeforeEach
+    void setUp(CmmnEngine cmmnEngine) {
+        this.mockHistoryManager = cmmnEngine.getCmmnEngineConfiguration().getCmmnHistoryManager();
     }
 
     @Test

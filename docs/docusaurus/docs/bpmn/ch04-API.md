@@ -342,13 +342,13 @@ Additionally, it’s possible to register custom functions that can be used in e
 
 Business processes are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests. Since Flowable is an embeddable Java engine, writing unit tests for business processes is as simple as writing regular unit tests.
 
-Flowable supports JUnit versions 3, 4 and 5 styles of unit testing.
+Flowable supports JUnit Jupiter styles of unit testing.
 
-In the JUnit 5 style one needs to use the org.flowable.engine.test.FlowableTest annotation or register the org.flowable.engine.test.FlowableExtension manually.
-The FlowableTest annotation is just a meta annotation and the does the registration of the FlowableExtension (i.e. it does @ExtendWith(FlowableExtension.class)).
+In the JUnit Jupiter style one needs to use the org.flowable.engine.test.FlowableTest annotation or register the org.flowable.engine.test.FlowableExtension manually.
+The FlowableTest annotation is just a meta-annotation and does the registration of the FlowableExtension (i.e., it does @ExtendWith(FlowableExtension.class)).
 This will make the ProcessEngine and the services available as parameters into the test and lifecycle methods (@BeforeAll, @BeforeEach, @AfterEach, @AfterAll).
 Before each test the processEngine will be initialized by default with the flowable.cfg.xml resource on the classpath.
-In order to specify a different configuration file the org.flowable.engine.test.ConfigurationResource annotation needs to be used (see second example).
+To specify a different configuration file, the org.flowable.engine.test.ConfigurationResource annotation needs to be used (see second example).
 Process engines are cached statically over multiple unit tests when the configuration resource is the same.
 
 By using FlowableExtension, you can annotate test methods with org.flowable.engine.test.Deployment.
@@ -357,9 +357,9 @@ In case there are no resources defined, a resource file of the form testClassNam
 At the end of the test, the deployment will be deleted, including all related process instances, tasks, and so on.
 See the Deployment class for more information.
 
-Taking all that in account, a JUnit 5 test looks as follows:
+Taking all that into account, a JUnit Jupiter test looks as follows:
 
-**JUnit 5 test with default resource.**
+**JUnit Jupiter test with default resource.**
 
     @FlowableTest
     class MyBusinessProcessTest {
@@ -388,9 +388,9 @@ Taking all that in account, a JUnit 5 test looks as follows:
       }
     }
 
-    With JUnit 5 you can also inject the id of the deployment (with +org.flowable.engine.test.DeploymentId+_) into your test and lifecycle methods.
+    With JUnit Jupiter you can also inject the id of the deployment (with +org.flowable.engine.test.DeploymentId+_) into your test and lifecycle methods.
 
-**JUnit 5 test with a custom resource file.**
+**JUnit Jupiter test with a custom resource file.**
 
     @FlowableTest
     @ConfigurationResource("flowable.custom.cfg.xml")
@@ -412,55 +412,6 @@ Taking all that in account, a JUnit 5 test looks as follows:
       void testSimpleProcess() {
         runtimeService.startProcessInstanceByKey("simpleProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-
-        taskService.complete(task.getId());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-      }
-    }
-
-In the JUnit 3 style, the org.flowable.engine.test.FlowableTestCase must be extended. This will make the ProcessEngine and the services available through protected member fields. In the setup() of the test, the processEngine will be initialized by default with the flowable.cfg.xml resource on the classpath. To specify a different configuration file, override the *getConfigurationResource()* method. Process engines are cached statically over multiple unit tests when the configuration resource is the same.
-
-As with the FlowableExtension (see above), extending the FlowableTestCase will enable the use of the org.flowable.engine.test.Deployment annotation (see above for an explanation of its use and configuration). Before the test is run, a resource file of the form testClassName.testMethod.bpmn20.xml in the same package as the test class, will be deployed. At the end of the test, the deployment will be deleted, including all related process instances, tasks, and so on. The Deployment annotation also supports setting the resource location explicitly. See the class itself for more information.
-
-Taking all that in account, a JUnit 3 style test looks as follows.
-
-**JUnit 3 test with default resource file.**
-
-    public class MyBusinessProcessTest extends FlowableTestCase {
-
-      @Deployment
-      public void testSimpleProcess() {
-        runtimeService.startProcessInstanceByKey("simpleProcess");
-
-        Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-
-        taskService.complete(task.getId());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-      }
-    }
-
-To get the same functionality when using the JUnit 4 style of writing unit tests, the org.flowable.engine.test.FlowableRule Rule must be used. Through this rule, the process engine and services are available through getters.
-As with the FlowableExtension (see above), including this Rule will enable the use of the org.flowable.engine.test.Deployment annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. Process engines are statically cached over multiple unit tests when using the same configuration resource.
-
-The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the FlowableRule.
-
-**JUnit 4 test with default resource file.**
-
-    public class MyBusinessProcessTest {
-
-      @Rule
-      public FlowableRule flowableRule = new FlowableRule();
-
-      @Test
-      @Deployment
-      public void ruleUsageExample() {
-        RuntimeService runtimeService = flowableRule.getRuntimeService();
-        runtimeService.startProcessInstanceByKey("ruleUsage");
-
-        TaskService taskService = flowableRule.getTaskService();
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 

@@ -127,6 +127,11 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByProcessInstanceId(String processInstanceId, Collection<String> variableNames) {
+        return dataManager.findHistoricVariableInstancesByProcessInstanceId(processInstanceId, variableNames);
+    }
+
+    @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByTaskId(String taskId) {
         return dataManager.findHistoricVariableInstancesByTaskId(taskId);
     }
@@ -136,6 +141,12 @@ public class HistoricVariableInstanceEntityManagerImpl
         return dataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType);
     }
     
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType,
+            Collection<String> variableNames) {
+        return dataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType, variableNames);
+    }
+
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
         return dataManager.findHistoricalVariableInstancesBySubScopeIdAndScopeType(subScopeId, scopeType);

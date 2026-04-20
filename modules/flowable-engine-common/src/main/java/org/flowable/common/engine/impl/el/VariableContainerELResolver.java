@@ -12,9 +12,6 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -108,11 +105,6 @@ public class VariableContainerELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
-        return null;
     }
 
     @Override

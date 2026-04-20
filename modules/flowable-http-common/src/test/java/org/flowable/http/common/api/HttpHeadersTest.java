@@ -108,6 +108,27 @@ class HttpHeadersTest {
     }
 
     @Test
+    void formatAsStringMultipleHeadersWithMask() {
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add("Content-Type", "application/json");
+        headers.add("Test", "test1");
+        headers.add("Test", "test2");
+
+        assertThat(headers)
+                .containsOnly(
+                        entry("Content-Type", Collections.singletonList("application/json")),
+                        entry("Test", Arrays.asList("test1", "test2"))
+                );
+        assertThat(headers.formatAsString(true))
+                .isEqualTo("""
+                        Content-Type: *****
+                        Test: *****
+                        Test: *****\
+                        """);
+    }
+
+    @Test
     void formatAsStringWithHeaderWithoutValue() {
         HttpHeaders headers = new HttpHeaders();
 
@@ -118,5 +139,41 @@ class HttpHeadersTest {
                         entry("Test-NoValue", Collections.singletonList(null))
                 );
         assertThat(headers.formatAsString()).isEqualTo("Test-NoValue:");
+    }
+
+    @Test
+    void formatAsStringWithHeaderWithoutValueWithMask() {
+        HttpHeaders headers = new HttpHeaders();
+
+        headers.add("Test-NoValue", null);
+
+        assertThat(headers)
+                .containsOnly(
+                        entry("Test-NoValue", Collections.singletonList(null))
+                );
+        assertThat(headers.formatAsString()).isEqualTo("Test-NoValue:");
+    }
+
+    @Test
+    void formatAsStringWithMaskShouldIgnoreRawHeaders() {
+        HttpHeaders headers = HttpHeaders.parseFromString("Content-Type:application/json\nTest:test1\nTest:test2");
+
+        assertThat(headers)
+                .containsOnly(
+                        entry("Content-Type", Collections.singletonList("application/json")),
+                        entry("Test", Arrays.asList("test1", "test2"))
+                );
+        assertThat(headers.formatAsString())
+                .isEqualTo("""
+                        Content-Type:application/json
+                        Test:test1
+                        Test:test2\
+                        """);
+        assertThat(headers.formatAsString(true))
+                .isEqualTo("""
+                        Content-Type: *****
+                        Test: *****
+                        Test: *****\
+                        """);
     }
 }

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
@@ -39,6 +40,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String caseDefinitionId;
     protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String stageInstanceId;
     protected String planItemInstanceId;
     protected String elementId;
@@ -65,6 +68,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Date completedAfter;
     protected Date terminatedBefore;
     protected Date terminatedAfter;
+    protected Date failedBefore;
+    protected Date failedAfter;
     protected Date occurredBefore;
     protected Date occurredAfter;
     protected Date exitBefore;
@@ -74,6 +79,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected boolean ended;
     protected boolean includeEnded;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -144,6 +151,23 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             this.currentOrQueryObject.caseInstanceId = caseInstanceId;
         } else {
             this.caseInstanceId = caseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is null");
+        }
+        if (caseInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
+        } else {
+            this.caseInstanceIds = caseInstanceIds;
         }
         return this;
     }
@@ -566,6 +590,32 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery planItemInstanceFailedBefore(Date failedBefore) {
+        if (failedBefore == null) {
+            throw new FlowableIllegalArgumentException("failedBefore is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedBefore = failedBefore;
+        } else {
+            this.failedBefore = failedBefore;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceFailedAfter(Date failedAfter) {
+        if (failedAfter == null) {
+            throw new FlowableIllegalArgumentException("failedAfter is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedAfter = failedAfter;
+        } else {
+            this.failedAfter = failedAfter;
+        }
+        return this;
+    }
+
+    @Override
     public PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore) {
         if (exitBefore == null) {
             throw new FlowableIllegalArgumentException("exitBefore is null");
@@ -650,7 +700,33 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         }
         return this;
     }
-    
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
+        if (assignee == null) {
+            throw new FlowableIllegalArgumentException("assignee is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.assignee = assignee;
+        } else {
+            this.assignee = assignee;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
+        if (completedBy == null) {
+            throw new FlowableIllegalArgumentException("completedBy is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedBy = completedBy;
+        } else {
+            this.completedBy = completedBy;
+        }
+        return this;
+    }
+
     @Override
     public PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId) {
         if (inOrStatement) {
@@ -1232,6 +1308,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public Date getTerminatedAfter() {
         return terminatedAfter;
     }
+    public Date getFailedBefore() {
+        return failedBefore;
+    }
+    public Date getFailedAfter() {
+        return failedAfter;
+    }
     public Date getOccurredBefore() {
         return occurredBefore;
     }
@@ -1258,6 +1340,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public String getStartUserId() {
         return startUserId;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public String getCompletedBy() {
+        return completedBy;
     }
     public String getReferenceId() {
         return referenceId;
@@ -1317,5 +1405,17 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
 
     public List<PlanItemInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeCaseInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getCaseInstanceIds() {
+        return caseInstanceIds;
     }
 }

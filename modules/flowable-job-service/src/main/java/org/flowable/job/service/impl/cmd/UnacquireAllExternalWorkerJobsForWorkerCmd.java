@@ -52,6 +52,13 @@ public class UnacquireAllExternalWorkerJobsForWorkerCmd implements Command<Void>
                     }
                 }
             }
+            
+            for (ExternalWorkerJobEntity externalWorkerJob : jobEntities) {
+                if (externalWorkerJob.isExclusive()) {
+                    new UnlockExclusiveJobCmd(externalWorkerJob, jobServiceConfiguration).execute(commandContext);
+                }
+            }
+            
             externalWorkerJobEntityManager.bulkUpdateJobLockWithoutRevisionCheck(jobEntities, null, null);
         }
         

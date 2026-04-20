@@ -27,10 +27,10 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -38,7 +38,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryConsumerTest {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    @Test
+    @CmmnDeployment
+    public void testGenericEventListenerNoCorrelationWithLongId() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(1);
+
+        inboundEventChannelAdapter.triggerTestEvent("test");
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(2);
+    }
 
     @Test
     @CmmnDeployment
@@ -583,6 +591,7 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
                 .caseDefinitionKey("testEventListenerInRepeatableStage")
                 .start();
 
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         ObjectNode eventJson = objectMapper.createObjectNode();
         eventJson.put("type", "startEvent");
         eventJson.put("eventField1", "abc");
@@ -634,6 +643,8 @@ public class CmmnEventRegistryConsumerTest extends AbstractCmmnEventRegistryCons
                 .caseDefinitionKey("testEventListenerInRepeatableStage")
                 .start()
                 .getId();
+
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
 
         inboundEventChannelAdapter.triggerTestEventWithJson(objectMapper.createObjectNode().put("type", "startEvent").put("eventField1", "a"));
         inboundEventChannelAdapter.triggerTestEventWithJson(objectMapper.createObjectNode().put("type", "startEvent").put("eventField1", "b"));

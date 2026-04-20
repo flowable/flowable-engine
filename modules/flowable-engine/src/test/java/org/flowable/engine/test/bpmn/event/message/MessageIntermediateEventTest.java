@@ -137,6 +137,26 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
         assertThat(managementService.createJobQuery().count()).isZero();
     }
 
+    @Test
+    @Deployment
+    public void testSingleIntermediateMessageEventWithLongId() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("process");
+
+        String longActivityId = "intermediateCatchEventWithAVeryLongActivityIdThatExceedsTheDatabaseColumnLimit";
+        List<String> activeActivityIds = runtimeService.getActiveActivityIds(pi.getId());
+        assertThat(activeActivityIds).containsExactly(longActivityId);
+
+        String messageName = "newInvoiceMessage";
+        Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName(messageName).singleResult();
+        assertThat(execution).isNotNull();
+
+        runtimeService.messageEventReceived(messageName, execution.getId());
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
+        assertThat(task).isNotNull();
+        taskService.complete(task.getId());
+    }
+
     private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
         return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutor(), processEngineConfiguration.getEventSubscriptionServiceConfiguration());
     }

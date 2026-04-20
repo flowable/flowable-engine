@@ -23,7 +23,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -121,7 +123,17 @@ public class CompleteTaskCmd implements Command<Void> {
             eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createTaskCompletedEvent(taskEntity), cmmnEngineConfiguration.getEngineCfgKey());
         }
 
-        cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        try {
+            cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(taskEntity, TaskListener.EVENTNAME_COMPLETE);
+        } catch (BusinessError businessError) {
+            if (planItemInstanceEntity != null) {
+                // Delete the task entity — it won't be cleaned up by the normal completion flow
+                cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().deleteTask(taskEntity, false);
+                FaultPropagation.propagateFault(businessError, commandContext, planItemInstanceEntity);
+                return null;
+            }
+            throw businessError;
+        }
 
         if (planItemInstanceEntity != null) {
             if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {

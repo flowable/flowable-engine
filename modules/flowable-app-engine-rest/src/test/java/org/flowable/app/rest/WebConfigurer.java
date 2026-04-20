@@ -22,9 +22,9 @@ import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
 import jakarta.servlet.ServletRegistration;
 
-import org.flowable.app.rest.conf.ApplicationConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -38,10 +38,10 @@ public class WebConfigurer implements ServletContextListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WebConfigurer.class);
 
-    public AnnotationConfigWebApplicationContext context;
+    protected final WebApplicationContext rootContext;
 
-    public void setContext(AnnotationConfigWebApplicationContext context) {
-        this.context = context;
+    public WebConfigurer(WebApplicationContext rootContext) {
+        this.rootContext = rootContext;
     }
 
     @Override
@@ -49,16 +49,6 @@ public class WebConfigurer implements ServletContextListener {
         ServletContext servletContext = sce.getServletContext();
 
         LOGGER.debug("Configuring Spring root application context");
-
-        AnnotationConfigWebApplicationContext rootContext = null;
-
-        if (context == null) {
-            rootContext = new AnnotationConfigWebApplicationContext();
-            rootContext.register(ApplicationConfiguration.class);
-            rootContext.refresh();
-        } else {
-            rootContext = context;
-        }
 
         servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
 
@@ -73,7 +63,7 @@ public class WebConfigurer implements ServletContextListener {
     /**
      * Initializes Spring and Spring MVC.
      */
-    private ServletRegistration.Dynamic initSpring(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+    private ServletRegistration.Dynamic initSpring(ServletContext servletContext, WebApplicationContext rootContext) {
         LOGGER.debug("Configuring Spring Web application context");
         AnnotationConfigWebApplicationContext dispatcherServletConfiguration = new AnnotationConfigWebApplicationContext();
         dispatcherServletConfiguration.setParent(rootContext);
@@ -103,8 +93,9 @@ public class WebConfigurer implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         LOGGER.info("Destroying Web application");
         WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sce.getServletContext());
-        AnnotationConfigWebApplicationContext gwac = (AnnotationConfigWebApplicationContext) ac;
-        gwac.close();
+        if (ac instanceof ConfigurableApplicationContext applicationContext) {
+            applicationContext.close();
+        }
         LOGGER.debug("Web application destroyed");
     }
 }

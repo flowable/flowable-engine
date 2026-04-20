@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
 
     <insert id="insertHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_, END_USER_ID_)
         values (
             #{id, jdbcType=VARCHAR},
             1, #{name, jdbcType=NVARCHAR},
@@ -23,12 +23,16 @@
             #{referenceId, jdbcType=VARCHAR},
             #{referenceType, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR},
-            #{businessStatus, jdbcType=NVARCHAR}
+            #{businessStatus, jdbcType=NVARCHAR},
+            #{dueDate, jdbcType=TIMESTAMP},
+            #{claimTime, jdbcType=TIMESTAMP},
+            #{claimedBy, jdbcType=NVARCHAR},
+            #{endUserId, jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertHistoricCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_, END_USER_ID_)
         values
         <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
             (
@@ -48,7 +52,11 @@
                 #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
                 #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId, jdbcType=VARCHAR},
-                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{historicCaseInstance.dueDate, jdbcType=TIMESTAMP},
+                #{historicCaseInstance.claimTime, jdbcType=TIMESTAMP},
+                #{historicCaseInstance.claimedBy, jdbcType=NVARCHAR},
+                #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -56,7 +64,7 @@
     <insert id="bulkInsertHistoricCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicCaseInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_) VALUES
+            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, LAST_REACTIVATION_TIME_, LAST_REACTIVATION_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_, END_USER_ID_) VALUES
             (
                 #{historicCaseInstance.id, jdbcType=VARCHAR},
                 1, #{historicCaseInstance.name, jdbcType=NVARCHAR},
@@ -74,7 +82,11 @@
                 #{historicCaseInstance.referenceId, jdbcType=VARCHAR},
                 #{historicCaseInstance.referenceType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId, jdbcType=VARCHAR},
-                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR}
+                #{historicCaseInstance.businessStatus, jdbcType=NVARCHAR},
+                #{historicCaseInstance.dueDate, jdbcType=TIMESTAMP},
+                #{historicCaseInstance.claimTime, jdbcType=TIMESTAMP},
+                #{historicCaseInstance.claimedBy, jdbcType=NVARCHAR},
+                #{historicCaseInstance.endUserId, jdbcType=VARCHAR}
             )
         </foreach>
         SELECT * FROM dual
@@ -132,6 +144,18 @@
             <if test="originalPersistentState.businessStatus != businessStatus">
                 BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
             </if>
+            <if test="originalPersistentState.dueDate != dueDate">
+                DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimTime != claimTime">
+                CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimedBy != claimedBy">
+                CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
+            </if>
+            <if test="originalPersistentState.endUserId != endUserId">
+                END_USER_ID_ = #{endUserId, jdbcType=VARCHAR},
+            </if>
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
@@ -175,12 +199,20 @@
         <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
+        <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+        <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+        <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+        <result property="endUserId" column="END_USER_ID_" jdbcType="VARCHAR" />
 
         <result property="caseDefinitionKey" column="CaseDefinitionKey" jdbcType="VARCHAR" />
         <result property="caseDefinitionName" column="CaseDefinitionName" jdbcType="NVARCHAR" />
         <result property="caseDefinitionVersion" column="CaseDefinitionVersion" jdbcType="INTEGER" />
         <result property="caseDefinitionDeploymentId" column="CaseDefinitionDeploymentId" jdbcType="VARCHAR" />
+    </resultMap>
+    
+    <resultMap id="historicCaseInstanceIdResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
     </resultMap>
 
     <resultMap id="historicCaseInstanceResultMapWithVariables"
@@ -247,6 +279,13 @@
         select count(distinct RES.ID_)
         <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
     </select>
+    
+    <select id="selectHistoricCaseInstanceIdsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl" resultMap="historicCaseInstanceIdResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        select RES.ID_ <if test="needsPaging">${limitBetween}</if>
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
 
     <select id="selectHistoricCaseInstancesWithVariablesByQueryCriteria"
             parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
@@ -284,6 +323,12 @@
             <if test="needsPaging">${limitAfter}</if>
         ) RES
         left outer join ${prefix}ACT_HI_VARINST VAR ON VAR.PROC_INST_ID_ is null and RES.ID_ = VAR.SCOPE_ID_ and VAR.SCOPE_TYPE_ = 'cmmn' and VAR.SUB_SCOPE_ID_ is null
+            <if test="variableNamesToInclude != null and !variableNamesToInclude.empty">
+                and VAR.NAME_ in
+                <foreach item="variableName" collection="variableNamesToInclude" open="(" separator="," close=")">
+                    #{variableName, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
         <if test="needsCaseDefinitionOuterJoin">
             left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         </if>
@@ -344,6 +389,12 @@
             <if test="caseDefinitionKeys != null">
                 and CASE_DEF.KEY_ IN
                 <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+                    #{caseDefinitionKey, jdbcType=VARCHAR}
+                </foreach>
+            </if>
+            <if test="excludeCaseDefinitionKeys != null">
+                and CASE_DEF.KEY_ NOT IN
+                <foreach item="caseDefinitionKey" index="index" collection="excludeCaseDefinitionKeys" open="(" separator="," close=")">
                     #{caseDefinitionKey, jdbcType=VARCHAR}
                 </foreach>
             </if>
@@ -489,6 +540,12 @@
                             #{caseDefinitionKey, jdbcType=VARCHAR}
                         </foreach>
                     </if>
+                    <if test="orQueryObject.excludeCaseDefinitionKeys != null &amp;&amp; !orQueryObject.excludeCaseDefinitionKeys.empty">
+                        or CASE_DEF.KEY_ NOT IN
+                        <foreach item="caseDefinitionKey" index="index" collection="orQueryObject.excludeCaseDefinitionKeys" open="(" separator="," close=")">
+                            #{caseDefinitionKey, jdbcType=VARCHAR}
+                        </foreach>
+                    </if>
                     <if test="orQueryObject.caseDefinitionCategory != null">
                         or CASE_DEF.CATEGORY_ = #{orQueryObject.caseDefinitionCategory, jdbcType=VARCHAR}
                     </if>
@@ -628,11 +685,17 @@
             ${queryTablePrefix}ID_ = #{caseInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="caseInstanceIds != null &amp;&amp; !caseInstanceIds.empty">
-            and ${queryTablePrefix}ID_ IN
-            <foreach item="caseInstanceId" index="index" collection="caseInstanceIds"
-                     open="(" separator="," close=")">
-              #{caseInstanceId, jdbcType=VARCHAR}
+            and (
+            <foreach item="caseInstanceIdListItem" index="groupIndex" collection="safeCaseInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                ${queryTablePrefix}ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                  #{caseInstanceId, jdbcType=VARCHAR}
+                </foreach>
             </foreach>
+            )
         </if>
         <if test="caseDefinitionId != null">
             and ${queryTablePrefix}CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR}
@@ -725,8 +788,21 @@
         <if test="callbackId != null">
             and ${queryTablePrefix}CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR}
         </if>
+        <if test="callbackIds != null">
+            and ${queryTablePrefix}CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="callbackIds" open="(" separator="," close=")">
+                #{callbackId, jdbcType=VARCHAR}
+            </foreach>
+        </if>
         <if test="callbackType != null">
             and ${queryTablePrefix}CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
+        </if>
+        <if test="parentCaseInstanceId != null">
+            and EXISTS(select 1 from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where
+              PLANITEM.CASE_INST_ID_ = #{parentCaseInstanceId, jdbcType=VARCHAR}
+              and RES.CALLBACK_ID_ = PLANITEM.ID_
+              and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-cmmn-1.1-child-case'
+            )
         </if>
         <if test="withoutCallbackId">
             and ${queryTablePrefix}CALLBACK_ID_ is null
@@ -787,6 +863,9 @@
             and EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
             I.GROUP_ID_ = #{involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
         </if>
+        <if test="finishedBy != null">
+            and ${queryTablePrefix}END_USER_ID_ = #{finishedBy, jdbcType=VARCHAR}
+        </if>
     </sql>
     
     <sql id="commonCaseInstanceOrQuerySql">
@@ -794,11 +873,17 @@
             ${queryTablePrefix}ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
         </if>
         <if test="orQueryObject.caseInstanceIds != null &amp;&amp; !orQueryObject.caseInstanceIds.empty">
-            or ${queryTablePrefix}ID_ IN
-            <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds"
-                     open="(" separator="," close=")">
-                #{caseInstanceId, jdbcType=VARCHAR}
+            or (
+            <foreach item="caseInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeCaseInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                ${queryTablePrefix}ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                  #{caseInstanceId, jdbcType=VARCHAR}
+                </foreach>
             </foreach>
+            )
         </if>
         <if test="orQueryObject.caseDefinitionId != null">
             or ${queryTablePrefix}CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}
@@ -878,8 +963,20 @@
         <if test="orQueryObject.callbackId != null">
             or ${queryTablePrefix}CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=VARCHAR}
         </if>
+        <if test="orQueryObject.callbackIds != null">
+            or ${queryTablePrefix}CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="orQueryObject.callbackIds" open="(" separator="," close=")">#{callbackId, jdbcType=VARCHAR}
+            </foreach>
+        </if>
         <if test="orQueryObject.callbackType != null">
             or ${queryTablePrefix}CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=VARCHAR}
+        </if>
+        <if test="orQueryObject.parentCaseInstanceId != null">
+            or EXISTS(select 1 from ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST PLANITEM where
+              PLANITEM.CASE_INST_ID_ = #{orQueryObject.parentCaseInstanceId, jdbcType=VARCHAR}
+              and RES.CALLBACK_ID_ = PLANITEM.ID_
+              and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-cmmn-1.1-child-case'
+            )
         </if>
         <if test="orQueryObject.withoutCallbackId">
             or ${queryTablePrefix}CALLBACK_ID_ is null
@@ -953,6 +1050,9 @@
                 LINK.REF_SCOPE_ID_ = RES.ID_
                 and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId, jdbcType=NVARCHAR}
             )
+        </if>
+        <if test="orQueryObject.finishedBy != null">
+            or ${queryTablePrefix}END_USER_ID_ = #{orQueryObject.finishedBy, jdbcType=VARCHAR}
         </if>
     </sql>
 

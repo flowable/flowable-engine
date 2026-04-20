@@ -48,8 +48,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.zaxxer.hikari.HikariDataSource;
+
+import tools.jackson.core.JacksonException;
 
 /**
  * @author Tijs Rademakers
@@ -192,7 +193,7 @@ public class SpringAutoDeployTest {
             .cause()
             .hasMessageContaining("Error reading app resource")
             .isInstanceOf(FlowableException.class)
-            .hasRootCauseInstanceOf(JsonParseException.class);
+            .hasRootCauseInstanceOf(JacksonException.class);
         assertThat(repositoryService).isNull();
 
         // Some of the resources should have been deployed
@@ -254,6 +255,7 @@ public class SpringAutoDeployTest {
             @Value("${jdbc.password:}") String password
         ) {
             HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setMinimumIdle(0);
             dataSource.setJdbcUrl(url);
             dataSource.setDriverClassName(driverClass);
             dataSource.setUsername(username);

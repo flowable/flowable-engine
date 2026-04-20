@@ -208,7 +208,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
 
     protected FlowableEventTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableEventTestHelper(
+            .computeIfAbsent(context.getRequiredTestClass(), key -> new FlowableEventTestHelper(
                             createEventRegistryEngine(context)), FlowableEventTestHelper.class);
     }
 

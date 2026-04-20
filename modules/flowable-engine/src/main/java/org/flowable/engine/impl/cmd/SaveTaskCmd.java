@@ -28,6 +28,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.TaskService;
@@ -89,6 +90,11 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             if (!StringUtils.equals(originalTaskEntity.getAssignee(), task.getAssignee())) {
                 handleAssigneeChange(commandContext, processEngineConfiguration);
             }
+
+            // Special care needed to detect the owner of the task has changed
+            if (!StringUtils.equals(originalTaskEntity.getOwner(), task.getOwner())) {
+                handleOwnerChange(processEngineConfiguration);
+            }
             
             // Special care needed to detect the parent task has changed
             if (!StringUtils.equals(originalTaskEntity.getParentTaskId(), task.getParentTaskId())) {
@@ -100,9 +106,20 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         return null;
     }
 
+    protected void handleOwnerChange(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        IdentityLinkInterceptor identityLinkInterceptor = processEngineConfiguration.getIdentityLinkInterceptor();
+        if (identityLinkInterceptor != null && task.getOwner() != null) {
+            identityLinkInterceptor.handleAddOwnerIdentityLinkToTask(task, task.getOwner());
+        }
+    }
+
     protected void handleAssigneeChange(CommandContext commandContext, ProcessEngineConfigurationImpl processEngineConfiguration) {
         processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
+        IdentityLinkInterceptor identityLinkInterceptor = processEngineConfiguration.getIdentityLinkInterceptor();
+        if (identityLinkInterceptor != null && task.getAssignee() != null) {
+            identityLinkInterceptor.handleAddAssigneeIdentityLinkToTask(task, task.getAssignee());
+        }
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task),

@@ -40,9 +40,7 @@ public class SignalThrowingEventListener extends BaseDelegateEventListener {
 
     @Override
     public void onEvent(FlowableEvent event) {
-        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-
-            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent engineEvent) {
 
             if (engineEvent.getProcessInstanceId() == null && processInstanceScope) {
                 throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped signal, since the dispatched event is not part of an ongoing process instance");

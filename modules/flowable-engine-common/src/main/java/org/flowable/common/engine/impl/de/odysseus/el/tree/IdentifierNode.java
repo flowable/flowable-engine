@@ -24,10 +24,10 @@ public interface IdentifierNode extends Node {
 	/**
 	 * Get the identifier name
 	 */
-	public String getName();
+    String getName();
 
 	/**
 	 * Get the unique index of this identifier in the expression (e.g. preorder index)
 	 */
-	public int getIndex();
+    int getIndex();
 }

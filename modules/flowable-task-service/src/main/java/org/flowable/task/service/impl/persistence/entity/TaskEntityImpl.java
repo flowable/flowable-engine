@@ -49,7 +49,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -395,13 +395,27 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
     @Override
     public void deleteUserIdentityLink(String userId, String identityLinkType) {
         IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
-        identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), userId, null, identityLinkType);
+        List<IdentityLinkEntity> identityLinkEntities = identityLinkEntityManager.deleteTaskIdentityLink(this.id,
+                getIdentityLinks(), userId, null, identityLinkType);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            for (IdentityLinkEntity identityLink : identityLinkEntities) {
+                taskAssignmentManager.deleteUserIdentityLink(this, identityLink);
+            }
+        }
     }
     
     @Override
     public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
         IdentityLinkEntityManager identityLinkEntityManager = getIdentityLinkServiceConfiguration().getIdentityLinkEntityManager();
-        identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), null, groupId,identityLinkType);
+        List<IdentityLinkEntity> identityLinkEntities = identityLinkEntityManager.deleteTaskIdentityLink(this.id,
+                getIdentityLinks(), null, groupId, identityLinkType);
+        InternalTaskAssignmentManager taskAssignmentManager = getTaskAssignmentManager();
+        if (taskAssignmentManager != null) {
+            for (IdentityLinkEntity identityLink : identityLinkEntities) {
+                taskAssignmentManager.deleteGroupIdentityLink(this, identityLink);
+            }
+        }
     }
 
     @Override

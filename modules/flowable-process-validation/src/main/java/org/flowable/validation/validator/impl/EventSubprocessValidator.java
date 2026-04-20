@@ -28,7 +28,7 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -38,7 +38,7 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class EventSubprocessValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<EventSubProcess> eventSubprocesses = process.findFlowElementsOfType(EventSubProcess.class);
         for (EventSubProcess eventSubprocess : eventSubprocesses) {
 
@@ -54,13 +54,13 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
                             !(eventDefinition instanceof TimerEventDefinition) &&
                             !(eventDefinition instanceof VariableListenerEventDefinition)) {
 
-                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, eventDefinition,
+                        validationContext.addError(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION, process, eventSubprocess, eventDefinition,
                                 "start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
                     }
 
                     if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition
                             && StringUtils.isEmpty(variableListenerEventDefinition.getVariableName())) {
-                        addError(errors, Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME,
+                        validationContext.addError(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME,
                                 process, startEvent, "variable name is required for variable listener with activity id " + startEvent.getId());
                     }
                 }
@@ -68,7 +68,7 @@ public class EventSubprocessValidator extends ProcessLevelValidator {
 
             List<BoundaryEvent> boundaryEvents = eventSubprocess.getBoundaryEvents();
             if (boundaryEvents != null && !boundaryEvents.isEmpty()) {
-                addWarning(errors, Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, process, eventSubprocess, "event sub process cannot have attached boundary events");
+                validationContext.addWarning(Problems.EVENT_SUBPROCESS_BOUNDARY_EVENT, process, eventSubprocess, "event sub process cannot have attached boundary events");
             }
 
         }

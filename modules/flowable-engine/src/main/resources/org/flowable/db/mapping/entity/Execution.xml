@@ -11,7 +11,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_)
     values (
       #{id, jdbcType=NVARCHAR},
       1, #{processInstanceId, jdbcType=NVARCHAR},
@@ -47,7 +47,10 @@
       #{referenceId, jdbcType=NVARCHAR},
       #{referenceType, jdbcType=NVARCHAR},
       #{propagatedStageInstanceId, jdbcType=NVARCHAR},
-      #{businessStatus, jdbcType=NVARCHAR}
+      #{businessStatus, jdbcType=NVARCHAR},
+      #{dueDate, jdbcType=TIMESTAMP},
+      #{claimTime, jdbcType=TIMESTAMP},
+      #{claimedBy, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -56,7 +59,7 @@
                                            IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                            TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                            TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_)
+                                           CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_)
     values
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id, jdbcType=NVARCHAR},
@@ -93,7 +96,10 @@
          #{execution.referenceId, jdbcType=NVARCHAR},
          #{execution.referenceType, jdbcType=NVARCHAR},
          #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
-         #{execution.businessStatus, jdbcType=NVARCHAR}
+         #{execution.businessStatus, jdbcType=NVARCHAR},
+         #{execution.dueDate, jdbcType=TIMESTAMP},
+         #{execution.claimTime, jdbcType=TIMESTAMP},
+         #{execution.claimedBy, jdbcType=NVARCHAR}
         )
       </foreach>
   </insert>
@@ -105,7 +111,7 @@
                                         IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
                                         TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
                                         TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, EXTERNAL_WORKER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
-                                        CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_) VALUES
+                                        CALLBACK_ID_, CALLBACK_TYPE_, REFERENCE_ID_, REFERENCE_TYPE_, PROPAGATED_STAGE_INST_ID_, BUSINESS_STATUS_, DUE_DATE_, CLAIM_TIME_, CLAIMED_BY_) VALUES
             (
              #{execution.id, jdbcType=NVARCHAR},
              1, #{execution.processInstanceId, jdbcType=NVARCHAR},
@@ -141,7 +147,10 @@
              #{execution.referenceId, jdbcType=NVARCHAR},
              #{execution.referenceType, jdbcType=NVARCHAR},
              #{execution.propagatedStageInstanceId, jdbcType=NVARCHAR},
-             #{execution.businessStatus, jdbcType=NVARCHAR}
+             #{execution.businessStatus, jdbcType=NVARCHAR},
+             #{execution.dueDate, jdbcType=TIMESTAMP},
+             #{execution.claimTime, jdbcType=TIMESTAMP},
+             #{execution.claimedBy, jdbcType=NVARCHAR}
             )
       </foreach>
     SELECT * FROM dual
@@ -239,6 +248,15 @@
             </if>
             <if test="originalPersistentState.businessStatus != businessStatus">
                 BUSINESS_STATUS_ = #{businessStatus, jdbcType=NVARCHAR},
+            </if>
+            <if test="originalPersistentState.dueDate != dueDate">
+                DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimTime != claimTime">
+                CLAIM_TIME_ = #{claimTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.claimedBy != claimedBy">
+                CLAIMED_BY_ = #{claimedBy, jdbcType=NVARCHAR},
             </if>
         </set>
     where ID_ = #{id, jdbcType=NVARCHAR}
@@ -360,6 +378,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="processInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -409,6 +430,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -448,6 +472,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
@@ -509,6 +536,9 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="NVARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="NVARCHAR" />
     <result property="propagatedStageInstanceId" column="PROPAGATED_STAGE_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="claimTime" column="CLAIM_TIME_" jdbcType="TIMESTAMP" />
+    <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR" />
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
@@ -649,6 +679,12 @@
         <if test="needsPaging">${limitAfter}</if>
         ) RES
         left outer join ${prefix}ACT_RU_VARIABLE VAR ON RES.PROC_INST_ID_ = VAR.EXECUTION_ID_
+            <if test="variableNamesToInclude != null and !variableNamesToInclude.empty">
+                and VAR.NAME_ in
+                <foreach item="variableName" collection="variableNamesToInclude" open="(" separator="," close=")">
+                    #{variableName, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
         <if test="needsProcessDefinitionOuterJoin">
             inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
         </if>
@@ -691,6 +727,12 @@
           #{processDefinitionKey, jdbcType=NVARCHAR}
         </foreach>
       </if>
+      <if test="excludeProcessDefinitionKeys != null and !excludeProcessDefinitionKeys.empty">
+        and P.KEY_ not in
+        <foreach item="processDefinitionKey" index="index" collection="excludeProcessDefinitionKeys" open="(" separator="," close=")">
+          #{processDefinitionKey, jdbcType=NVARCHAR}
+        </foreach>
+      </if>
       <if test="processDefinitionCategory != null">
         and P.CATEGORY_ = #{processDefinitionCategory, jdbcType=NVARCHAR}
       </if>
@@ -725,10 +767,17 @@
         and RES.ROOT_PROC_INST_ID_ = #{rootProcessInstanceId, jdbcType=NVARCHAR}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.empty">
-        and RES.PROC_INST_ID_ in
-        <foreach item="processInstanceId" index="index" collection="processInstanceIds" open="(" separator="," close=")">
-          #{processInstanceId, jdbcType=NVARCHAR}
+        and (
+        <foreach item="processInstanceIdListItem" index="groupIndex" collection="safeProcessInstanceIds">
+            <if test="groupIndex &gt; 0">
+            or
+            </if>
+            RES.PROC_INST_ID_ IN
+            <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+              #{processInstanceId, jdbcType=NVARCHAR}
+            </foreach>
         </foreach>
+        )
       </if>
       <if test="businessKey != null or businessKeyLike != null or businessKeyLikeIgnoreCase != null">
           <choose>
@@ -817,16 +866,29 @@
         </if>
       </if>
       <if test="callbackId != null">
-           and CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
+          and RES.CALLBACK_ID_ = #{callbackId, jdbcType=NVARCHAR}
       </if>
+        <if test="callbackIds != null">
+            and RES.CALLBACK_ID_ in
+            <foreach item="callbackId" index="index" collection="callbackIds" open="(" separator="," close=")">
+                #{callbackId, jdbcType=NVARCHAR}
+            </foreach>
+        </if>
       <if test="callbackType != null">
-           and CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
+          and RES.CALLBACK_TYPE_ = #{callbackType, jdbcType=NVARCHAR}
+      </if>
+      <if test="parentCaseInstanceId != null">
+          and EXISTS(select 1 from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST PLANITEM where
+            PLANITEM.CASE_INST_ID_ = #{parentCaseInstanceId, jdbcType=VARCHAR}
+            and RES.CALLBACK_ID_ = PLANITEM.ID_
+            and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-bpmn-2.0-child-process'
+          )
       </if>
       <if test="referenceId != null">
-           and REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
+          and RES.REFERENCE_ID_ = #{referenceId, jdbcType=NVARCHAR}
       </if>
       <if test="referenceType != null">
-           and REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
+          and RES.REFERENCE_TYPE_ = #{referenceType, jdbcType=NVARCHAR}
       </if>
       <if test="tenantId != null">
         and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
@@ -1051,6 +1113,12 @@
               #{processDefinitionKey, jdbcType=NVARCHAR}
             </foreach>
           </if>
+          <if test="orQueryObject.excludeProcessDefinitionKeys != null and !orQueryObject.excludeProcessDefinitionKeys.empty">
+            or P.KEY_ not in
+            <foreach item="processDefinitionKey" index="index" collection="orQueryObject.excludeProcessDefinitionKeys" open="(" separator="," close=")">
+              #{processDefinitionKey, jdbcType=NVARCHAR}
+            </foreach>
+          </if>
           <if test="orQueryObject.processDefinitionCategory != null">
             or P.CATEGORY_ = #{orQueryObject.processDefinitionCategory, jdbcType=NVARCHAR}
           </if>
@@ -1082,10 +1150,17 @@
             or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.processInstanceIds != null and !orQueryObject.processInstanceIds.empty">
-            or RES.PROC_INST_ID_ in
-            <foreach item="processInstanceId" index="index" collection="orQueryObject.processInstanceIds" open="(" separator="," close=")">
-              #{processInstanceId, jdbcType=NVARCHAR}
+            or (
+            <foreach item="processInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeProcessInstanceIds">
+                <if test="groupIndex &gt; 0">
+                or
+                </if>
+                RES.PROC_INST_ID_ IN
+                <foreach item="processInstanceId" index="index" collection="processInstanceIdListItem" open="(" separator="," close=")">
+                  #{processInstanceId, jdbcType=NVARCHAR}
+                </foreach>
             </foreach>
+            )
           </if>
           <if test="orQueryObject.businessKey != null">
             or RES.BUSINESS_KEY_ = #{orQueryObject.businessKey, jdbcType=NVARCHAR}
@@ -1141,16 +1216,28 @@
             </if>
           </if>
           <if test="orQueryObject.callbackId != null">
-              or CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=NVARCHAR}
+              or RES.CALLBACK_ID_ = #{orQueryObject.callbackId, jdbcType=NVARCHAR}
           </if>
+            <if test="orQueryObject.callbackIds != null">
+                or RES.CALLBACK_ID_ in
+                <foreach item="callbackId" index="index" collection="orQueryObject.callbackIds" open="(" separator="," close=")">#{callbackId, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
           <if test="orQueryObject.callbackType != null">
-              or CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
+              or RES.CALLBACK_TYPE_ = #{orQueryObject.callbackType, jdbcType=NVARCHAR}
+          </if>
+          <if test="orQueryObject.parentCaseInstanceId != null">
+              or EXISTS(select 1 from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST PLANITEM where
+                PLANITEM.CASE_INST_ID_ = #{orQueryObject.parentCaseInstanceId, jdbcType=VARCHAR}
+                and RES.CALLBACK_ID_ = PLANITEM.ID_
+                and RES.CALLBACK_TYPE_ = 'cmmn-1.1-to-bpmn-2.0-child-process'
+              )
           </if>
           <if test="orQueryObject.referenceId != null">
-              or REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=NVARCHAR}
+              or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.referenceType != null">
-              or REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=NVARCHAR}
+              or RES.REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=NVARCHAR}
           </if>
           <if test="orQueryObject.tenantId != null">
             or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=NVARCHAR}

@@ -46,7 +46,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.subethamail.wiser.WiserMessage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Joram Barrez
@@ -87,7 +87,7 @@ public class EmailServiceTaskTest extends EmailTestCase {
         return Stream.of(
                 Arguments.of("flowable@localhost, misspiggy@flowable.org"),
                 Arguments.of(Arrays.asList("flowable@localhost", "misspiggy@flowable.org")),
-                Arguments.of(new ObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org"))
+                Arguments.of(JsonMapper.shared().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org"))
         );
     }
 

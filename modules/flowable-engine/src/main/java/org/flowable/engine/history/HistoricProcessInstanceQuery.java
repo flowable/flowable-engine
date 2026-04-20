@@ -14,6 +14,7 @@
 package org.flowable.engine.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +57,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select historic process instances that are defined by a process definition with one of the given process definition keys.
      */
     HistoricProcessInstanceQuery processDefinitionKeyIn(List<String> processDefinitionKeys);
+    
+    /**
+     * Only select historic process instances that are defined by a process definition that doesn't match one of the given process definition keys.
+     */
+    HistoricProcessInstanceQuery excludeProcessDefinitionKeys(List<String> processDefinitionKeys);
 
     /**
      * Only select historic process instances that don't have a process-definition of which the key is present in the given list
@@ -456,6 +462,16 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      */
     HistoricProcessInstanceQuery startedBy(String userId);
 
+    /**
+     * Only select historic process instances that are ended by the provided user identifier.
+     */
+    HistoricProcessInstanceQuery finishedBy(String userId);
+
+    /**
+     * Only select historic process instances that have a state that is equal to the provided value.
+     */
+    HistoricProcessInstanceQuery state(String state);
+
     /** Only select process instances that have the given tenant id. */
     HistoricProcessInstanceQuery processInstanceTenantId(String tenantId);
 
@@ -529,6 +545,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery includeProcessVariables();
 
     /**
+     * Include the process variables with the given names into the query result.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
+
+    /**
      * Only select process instances that failed due to an exception happening during a job execution.
      */
     HistoricProcessInstanceQuery withJobException();
@@ -549,14 +570,24 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
     /**
-     * Only select process instances with the given callback identifier. 
+     * Only select process instances with the given callback identifier.
      */
     HistoricProcessInstanceQuery processInstanceCallbackId(String callbackId);
-    
+
+    /**
+     * Only select process instances with the given callback identifiers.
+     */
+    HistoricProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
+
     /**
      * Only select process instances with the given callback type. 
      */
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
+    
+    /**
+     * Only select process instances with the given parent case instance id. 
+     */
+    HistoricProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
      * Only select process instances that do not have a callback identifier.
@@ -582,4 +613,14 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     HistoricProcessInstanceQuery withLocalizationFallback();
+    
+    /**
+     * Perform the query without applying sorting parameters. By default sorting will be applied.
+     */
+    HistoricProcessInstanceQuery withoutSorting();
+    
+    /**
+     * Return only the id value of the process instances, to reduce any additional instance data to be returned.
+     */
+    HistoricProcessInstanceQuery returnIdsOnly();
 }

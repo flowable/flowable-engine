@@ -43,8 +43,7 @@ public class DefaultAsyncRunnableExecutionExceptionHandler implements AsyncRunna
                 String message = "Job " + job.getId() + " failed";
                 LOGGER.error(message, exception);
 
-                if (job instanceof AbstractRuntimeJobEntity) {
-                    AbstractRuntimeJobEntity runtimeJob = (AbstractRuntimeJobEntity) job;
+                if (job instanceof AbstractRuntimeJobEntity runtimeJob) {
                     InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
                     if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(runtimeJob)) {
                         internalJobCompatibilityManager.handleFailedV5Job(runtimeJob, exception);

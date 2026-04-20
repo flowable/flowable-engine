@@ -13,6 +13,7 @@
 
 package org.flowable.variable.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -44,12 +45,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     protected String executionId;
     protected Set<String> executionIds;
     protected String processInstanceId;
+    protected Collection<String> processInstanceIds;
     protected String activityInstanceId;
     protected String variableName;
     protected String variableNameLike;
     protected boolean excludeTaskRelated;
     protected boolean excludeVariableInitialization;
     protected String scopeId;
+    protected Collection<String> scopeIds;
     protected String subScopeId;
     protected String scopeType;
     protected QueryVariableValue queryVariableValue;
@@ -80,6 +83,15 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
             throw new FlowableIllegalArgumentException("processInstanceId is null");
         }
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public HistoricVariableInstanceQuery processInstanceIds(Collection<String> processInstanceIds) {
+        if (processInstanceIds == null || processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("processInstanceIds is empty");
+        }
+        this.processInstanceIds = processInstanceIds;
         return this;
     }
 
@@ -243,6 +255,15 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     }
     
     @Override
+    public HistoricVariableInstanceQuery scopeIds(Collection<String> scopeIds) {
+        if (scopeIds == null || scopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("scopeIds is empty");
+        }
+        this.scopeIds = scopeIds;
+        return this;
+    }
+
+    @Override
     public HistoricVariableInstanceQuery subScopeId(String subScopeId) {
         if (excludeLocalVariables) {
             throw new FlowableIllegalArgumentException("Cannot use subScopeId together with excludeLocalVariables");
@@ -296,8 +317,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
         if (!excludeVariableInitialization) {
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
-                if (historicVariableInstance instanceof HistoricVariableInstanceEntity) {
-                    HistoricVariableInstanceEntity variableEntity = (HistoricVariableInstanceEntity) historicVariableInstance;
+                if (historicVariableInstance instanceof HistoricVariableInstanceEntity variableEntity) {
                     if (variableEntity.getVariableType() != null) {
                         variableEntity.getValue();
 
@@ -334,6 +354,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return processInstanceId;
     }
 
+    public Collection<String> getProcessInstanceIds() {
+        return processInstanceIds;
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return getSafeList(processInstanceIds);
+    }
+
     public String getTaskId() {
         return taskId;
     }
@@ -358,6 +386,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return scopeId;
     }
     
+    public Collection<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public List<List<String>> getSafeScopeIds() {
+        return getSafeList(scopeIds);
+    }
+
     public String getSubScopeId() {
         return subScopeId;
     }
@@ -372,6 +408,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
     public Set<String> getTaskIds() {
         return taskIds;
+    }
+
+    public List<List<String>> getSafeTaskIds() {
+        return getSafeList(taskIds);
     }
 
     public String getExecutionId() {

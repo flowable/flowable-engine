@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.flowable.common.engine.impl.scripting.CompositeScriptTraceListener;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
 import org.flowable.common.engine.impl.scripting.MapResolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
@@ -45,7 +46,7 @@ public class ScriptingEnginesTest {
         resolverFactories = new ArrayList<>();
         ScriptBindingsFactory factory = new ScriptBindingsFactory(null, resolverFactories);
 
-        engines = new ScriptingEngines(factory);
+        engines = new ScriptingEngines(new JSR223FlowableScriptEngine(), factory);
     }
 
     @AfterEach
@@ -57,7 +58,7 @@ public class ScriptingEnginesTest {
     public void expectVariableResolvedFromResolverFactory() {
         // GIVEN
         MapResolver factoryMapResolver = new MapResolver().put("myBean", new MyBean());
-        ResolverFactory resolverFactory = (config, variableScope) -> factoryMapResolver;
+        ResolverFactory resolverFactory = (config, variableScope, ignored) -> factoryMapResolver;
         resolverFactories.add(resolverFactory);
         String script = "myBean.setBar('setInScript'); myBean";
 
@@ -65,7 +66,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .build();
         // WHEN
         Object scriptResult = engines.evaluate(request).getResult();
@@ -85,7 +86,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .additionalResolver(resolver)
                 .build();
 
@@ -104,7 +105,7 @@ public class ScriptingEnginesTest {
         MyBean myBeanResolverFactory = new MyBean();
 
         MapResolver factoryMapResolver = new MapResolver().put("myBean", new MyBean());
-        ResolverFactory resolverFactory = (config, variableScope) -> factoryMapResolver;
+        ResolverFactory resolverFactory = (config, variableScope, ignored) -> factoryMapResolver;
         resolverFactories.add(resolverFactory);
 
         MyBean myBeanAdditionalResolver = new MyBean();
@@ -115,7 +116,7 @@ public class ScriptingEnginesTest {
         ScriptEngineRequest request = ScriptEngineRequest.builder()
                 .script(script)
                 .language("JavaScript")
-                .variableContainer(VariableScope.empty())
+                .scopeContainer(VariableScope.empty())
                 .additionalResolver(resolver)
                 .build();
 

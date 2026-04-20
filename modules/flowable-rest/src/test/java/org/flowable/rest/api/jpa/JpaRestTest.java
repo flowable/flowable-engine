@@ -27,22 +27,18 @@ import org.flowable.rest.api.jpa.model.Message;
 import org.flowable.rest.api.jpa.repository.MessageRepository;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 public class JpaRestTest extends BaseJPARestTestCase {
     
+    @Autowired
     protected MessageRepository messageRepository;
     
-    @Before
-    public void initMessageRepository() {
-        this.messageRepository = appContext.getBean(MessageRepository.class);
-    }
-
     @Test
     @Deployment(resources = { "org/flowable/rest/api/jpa/jpa-process.bpmn20.xml" })
     public void testGetJpaVariableViaTaskVariablesCollections() throws Exception {

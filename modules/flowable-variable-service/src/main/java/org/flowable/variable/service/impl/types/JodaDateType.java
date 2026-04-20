@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.joda.time.LocalDate;
@@ -53,6 +54,19 @@ public class JodaDateType implements VariableType {
     @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
+            if (valueFields.getTaskId() != null) {
+                JodaDeprecationLogger.LOGGER.warn(
+                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Task Variable {} in task {} was a Joda-Time LocalDate. ",
+                        valueFields.getName(), valueFields.getTaskId());
+            } else if (valueFields.getProcessInstanceId() != null) {
+                JodaDeprecationLogger.LOGGER.warn(
+                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Process Variable {} in process instance {} and execution {} was a Joda-Time LocalDate. ",
+                        valueFields.getName(), valueFields.getProcessInstanceId(), valueFields.getExecutionId());
+            } else {
+                JodaDeprecationLogger.LOGGER.warn(
+                        "Using Joda-Time LocalDate has been deprecated and will be removed in a future version. Variable {} in {} instance {} and sub-scope {} was a Joda-Time LocalDate. ",
+                        valueFields.getName(), valueFields.getScopeType(), valueFields.getScopeId(), valueFields.getSubScopeId());
+            }
             valueFields.setLongValue(((LocalDate) value).toDateTimeAtStartOfDay().getMillis());
         } else {
             valueFields.setLongValue(null);

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="parentReactivationTestCase" name="Parent Reactivation Test Case" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <planItem id="planItem1" name="Parent task" definitionRef="humanTask1" />
+      <planItem id="planItem2" name="Child Case" definitionRef="childTask" />
+      
+      <humanTask id="humanTask1" name="Parent task" />
+      <caseTask id="childTask" name="Child Case">
+        <caseRefExpression><![CDATA[simpleReactivationTestCase]]></caseRefExpression>
+      </caseTask>
+    </casePlanModel>
+  </case>
+</definitions>

@@ -20,6 +20,6 @@ import java.lang.reflect.Method;
 @FunctionalInterface
 public interface FlowableFunctionResolver {
 
-    Method resolveFunction(String prefix, String localName);
+    Method resolveFunction(String prefix, String localName) throws NoSuchMethodException;
 
 }

@@ -93,9 +93,17 @@ public class ActivityInstanceBaseResource {
         if (queryRequest.getTaskAssignee() != null) {
             query.taskAssignee(queryRequest.getTaskAssignee());
         }
+        
+        if (queryRequest.getTaskCompletedBy() != null) {
+            query.taskCompletedBy(queryRequest.getTaskCompletedBy());
+        }
 
         if (queryRequest.getProcessInstanceId() != null) {
             query.processInstanceId(queryRequest.getProcessInstanceId());
+        }
+
+        if (queryRequest.getProcessInstanceIds() != null && !queryRequest.getProcessInstanceIds().isEmpty()) {
+            query.processInstanceIds(queryRequest.getProcessInstanceIds());
         }
 
         if (queryRequest.getProcessDefinitionId() != null) {

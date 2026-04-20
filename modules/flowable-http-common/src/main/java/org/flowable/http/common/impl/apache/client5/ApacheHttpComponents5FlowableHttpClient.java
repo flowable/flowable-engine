@@ -18,6 +18,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -50,11 +51,13 @@ import org.apache.hc.core5.http.HttpVersion;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
 import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.io.ModalCloseable;
+import org.apache.hc.core5.net.WWWFormCodec;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.TimeValue;
 import org.flowable.common.engine.api.FlowableException;
@@ -83,6 +86,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
 
     protected HttpAsyncClient client;
     protected boolean closeClient;
+    protected HttpMultipartMode multipartMode;
     protected int socketTimeout;
     protected int connectTimeout;
     protected int connectionRequestTimeout;
@@ -130,6 +134,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
         this.client = client;
         this.closeClient = true;
 
+        this.multipartMode = resolveMultipartMode(config.getMultipartMode());
         this.socketTimeout = config.getSocketTimeout();
         this.connectTimeout = config.getConnectTimeout();
         this.connectionRequestTimeout = config.getConnectionRequestTimeout();
@@ -138,9 +143,23 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
     public ApacheHttpComponents5FlowableHttpClient(HttpAsyncClient client, int socketTimeout, int connectTimeout,
             int connectionRequestTimeout) {
         this.client = client;
+        this.multipartMode = HttpMultipartMode.STRICT;
         this.socketTimeout = socketTimeout;
         this.connectTimeout = connectTimeout;
         this.connectionRequestTimeout = connectionRequestTimeout;
+    }
+
+    protected static HttpMultipartMode resolveMultipartMode(String mode) {
+        if (mode == null) {
+            return HttpMultipartMode.STRICT;
+        }
+        return switch (mode.toUpperCase()) {
+            case "BROWSER_COMPATIBLE", "LEGACY" -> HttpMultipartMode.LEGACY;
+            case "STRICT" -> HttpMultipartMode.STRICT;
+            case "EXTENDED" -> HttpMultipartMode.EXTENDED;
+            default -> throw new FlowableIllegalArgumentException("Unsupported multipart mode: " + mode
+                    + ". Supported values are: STRICT, BROWSER_COMPATIBLE, LEGACY, EXTENDED");
+        };
     }
 
     public void close() {
@@ -192,9 +211,8 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(request, requestInfo.getHttpHeaders());
-            }
+            setHeaders(request, requestInfo.getHttpHeaders());
+            setHeaders(request, requestInfo.getSecureHttpHeaders());
 
             return new ApacheHttpComponentsExecutableHttpRequest(request.build(), createRequestConfig(requestInfo));
         } catch (URISyntaxException ex) {
@@ -218,14 +236,22 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             }
         } else if (requestInfo.getMultiValueParts() != null) {
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-            entityBuilder.setMode(HttpMultipartMode.LEGACY);
+            entityBuilder.setMode(multipartMode);
             for (MultiValuePart part : requestInfo.getMultiValueParts()) {
                 String name = part.getName();
                 Object value = part.getBody();
                 if (value instanceof byte[]) {
-                    entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                    if (StringUtils.isNotBlank(part.getMimeType())) {
+                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.create(part.getMimeType()), part.getFilename());
+                    } else {
+                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                    }
                 } else if (value instanceof String) {
-                    entityBuilder.addTextBody(name, (String) value);
+                    if (StringUtils.isNotBlank(part.getMimeType())) {
+                        entityBuilder.addTextBody(name, (String) value, ContentType.create(part.getMimeType()));
+                    } else {
+                        entityBuilder.addTextBody(name, (String) value);
+                    }
                 } else if (value != null) {
                     throw new FlowableIllegalArgumentException("Value of type " + value.getClass() + " is not supported as multi part content");
                 }
@@ -238,10 +264,27 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             } catch (IOException e) {
                 throw new FlowableException("Cannot create multi part entity", e);
             }
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
+                String name = entry.getKey();
+                for (String value : entry.getValue()) {
+                    parameters.add(new BasicNameValuePair(name, value));
+                }
+            }
+
+            Charset charset = requestInfo.getBodyEncoding() != null ? Charset.forName(requestInfo.getBodyEncoding()) : null;
+
+            String formParametersString = WWWFormCodec.format(parameters, charset);
+            requestBase.setEntity(AsyncEntityProducers.create(formParametersString, ContentType.APPLICATION_FORM_URLENCODED.withCharset(charset)));
         }
     }
 
     protected void setHeaders(AsyncRequestBuilder base, HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {
@@ -263,7 +306,13 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
         HttpResponse responseInfo = new HttpResponse();
 
         responseInfo.setStatusCode(response.getCode());
-        responseInfo.setReason(response.getReasonPhrase());
+        try {
+            responseInfo.setReason(response.getReasonPhrase());
+        } catch (IllegalArgumentException ignored) {
+            // Ignore the exception, it is not important
+            // HttpClient 5 throws an exception if the status code is not in the range of 100-599
+            // Therefore, if there is an exception we just ignore it
+        }
         responseInfo.setProtocol((response.getVersion() != null ? response.getVersion() : HttpVersion.HTTP_1_1).toString());
 
         HttpHeaders headers = null;

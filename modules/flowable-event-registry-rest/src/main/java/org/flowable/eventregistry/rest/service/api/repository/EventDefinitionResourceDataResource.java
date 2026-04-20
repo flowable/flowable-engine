@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Definitions" }, description = "Manage Event Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
     @ApiOperation(value = "Get an event definition resource content", tags = { "Event Definitions" })

@@ -59,7 +59,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
 
-        persistDecisionAudit(executeDecisionContext);
+        finalizeDecisionExecutionAudit(executeDecisionContext);
 
         return decisionResult;
     }
@@ -72,7 +72,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         Map<String, List<Map<String, Object>>> decisionResult = composeDecisionServiceResult(executeDecisionContext);
 
-        persistDecisionAudit(executeDecisionContext);
+        finalizeDecisionExecutionAudit(executeDecisionContext);
 
         return decisionResult;
     }
@@ -86,7 +86,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         Map<String, Object> singleDecisionResult = null;
         Map<String, List<Map<String, Object>>> decisionResult = composeEvaluateDecisionResult(executeDecisionContext);
 
-        persistDecisionAudit(executeDecisionContext);
+        finalizeDecisionExecutionAudit(executeDecisionContext);
 
         for (Map.Entry<String, List<Map<String, Object>>> entry : decisionResult.entrySet()) {
             List<Map<String, Object>> decisionResults = entry.getValue();
@@ -113,7 +113,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         Map<String, Object> singleDecisionResult = null;
         List<Map<String, Object>> decisionResult = composeDecisionResult(executeDecisionContext);
 
-        persistDecisionAudit(executeDecisionContext);
+        finalizeDecisionExecutionAudit(executeDecisionContext);
 
         if (decisionResult != null && !decisionResult.isEmpty()) {
             if (decisionResult.size() > 1) {
@@ -134,7 +134,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         Map<String, Object> singleDecisionResult = new HashMap<>();
         Map<String, List<Map<String, Object>>> decisionResult = composeDecisionServiceResult(executeDecisionContext);
 
-        persistDecisionAudit(executeDecisionContext);
+        finalizeDecisionExecutionAudit(executeDecisionContext);
 
         for (Map.Entry<String, List<Map<String, Object>>> entry : decisionResult.entrySet()) {
             List<Map<String, Object>> decisionResults = entry.getValue();
@@ -157,7 +157,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         composeEvaluateDecisionResult(executeDecisionContext);
 
-        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
+        DecisionExecutionAuditContainer decisionExecution = finalizeDecisionExecutionAudit(executeDecisionContext);
 
         return decisionExecution;
     }
@@ -170,7 +170,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         composeDecisionResult(executeDecisionContext);
 
-        DecisionExecutionAuditContainer decisionExecution = persistDecisionAudit(executeDecisionContext);
+        DecisionExecutionAuditContainer decisionExecution = finalizeDecisionExecutionAudit(executeDecisionContext);
 
         return decisionExecution;
     }
@@ -183,7 +183,7 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
         composeDecisionServiceResult(executeDecisionContext);
 
-        DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) persistDecisionAudit(executeDecisionContext);
+        DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) finalizeDecisionExecutionAudit(executeDecisionContext);
 
         return decisionServiceExecutionAuditContainer;
     }
@@ -213,9 +213,8 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
 
     protected Map<String, List<Map<String, Object>>> composeDecisionServiceResult(ExecuteDecisionContext executeDecisionContext) {
         // check if execution was Decision or DecisionService
-        if (executeDecisionContext.getDmnElement() instanceof DecisionService) {
+        if (executeDecisionContext.getDmnElement() instanceof DecisionService decisionService) {
             Map<String, List<Map<String, Object>>> decisionServiceResult = new HashMap<>();
-            DecisionService decisionService = (DecisionService) executeDecisionContext.getDmnElement();
             DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) executeDecisionContext.getDecisionExecution();
 
             boolean multipleResults = decisionService.getOutputDecisions().size() > 1;
@@ -236,12 +235,14 @@ public class DmnDecisionServiceImpl extends CommonEngineServiceImpl<DmnEngineCon
         }
     }
 
-    protected DecisionExecutionAuditContainer persistDecisionAudit(ExecuteDecisionContext executeDecisionContext) {
+    protected DecisionExecutionAuditContainer finalizeDecisionExecutionAudit(ExecuteDecisionContext executeDecisionContext) {
         DecisionExecutionAuditContainer decisionExecution = executeDecisionContext.getDecisionExecution();
 
         decisionExecution.stopAudit(configuration.getClock().getCurrentTime());
 
-        commandExecutor.execute(new PersistHistoricDecisionExecutionCmd(executeDecisionContext));
+        if (!executeDecisionContext.isDisableHistory()) {
+            commandExecutor.execute(new PersistHistoricDecisionExecutionCmd(executeDecisionContext));
+        }
 
         return decisionExecution;
     }

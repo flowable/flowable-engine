@@ -86,6 +86,13 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
         setSafeInValueLists(historicProcessInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricProcessInstancesWithVariablesByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricProcessInstance> findHistoricProcessInstanceIdsByQueryCriteria(HistoricProcessInstanceQueryImpl historicProcessInstanceQuery) {
+        setSafeInValueLists(historicProcessInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricProcessInstanceIdsByQueryCriteria", historicProcessInstanceQuery, getManagedEntityClass());
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -109,6 +116,10 @@ public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDa
     }
 
     protected void setSafeInValueLists(HistoricProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getProcessInstanceIds() != null) {
+            processInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(processInstanceQuery.getProcessInstanceIds()));
+        }
+        
         if (processInstanceQuery.getInvolvedGroups() != null) {
             processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
         }

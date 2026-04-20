@@ -20,8 +20,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.InternalProcessDefinitionLocalizationManager;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author David Lamas
@@ -44,12 +44,12 @@ public class DefaultProcessDefinitionLocalizationManager implements InternalProc
             if (languageNode != null) {
                 JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                 if (languageNameNode != null && !languageNameNode.isNull()) {
-                    processDefinitionEntity.setLocalizedName(languageNameNode.asText());
+                    processDefinitionEntity.setLocalizedName(languageNameNode.asString());
                 }
 
                 JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                 if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                    processDefinitionEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                    processDefinitionEntity.setLocalizedDescription(languageDescriptionNode.asString());
                 }
             }
         }

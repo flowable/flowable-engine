@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -33,6 +34,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -53,6 +55,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
@@ -99,6 +102,7 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected HttpClientBuilder clientBuilder;
+    protected HttpMultipartMode multipartMode;
     protected int socketTimeout;
     protected int connectTimeout;
     protected int connectionRequestTimeout;
@@ -146,6 +150,7 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
 
         this.clientBuilder = httpClientBuilder;
 
+        this.multipartMode = resolveMultipartMode(config.getMultipartMode());
         this.socketTimeout = config.getSocketTimeout();
         this.connectTimeout = config.getConnectTimeout();
         this.connectionRequestTimeout = config.getConnectionRequestTimeout();
@@ -154,9 +159,22 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
     public ApacheHttpComponentsFlowableHttpClient(HttpClientBuilder clientBuilder, int socketTimeout, int connectTimeout,
             int connectionRequestTimeout) {
         this.clientBuilder = clientBuilder;
+        this.multipartMode = HttpMultipartMode.STRICT;
         this.socketTimeout = socketTimeout;
         this.connectTimeout = connectTimeout;
         this.connectionRequestTimeout = connectionRequestTimeout;
+    }
+
+    protected static HttpMultipartMode resolveMultipartMode(String mode) {
+        if (mode == null) {
+            return HttpMultipartMode.STRICT;
+        }
+        return switch (mode.toUpperCase()) {
+            case "BROWSER_COMPATIBLE" -> HttpMultipartMode.BROWSER_COMPATIBLE;
+            case "STRICT" -> HttpMultipartMode.STRICT;
+            default -> throw new FlowableIllegalArgumentException("Unsupported multipart mode: " + mode
+                    + ". Supported values are: STRICT, BROWSER_COMPATIBLE");
+        };
     }
 
     @Override
@@ -205,9 +223,8 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(request, requestInfo.getHttpHeaders());
-            }
+            setHeaders(request, requestInfo.getHttpHeaders());
+            setHeaders(request, requestInfo.getSecureHttpHeaders());
 
             setConfig(request, requestInfo);
             return new ApacheHttpComponentsExecutableHttpRequest(request);
@@ -233,14 +250,22 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
         } else if (requestInfo.getMultiValueParts() != null) {
             if (MULTIPART_ENTITY_BUILDER_PRESENT) {
                 MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
-                entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+                entityBuilder.setMode(multipartMode);
                 for (MultiValuePart part : requestInfo.getMultiValueParts()) {
                     String name = part.getName();
                     Object value = part.getBody();
                     if (value instanceof byte[]) {
-                        entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                        if (StringUtils.isNotBlank(part.getMimeType())) {
+                            entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.create(part.getMimeType()), part.getFilename());
+                        } else {
+                            entityBuilder.addBinaryBody(name, (byte[]) value, ContentType.DEFAULT_BINARY, part.getFilename());
+                        }
                     } else if (value instanceof String) {
-                        entityBuilder.addTextBody(name, (String) value);
+                        if (StringUtils.isNotBlank(part.getMimeType())) {
+                            entityBuilder.addTextBody(name, (String) value, ContentType.create(part.getMimeType()));
+                        } else {
+                            entityBuilder.addTextBody(name, (String) value);
+                        }
                     } else if (value != null) {
                         throw new FlowableIllegalArgumentException("Value of type " + value.getClass() + " is not supported as multi part content");
                     }
@@ -252,10 +277,28 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
                         + " If you want to use, please make sure that the org.apache.httpcomponents:httpmime dependency is available");
             }
 
+        } else if (requestInfo.getFormParameters() != null) {
+            Map<String, List<String>> formParameters = requestInfo.getFormParameters();
+            List<BasicNameValuePair> parameters = new ArrayList<>(formParameters.size());
+            for (Map.Entry<String, List<String>> entry : formParameters.entrySet()) {
+                String name = entry.getKey();
+                for (String value : entry.getValue()) {
+                    parameters.add(new BasicNameValuePair(name, value));
+                }
+            }
+
+            if (StringUtils.isNotEmpty(requestInfo.getBodyEncoding())) {
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters, requestInfo.getBodyEncoding()));
+            } else {
+                requestBase.setEntity(new UrlEncodedFormEntity(parameters));
+            }
         }
     }
 
     protected void setHeaders(final HttpMessage base, final HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             for (String headerValue : entry.getValue()) {

@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.history.task;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.flowable.common.rest.api.DataResponse;
@@ -35,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")
@@ -263,6 +264,14 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("tenantIdLike") != null) {
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
+        }
+
+        if (allRequestParams.get("scopeId") != null) {
+            queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+        
+        if (allRequestParams.get("scopeIds") != null) {
+            queryRequest.setScopeIds(RequestUtil.parseToSet(allRequestParams.get("scopeIds")));
         }
 
         if (allRequestParams.get("withoutTenantId") != null) {

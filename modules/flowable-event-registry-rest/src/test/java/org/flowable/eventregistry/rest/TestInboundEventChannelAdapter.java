@@ -18,14 +18,18 @@ import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.model.InboundChannelModel;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class TestInboundEventChannelAdapter implements InboundEventChannelAdapter {
 
     public InboundChannelModel inboundChannelModel;
     public EventRegistry eventRegistry;
+    protected final ObjectMapper objectMapper;
+
+    public TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -50,7 +54,6 @@ public class TestInboundEventChannelAdapter implements InboundEventChannelAdapte
     }
 
     public void triggerTestEvent(String customerId, String orderId) {
-        ObjectMapper objectMapper = new ObjectMapper();
 
         ObjectNode json = objectMapper.createObjectNode();
         json.put("type", "myEvent");
@@ -63,11 +66,7 @@ public class TestInboundEventChannelAdapter implements InboundEventChannelAdapte
         }
         json.put("payload1", "Hello World");
         json.put("payload2", new Random().nextInt());
-        try {
-            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
     }
 
 }

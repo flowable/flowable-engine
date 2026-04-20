@@ -239,13 +239,13 @@ public interface CmmnRestApiInterceptor {
     
     void accessHistoryVariableInfoWithQuery(HistoricVariableInstanceQuery historicVariableInstanceQuery, HistoricVariableInstanceQueryRequest request);
 
-    void migrateCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    void migrateCaseInstance(CaseInstance caseInstance, String migrationDocumentJson);
     
-    void migrateHistoricCaseInstance(String caseInstanceId, String migrationDocumentJson);
+    void migrateHistoricCaseInstance(HistoricCaseInstance caseInstance, String migrationDocumentJson);
     
     void migrateInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
     
     void migrateHistoricInstancesOfCaseDefinition(CaseDefinition caseDefinition, String migrationDocument);
     
-    void changePlanItemState(String caseInstanceId, ChangePlanItemStateRequest planItemStateRequest);
+    void changePlanItemState(CaseInstance caseInstance, ChangePlanItemStateRequest planItemStateRequest);
 }

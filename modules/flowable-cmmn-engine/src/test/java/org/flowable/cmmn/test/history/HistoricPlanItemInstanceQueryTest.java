@@ -18,18 +18,19 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -39,7 +40,7 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     protected String deploymentId;
     protected String caseDefinitionId;
 
-    @Before
+    @BeforeEach
     public void deployCaseDefinition() {
         deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
@@ -66,6 +67,14 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
             if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
                 assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstanceId).list()).hasSize(4);
             }
+        }
+    }
+
+    @Test
+    public void testByCaseInstanceIds() {
+        List<String> caseInstanceIds = startInstances(3);
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceIds(Set.of(caseInstanceIds.get(0),caseInstanceIds.get(1))).list()).hasSize(8);
         }
     }
 
@@ -160,6 +169,64 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .list())
                 .hasSize(3);
         }
+    }
+
+    @Test
+    public void testByAssignee() {
+        startInstances(2);
+
+        List<HistoricPlanItemInstance> planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertThat(planItemInstances).hasSize(4);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+        }
+
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
+
+    }
+
+    @Test
+    public void testByCompletedBy() {
+        startInstances(3);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+            cmmnTaskService.complete(task.getId(), "kermit");
+        }
+
+        List<HistoricPlanItemInstance> planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceCompletedBy("kermit")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceCompletedBy("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
+
     }
 
     @Test

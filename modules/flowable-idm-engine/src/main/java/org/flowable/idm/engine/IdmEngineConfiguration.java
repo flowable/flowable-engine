@@ -316,7 +316,7 @@ public class IdmEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER, EntityDependencyOrder.IMMUTABLE_ENTITIES);
     }
 
     public void initPasswordEncoder() {

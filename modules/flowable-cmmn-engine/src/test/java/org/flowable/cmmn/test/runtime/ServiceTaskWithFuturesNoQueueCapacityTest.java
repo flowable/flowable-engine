@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.FlowablePlanItemFutureJavaDelegate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
@@ -39,9 +39,9 @@ import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.async.DefaultAsyncTaskInvoker;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -51,13 +51,13 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends FlowableCmmnTestC
     protected AsyncTaskInvoker originalAsyncTaskInvoker;
     protected AsyncTaskExecutor originalAsyncTaskInvokerTaskExecutor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.originalAsyncTaskInvoker = this.cmmnEngineConfiguration.getAsyncTaskInvoker();
         this.originalAsyncTaskInvokerTaskExecutor = this.cmmnEngineConfiguration.getAsyncTaskInvokerTaskExecutor();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (this.originalAsyncTaskInvoker != null) {
             this.cmmnEngineConfiguration.setAsyncTaskInvoker(this.originalAsyncTaskInvoker);

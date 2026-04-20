@@ -170,8 +170,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         DelegateExecution parentExecution = execution.getParent();
         if (parentExecution != null && parentExecution.getCurrentFlowElement() != null) {
             FlowElement flowElement = parentExecution.getCurrentFlowElement();
-            if (flowElement instanceof Activity) {
-                Activity activity = (Activity) flowElement;
+            if (flowElement instanceof Activity activity) {
                 if (activity.getLoopCharacteristics() != null) {
                     multiInstanceExecution = parentExecution;
                 }

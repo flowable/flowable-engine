@@ -14,11 +14,9 @@ package org.flowable.rest.api.jpa;
 
 import org.flowable.rest.conf.JPAApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
+@SpringJUnitWebConfig(JPAApplicationConfiguration.class)
 public class BaseJPARestTestCase extends BaseSpringRestTestCase {
 
-    @Override
-    protected Class<?> getConfigurationClass() {
-        return JPAApplicationConfiguration.class;
-    }
 }

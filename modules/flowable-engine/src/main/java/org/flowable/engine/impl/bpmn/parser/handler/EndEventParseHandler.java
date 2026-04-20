@@ -45,8 +45,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
         if (endEvent.getEventDefinitions().size() > 0) {
             eventDefinition = endEvent.getEventDefinitions().get(0);
 
-            if (eventDefinition instanceof ErrorEventDefinition) {
-                ErrorEventDefinition errorDefinition = (ErrorEventDefinition) eventDefinition;
+            if (eventDefinition instanceof ErrorEventDefinition errorDefinition) {
                 if (bpmnParse.getBpmnModel().containsErrorRef(errorDefinition.getErrorCode())) {
                     String errorCode = bpmnParse.getBpmnModel().getErrors().get(errorDefinition.getErrorCode());
                     if (StringUtils.isEmpty(errorCode)) {
@@ -55,8 +54,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
                 }
                 endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createErrorEndEventActivityBehavior(endEvent, errorDefinition));
                 
-            } else if (eventDefinition instanceof EscalationEventDefinition) {
-                EscalationEventDefinition escalationDefinition = (EscalationEventDefinition) eventDefinition;
+            } else if (eventDefinition instanceof EscalationEventDefinition escalationDefinition) {
                 Escalation escalation = null;
                 if (bpmnParse.getBpmnModel().containsEscalationRef(escalationDefinition.getEscalationCode())) {
                     escalation = bpmnParse.getBpmnModel().getEscalation(escalationDefinition.getEscalationCode());

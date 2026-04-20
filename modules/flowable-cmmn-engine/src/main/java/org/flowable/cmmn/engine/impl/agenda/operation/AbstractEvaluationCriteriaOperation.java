@@ -39,6 +39,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnFaultVariableContainer;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
@@ -143,7 +144,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion.getId(),
                 satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
-        } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+        } else if (planItem.getPlanItemDefinition() instanceof Stage stage) {
 
             if (PlanItemInstanceState.ACTIVE.equals(state)) {
 
@@ -153,7 +154,6 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         evaluationResult.markCriteriaChanged();
                         planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
                     } else {
-                        Stage stage = (Stage) planItem.getPlanItemDefinition();
                         if (isStageCompletable(planItemInstanceEntity, stage)) {
                             evaluationResult.markCriteriaChanged();
                             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
@@ -183,6 +183,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             }
 
             evaluationResult.increaseActiveChildren();
+        } else if (PlanItemInstanceState.ACTIVE_STATES.contains(state)) {
+            evaluationResult.increaseActiveChildren();
         }
         return false;
     }
@@ -201,11 +203,10 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
         
         // needed because when doing case instance migration the child plan item instances can be null
-        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) && 
-                planItemInstanceContainer instanceof CaseInstanceEntity) {
+        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) &&
+                planItemInstanceContainer instanceof CaseInstanceEntity caseInstance) {
             
             PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-            CaseInstanceEntity caseInstance = (CaseInstanceEntity) planItemInstanceContainer;
             planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
             planItemInstanceContainer.setChildPlanItemInstances(planItemInstances);
             
@@ -517,6 +518,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
 
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
+                        && sentry.getSentryIfPart() != null
                         && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
 
                         sentryIfPartSatisfied = true;
@@ -691,8 +693,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         if (entityWithSentryPartInstances instanceof CaseInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(((CaseInstanceEntity) entityWithSentryPartInstances).getId());
             sentryPartInstanceEntity.setCaseDefinitionId(((CaseInstanceEntity) entityWithSentryPartInstances).getCaseDefinitionId());
-        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) entityWithSentryPartInstances;
+        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             sentryPartInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             sentryPartInstanceEntity.setPlanItemInstanceId(planItemInstanceEntity.getId());
@@ -716,9 +717,18 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        try { 
+
+        // When the lifecycle event carries fault data, wrap the variable container with CmmnFaultVariableContainer
+        // so that fault-specific variables (faultCode, faultMessage, error) are available for if-part expression
+        // resolution without polluting the actual variable scope. This is analogous to BPMN's BpmnErrorVariableContainer.
+        VariableContainer resolveContainer = variableContainer;
+        if (planItemLifeCycleEvent != null && planItemLifeCycleEvent.getBusinessError() != null) {
+            resolveContainer = new CmmnFaultVariableContainer(planItemLifeCycleEvent.getBusinessError(), variableContainer);
+        }
+
+        try {
             Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
-            Object result = conditionExpression.getValue(variableContainer);
+            Object result = conditionExpression.getValue(resolveContainer);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);

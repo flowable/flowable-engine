@@ -92,8 +92,7 @@ public class HistoricDetailEntityManagerImpl
     public void delete(HistoricDetailEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, fireDeleteEvent);
 
-        if (entity instanceof HistoricDetailVariableInstanceUpdateEntity) {
-            HistoricDetailVariableInstanceUpdateEntity historicDetailVariableInstanceUpdateEntity = ((HistoricDetailVariableInstanceUpdateEntity) entity);
+        if (entity instanceof HistoricDetailVariableInstanceUpdateEntity historicDetailVariableInstanceUpdateEntity) {
             if (historicDetailVariableInstanceUpdateEntity.getByteArrayRef() != null) {
                 historicDetailVariableInstanceUpdateEntity.getByteArrayRef().delete(engineConfiguration.getEngineCfgKey());
             }

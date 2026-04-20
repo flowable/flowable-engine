@@ -42,7 +42,7 @@ import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens
@@ -78,11 +78,9 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
             throw new IllegalArgumentException("no decision provided");
         }
 
-        if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable)) {
+        if (decision.getExpression() == null || !(decision.getExpression() instanceof DecisionTable currentDecisionTable)) {
             throw new IllegalArgumentException("no decision table present in decision");
         }
-
-        DecisionTable currentDecisionTable = (DecisionTable) decision.getExpression();
 
         // create execution context and audit trail
         ELExecutionContext executionContext = ELExecutionContextBuilder.build(decision, executeDecisionInfo);
@@ -95,7 +93,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
         } catch (FlowableException fe) {
             LOGGER.error("decision table execution sanity check failed", fe);
-            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setFailedWithException(fe);
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(fe));
 
         } finally {
@@ -156,7 +154,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
         } catch (FlowableException ade) {
             LOGGER.error("decision table execution failed", ade);
             executionContext.getRuleResults().clear();
-            executionContext.getAuditContainer().setFailed();
+            executionContext.getAuditContainer().setFailedWithException(ade);
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(ade));
         }
 
@@ -301,13 +299,11 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     }
 
     protected String getExceptionMessage(Exception exception) {
-        String exceptionMessage;
-        if (exception.getCause() != null && exception.getCause().getMessage() != null) {
-            exceptionMessage = exception.getCause().getMessage();
-        } else {
-            exceptionMessage = exception.getMessage();
+        Throwable rootCause = exception;
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
         }
-        return exceptionMessage;
+        return rootCause.getMessage();
     }
 
     protected AbstractHitPolicy getHitPolicyBehavior(HitPolicy hitPolicy) {

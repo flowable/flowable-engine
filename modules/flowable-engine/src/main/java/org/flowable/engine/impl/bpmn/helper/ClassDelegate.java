@@ -25,7 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -50,7 +50,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
@@ -181,7 +181,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asString();
                 if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
                     className = overrideClassName;
                     activityBehaviorInstance = null;
@@ -195,7 +195,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         try {
             activityBehaviorInstance.execute(execution);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             ErrorPropagation.propagateError(error, execution);
         } catch (RuntimeException e) {
             if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
@@ -217,7 +217,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                 if (triggerable && context.shouldLeave()) {
                     leave(execution);
                 }
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             } catch (RuntimeException e) {
                 if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
@@ -230,7 +230,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
                 if (triggerable) {
                     leave(execution);
                 }
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             } catch (RuntimeException e) {
                 if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {

@@ -122,12 +122,14 @@ import org.flowable.common.engine.impl.util.DbUtil;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public abstract class AbstractEngineConfiguration {
 
@@ -400,6 +402,14 @@ public abstract class AbstractEngineConfiguration {
      */
     protected int maxLengthStringVariableType = -1;
 
+    /**
+     * Define variable length for variables that have length, e.g. String, JSON, etc.
+     * The length verifier can be used to throw an exception if the length exceeds a certain threshold and / or it can log a warning.
+     */
+    protected VariableLengthVerifier variableLengthVerifier = NoopVariableLengthVerifier.INSTANCE;
+
+    protected VariableValueConversionHandler variableValueConversionHandler;
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -633,10 +643,15 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    public void initVariableValueConversionHandler() {
+        if (variableValueConversionHandler == null) {
+            variableValueConversionHandler = new DefaultVariableValueConversionHandler();
+        }
+    }
+
     public void initObjectMapper() {
         if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            objectMapper = JsonMapper.shared();
         }
     }
 
@@ -752,6 +767,10 @@ public abstract class AbstractEngineConfiguration {
     protected abstract void initDbSqlSessionFactoryEntitySettings();
 
     protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
+        defaultInitDbSqlSessionFactoryEntitySettings(insertOrder, deleteOrder, Collections.emptyList());
+    }
+
+    protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder, Collection<Class<? extends Entity>> immutableEntities) {
         if (insertOrder != null) {
             for (Class<? extends Entity> clazz : insertOrder) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -766,6 +785,10 @@ public abstract class AbstractEngineConfiguration {
             for (Class<? extends Entity> clazz : deleteOrder) {
                 dbSqlSessionFactory.getDeletionOrder().add(clazz);
             }
+        }
+
+        if (immutableEntities != null && !immutableEntities.isEmpty()) {
+            dbSqlSessionFactory.getImmutableEntities().addAll(immutableEntities);
         }
     }
 
@@ -1951,6 +1974,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public VariableLengthVerifier getVariableLengthVerifier() {
+        return variableLengthVerifier;
+    }
+
+    public AbstractEngineConfiguration setVariableLengthVerifier(VariableLengthVerifier variableLengthVerifier) {
+        this.variableLengthVerifier = variableLengthVerifier;
+        return this;
+    }
+
+    public VariableValueConversionHandler getVariableValueConversionHandler() {
+        return variableValueConversionHandler;
+    }
+
+    public AbstractEngineConfiguration setVariableValueConversionHandler(VariableValueConversionHandler variableValueConversionHandler) {
+        this.variableValueConversionHandler = variableValueConversionHandler;
         return this;
     }
 

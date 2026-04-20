@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployments" }, description = "Manage App Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResource {
 
     @Autowired

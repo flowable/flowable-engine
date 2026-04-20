@@ -26,8 +26,9 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.dmn.rest.service.api.HttpMultipartHelper;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -39,6 +40,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFile() throws Exception {
 
         try {
@@ -52,7 +54,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -66,7 +68,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -85,6 +87,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFileDecisionService() throws Exception {
 
         try {
@@ -98,7 +101,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -112,7 +115,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -130,6 +133,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -193,6 +197,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
         }
     }
 
+    @Test
     public void testGetDeploymentsSorting() throws Exception {
 
         try {
@@ -289,6 +294,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeploymentsDecisionService() throws Exception {
 
         try {
@@ -352,6 +358,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
         }
     }
 
+    @Test
     public void testGetDeploymentsDecisionServiceSorting() throws Exception {
 
         try {

@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionFormDefinitionCollectionResource extends BaseCaseDefinitionResource {
 
     @ApiOperation(value = "List form definitions for a case definition", nickname = "listCaseDefinitionFormDefinitions", tags = { "Case Definitions" })

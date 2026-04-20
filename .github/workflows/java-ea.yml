@@ -16,15 +16,15 @@ jobs:
     name: Linux (OpenJDK EA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Cache Maven Repository
-        uses: actions/cache@v3
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Restore Maven Repository Cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
       - name: 'Set up JDK'
-        uses: oracle-actions/setup-java@v1
+        uses: oracle-actions/setup-java@fff43251af9936a0e6a4d5d0946e14f1680e9b6b # v1.5.0
         with:
           website: jdk.java.net
           release: EA

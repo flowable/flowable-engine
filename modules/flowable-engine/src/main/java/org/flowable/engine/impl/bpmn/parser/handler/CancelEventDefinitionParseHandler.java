@@ -30,8 +30,7 @@ public class CancelEventDefinitionParseHandler extends AbstractBpmnParseHandler<
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, CancelEventDefinition cancelEventDefinition) {
-        if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryCancelEventActivityBehavior(cancelEventDefinition));
         }
 

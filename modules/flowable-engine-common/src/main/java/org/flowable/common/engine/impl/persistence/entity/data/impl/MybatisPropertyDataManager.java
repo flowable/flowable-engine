@@ -42,6 +42,7 @@ public class MybatisPropertyDataManager extends AbstractDataManager<PropertyEnti
         return new PropertyEntityImpl();
     }
     
+    @Override
     public void directInsertProperty(String name, String value) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("name", name);

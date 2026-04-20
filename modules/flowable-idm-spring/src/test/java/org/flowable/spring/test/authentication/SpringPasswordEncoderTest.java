@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -49,7 +48,7 @@ public class SpringPasswordEncoderTest {
     public void testSpringPasswordEncoderInstance() {
         PasswordEncoder passwordEncoder = autoWiredIdmIdmEngineConfiguration.getPasswordEncoder();
 
-        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(new SpringEncoder(new StandardPasswordEncoder()));
+        autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(new SpringEncoder(new BCryptPasswordEncoder(4)));
         validatePassword();
 
         autoWiredIdmIdmEngineConfiguration.setPasswordEncoder(passwordEncoder);

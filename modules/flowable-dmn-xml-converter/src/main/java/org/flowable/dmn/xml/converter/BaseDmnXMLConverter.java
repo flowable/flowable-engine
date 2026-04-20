@@ -58,52 +58,45 @@ public abstract class BaseDmnXMLConverter implements DmnXMLConstants {
             decisionTable = Optional.of(decisionTableExpression);
         }
 
-        if (parsedElement instanceof InputClause) {
+        if (parsedElement instanceof InputClause inputClause) {
             decisionTable.ifPresent(dt -> {
-                InputClause inputClause = (InputClause) parsedElement;
                 inputClause.setInputNumber(elementCounter);
                 dt.addInput(inputClause);
                 elementCounter++;
             });
-        } else if (parsedElement instanceof OutputClause) {
+        } else if (parsedElement instanceof OutputClause outputClause) {
             decisionTable.ifPresent(dt -> {
-                OutputClause outputClause = (OutputClause) parsedElement;
                 outputClause.setOutputNumber(elementCounter);
                 dt.addOutput(outputClause);
                 elementCounter++;
             });
 
-        } else if (parsedElement instanceof DecisionRule) {
+        } else if (parsedElement instanceof DecisionRule decisionRule) {
             decisionTable.ifPresent(dt -> {
-                DecisionRule decisionRule = (DecisionRule) parsedElement;
                 decisionRule.setRuleNumber(elementCounter);
                 dt.addRule(decisionRule);
                 elementCounter++;
             });
         } else if (parsedElement instanceof ItemDefinition) {
             conversionHelper.getDmnDefinition().addItemDefinition((ItemDefinition) parsedElement);
-        } else if (parsedElement instanceof InputData) {
-            InputData inputData = (InputData) parsedElement;
+        } else if (parsedElement instanceof InputData inputData) {
             // TODO: handle inputData as href in DecisionService (same tag)
             if (inputData.getVariable() != null) {
                 conversionHelper.getDmnDefinition().addInputData(inputData);
             }
-        } else if (parsedElement instanceof InformationRequirement) {
-            InformationRequirement informationRequirement = (InformationRequirement) parsedElement;
+        } else if (parsedElement instanceof InformationRequirement informationRequirement) {
             if (informationRequirement.getRequiredDecision() != null) {
                 conversionHelper.getCurrentDecision().addRequiredDecision(informationRequirement);
             } else if (informationRequirement.getRequiredInput() != null) {
                 conversionHelper.getCurrentDecision().addRequiredInput(informationRequirement);
             }
-        } else if (parsedElement instanceof AuthorityRequirement) {
-            AuthorityRequirement authorityRequirement = (AuthorityRequirement) parsedElement;
+        } else if (parsedElement instanceof AuthorityRequirement authorityRequirement) {
             conversionHelper.getCurrentDecision().addAuthorityRequirement(authorityRequirement);
         } else if (parsedElement instanceof InformationItem) {
             if (conversionHelper.getCurrentDecision().getVariable() == null) {
                 conversionHelper.getCurrentDecision().setVariable((InformationItem) parsedElement);
             }
-        }  else if (parsedElement instanceof DecisionService) {
-            DecisionService decisionService = (DecisionService) parsedElement;
+        }  else if (parsedElement instanceof DecisionService decisionService) {
             decisionService.setDmnDefinition(conversionHelper.getDmnDefinition());
             conversionHelper.getDmnDefinition().addDecisionService(decisionService);
         }

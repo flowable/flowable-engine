@@ -980,7 +980,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                     waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
                 }
-                        
+
+                processEngineConfiguration.resetClock();
+
                 managementService.handleHistoryCleanupTimerJob();
                 
                 assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
@@ -1187,6 +1189,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackType", "callbackType");
         methodNameToExpectedQueryPropertyName.put("processInstanceCallbackId", "callbackId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceCallbackIds", "callbackIds");
         methodNameToExpectedQueryPropertyName.put("withoutProcessInstanceCallbackId", "withoutCallbackId");
         methodNameToExpectedQueryPropertyName.put("processInstanceReferenceType", "referenceType");
         methodNameToExpectedQueryPropertyName.put("processInstanceReferenceId", "referenceId");
@@ -1198,10 +1201,13 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLike", "tenantIdLike");
         methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLikeIgnoreCase", "tenantIdLikeIgnoreCase");
         Set<String> methodsToIgnore = new HashSet<>();
+        methodsToIgnore.add("parentCaseInstanceId");
         methodsToIgnore.add("limitProcessInstanceVariables");
         methodsToIgnore.add("includeProcessVariables");
         methodsToIgnore.add("locale");
         methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("withoutSorting");
+        methodsToIgnore.add("returnIdsOnly");
         methodsToIgnore.add("asc");
         methodsToIgnore.add("desc");
         methodsToIgnore.add("or");
@@ -1230,6 +1236,8 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 // We only care about methods that return the query itself
                 continue;
             }
+            
+            System.out.println(methodName);
 
             Instant baseTime = Instant.now().truncatedTo(ChronoUnit.SECONDS)
                     .minus(365, ChronoUnit.DAYS)

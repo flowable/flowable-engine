@@ -20,6 +20,11 @@ create table ACT_HI_PROCINST (
     REFERENCE_TYPE_ varchar(255),
     PROPAGATED_STAGE_INST_ID_ varchar(255),
     BUSINESS_STATUS_ varchar(255),
+    DUE_DATE_ timestamp,
+    CLAIM_TIME_ timestamp,
+    CLAIMED_BY_ varchar(255),
+    END_USER_ID_ varchar(255),
+    STATE_ varchar(255),
     primary key (ID_)
 );
 
@@ -36,8 +41,8 @@ create table ACT_HI_ACTINST (
     CALL_PROC_INST_ID_ varchar(64),
     ACT_NAME_ varchar(255),
     ACT_TYPE_ varchar(255) not null,
-    OWNER_ varchar(64),
     ASSIGNEE_ varchar(255),
+    COMPLETED_BY_ varchar(255),
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
     TRANSACTION_ORDER_ integer,

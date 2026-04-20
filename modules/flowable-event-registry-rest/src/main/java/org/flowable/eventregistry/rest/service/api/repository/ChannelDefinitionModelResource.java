@@ -30,7 +30,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Channel Definitions" }, description = "Manage Channel Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Channel Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ChannelDefinitionModelResource extends BaseEventDefinitionResource {
 
     @ApiOperation(value = "Get a channel definition JSON model", tags = { "Channel Definitions" }, nickname = "getChannelModelResource")

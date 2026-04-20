@@ -26,6 +26,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.common.rest.util.RestUrlBuilder;
+import org.flowable.common.rest.variable.BigDecimalRestVariableConverter;
+import org.flowable.common.rest.variable.BigIntegerRestVariableConverter;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
@@ -113,7 +115,7 @@ import org.flowable.task.api.history.HistoricTaskLogEntry;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.
@@ -469,7 +471,7 @@ public class RestResponseFactory {
         } else if (taskId != null) {
             result.setUrl(urlBuilder.buildUrl(RestUrls.URL_TASK_IDENTITYLINK, taskId, family, (userId != null ? userId : groupId), type));
         } else {
-            result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstanceId, (userId != null ? userId : groupId), type));
+            result.setUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstanceId, family, (userId != null ? userId : groupId), type));
         }
         return result;
     }
@@ -626,6 +628,9 @@ public class RestResponseFactory {
         result.setStartTime(processInstance.getStartTime());
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setBusinessStatus(processInstance.getBusinessStatus());
+        result.setDueDate(processInstance.getDueDate());
+        result.setClaimTime(processInstance.getClaimTime());
+        result.setClaimedBy(processInstance.getClaimedBy());
         result.setId(processInstance.getId());
         result.setName(processInstance.getName());
         result.setProcessDefinitionId(processInstance.getProcessDefinitionId());
@@ -825,6 +830,9 @@ public class RestResponseFactory {
         HistoricProcessInstanceResponse result = new HistoricProcessInstanceResponse();
         result.setBusinessKey(processInstance.getBusinessKey());
         result.setBusinessStatus(processInstance.getBusinessStatus());
+        result.setDueDate(processInstance.getDueDate());
+        result.setClaimTime(processInstance.getClaimTime());
+        result.setClaimedBy(processInstance.getClaimedBy());
         result.setDeleteReason(processInstance.getDeleteReason());
         result.setDurationInMillis(processInstance.getDurationInMillis());
         result.setEndActivityId(processInstance.getEndActivityId());
@@ -836,6 +844,8 @@ public class RestResponseFactory {
         result.setStartActivityId(processInstance.getStartActivityId());
         result.setStartTime(processInstance.getStartTime());
         result.setStartUserId(processInstance.getStartUserId());
+        result.setEndUserId(processInstance.getEndUserId());
+        result.setState(processInstance.getState());
         result.setSuperProcessInstanceId(processInstance.getSuperProcessInstanceId());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, processInstance.getId()));
         if (processInstance.getProcessVariables() != null) {
@@ -1523,6 +1533,8 @@ public class RestResponseFactory {
         variableConverters.add(new LongRestVariableConverter());
         variableConverters.add(new ShortRestVariableConverter());
         variableConverters.add(new DoubleRestVariableConverter());
+        variableConverters.add(new BigDecimalRestVariableConverter());
+        variableConverters.add(new BigIntegerRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
         variableConverters.add(new InstantRestVariableConverter());

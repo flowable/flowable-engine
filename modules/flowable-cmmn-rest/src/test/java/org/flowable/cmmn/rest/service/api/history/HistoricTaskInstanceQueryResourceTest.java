@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -33,11 +32,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic task instance query resource.
@@ -49,6 +48,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     /**
      * Test querying historic task instance. POST cmmn-query/historic-task-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").businessKey("myBusinessKey").start();
@@ -217,35 +217,35 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateAfter", longDateFormat.format(new GregorianCalendar(2015, 0, 1).getTime()));
+        requestNode.put("dueDateAfter", getISODateString(new GregorianCalendar(2015, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateAfter", longDateFormat.format(new GregorianCalendar(2018, 4, 1).getTime()));
+        requestNode.put("dueDateAfter", getISODateString(new GregorianCalendar(2018, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateBefore", longDateFormat.format(new GregorianCalendar(2015, 0, 1).getTime()));
+        requestNode.put("dueDateBefore", getISODateString(new GregorianCalendar(2015, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("dueDateBefore", longDateFormat.format(new GregorianCalendar(2018, 4, 1).getTime()));
+        requestNode.put("dueDateBefore", getISODateString(new GregorianCalendar(2018, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", longDateFormat.format(new GregorianCalendar(2015, 0, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2015, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", longDateFormat.format(new GregorianCalendar(2018, 4, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2018, 4, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedBefore", longDateFormat.format(new GregorianCalendar(2015, 0, 1).getTime()));
+        requestNode.put("taskCompletedBefore", getISODateString(new GregorianCalendar(2015, 0, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
         requestNode = objectMapper.createObjectNode();
-        requestNode.put("taskCompletedAfter", longDateFormat.format(new GregorianCalendar(2015, 3, 1).getTime()));
+        requestNode.put("taskCompletedAfter", getISODateString(new GregorianCalendar(2015, 3, 1).getTime()));
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
 
         requestNode = objectMapper.createObjectNode();
@@ -259,8 +259,17 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         requestNode = objectMapper.createObjectNode();
         requestNode.put("planItemInstanceId", finishedTaskCase1.getSubScopeId());
         assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("scopeId", caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), finishedTaskCase1.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("scopeIds").add("someId").add(caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), finishedTaskCase1.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -281,6 +290,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         assertResultsPresentInPostDataResponse(url, requestNode, task.getId());
     }
 
+    @Test
     public void testQueryTaskByCategory() throws Exception {
         Task t1 = taskService.newTask();
         t1.setName("t1");
@@ -323,7 +333,7 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
     }
 
     protected void assertResultsPresentInPostDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedTaskIds)
-            throws JsonProcessingException, IOException {
+            throws IOException {
         // Do the actual call
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
         httpPost.setEntity(new StringEntity(body.toString()));
@@ -335,12 +345,11 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         // Check presence of ID's
         if (expectedTaskIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String id = it.next().get("id").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String id = jsonNode.get("id").stringValue();
                 toBeFound.remove(id);
             }
-            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
         }
     }
 }

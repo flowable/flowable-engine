@@ -32,6 +32,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -335,6 +336,24 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         assertProcessEnded(processInstance.getId());
 
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/compensate/CompensateEventTest.testCompensationTimerEventBoundary.bpmn20.xml" })
+    public void testCompensationTimerEventBoundary() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationTimerEventBoundary");
+
+        // Verify the timer boundary event was properly set up (not mismatched with the compensation boundary event)
+        assertThat(managementService.createTimerJobQuery()
+                .processInstanceId(processInstance.getId()).list()).hasSize(1);
+
+        // Complete the wait task to end the process
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .taskDefinitionKey("waitTask").singleResult();
+        assertThat(task).isNotNull();
+        taskService.complete(task.getId());
+
+        assertProcessEnded(processInstance.getId());
     }
 
 }

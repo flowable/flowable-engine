@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.history;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -30,12 +31,16 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId);
+
+    HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceIds(Set<String> caseInstanceIds);
     HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId);
     HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionType(String planItemDefinitionType);
     HistoricPlanItemInstanceQuery planItemInstanceDefinitionTypes(List<String> planItemDefinitionTypes);
     HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee);
+    HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     HistoricPlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
@@ -68,6 +73,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery occurredAfter(Date occurredAfter);
     HistoricPlanItemInstanceQuery terminatedBefore(Date terminatedBefore);
     HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter);
+    HistoricPlanItemInstanceQuery failedBefore(Date failedBefore);
+    HistoricPlanItemInstanceQuery failedAfter(Date failedAfter);
     HistoricPlanItemInstanceQuery exitBefore(Date exitBefore);
     HistoricPlanItemInstanceQuery exitAfter(Date exitAfter);
     HistoricPlanItemInstanceQuery endedBefore(Date endedBefore);

@@ -34,8 +34,7 @@ public class VariableScopeExpressionManager extends DefaultExpressionManager {
         // The VariableScopeExpressionManager class adds caching of the ELContext
         
         ELContext elContext = null;
-        if (variableContainer instanceof VariableScopeImpl) {
-            VariableScopeImpl variableScopeImpl = (VariableScopeImpl) variableContainer;
+        if (variableContainer instanceof VariableScopeImpl variableScopeImpl) {
             elContext = variableScopeImpl.getCachedElContext();
         }
 

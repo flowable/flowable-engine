@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -51,7 +51,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Attachments"}, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments"}, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentCollectionResource extends TaskBaseResource {
 
     @Autowired

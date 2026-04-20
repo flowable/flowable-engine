@@ -14,7 +14,6 @@ package org.flowable.cmmn.engine.impl.delete;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -28,15 +27,13 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.QueryOperator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -94,7 +91,7 @@ public class BatchDeleteCaseConfig {
 
         Batch batch = batchService.getBatch(batchPart.getBatchId());
         JsonNode batchConfiguration = getBatchConfiguration(batch, engineConfiguration);
-        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue();
+        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue(false);
 
         JsonNode queryNode = batchConfiguration.path("query");
         if (queryNode.isMissingNode()) {
@@ -130,7 +127,7 @@ public class BatchDeleteCaseConfig {
 
         populateQuery(queryNode, query, engineConfiguration);
 
-        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").asBoolean(false)) {
+        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").booleanValue(false)) {
             // When the query has finishedBefore, finishedAfter or finished then we need to order by the end time
             // This is done in order to improve the performance when getting pages with large offsets.
             // When the properties are not set we cannot order on the end time
@@ -142,54 +139,55 @@ public class BatchDeleteCaseConfig {
     }
 
     protected static void populateQuery(JsonNode queryNode, HistoricCaseInstanceQuery query, CmmnEngineConfiguration engineConfiguration) {
-        Iterator<Map.Entry<String, JsonNode>> fieldIterator = queryNode.fields();
-        while (fieldIterator.hasNext()) {
-            Map.Entry<String, JsonNode> field = fieldIterator.next();
-            String property = field.getKey();
-            JsonNode value = field.getValue();
+        for (Map.Entry<String, JsonNode> propertyEntry : queryNode.properties()) {
+            String property = propertyEntry.getKey();
+            JsonNode value = propertyEntry.getValue();
             switch (property) {
                 case "caseDefinitionId":
-                    query.caseDefinitionId(value.textValue());
+                    query.caseDefinitionId(value.stringValue());
                     break;
                 case "caseDefinitionKey":
-                    query.caseDefinitionKey(value.textValue());
+                    query.caseDefinitionKey(value.stringValue());
                     break;
                 case "caseDefinitionKeys":
                     query.caseDefinitionKeys(asStringSet(value));
+                    break;
+                case "excludeCaseDefinitionKeys":
+                    query.excludeCaseDefinitionKeys(asStringSet(value));
                     break;
                 case "caseDefinitionIds":
                     query.caseDefinitionIds(asStringSet(value));
                     break;
                 case "caseDefinitionName":
-                    query.caseDefinitionName(value.textValue());
+                    query.caseDefinitionName(value.stringValue());
                     break;
                 case "caseDefinitionCategory":
-                    query.caseDefinitionCategory(value.textValue());
+                    query.caseDefinitionCategory(value.stringValue());
                     break;
                 case "caseDefinitionVersion":
                     query.caseDefinitionVersion(value.intValue());
                     break;
                 case "caseInstanceId":
-                    query.caseInstanceId(value.textValue());
+                    query.caseInstanceId(value.stringValue());
                     break;
                 case "caseInstanceIds":
                     query.caseInstanceIds(asStringSet(value));
                     break;
                 case "caseInstanceName":
-                    query.caseInstanceName(value.textValue());
+                    query.caseInstanceName(value.stringValue());
                 case "caseInstanceNameLike":
-                    query.caseInstanceNameLike(value.textValue());
+                    query.caseInstanceNameLike(value.stringValue());
                 case "caseInstanceNameLikeIgnoreCase":
-                    query.caseInstanceNameLikeIgnoreCase(value.textValue());
+                    query.caseInstanceNameLikeIgnoreCase(value.stringValue());
                     break;
                 case "businessKey":
-                    query.caseInstanceBusinessKey(value.textValue());
+                    query.caseInstanceBusinessKey(value.stringValue());
                     break;
                 case "businessStatus":
-                    query.caseInstanceBusinessStatus(value.textValue());
+                    query.caseInstanceBusinessStatus(value.stringValue());
                     break;
                 case "caseInstanceParentId":
-                    query.caseInstanceParentId(value.textValue());
+                    query.caseInstanceParentId(value.stringValue());
                     break;
                 case "withoutCaseInstanceParentId":
                     if (value.booleanValue()) {
@@ -197,7 +195,7 @@ public class BatchDeleteCaseConfig {
                     }
                     break;
                 case "deploymentId":
-                    query.deploymentId(value.textValue());
+                    query.deploymentId(value.stringValue());
                     break;
                 case "deploymentIds":
                     query.deploymentIds(asStringList(value));
@@ -213,33 +211,38 @@ public class BatchDeleteCaseConfig {
                     }
                     break;
                 case "startedBefore":
-                    query.startedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.startedBefore(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "startedAfter":
-                    query.startedAfter(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.startedAfter(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "finishedBefore":
-                    query.finishedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.finishedBefore(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "finishedAfter":
-                    query.finishedAfter(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.finishedAfter(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "startedBy":
-                    query.startedBy(value.textValue());
+                    query.startedBy(value.stringValue());
+                    break;
+                case "finishedBy":
+                    query.finishedBy(value.stringValue());
                     break;
                 case "lastReactivatedBefore":
-                    query.lastReactivatedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.lastReactivatedBefore(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "lastReactivatedAfter":
-                    query.lastReactivatedAfter(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.lastReactivatedAfter(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                 case "lastReactivatedBy":
-                    query.lastReactivatedBy(value.textValue());
+                    query.lastReactivatedBy(value.stringValue());
                     break;
                 case "callbackId":
-                    query.caseInstanceCallbackId(value.textValue());
+                    query.caseInstanceCallbackId(value.stringValue());
+                case "callbackIds":
+                    query.caseInstanceCallbackIds(asStringSet(value));
                     break;
                 case "callbackType":
-                    query.caseInstanceCallbackType(value.textValue());
+                    query.caseInstanceCallbackType(value.stringValue());
                     break;
                 case "withoutCallbackId":
                     if (value.booleanValue()) {
@@ -247,13 +250,13 @@ public class BatchDeleteCaseConfig {
                     }
                     break;
                 case "referenceId":
-                    query.caseInstanceReferenceId(value.textValue());
+                    query.caseInstanceReferenceId(value.stringValue());
                     break;
                 case "referenceType":
-                    query.caseInstanceReferenceType(value.textValue());
+                    query.caseInstanceReferenceType(value.stringValue());
                     break;
                 case "tenantId":
-                    query.caseInstanceTenantId(value.textValue());
+                    query.caseInstanceTenantId(value.stringValue());
                     break;
                 case "withoutTenantId":
                     if (value.booleanValue()) {
@@ -261,22 +264,22 @@ public class BatchDeleteCaseConfig {
                     }
                     break;
                 case "activePlanItemDefinitionId":
-                    query.activePlanItemDefinitionId(value.textValue());
+                    query.activePlanItemDefinitionId(value.stringValue());
                     break;
                 case "activePlanItemDefinitionIds":
                     query.activePlanItemDefinitionIds(asStringSet(value));
                     break;
                 case "involvedUser":
-                    query.involvedUser(value.textValue());
+                    query.involvedUser(value.stringValue());
                     break;
                 case "involvedUserIdentityLink":
-                    query.involvedUser(value.path("userId").textValue(), value.path("type").textValue());
+                    query.involvedUser(value.path("userId").stringValue(), value.path("type").stringValue());
                     break;
                 case "involvedGroups":
                     query.involvedGroups(asStringSet(value));
                     break;
                 case "involvedGroupIdentityLink":
-                    query.involvedUser(value.path("groupId").textValue(), value.path("type").textValue());
+                    query.involvedUser(value.path("groupId").stringValue(), value.path("type").stringValue());
                     break;
                 case "queryVariableValues":
                     populateQueryVariableValues(value, query, engineConfiguration);
@@ -285,10 +288,10 @@ public class BatchDeleteCaseConfig {
                     populateOrQueryObjects(value, query, engineConfiguration);
                     break;
                 case "caseInstanceRootScopeId":
-                    query.caseInstanceRootScopeId(value.textValue());
+                    query.caseInstanceRootScopeId(value.stringValue());
                     break;
                 case "caseInstanceParentScopeId":
-                    query.caseInstanceParentScopeId(value.textValue());
+                    query.caseInstanceParentScopeId(value.stringValue());
                     break;
                 default:
                     throw new FlowableIllegalArgumentException("Query property " + property + " is not supported");
@@ -310,13 +313,13 @@ public class BatchDeleteCaseConfig {
             CmmnEngineConfiguration engineConfiguration) {
         if (variableValuesNode.isArray()) {
             for (JsonNode variableValue : variableValuesNode) {
-                String operatorString = variableValue.path("operator").asText(null);
+                String operatorString = variableValue.path("operator").stringValue(null);
                 if (operatorString == null) {
                     throw new FlowableIllegalArgumentException("The variable value does not contain an operator value");
                 }
 
                 QueryOperator operator = QueryOperator.valueOf(operatorString);
-                String variableName = variableValue.path("name").textValue();
+                String variableName = variableValue.path("name").stringValue(null);
                 switch (operator) {
                     case EQUALS:
                         if (variableName != null) {
@@ -369,7 +372,7 @@ public class BatchDeleteCaseConfig {
     }
 
     protected static Object extractVariableValue(JsonNode variableValueNode, CmmnEngineConfiguration engineConfiguration) {
-        String type = variableValueNode.path("type").asText(null);
+        String type = variableValueNode.path("type").stringValue(null);
         if (type == null) {
             throw new FlowableIllegalArgumentException("The variable value does not have a type");
         }
@@ -380,10 +383,10 @@ public class BatchDeleteCaseConfig {
     }
 
     protected static List<String> asStringList(JsonNode node) {
-        if (node != null && node.isArray() && node.size() > 0) {
+        if (node != null && node.isArray() && !node.isEmpty()) {
             List<String> values = new ArrayList<>(node.size());
             for (JsonNode element : node) {
-                values.add(element.textValue());
+                values.add(element.stringValue());
             }
             return values;
         }
@@ -392,10 +395,10 @@ public class BatchDeleteCaseConfig {
     }
 
     protected static Set<String> asStringSet(JsonNode node) {
-        if (node != null && node.isArray() && node.size() > 0) {
+        if (node != null && node.isArray() && !node.isEmpty()) {
             List<String> values = new ArrayList<>(node.size());
             for (JsonNode element : node) {
-                values.add(element.textValue());
+                values.add(element.stringValue());
             }
             return new HashSet<>(values);
         }
@@ -404,13 +407,8 @@ public class BatchDeleteCaseConfig {
     }
 
     protected static JsonNode getBatchConfiguration(Batch batch, CmmnEngineConfiguration engineConfiguration) {
-        try {
-            return engineConfiguration.getObjectMapper()
-                    .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG));
-        } catch (JsonProcessingException e) {
-            ExceptionUtil.sneakyThrow(e);
-            return null;
-        }
+        return engineConfiguration.getObjectMapper()
+                .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG));
     }
 
     protected static String prepareFailedResultAsJsonString(String errorMessage, CmmnEngineConfiguration engineConfiguration) {
@@ -437,7 +435,7 @@ public class BatchDeleteCaseConfig {
 
         @Override
         public String getName() {
-            return node.path("name").textValue();
+            return node.path("name").stringValue();
         }
 
         @Override
@@ -472,7 +470,7 @@ public class BatchDeleteCaseConfig {
 
         @Override
         public String getTextValue() {
-            return node.path("textValue").textValue();
+            return node.path("textValue").stringValue(null);
         }
 
         @Override
@@ -482,7 +480,7 @@ public class BatchDeleteCaseConfig {
 
         @Override
         public String getTextValue2() {
-            return node.path("textValues").textValue();
+            return node.path("textValues").stringValue(null);
         }
 
         @Override

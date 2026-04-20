@@ -48,7 +48,7 @@ public class DefaultCmmnHistoryCleaningManager implements CmmnHistoryCleaningMan
 
     protected Date getEndedBefore() {
         Duration endedAfterDuration = cmmnEngineConfiguration.getCleanInstancesEndedAfter();
-        Instant endedBefore = Instant.now().minus(endedAfterDuration);
+        Instant endedBefore = cmmnEngineConfiguration.getClock().getCurrentTime().toInstant().minus(endedAfterDuration);
         return Date.from(endedBefore);
     }
 }

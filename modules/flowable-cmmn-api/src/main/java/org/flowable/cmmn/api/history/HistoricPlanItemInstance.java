@@ -63,6 +63,8 @@ public interface HistoricPlanItemInstance {
 
     Date getTerminatedTime();
 
+    Date getFailedTime();
+
     Date getExitTime();
 
     Date getEndedTime();
@@ -70,6 +72,10 @@ public interface HistoricPlanItemInstance {
     Date getLastUpdatedTime();
 
     String getStartUserId();
+
+    String getAssignee();
+
+    String getCompletedBy();
 
     String getReferenceId();
 

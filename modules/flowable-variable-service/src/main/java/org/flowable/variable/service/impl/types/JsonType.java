@@ -12,7 +12,6 @@
  */
 package org.flowable.variable.service.impl.types;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +23,9 @@ import org.flowable.common.engine.impl.HasVariableServiceConfiguration;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -31,14 +33,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tijs Rademakers
  * @author Filip Hrisafov
  */
-public class JsonType implements VariableType, MutableVariableType<JsonNode, JsonNode> {
+public class JsonType implements VariableType, MutableVariableType<Object, Object> {
 
     public static final String TYPE_NAME = "json";
 
@@ -47,24 +46,34 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonType.class);
 
     protected final int maxLength;
+    protected final VariableLengthVerifier lengthVerifier;
     protected final boolean trackObjects;
     protected final String typeName;
-    protected ObjectMapper objectMapper;
+    protected VariableJsonMapper jsonMapper;
 
-    public JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        this(maxLength, objectMapper, trackObjects, TYPE_NAME);
+    public JsonType(int maxLength, VariableJsonMapper jsonMapper, boolean trackObjects) {
+        this(maxLength, NoopVariableLengthVerifier.INSTANCE, jsonMapper, trackObjects);
     }
 
-    protected JsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects, String typeName) {
+    public JsonType(int maxLength, VariableLengthVerifier lengthVerifier, VariableJsonMapper jsonMapper, boolean trackObjects) {
+        this(maxLength, lengthVerifier, jsonMapper, trackObjects, TYPE_NAME);
+    }
+
+    protected JsonType(int maxLength, VariableLengthVerifier lengthVerifier, VariableJsonMapper jsonMapper, boolean trackObjects, String typeName) {
         this.maxLength = maxLength;
+        this.lengthVerifier = lengthVerifier;
         this.trackObjects = trackObjects;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.typeName = typeName;
     }
 
     // Needed for backwards compatibility of longJsonType
-    public static JsonType longJsonType(int maxLength, ObjectMapper objectMapper, boolean trackObjects) {
-        return new JsonType(maxLength, objectMapper, trackObjects, LONG_JSON_TYPE_NAME);
+    public static JsonType longJsonType(int maxLength, VariableJsonMapper jsonMapper, boolean trackObjects) {
+        return longJsonType(maxLength, NoopVariableLengthVerifier.INSTANCE, jsonMapper, trackObjects);
+    }
+
+    public static JsonType longJsonType(int maxLength, VariableLengthVerifier lengthVerifier, VariableJsonMapper jsonMapper, boolean trackObjects) {
+        return new JsonType(maxLength, lengthVerifier, jsonMapper, trackObjects, LONG_JSON_TYPE_NAME);
     }
 
     @Override
@@ -83,11 +92,11 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             return valueFields.getCachedValue();
         }
 
-        JsonNode jsonValue = null;
+        Object jsonValue = null;
         String textValue = valueFields.getTextValue();
         if (textValue != null && textValue.length() > 0) {
             try {
-                jsonValue = objectMapper.readTree(textValue);
+                jsonValue = jsonMapper.readTree(textValue);
                 valueFields.setCachedValue(jsonValue);
                 traceValue(jsonValue, valueFields);
             } catch (Exception e) {
@@ -97,10 +106,10 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             byte[] bytes = valueFields.getBytes();
             if (bytes != null && bytes.length > 0) {
                 try {
-                    jsonValue = objectMapper.readTree(bytes);
+                    jsonValue = jsonMapper.readTree(bytes);
                     valueFields.setCachedValue(jsonValue);
                     traceValue(jsonValue, valueFields);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     LOGGER.error("Error reading json variable {}", valueFields.getName(), e);
                 }
             }
@@ -115,22 +124,24 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
             valueFields.setBytes(null);
             valueFields.setCachedValue(null);
         } else {
-            JsonNode jsonNode = (JsonNode) value;
+
             String textValue = value.toString();
-            if (textValue.length() <= maxLength) {
+            int length = textValue.length();
+            lengthVerifier.verifyLength(length, valueFields, this);
+            if (length <= maxLength) {
                 valueFields.setTextValue(textValue);
                 valueFields.setBytes(null);
             } else {
                 valueFields.setBytes(textValue.getBytes(StandardCharsets.UTF_8));
                 valueFields.setTextValue(null);
             }
-            valueFields.setCachedValue(jsonNode);
-            traceValue(jsonNode, valueFields);
+            valueFields.setCachedValue(value);
+            traceValue(value, valueFields);
         }
     }
 
     @Override
-    public boolean updateValueIfChanged(JsonNode originalNode, JsonNode originalCopyNode, VariableInstanceEntity variableInstanceEntity) {
+    public boolean updateValueIfChanged(Object originalNode, Object originalCopyNode, VariableInstanceEntity variableInstanceEntity) {
         boolean valueChanged = false;
         if (!Objects.equals(originalNode, originalCopyNode)) {
             String textValue = originalNode.toString();
@@ -148,14 +159,14 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         return valueChanged;
     }
 
-    protected void traceValue(JsonNode value, ValueFields valueFields) {
+    protected void traceValue(Object value, ValueFields valueFields) {
         if (trackObjects && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
                 VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(valueFields);
                 if (variableServiceConfiguration != null) {
                     commandContext.addCloseListener(new TraceableVariablesCommandContextCloseListener(
-                        new TraceableObject<>(this, value, value.deepCopy(), (VariableInstanceEntity) valueFields)
+                            new TraceableObject<>(this, value, jsonMapper.deepCopy(value), (VariableInstanceEntity) valueFields)
                     ));
                     
                 }
@@ -195,6 +206,6 @@ public class JsonType implements VariableType, MutableVariableType<JsonNode, Jso
         if (value == null) {
             return true;
         }
-        return value instanceof JsonNode;
+        return jsonMapper.isJsonNode(value);
     }
 }

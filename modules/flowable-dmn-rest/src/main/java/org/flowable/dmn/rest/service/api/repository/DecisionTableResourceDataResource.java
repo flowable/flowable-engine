@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  */
 @Deprecated
 @RestController
-@Api(tags = { "Decision Tables" }, description = "Manage Decision Tables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Decision Tables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionTableResourceDataResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision table resource content", tags = { "Decision Tables" })

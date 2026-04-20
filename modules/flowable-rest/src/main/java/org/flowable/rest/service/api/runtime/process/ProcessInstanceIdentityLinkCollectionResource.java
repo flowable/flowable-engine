@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -37,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Identity Links" }, description = "Manage Process Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessInstanceResource {
 
     @ApiOperation(value = "Get involved people for process instance", tags = {"Process Instance Identity Links" }, nickname = "listProcessInstanceIdentityLinks",
@@ -71,12 +72,12 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
 
         ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
-        if (identityLink.getGroup() != null) {
-            throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");
+        if (identityLink.getGroup() == null && identityLink.getUser() == null) {
+            throw new FlowableIllegalArgumentException("User or group are required.");
         }
-
-        if (identityLink.getUser() == null) {
-            throw new FlowableIllegalArgumentException("The user is required.");
+        
+        if (StringUtils.isEmpty(identityLink.getGroup()) && StringUtils.isEmpty(identityLink.getUser())) {
+            throw new FlowableIllegalArgumentException("Only one value of user or group is supported.");
         }
 
         if (identityLink.getType() == null) {
@@ -87,7 +88,12 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
             restApiInterceptor.createProcessInstanceIdentityLink(processInstance, identityLink);
         }
 
-        runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());
+        if (StringUtils.isNotEmpty(identityLink.getGroup())) {
+            runtimeService.addGroupIdentityLink(processInstance.getId(), identityLink.getGroup(), identityLink.getType());
+            
+        } else {
+            runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());
+        }
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), null, null, processInstance.getId());
     }

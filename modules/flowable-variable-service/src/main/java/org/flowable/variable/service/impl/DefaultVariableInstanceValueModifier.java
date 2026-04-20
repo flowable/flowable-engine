@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.impl;
 
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -32,8 +33,11 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
 
     @Override
     public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
-        if (variableInstance instanceof VariableInstanceEntity) {
-            VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+        if (JsonUtil.isJsonNode(value)) {
+            // If the value is JSON, we need to transform it to the json type that the variable json mapper understands.
+            value = serviceConfiguration.getVariableJsonMapper().transformToJsonNode(value);
+        }
+        if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
             VariableType variableType = determineVariableType(value);
             setVariableType(variableInstanceEntity, variableType);
         }
@@ -45,8 +49,7 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
         /* Always check if the type should be altered. It's possible that the previous type is lower in the type
          * checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type higher in the chain is eligible for storage.
          */
-        if (variableInstance instanceof VariableInstanceEntity) {
-            VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+        if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
             VariableType variableType = determineVariableType(value);
             if (!variableType.equals(variableInstanceEntity.getType())) {
                 updateVariableType(variableInstanceEntity, variableType);

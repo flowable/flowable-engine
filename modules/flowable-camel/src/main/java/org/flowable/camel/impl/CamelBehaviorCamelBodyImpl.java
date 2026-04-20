@@ -13,7 +13,6 @@
 
 package org.flowable.camel.impl;
 
-import org.flowable.camel.FlowableEndpoint;
 import org.flowable.camel.SpringCamelBehavior;
 
 /**
@@ -27,7 +26,7 @@ public class CamelBehaviorCamelBodyImpl extends SpringCamelBehavior {
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
-        toTargetType = TargetType.BODY;
+    protected TargetType getDefaultToTargetType() {
+        return TargetType.BODY;
     }
 }

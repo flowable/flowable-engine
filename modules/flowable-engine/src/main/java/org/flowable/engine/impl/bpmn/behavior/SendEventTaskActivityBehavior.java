@@ -33,7 +33,9 @@ import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -72,6 +74,14 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(sendEventServiceTask.getSkipExpression(), sendEventServiceTask.getId(), execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(sendEventServiceTask.getSkipExpression(), sendEventServiceTask.getId(), execution, commandContext)) {
+            leave(execution);
+            return;
+        }
+        
         EventRegistry eventRegistry = CommandContextUtil.getEventRegistry(commandContext);
 
         EventModel eventModel = getEventModel(commandContext, execution);
@@ -89,6 +99,8 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
             jobService.scheduleAsyncJob(job);
 
         } else {
+            commandContext.removeAttribute(AsyncSendEventJobHandler.TYPE);
+
             Collection<EventPayloadInstance> eventPayloadInstances = EventInstanceBpmnUtil.createEventPayloadInstances(executionEntity,
                     processEngineConfiguration.getExpressionManager(), execution.getCurrentFlowElement(), eventModel);
 
@@ -103,6 +115,9 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
                 eventRegistry.sendSystemEventOutbound(eventInstance);
             }
 
+            if (executedAsAsyncJob) {
+                commandContext.addAttribute(AsyncSendEventJobHandler.TYPE, true);
+            }
         }
 
         if (sendEventServiceTask.isTriggerable() && !executedAsAsyncJob) {
@@ -216,12 +231,13 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         if (sendEventServiceTask.isTriggerable()) {
             Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
-            if (eventInstance instanceof EventInstance) {
-                EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
-            }
-
             CommandContext commandContext = CommandContextUtil.getCommandContext();
             ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+            if (eventInstance instanceof EventInstance) {
+                BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+                outParameterHandler.handleOutParameters(execution, sendEventServiceTask, (EventInstance) eventInstance);
+            }
+
             EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
             ExecutionEntity executionEntity = (ExecutionEntity) execution;
             List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();

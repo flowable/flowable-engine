@@ -403,6 +403,10 @@ public class CaseDefinitionQueryImpl extends AbstractQuery<CaseDefinitionQuery, 
         return ids;
     }
 
+    public List<List<String>> getSafeIds() {
+        return getSafeList(ids);
+    }
+
     public String getName() {
         return name;
     }

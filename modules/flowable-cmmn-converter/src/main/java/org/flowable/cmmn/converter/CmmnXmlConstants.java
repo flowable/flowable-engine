@@ -158,8 +158,10 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_IOPARAMETER_SOURCE = "source";
     String ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION = "sourceExpression";
+    String ATTRIBUTE_IOPARAMETER_SOURCE_TYPE = "sourceType";
     String ATTRIBUTE_IOPARAMETER_TARGET = "target";
     String ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION = "targetExpression";
+    String ATTRIBUTE_IOPARAMETER_TARGET_TYPE = "targetType";
     String ATTRIBUTE_IOPARAMETER_TRANSIENT = "transient";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
@@ -211,6 +213,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME = "elementIndexVariable";
 
     String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+    String ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
 
     String ATTRIBUTE_EVENT_LISTENER_TYPE = "eventType"; // Note that this is the same as ELEMENT_EVENT_TYPE. We can't change this (backwards compatibility)
     String ATTRIBUTE_EVENT_LISTENER_AVAILABLE_CONDITION = "availableCondition";

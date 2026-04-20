@@ -128,8 +128,7 @@ public class SimpleFormModel implements FormModel {
         if (fields != null && fields.size() > 0) {
             for (FormField field : fields) {
                 listOfAllFields.add(field);
-                if (field instanceof FormContainer) {
-                    FormContainer container = (FormContainer) field;
+                if (field instanceof FormContainer container) {
                     List<List<FormField>> subFields = container.getFields();
                     if (subFields != null) {
                         for (List<FormField> subFieldDefinitions : subFields) {

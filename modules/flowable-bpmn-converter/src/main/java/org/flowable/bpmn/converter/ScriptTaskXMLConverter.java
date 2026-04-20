@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.ScriptTextParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -39,7 +40,8 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE),
             new ExtensionAttribute(ATTRIBUTE_TASK_SERVICE_RESULT_VARIABLE_NAME),
             new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION),
-            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE)
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE),
+            new ExtensionAttribute(ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES)
     );
 
     protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
@@ -47,6 +49,8 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
     public ScriptTaskXMLConverter() {
         ScriptTextParser scriptTextParser = new ScriptTextParser();
         childParserMap.put(scriptTextParser.getElementName(), scriptTextParser);
+        InParameterParser inParameterParser = new InParameterParser();
+        childParserMap.put(inParameterParser.getElementName(), inParameterParser);
     }
 
     @Override
@@ -78,6 +82,8 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
             scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
         }
 
+        scriptTask.setDoNotIncludeVariables(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES, xtr)));
+
         BpmnXMLUtil.addCustomAttributes(xtr, scriptTask, defaultElementAttributes, defaultActivityAttributes, defaultScriptTaskAttributes);
 
         parseChildElements(getXMLElementName(), scriptTask, childParserMap, model, xtr);
@@ -93,9 +99,21 @@ public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE, scriptTask.getResultVariable(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION, scriptTask.getSkipExpression(), xtw);
         writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE, String.valueOf(scriptTask.isAutoStoreVariables()), xtw);
+        if (scriptTask.isDoNotIncludeVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES, "true", xtw);
+        }
 
         BpmnXMLUtil.writeCustomAttributes(scriptTask.getAttributes().values(), xtw, defaultElementAttributes,
                 defaultActivityAttributes, defaultScriptTaskAttributes);
+    }
+
+    @Override
+    protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        ScriptTask scriptTask = (ScriptTask) element;
+        didWriteExtensionStartElement = super.writeExtensionChildElements(element, didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS,
+                scriptTask.getInParameters(), didWriteExtensionStartElement, xtw);
+        return didWriteExtensionStartElement;
     }
 
     @Override

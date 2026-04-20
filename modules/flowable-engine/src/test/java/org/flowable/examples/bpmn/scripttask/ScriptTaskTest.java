@@ -30,7 +30,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import groovy.lang.MissingPropertyException;
 
@@ -78,6 +78,28 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         // The second script, after the user task will set the variable
         taskService.complete(taskService.createTaskQuery().singleResult().getId());
         assertThat(((Number) runtimeService.getVariable(id, "sum")).intValue()).isEqualTo(42);
+    }
+
+    @Test
+    @Deployment
+    public void testInputVariables() {
+        // The first script should use the input variables
+        // i.e. when input parameters are defined then doNotIncludeVariables is ignored
+        String id = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testInputVariables")
+                .variable("a", 20)
+                .variable("b", 22)
+                .variable("aVar", 100)
+                .variable("bVar", 10)
+                .start()
+                .getId();
+        assertThat(runtimeService.getVariable(id, "sum"))
+                .isInstanceOfSatisfying(Number.class, number -> assertThat(number.intValue()).isEqualTo(120));
+
+        // The second script should not use the input variables at all
+        assertThatThrownBy(() -> {
+            taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        }).hasMessageContaining("\"a\" is not defined");
     }
 
     @Test

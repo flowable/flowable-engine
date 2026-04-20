@@ -14,6 +14,7 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -37,6 +39,8 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String businessKey;
     protected String businessStatus;
     protected String startUserId;
+    protected String state;
+    protected String endUserId;
     protected String startActivityId;
     protected String superProcessInstanceId;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
@@ -54,6 +58,9 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String referenceId;
     protected String referenceType;
     protected String propagatedStageInstanceId;
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -81,6 +88,7 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         this.referenceId = processInstance.getReferenceId();
         this.referenceType = processInstance.getReferenceType();
         this.propagatedStageInstanceId = processInstance.getPropagatedStageInstanceId();
+        this.state = ProcessInstanceState.RUNNING;
 
         // Inherit tenant id (if applicable)
         if (processInstance.getTenantId() != null) {
@@ -111,6 +119,11 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("propagatedStageInstanceId", propagatedStageInstanceId);
+        persistentState.put("state", state);
+        persistentState.put("endUserId", endUserId);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         return persistentState;
     }
 
@@ -154,6 +167,26 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+
+    @Override
+    public String getState() {
+        return state;
+    }
+
+    @Override
+    public void setState(String state) {
+        this.state = state;
+    }
+
+    @Override
+    public String getEndUserId() {
+        return endUserId;
+    }
+
+    @Override
+    public void setEndUserId(String endUserId) {
+        this.endUserId = endUserId;
     }
 
     @Override
@@ -330,6 +363,36 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     @Override
     public void setPropagatedStageInstanceId(String propagatedStageInstanceId) {
         this.propagatedStageInstanceId = propagatedStageInstanceId;
+    }
+
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 
     @Override

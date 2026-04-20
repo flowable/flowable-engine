@@ -21,8 +21,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.test.FlowableAppExtension;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -42,7 +46,6 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
@@ -50,22 +53,22 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessTest extends FlowableAppTestCase {
+@ExtendWith(FlowableAppExtension.class)
+@MockitoSettings
+public class ProcessTest {
 
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
+    protected AppEngineConfiguration appEngineConfiguration;
+    protected AppRepositoryService appRepositoryService;
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -76,13 +79,15 @@ public class ProcessTest extends FlowableAppTestCase {
     @Mock
     protected FormRepositoryService formRepositoryService;
 
-    @Before
-    public void initializeMocks() {
+    @BeforeEach
+    void setUp(AppEngine appEngine) {
+        appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        appRepositoryService = appEngine.getAppRepositoryService();
         Map engineConfigurations = appEngineConfiguration.getEngineConfigurations();
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void resetMocks() {
         appEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
@@ -382,11 +387,6 @@ public class ProcessTest extends FlowableAppTestCase {
             
             runtimeService.setVariable(processInstance.getId(), "var1", "test");
             
-            List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-            for (Execution execution : executions) {
-                System.out.println("execution " + execution.getId() + " " + execution.getActivityId());
-            }
-            
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         } finally {
@@ -463,5 +463,54 @@ public class ProcessTest extends FlowableAppTestCase {
                     .list()
                     .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
         }
+    }
+
+    @Test
+    public void deletingAppDeploymentShouldDeleteChildInstances() {
+        AppDeployment appDeployment = appRepositoryService
+                .createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/test.app")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithListener.cmmn")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseTaskProcessWithListener.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+            TaskService taskService = processEngineConfiguration.getTaskService();
+            HistoryService historyService = processEngineConfiguration.getHistoryService();
+
+            CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("caseTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+            CaseInstance subCaseInstance = cmmnRuntimeService
+                    .createCaseInstanceQuery()
+                    .caseDefinitionKey("caseWithListener")
+                    .singleResult();
+            assertThat(subCaseInstance).isNotNull();
+
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery().list()).isEmpty();
+                assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+            }
+        } finally {
+            appDeployment = appRepositoryService.createDeploymentQuery().deploymentId(appDeployment.getId()).singleResult();
+            if (appDeployment != null) {
+                appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+            }
+
+        }
+
     }
 }

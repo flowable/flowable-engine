@@ -20,7 +20,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -30,7 +30,7 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class DataObjectValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
 
         // Gather data objects
         List<ValuedDataObject> allDataObjects = new ArrayList<>(process.getDataObjects());
@@ -42,7 +42,7 @@ public class DataObjectValidator extends ProcessLevelValidator {
         // Validate
         for (ValuedDataObject dataObject : allDataObjects) {
             if (StringUtils.isEmpty(dataObject.getName())) {
-                addError(errors, Problems.DATA_OBJECT_MISSING_NAME, process, dataObject, "Name is mandatory for a data object");
+                validationContext.addError(Problems.DATA_OBJECT_MISSING_NAME, process, dataObject, "Name is mandatory for a data object");
             }
         }
 

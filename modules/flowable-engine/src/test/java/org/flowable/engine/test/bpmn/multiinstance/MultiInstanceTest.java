@@ -709,7 +709,7 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             assertThat(jobs).hasSize(10);
 
             // When a job fails it is moved to the timer jobs, so it can be executed later
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000, 200);
+            waitForJobExecutorToProcessAllJobs(20000, 200);
             jobs = managementService.createJobQuery().list();
             assertThat(jobs).isEmpty();
             List<Job> timerJobs = managementService.createTimerJobQuery().list();

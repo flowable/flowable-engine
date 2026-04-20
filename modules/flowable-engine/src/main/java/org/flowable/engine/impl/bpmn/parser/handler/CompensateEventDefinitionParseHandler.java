@@ -32,13 +32,11 @@ public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHand
     @Override
     protected void executeParse(BpmnParse bpmnParse, CompensateEventDefinition eventDefinition) {
 
-        if (bpmnParse.getCurrentFlowElement() instanceof ThrowEvent) {
-            ThrowEvent throwEvent = (ThrowEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof ThrowEvent throwEvent) {
             throwEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowCompensationEventActivityBehavior(
                     throwEvent, eventDefinition));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
+        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryCompensateEventActivityBehavior(boundaryEvent,
                     eventDefinition, boundaryEvent.isCancelActivity()));
 

@@ -144,6 +144,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             if (xtr.isStartElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = true;
+                    
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {
                     BaseChildElementParser childParser = localParserMap.get(xtr.getLocalName());
                     // if we're into an extension element but the current element is not accepted by this parentElement then is read as a custom extension element
@@ -153,6 +154,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                         continue;
                     }
                     localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, model);
+                    
                 } else if (inExtensionElements) {
                     ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
                     parentElement.addExtensionElement(extensionElement);
@@ -199,11 +201,17 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
                 if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-                    extensionElement.setElementText(xtr.getText().trim());
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
                 }
             } else if (xtr.isStartElement()) {
                 ExtensionElement childExtensionElement = parseExtensionElement(xtr);
                 extensionElement.addChildElement(childExtensionElement);
+                
             } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
                 readyWithExtensionElement = true;
             }
@@ -243,10 +251,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_TARGET_TYPE.equals(attributeName)) {
+                    parameter.setTargetType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -259,10 +272,10 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 parameter.addAttribute(extensionAttribute);
             }
         }
-        
+
         return parameter;
     }
-    
+
     public static IOParameter parseOutIOParameter(XMLStreamReader xtr) {
         IOParameter parameter = null;
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
@@ -289,10 +302,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_SOURCE_TYPE.equals(attributeName)) {
+                    parameter.setSourceType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -448,8 +466,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getSourceType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getSourceType(), xtw);
             }
             
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
@@ -459,8 +477,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getTargetType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getTargetType(), xtw);
             }
             
             if (ioParameter.isTransient()) {

@@ -10,6 +10,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="minimumIdle" value="0" />
         <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
         <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
         <property name="username" value="${jdbc.username:sa}" />
@@ -31,10 +32,6 @@
     </bean>
 
     <bean id="idmIdentityService" factory-bean="idmEngine" factory-method="getIdmIdentityService"/>
-
-    <bean id="activitiRule" class="org.flowable.idm.engine.test.FlowableIdmRule">
-        <property name="idmEngine" ref="idmEngine"/>
-    </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
 

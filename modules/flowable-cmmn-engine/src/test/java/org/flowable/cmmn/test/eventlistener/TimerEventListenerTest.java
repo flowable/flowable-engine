@@ -33,18 +33,19 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -930,5 +931,184 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
                             tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.AVAILABLE)
                     );
         }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testSuspendTimerEventListener() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSuspendTimerEventListener").start();
+        assertThat(caseInstance).isNotNull();
+
+        // Verify timer event listener is available and a timer job exists
+        PlanItemInstance timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable()
+                .singleResult();
+        assertThat(timerPlanItemInstance).isNotNull();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
+        // Suspend the timer event listener via the command executor
+        String planItemInstanceId = timerPlanItemInstance.getId();
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).suspend();
+
+        // Verify the timer event listener is in suspended state
+        PlanItemInstance suspendedPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceState(PlanItemInstanceState.SUSPENDED)
+                .singleResult();
+        assertThat(suspendedPlanItemInstance).isNotNull();
+        assertThat(suspendedPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+        assertThat(suspendedPlanItemInstance.getLastSuspendedTime()).isNotNull();
+
+        // Verify the available query no longer returns the timer
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable()
+                .singleResult()).isNull();
+
+        // Verify all plan items: timer should be suspended, human task should still be available
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionType, PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple(PlanItemDefinitionType.TIMER_EVENT_LISTENER, "timerListener", PlanItemInstanceState.SUSPENDED),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.AVAILABLE)
+                );
+        
+        Job suspendedJob = cmmnManagementService.createSuspendedJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).singleResult();
+        assertThat(suspendedJob).isNotNull();
+        
+        assertThat(cmmnManagementService.createTimerJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).count()).isZero();
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricPlanItemInstance historicTimerPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                    .singleResult();
+            assertThat(historicTimerPlanItemInstance).isNotNull();
+            assertThat(historicTimerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+            assertThat(historicTimerPlanItemInstance.getLastSuspendedTime()).isNotNull();
+        }
+        
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).suspend();
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("plan item instance is already suspended");
+        
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).resume();
+        
+        PlanItemInstance activatedPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .singleResult();
+        assertThat(activatedPlanItemInstance).isNotNull();
+        assertThat(activatedPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        
+        suspendedJob = cmmnManagementService.createSuspendedJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).singleResult();
+        assertThat(suspendedJob).isNull();
+        
+        assertThat(cmmnManagementService.createTimerJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).count()).isEqualTo(1);
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricPlanItemInstance historicTimerPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                    .singleResult();
+            assertThat(historicTimerPlanItemInstance).isNotNull();
+            assertThat(historicTimerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+        }
+        
+        assertThatThrownBy(() -> {
+            cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).resume();
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("plan item instance can only be resumed if the state is suspended");
+        
+        Job timerJob = cmmnManagementService.createTimerJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).singleResult();
+        Job executableJob = cmmnManagementService.moveTimerToExecutableJob(timerJob.getId());
+        cmmnManagementService.executeJob(executableJob.getId());
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testSuspendTimerAndExitStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerExitStageOnCompletedTask").start();
+        assertThat(caseInstance).isNotNull();
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
+        // Verify timer event listener is available and a timer job exists
+        PlanItemInstance timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable()
+                .singleResult();
+        assertThat(timerPlanItemInstance).isNotNull();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
+        // Suspend the timer event listener via the command executor
+        String planItemInstanceId = timerPlanItemInstance.getId();
+        cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceId).suspend();
+
+        // Verify the timer event listener is in suspended state
+        PlanItemInstance suspendedPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceState(PlanItemInstanceState.SUSPENDED)
+                .singleResult();
+        assertThat(suspendedPlanItemInstance).isNotNull();
+        assertThat(suspendedPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+        assertThat(suspendedPlanItemInstance.getLastSuspendedTime()).isNotNull();
+        
+        Job suspendedJob = cmmnManagementService.createSuspendedJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).singleResult();
+        assertThat(suspendedJob).isNotNull();
+        
+        assertThat(cmmnManagementService.createTimerJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).count()).isZero();
+        
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("onehumantask1").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+        
+        assertThat(cmmnManagementService.createSuspendedJobQuery().planItemInstanceId(suspendedPlanItemInstance.getId()).count()).isZero();
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testActiveTimerAndExitStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerExitStageOnCompletedTask").start();
+        assertThat(caseInstance).isNotNull();
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
+
+        // Verify timer event listener is available and a timer job exists
+        PlanItemInstance timerPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
+                .planItemInstanceStateAvailable()
+                .singleResult();
+        assertThat(timerPlanItemInstance).isNotNull();
+        assertThat(timerPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        assertThat(cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).count()).isEqualTo(1);
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("onehumantask1").singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
+        
+        assertThat(cmmnManagementService.createTimerJobQuery().planItemInstanceId(timerPlanItemInstance.getId()).count()).isZero();
+        
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+        
+        assertCaseInstanceEnded(caseInstance);
     }
 }

@@ -34,7 +34,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Engine" }, description = "Manage Engine", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Engine" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessEngineResource {
 
     @Autowired

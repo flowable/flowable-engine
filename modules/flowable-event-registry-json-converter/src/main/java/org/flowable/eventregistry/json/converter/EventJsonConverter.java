@@ -13,14 +13,18 @@
 package org.flowable.eventregistry.json.converter;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 import org.flowable.eventregistry.model.EventModel;
 import org.flowable.eventregistry.model.EventPayload;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -28,22 +32,30 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventJsonConverter {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected Supplier<ObjectMapper> objectMapperSupplier;
+
+    public EventJsonConverter() {
+        this(JsonMapper::shared);
+    }
+
+    public EventJsonConverter(Supplier<ObjectMapper> objectMapperSupplier) {
+        this.objectMapperSupplier = objectMapperSupplier;
+    }
 
     public EventModel convertToEventModel(String modelJson) {
         try {
-            JsonNode modelNode = objectMapper.readTree(modelJson);
+            JsonNode modelNode = objectMapperSupplier.get().readTree(modelJson);
             EventModel eventModel = new EventModel();
 
-            eventModel.setKey(modelNode.path("key").asText(null));
-            eventModel.setName(modelNode.path("name").asText(null));
+            eventModel.setKey(modelNode.path("key").stringValue(null));
+            eventModel.setName(modelNode.path("name").stringValue(null));
             
             JsonNode payloadNode = modelNode.path("payload");
 
             if (payloadNode.isArray()) {
                 for (JsonNode node : payloadNode) {
-                    String name = node.path("name").asText(null);
-                    String type = node.path("type").asText(null);
+                    String name = node.path("name").stringValue(null);
+                    String type = node.path("type").stringValue(null);
 
                     EventPayload payload = new EventPayload(name, type);
                     if (node.path("isFullPayload").asBoolean(false)) {
@@ -53,6 +65,8 @@ public class EventJsonConverter {
                         payload.setHeader(node.path("header").asBoolean(false));
                         payload.setMetaParameter(node.path("metaParameter").asBoolean(false));
                     }
+                    
+                    processExtensionProperties(node, payload);
 
                     eventModel.addPayload(payload);
                 }
@@ -61,9 +75,11 @@ public class EventJsonConverter {
             JsonNode correlationParameters = modelNode.path("correlationParameters");
             if (correlationParameters.isArray()) {
                 for (JsonNode correlationPayloadNode : correlationParameters) {
-                    String name = correlationPayloadNode.path("name").asText(null);
-                    String type = correlationPayloadNode.path("type").asText(null);
-                    eventModel.addCorrelation(name, type);
+                    String name = correlationPayloadNode.path("name").stringValue(null);
+                    String type = correlationPayloadNode.path("type").stringValue(null);
+                    EventPayload payload = eventModel.addCorrelation(name, type);
+                    
+                    processExtensionProperties(correlationPayloadNode, payload);
                 }
             }
 
@@ -75,6 +91,7 @@ public class EventJsonConverter {
     }
 
     public String convertToJson(EventModel definition) {
+        ObjectMapper objectMapper = objectMapperSupplier.get();
         ObjectNode modelNode = objectMapper.createObjectNode();
 
         if (definition.getKey() != null) {
@@ -113,6 +130,13 @@ public class EventJsonConverter {
                 if (eventPayload.isMetaParameter()) {
                     eventPayloadNode.put("metaParameter", true);
                 }
+                
+                if (eventPayload.getExtensionProperties() != null && !eventPayload.getExtensionProperties().isEmpty()) {
+                    ObjectNode extensionPropNode = eventPayloadNode.putObject("extensionProperties");
+                    for (String propName : eventPayload.getExtensionProperties().keySet()) {
+                        extensionPropNode.put(propName, eventPayload.getExtensionProperties().get(propName));
+                    }
+                }
             }
         }
 
@@ -120,6 +144,18 @@ public class EventJsonConverter {
             return objectMapper.writeValueAsString(modelNode);
         } catch (Exception e) {
             throw new FlowableEventJsonException("Error writing event json", e);
+        }
+    }
+    
+    protected void processExtensionProperties(JsonNode node, EventPayload payload) {
+        JsonNode extensionNodes = node.path("extensionProperties");
+        if (extensionNodes != null && !extensionNodes.isMissingNode()) {
+            Map<String, String> extensionPropertyMap = new HashMap<>();
+            for (String extensionName : extensionNodes.propertyNames()) {
+                extensionPropertyMap.put(extensionName, extensionNodes.get(extensionName).asString());
+            }
+            
+            payload.setExtensionProperties(extensionPropertyMap);
         }
     }
 }

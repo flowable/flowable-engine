@@ -114,7 +114,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         vars.put("name", "kermit");
         vars.put("gender", "male");
         vars.put("genderBean", new GenderBean());
-        vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        vars.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         vars.put("skip", false);
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars);
@@ -129,7 +129,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         vars2.put("name", "kermit");
         vars2.put("gender", "male");
         vars2.put("genderBean", new GenderBean());
-        vars2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
+        vars2.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         vars2.put("skip", true);
 
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars2);

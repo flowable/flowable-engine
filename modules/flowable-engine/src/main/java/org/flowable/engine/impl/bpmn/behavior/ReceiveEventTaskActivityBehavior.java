@@ -23,12 +23,13 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.EventInstanceBpmnUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -39,15 +40,27 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
  */
 public class ReceiveEventTaskActivityBehavior extends AbstractBpmnActivityBehavior {
 
+    protected String receiveTaskId;
+    protected String skipExpression;
     protected String eventDefinitionKey;
 
-    public ReceiveEventTaskActivityBehavior(String eventDefinitionKey) {
+    public ReceiveEventTaskActivityBehavior(String eventDefinitionKey, String receiveTaskId, String skipExpression) {
         this.eventDefinitionKey = eventDefinitionKey;
+        this.receiveTaskId = receiveTaskId;
+        this.skipExpression = skipExpression;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = Context.getCommandContext();
+        
+        boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(skipExpression, receiveTaskId, execution, commandContext);
+
+        if (isSkipExpressionEnabled && SkipExpressionUtil.shouldSkipFlowElement(skipExpression, receiveTaskId, execution, commandContext)) {
+            leave(execution);
+            return;
+        }
+        
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         String eventDefinitionKey = getEventDefinitionKey(commandContext, executionEntity);
@@ -71,13 +84,13 @@ public class ReceiveEventTaskActivityBehavior extends AbstractBpmnActivityBehavi
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
         Object eventInstance = execution.getTransientVariables().get(EventConstants.EVENT_INSTANCE);
         if (eventInstance instanceof EventInstance) {
-            EventInstanceBpmnUtil.handleEventInstanceOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
+            BpmnEventInstanceOutParameterHandler outParameterHandler = processEngineConfiguration.getBpmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(execution, execution.getCurrentFlowElement(), (EventInstance) eventInstance);
         }
-
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
         List<EventSubscriptionEntity> eventSubscriptions = executionEntity.getEventSubscriptions();
 

@@ -33,7 +33,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
@@ -118,8 +118,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         if (currentFlowElement instanceof FlowNode) {
             sourceFlowNode = (FlowNode) currentFlowElement;
 
-        } else if (currentFlowElement instanceof SequenceFlow){
-            SequenceFlow sequenceFlow = (SequenceFlow) currentFlowElement;
+        } else if (currentFlowElement instanceof SequenceFlow sequenceFlow){
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             if (sourceFlowElement instanceof FlowNode) {
                 sourceFlowNode = (FlowNode) sourceFlowElement;
@@ -165,8 +164,8 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             if (shouldExecuteEndListeners(flowNode)) {
                 try {
                     executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
-                } catch (BpmnError bpmnError) {
-                    ErrorPropagation.propagateError(bpmnError, execution);
+                } catch (BusinessError businessError) {
+                    ErrorPropagation.propagateError(businessError, execution);
                     // We don't return here immediately, because the activity needs to be ended properly and the event dispatched
                     continueNormally = false;
                 }
@@ -370,11 +369,10 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             agenda.planDestroyScopeOperation(execution);
 
-        } else if (currentFlowElement instanceof Activity) {
+        } else if (currentFlowElement instanceof Activity activity) {
 
             // If the current activity is an activity, we need to remove any currently active boundary events
 
-            Activity activity = (Activity) currentFlowElement;
             if (CollectionUtil.isNotEmpty(activity.getBoundaryEvents())) {
 
                 // Cancel events are not removed

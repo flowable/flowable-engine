@@ -51,7 +51,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Case" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResource {
 
     @Autowired
@@ -121,8 +121,10 @@ public class HistoricCaseInstanceResource extends HistoricCaseInstanceBaseResour
     public void migrateHistoricCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
                                        @RequestBody String migrationDocumentJson) {
 
+        HistoricCaseInstance caseInstance = getHistoricCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.migrateHistoricCaseInstance(caseInstanceId, migrationDocumentJson);
+            restApiInterceptor.migrateHistoricCaseInstance(caseInstance, migrationDocumentJson);
         }
 
         HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);

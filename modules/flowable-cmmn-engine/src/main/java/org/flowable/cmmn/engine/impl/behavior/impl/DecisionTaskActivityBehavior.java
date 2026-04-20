@@ -33,10 +33,10 @@ import org.flowable.dmn.api.DecisionServiceExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author martin.grofcik
@@ -115,7 +115,8 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
         
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + ". For " + planItemInstanceEntity);
+            throw new FlowableException("DMN decision with key " + externalRef + " execution failed. For " + planItemInstanceEntity,
+                    decisionExecutionAuditContainer.getException());
         }
 
         /* Throw error if there were no rules hit when the flag indicates to do this. */
@@ -135,8 +136,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
 
         if (cmmnEngineConfiguration.getDecisionTableVariableManager() != null) {
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 cmmnEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     externalRef, planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
@@ -146,8 +146,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && cmmnEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 setDecisionServiceVariablesOnPlanItemInstance(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), externalRef,
                     planItemInstanceEntity, cmmnEngineConfiguration.getObjectMapper(), multipleResults);
             } else {

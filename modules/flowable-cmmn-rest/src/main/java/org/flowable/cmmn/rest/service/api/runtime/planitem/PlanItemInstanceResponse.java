@@ -20,7 +20,7 @@ import java.util.List;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -69,6 +69,8 @@ public class PlanItemInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -352,6 +354,22 @@ public class PlanItemInstanceResponse {
 
     public void setFormKey(String formKey) {
         this.formKey = formKey;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
     }
 
     public String getExtraValue() {

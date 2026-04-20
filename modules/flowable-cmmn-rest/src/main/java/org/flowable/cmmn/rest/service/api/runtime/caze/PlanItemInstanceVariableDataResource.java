@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Christopher Welsch
  */
 @RestController
-@Api(tags = { "Plan Item Instance Variables" }, description = "Manage Plan Item Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Plan Item Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceVariableDataResource extends BaseVariableResource {
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Plan Item Instance Variables" }, nickname = "getPlanItemInstanceVariableData")

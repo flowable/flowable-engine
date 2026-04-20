@@ -21,6 +21,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.types.MutableVariableType;
 
 /**
  * @author Tom Baeyens
@@ -141,7 +142,12 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
     public void setValue(Object value) {
         type.setValue(value, this);
         typeName = type.getTypeName();
-        cachedValue = value;
+
+        // MutableVariableType implementation are responsible for setting cachedValue themselves,
+        // as there can be a deepCopy happen which would break this flow.
+        if (!(type instanceof MutableVariableType)) {
+            cachedValue = value;
+        }
     }
 
     // getters and setters ////////////////////////////////////////////////////////

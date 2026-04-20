@@ -399,8 +399,7 @@ public class ExecutionEntityManagerImpl
 
         // Inherits the 'count' feature from the parent.
         // If the parent was not 'counting', we can't make the child 'counting' again.
-        if (parentExecutionEntity instanceof CountingExecutionEntity) {
-            CountingExecutionEntity countingParentExecutionEntity = (CountingExecutionEntity) parentExecutionEntity;
+        if (parentExecutionEntity instanceof CountingExecutionEntity countingParentExecutionEntity) {
             ((CountingExecutionEntity) childExecution).setCountEnabled(countingParentExecutionEntity.isCountEnabled());
         }
 
@@ -431,7 +430,7 @@ public class ExecutionEntityManagerImpl
         List<String> processInstanceIds = dataManager.findProcessInstanceIdsByProcessDefinitionId(processDefinitionId);
 
         for (String processInstanceId : processInstanceIds) {
-            deleteProcessInstanceCascade(findById(processInstanceId), deleteReason, cascade, true);
+            deleteProcessInstanceCascade(findById(processInstanceId), ProcessInstanceState.CANCELLED, deleteReason, cascade, true);
         }
 
         if (cascade) {
@@ -448,11 +447,15 @@ public class ExecutionEntityManagerImpl
     public void deleteProcessInstance(String processInstanceId, String deleteReason, boolean cascade, boolean directDeleteInDatabase) {
         ExecutionEntity processInstanceExecution = findById(processInstanceId);
 
+        if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            engineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(processInstanceExecution, ProcessInstanceState.CANCELLED);
+        }
+
         if (processInstanceExecution == null) {
             throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
         }
 
-        deleteProcessInstanceCascade(processInstanceExecution, deleteReason, cascade, directDeleteInDatabase);
+        deleteProcessInstanceCascade(processInstanceExecution, ProcessInstanceState.CANCELLED, deleteReason, cascade, directDeleteInDatabase);
         
         // Special care needed for a process instance of a call activity: the parent process instance needs to be triggered for completion
         // This can't be added to the deleteProcessInstanceCascade method, as this will also trigger all child and/or multi-instance
@@ -460,9 +463,8 @@ public class ExecutionEntityManagerImpl
         if (processInstanceExecution.getSuperExecutionId() != null) {
             ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
             if (superExecution != null
-                    && superExecution.getCurrentFlowElement() instanceof FlowNode
-                    && ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior() instanceof SubProcessActivityBehavior) {
-                SubProcessActivityBehavior subProcessActivityBehavior = (SubProcessActivityBehavior) ((FlowNode) superExecution.getCurrentFlowElement()).getBehavior();
+                    && superExecution.getCurrentFlowElement() instanceof FlowNode flowNode
+                    && flowNode.getBehavior() instanceof SubProcessActivityBehavior subProcessActivityBehavior) {
                 try {
                     subProcessActivityBehavior.completing(superExecution, processInstanceExecution);
                     superExecution.setSubProcessInstance(null);
@@ -473,9 +475,13 @@ public class ExecutionEntityManagerImpl
                 }
             }
         }
+
+        if (engineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            engineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(processInstanceId, ProcessInstanceState.CANCELLED);
+        }
     }
 
-    protected void deleteProcessInstanceCascade(ExecutionEntity execution, String deleteReason, boolean deleteHistory, boolean directDeleteInDatabase) {
+    protected void deleteProcessInstanceCascade(ExecutionEntity execution, String state, String deleteReason, boolean deleteHistory, boolean directDeleteInDatabase) {
 
         // fill default reason if none provided
         if (deleteReason == null) {
@@ -498,7 +504,7 @@ public class ExecutionEntityManagerImpl
             if (subExecutionEntity.isMultiInstanceRoot()) {
                 for (ExecutionEntity miExecutionEntity : subExecutionEntity.getExecutions()) {
                     if (miExecutionEntity.getSubProcessInstance() != null) {
-                        deleteProcessInstanceCascade(miExecutionEntity.getSubProcessInstance(), deleteReason, deleteHistory, directDeleteInDatabase);
+                        deleteProcessInstanceCascade(miExecutionEntity.getSubProcessInstance(), state, deleteReason, deleteHistory, directDeleteInDatabase);
 
                         if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                             FlowElement callActivityElement = miExecutionEntity.getCurrentFlowElement();
@@ -510,7 +516,7 @@ public class ExecutionEntityManagerImpl
                 }
 
             } else if (subExecutionEntity.getSubProcessInstance() != null) {
-                deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), deleteReason, deleteHistory, directDeleteInDatabase);
+                deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), state, deleteReason, deleteHistory, directDeleteInDatabase);
 
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled()) {
                     FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
@@ -547,7 +553,7 @@ public class ExecutionEntityManagerImpl
             getHistoryManager().recordProcessInstanceDeleted(execution.getId(), execution.getProcessDefinitionId(), execution.getTenantId());
         }
 
-        getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity, deleteReason, null, getClock().getCurrentTime());
+        getHistoryManager().recordProcessInstanceEnd(processInstanceExecutionEntity, state, deleteReason, null, getClock().getCurrentTime());
         processInstanceExecutionEntity.setDeleted(true);
     }
 
@@ -597,6 +603,7 @@ public class ExecutionEntityManagerImpl
             boolean cascade, boolean cancel, boolean fireEvents) {
 
         ExecutionEntity processInstanceEntity = findById(processInstanceId);
+        String state = cancel ? ProcessInstanceState.CANCELLED : ProcessInstanceState.COMPLETED;
 
         if (processInstanceEntity == null) {
             throw new FlowableObjectNotFoundException("No process instance found for id '" + processInstanceId + "'", ProcessInstance.class);
@@ -609,7 +616,7 @@ public class ExecutionEntityManagerImpl
         // Call activities
         for (ExecutionEntity subExecutionEntity : processInstanceEntity.getExecutions()) {
             if (subExecutionEntity.getSubProcessInstance() != null && !subExecutionEntity.isEnded()) {
-                deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), deleteReason, cascade, false);
+                deleteProcessInstanceCascade(subExecutionEntity.getSubProcessInstance(), state, deleteReason, cascade, false);
 
                 if (getEventDispatcher() != null && getEventDispatcher().isEnabled() && fireEvents) {
                     FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
@@ -645,7 +652,7 @@ public class ExecutionEntityManagerImpl
             BpmnLoggingSessionUtil.addLoggingData(LoggingSessionConstants.TYPE_PROCESS_COMPLETED, "Completed process instance with id " + processInstanceEntity.getId(), processInstanceEntity);
         }
 
-        getHistoryManager().recordProcessInstanceEnd(processInstanceEntity, deleteReason, currentFlowElementId, getClock().getCurrentTime());
+        getHistoryManager().recordProcessInstanceEnd(processInstanceEntity, state, deleteReason, currentFlowElementId, getClock().getCurrentTime());
         processInstanceEntity.setDeleted(true);
     }
 
@@ -930,9 +937,8 @@ public class ExecutionEntityManagerImpl
                 
                 List<ByteArrayRef> variableByteArrayRefs = new ArrayList<>();
                 for (VariableInstance variableInstance : executionVariables) {
-                    if (variableInstance instanceof VariableInstanceEntity) {
-                        VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-                        
+                    if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
+
                         if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
                             variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
                         }
@@ -1119,6 +1125,19 @@ public class ExecutionEntityManagerImpl
             return businessStatus;
         }
         return null;
+    }
+
+    @Override
+    public void updateProcessInstanceDueDate(ExecutionEntity executionEntity, Date dueDate) {
+        executionEntity.setDueDate(dueDate);
+        getHistoryManager().updateProcessDueDateInHistory(executionEntity);
+    }
+
+    @Override
+    public void updateProcessInstanceClaimTime(ExecutionEntity executionEntity, Date claimTime, String claimedBy) {
+        executionEntity.setClaimTime(claimTime);
+        executionEntity.setClaimedBy(claimedBy);
+        getHistoryManager().updateProcessClaimTimeInHistory(executionEntity);
     }
 
     protected HistoryManager getHistoryManager() {

@@ -18,8 +18,8 @@ import org.activiti.engine.impl.context.Context;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -68,7 +68,7 @@ public class ScriptCondition implements Condition {
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

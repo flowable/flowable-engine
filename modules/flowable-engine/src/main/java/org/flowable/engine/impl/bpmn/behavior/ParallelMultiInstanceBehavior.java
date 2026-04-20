@@ -26,7 +26,7 @@ import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
@@ -199,8 +199,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         try {
             callActivityEndListeners(execution);
-        } catch (BpmnError bpmnError) {
-            ErrorPropagation.propagateError(bpmnError, execution);
+        } catch (BusinessError businessError) {
+            ErrorPropagation.propagateError(businessError, execution);
             return;
         }
 
@@ -325,11 +325,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         boolean hasCompensation = false;
         if (activity instanceof Transaction) {
             hasCompensation = true;
-        } else if (activity instanceof SubProcess) {
-            SubProcess subProcess = (SubProcess) activity;
+        } else if (activity instanceof SubProcess subProcess) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
-                if (subElement instanceof Activity) {
-                    Activity subActivity = (Activity) subElement;
+                if (subElement instanceof Activity subActivity) {
                     if (CollectionUtil.isNotEmpty(subActivity.getBoundaryEvents())) {
                         for (BoundaryEvent boundaryEvent : subActivity.getBoundaryEvents()) {
                             if (CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) &&

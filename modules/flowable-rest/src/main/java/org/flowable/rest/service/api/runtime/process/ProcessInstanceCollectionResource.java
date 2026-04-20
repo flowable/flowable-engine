@@ -57,7 +57,7 @@ import io.swagger.annotations.Authorization;
  * @author Zheng Ji
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceCollectionResource extends BaseProcessInstanceResource {
 
     @Autowired
@@ -102,14 +102,19 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "subProcessInstanceId", dataType = "string", value = "Only return process instances which have the given sub process-instance id (for processes started as a call-activity).", paramType = "query"),
         @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which are not sub processes.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
+        @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return process instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),
+        @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return process instances with the given parent case instance id.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return process instances with the given tenant id.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return process instances with a tenant id like the given value.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return process instances with a tenant id like the given value ignoring case.", paramType = "query"),
         @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns process instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
         @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,processDefinitionId,tenantId,processDefinitionKey", paramType = "query"),
-    })
+        @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+        @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+        @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"), })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the process-instances are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
@@ -254,13 +259,24 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         if (allRequestParams.containsKey("includeProcessVariables")) {
             queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
         }
+
+        if (allRequestParams.containsKey("includeProcessVariablesNames")) {
+            queryRequest.setIncludeProcessVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeProcessVariablesNames")));
+        }
         
         if (allRequestParams.containsKey("callbackId")) {
             queryRequest.setCallbackId(allRequestParams.get("callbackId"));
         }
-        
+
+        if (allRequestParams.containsKey("callbackIds")) {
+            queryRequest.setCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
+        }
         if (allRequestParams.containsKey("callbackType")) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
+        }
+        
+        if (allRequestParams.containsKey("parentCaseInstanceId")) {
+            queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
         }
 
         if (allRequestParams.containsKey("tenantId")) {

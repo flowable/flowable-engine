@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="oneHumanTaskCase" name="oneHumanTaskCaseName">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItemcmmnTask_1" name="A" definitionRef="cmmnTask_1"></planItem>
+            <planItem id="planItemcmmnTask_2" name="B" definitionRef="cmmnTask_2">
+                <entryCriterion id="cmmnEntrySentry_3" sentryRef="sentrycmmnEntrySentry_3"></entryCriterion>
+            </planItem>
+            <sentry id="sentrycmmnEntrySentry_3" name="Entry criterion">
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_3" sourceRef="planItemcmmnTask_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="cmmnTask_1" name="A" flowable:assignee="${assigneeVar}" >
+            </humanTask>
+            <humanTask id="cmmnTask_2" name="B" >
+            </humanTask>
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -49,8 +49,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -58,8 +58,6 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Test
     @Deployment
@@ -390,6 +388,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String body = (String) runtimeService.getVariable(process.getId(), "resultResponseBody");
         assertThat(body).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(body, JsonNode.class);
         mapper.convertValue(jsonNode, HttpTestData.class);
         continueProcess(process);
@@ -445,8 +444,42 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertProcessEnded(process.getId());
     }
 
+    @Test
+    @Deployment
+    public void testHttpGetNonSpecStatusCode() {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGetNonSpecCode");
+        assertThat(process.isEnded()).isFalse();
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("get981RequestMethod", "GET");
+        request.put("get981RequestUrl", "https://localhost:9799/api?code=981");
+        request.put("get981RequestHeaders", "Accept: application/json");
+        request.put("get981RequestTimeout", 5000);
+        request.put("get981HandleStatusCodes", "981");
+        request.put("get981SaveRequestVariables", true);
+        assertKeysEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("get981ResponseStatusCode", 981);
+        response.put("get981ResponseReason", getNonSpecResponseReason(981));
+        assertKeysEquals(process.getId(), response);
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(process.getId())
+                .onlyChildExecutions()
+                .singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("waitAfterError");
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(process.getId());
+    }
+
     protected String get500ResponseReason() {
         return "Server Error";
+    }
+
+    protected String getNonSpecResponseReason(int code) {
+        return String.valueOf(code);
     }
 
     @Test
@@ -470,6 +503,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);
@@ -590,6 +624,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPatchResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);
@@ -705,12 +740,41 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         );
     }
 
+    @Test
+    @Deployment
+    public void testHttpSecureHeaders() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("url", "https://localhost:9799/api?code=200");
+        variables.put("headers", "Content-Type: text/plain");
+        variables.put("secureHeaders", "Authorization: Bearer secretToken\nX-Request-Key: testKey");
+        variables.put("prefix", "test");
+
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpSecureHeaders", variables);
+        assertThat(process.isEnded()).isFalse();
+
+        Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("Authorization", "Bearer secretToken"),
+                        entry("X-Request-Key", "testKey")
+                );
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("testRequestMethod", "POST");
+        request.put("testRequestUrl", "https://localhost:9799/api?code=200");
+        request.put("testRequestHeaders", "Content-Type: text/plain");
+        request.put("testRequestSecureHeaders", "Authorization: *****\nX-Request-Key: *****");
+        assertKeysEquals(process.getId(), request);
+    }
+
     private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
             if (key.contains("Headers")) {
-                assertThat((String) runtimeService.getVariable(processInstanceId, key)).containsSequence((String) vars.get(key));
+                assertThat((String) runtimeService.getVariable(processInstanceId, key)).as(key).containsSequence((String) vars.get(key));
             } else {
-                assertThat(runtimeService.getVariable(processInstanceId, key)).isEqualTo(vars.get(key));
+                assertThat(runtimeService.getVariable(processInstanceId, key)).as(key).isEqualTo(vars.get(key));
             }
         }
     }

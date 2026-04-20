@@ -29,8 +29,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
@@ -42,7 +42,7 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests {@link CmmnRuntimeServiceImpl} implementation
@@ -339,10 +339,12 @@ public class CmmnRuntimeServiceTest extends FlowableCmmnTestCase {
 
                 @Override
                 public void onEvent(FlowableEvent event) {
-                    Object entity = ((FlowableEntityEvent) event).getEntity();
-                    if (event instanceof FlowableCaseStartedEvent) {
-                        CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) entity;
-                        cmmnRuntimeService.setVariable(caseInstanceEntity.getId(), "testVariable", 123);
+                    if (event instanceof FlowableEntityEvent) {
+                        Object entity = ((FlowableEntityEvent) event).getEntity();
+                        if (event instanceof FlowableCaseStartedEvent) {
+                            CaseInstanceEntity caseInstanceEntity = (CaseInstanceEntity) entity;
+                            cmmnRuntimeService.setVariable(caseInstanceEntity.getId(), "testVariable", 123);
+                        }
                     }
                 }
 

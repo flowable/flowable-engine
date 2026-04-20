@@ -37,7 +37,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get an attachment on a task", tags = { "Task Attachments" })

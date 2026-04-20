@@ -12,13 +12,12 @@
  */
 package org.flowable.http.cmmn;
 
+import org.flowable.cmmn.engine.test.CmmnConfigurationResource;
+
 /**
  * @author Filip Hrisafov
  */
+@CmmnConfigurationResource("org/flowable/http/cmmn/CmmnHttpTaskParallelInSameTransactionTest.cfg.xml")
 public class CmmnHttpTaskParallelInSameTransactionTest extends CmmnHttpTaskTest {
-
-    public CmmnHttpTaskParallelInSameTransactionTest() {
-        super("org/flowable/http/cmmn/CmmnHttpTaskParallelInSameTransactionTest.cfg.xml");
-    }
 
 }

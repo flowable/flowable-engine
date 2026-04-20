@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.GenericEventListener;
+import org.flowable.cmmn.model.IntentEventListener;
 import org.flowable.cmmn.model.ReactivateEventListener;
 import org.flowable.cmmn.model.SignalEventListener;
 import org.flowable.cmmn.model.VariableEventListener;
@@ -49,6 +50,10 @@ public class GenericEventListenerXmlConverter extends PlanItemDefinitionXmlConve
             variableEventListener.setVariableName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_VARIABLE_NAME));
             variableEventListener.setVariableChangeType(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_EVENT_LISTENER_VARIABLE_CHANGE_TYPE));
             return convertCommonAttributes(xtr, variableEventListener);
+            
+        } else if ("intent".equals(listenerType)) {
+            IntentEventListener intentEventListener = new IntentEventListener();
+            return convertCommonAttributes(xtr, intentEventListener);
 
         } else if ("reactivate".equals(listenerType)) {
             ReactivateEventListener reactivateEventListener = new ReactivateEventListener();

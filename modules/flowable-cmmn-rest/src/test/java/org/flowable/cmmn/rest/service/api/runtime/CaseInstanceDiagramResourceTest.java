@@ -22,12 +22,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
     public void testGetCaseDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingStage").start();
@@ -40,6 +42,7 @@ public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDiagramWithoutDiagram() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -51,6 +54,7 @@ public class CaseInstanceDiagramResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting case instance.
      */
+    @Test
     public void testGetUnexistingCaseInstance() {
         closeResponse(
                 executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_DIAGRAM, "unexistingpi")),

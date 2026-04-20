@@ -46,13 +46,11 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
             throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
         }
 
-        if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
+        if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess adhocSubProcess)) {
             throw new FlowableException("The current flow element of the requested " + execution + " is not an ad-hoc sub process");
         }
 
         List<FlowNode> enabledFlowNodes = new ArrayList<>();
-
-        AdhocSubProcess adhocSubProcess = (AdhocSubProcess) execution.getCurrentFlowElement();
 
         // if sequential ordering, only one child execution can be active, so no enabled activities
         if (adhocSubProcess.hasSequentialOrdering()) {
@@ -62,8 +60,7 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
         }
 
         for (FlowElement flowElement : adhocSubProcess.getFlowElements()) {
-            if (flowElement instanceof FlowNode) {
-                FlowNode flowNode = (FlowNode) flowElement;
+            if (flowElement instanceof FlowNode flowNode) {
                 if (flowNode.getIncomingFlows().size() == 0) {
                     enabledFlowNodes.add(flowNode);
                 }

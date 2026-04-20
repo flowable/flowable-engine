@@ -49,8 +49,7 @@ public class EventSubscriptionUtil {
             
             @SuppressWarnings("unchecked")
             Map<String, Object> payloadMap = (Map<String, Object>) payload;
-            if (currentFlowElement instanceof Event) {
-                Event event = (Event) currentFlowElement;
+            if (currentFlowElement instanceof Event event) {
                 if (event.getInParameters().size() > 0) {
                     
                     VariableContainerWrapper variableWrapper = new VariableContainerWrapper(payloadMap);

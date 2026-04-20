@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,8 @@ import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateToActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateVariableEventListenersOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.FailPlanItemInstanceOperation;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
@@ -40,7 +43,9 @@ import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanModelInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ResumePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.SuspendPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
@@ -64,17 +69,36 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmmnEngineAgenda.class);
 
+    protected final LinkedList<EvaluateCriteriaOperation> evaluateCriteriaOperations = new LinkedList<>();
+
     public DefaultCmmnEngineAgenda(CommandContext commandContext) {
         super(commandContext);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && evaluateCriteriaOperations.isEmpty();
+    }
+
+    @Override
+    public Runnable getNextOperation() {
+        if (operations.isEmpty() && !evaluateCriteriaOperations.isEmpty()) {
+            return evaluateCriteriaOperations.poll();
+        }
+        return super.getNextOperation();
     }
 
     public void addOperation(CmmnOperation operation) {
 
         operation.onPlanned();
         
-        int operationIndex = getOperationIndex(operation);
-        if (operationIndex >= 0) {
-            operations.add(operationIndex, operation);
+        // The operation to evaluate the criteria is the most expensive operation.
+        // As such, when it's planned it is always
+        // - moved to the end of the operations list
+        // - other operations are always planned before, as these can trigger new evaluation operations
+
+        if (operation instanceof EvaluateCriteriaOperation evaluateCriteriaOperation) {
+            evaluateCriteriaOperations.addLast(evaluateCriteriaOperation);
         } else {
             operations.addLast(operation);
         }
@@ -84,28 +108,6 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         }
     }
     
-    /**
-     * Returns the index in the list of operations where the {@link CmmnOperation} should be inserted.
-     * Returns a negative value if the element should be added to the end of the list. 
-     */
-    protected int getOperationIndex(CmmnOperation operation) {
-        
-        // The operation to evaluate the criteria is the most expensive operation.
-        // As such, when it's planned it is always 
-        // - moved to the end of the operations list
-        // - checked for duplicates to avoid duplicate evaluations (see the add method for it)
-        // - other operations are always planned before, as these can trigger new evaluation operations
-        
-        if (!operations.isEmpty() && !(operation instanceof EvaluateCriteriaOperation)) {
-            for (int i=0; i<operations.size(); i++) {
-                if (operations.get(i) instanceof EvaluateCriteriaOperation) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     @Override
     protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
         return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getAgendaFutureMaxWaitTimeoutProvider();
@@ -255,15 +257,35 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
         addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType));
     }
+    
+    @Override
+    public void planSuspendPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new SuspendPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
 
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType));
     }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, BusinessError businessError) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity, businessError));
+    }
     
     @Override
     public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planResumePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ResumePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override

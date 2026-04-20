@@ -39,10 +39,11 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -56,6 +57,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test getting all task variables. GET cmmn-runtime/tasks/{taskId}/variables
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetTaskVariables() throws Exception {
 
@@ -181,6 +183,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable. POST cmmn-runtime/tasks/{taskId}/variables
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testCreateSingleTaskVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -264,6 +267,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable using a binary stream. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleBinaryTaskVariable() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -312,6 +316,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable using a binary stream. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleSerializableTaskVariable() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -369,6 +374,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable, testing edge case exceptions. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleTaskVariableEdgeCases() throws Exception {
         try {
             // Test adding variable to unexisting task
@@ -434,6 +440,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a single task variable, testing default types when omitted. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateSingleTaskVariableDefaultTypes() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -498,6 +505,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test creating a multiple task variable in a single call. POST runtime/tasks/{taskId}/variables
      */
+    @Test
     public void testCreateMultipleTaskVariables() throws Exception {
         try {
             Task task = taskService.newTask();
@@ -578,7 +586,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
                             entry("longVariable", 4567890L),
                             entry("doubleVariable", 123.456),
                             entry("booleanVariable", Boolean.TRUE),
-                            entry("dateVariable", longDateFormat.parse(isoString))
+                            entry("dateVariable", getDateFromISOString(isoString))
                     );
 
         } finally {
@@ -593,6 +601,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
     /**
      * Test deleting all local task variables. DELETE runtime/tasks/{taskId}/variables
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteAllLocalVariables() throws Exception {
         // Start process with all types of variables

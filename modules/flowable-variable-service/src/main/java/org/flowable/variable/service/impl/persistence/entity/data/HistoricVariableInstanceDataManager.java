@@ -28,6 +28,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
 
     List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
 
+    List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId, Collection<String> variableNames);
+
     List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByTaskId(String taskId);
 
     long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
@@ -38,6 +40,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
     
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType);
     
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType, Collection<String> variableNames);
+
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap);

@@ -22,12 +22,14 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn"})
     public void testGetCaseDefinitionImage() throws Exception {
         CaseDefinition repeatingStageCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("testRepeatingStage").singleResult();
@@ -38,6 +40,7 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseDefinitionImageWithoutImage() throws Exception {
         CaseDefinition oneTaskCase = repositoryService.createCaseDefinitionQuery().caseDefinitionKey("oneHumanTaskCase").singleResult();
@@ -49,6 +52,7 @@ public class CaseDefinitionImageResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting case definition.
      */
+    @Test
     public void testGetUnexistingCaseDefinition() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_DEFINITION_IMAGE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }

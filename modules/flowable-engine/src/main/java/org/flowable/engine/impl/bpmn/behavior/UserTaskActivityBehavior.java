@@ -17,9 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +29,7 @@ import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.calendar.BusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
@@ -38,7 +37,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.DynamicPropertyUtil;
@@ -62,9 +61,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -114,32 +111,33 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
         if (processEngineConfiguration.isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(userTask.getId(), execution.getProcessDefinitionId());
-            activeTaskName = DynamicPropertyUtil.getActiveValue(userTask.getName(), DynamicBpmnConstants.USER_TASK_NAME, taskElementProperties);
+            activeTaskName = getNameValue(userTask, migrationContext, taskElementProperties);
             activeTaskDescription = DynamicPropertyUtil.getActiveValue(userTask.getDocumentation(), DynamicBpmnConstants.USER_TASK_DESCRIPTION, taskElementProperties);
-            activeTaskDueDate = DynamicPropertyUtil.getActiveValue(userTask.getDueDate(), DynamicBpmnConstants.USER_TASK_DUEDATE, taskElementProperties);
-            activeTaskPriority = DynamicPropertyUtil.getActiveValue(userTask.getPriority(), DynamicBpmnConstants.USER_TASK_PRIORITY, taskElementProperties);
-            activeTaskCategory = DynamicPropertyUtil.getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
-            activeTaskFormKey = DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
+            activeTaskDueDate = getDueDateValue(userTask, migrationContext, taskElementProperties);
+            activeTaskPriority = getPriorityValue(userTask, migrationContext, taskElementProperties);
+            activeTaskCategory = getCategoryValue(userTask, migrationContext, taskElementProperties);
+            activeTaskFormKey = getFormKeyValue(userTask, migrationContext, taskElementProperties);
             activeTaskSkipExpression = DynamicPropertyUtil.getActiveValue(userTask.getSkipExpression(), DynamicBpmnConstants.TASK_SKIP_EXPRESSION, taskElementProperties);
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, taskElementProperties);
             activeTaskOwner = getOwnerValue(userTask, migrationContext, taskElementProperties);
-            activeTaskCandidateUsers = getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
-            activeTaskCandidateGroups = getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
+            activeTaskCandidateUsers = getCandidateUsersValue(userTask, migrationContext, taskElementProperties);
+            activeTaskCandidateGroups = getCandidateGroupsValue(userTask, migrationContext, taskElementProperties);
             activeTaskIdVariableName = DynamicPropertyUtil.getActiveValue(userTask.getTaskIdVariableName(), DynamicBpmnConstants.USER_TASK_TASK_ID_VARIABLE_NAME, taskElementProperties);
         } else {
-            activeTaskName = userTask.getName();
+            activeTaskName = getNameValue(userTask, migrationContext, null);
             activeTaskDescription = userTask.getDocumentation();
-            activeTaskDueDate = userTask.getDueDate();
-            activeTaskPriority = userTask.getPriority();
-            activeTaskCategory = userTask.getCategory();
-            activeTaskFormKey = userTask.getFormKey();
+            activeTaskDueDate = getDueDateValue(userTask, migrationContext, null);
+            activeTaskPriority = getPriorityValue(userTask, migrationContext, null);
+            activeTaskCategory = getCategoryValue(userTask, migrationContext, null);
+            activeTaskFormKey = getFormKeyValue(userTask, migrationContext, null);
             activeTaskSkipExpression = userTask.getSkipExpression();
             activeTaskAssignee = getAssigneeValue(userTask, migrationContext, null);
             activeTaskOwner = getOwnerValue(userTask, migrationContext, null);
-            activeTaskCandidateUsers = userTask.getCandidateUsers();
-            activeTaskCandidateGroups = userTask.getCandidateGroups();
+            activeTaskCandidateUsers = getCandidateUsersValue(userTask, migrationContext, null);
+            activeTaskCandidateGroups = getCandidateGroupsValue(userTask, migrationContext, null);
             activeTaskIdVariableName = userTask.getTaskIdVariableName();
         }
+        
         if (execution.getCurrentActivityName() != null) {
             activeTaskName = execution.getCurrentActivityName();
         }
@@ -181,8 +179,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
 
             try {
                 processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
-            } catch (BpmnError bpmnError) {
-                ErrorPropagation.propagateError(bpmnError, execution);
+            } catch (BusinessError businessError) {
+                ErrorPropagation.propagateError(businessError, execution);
                 return;
             }
 
@@ -489,30 +487,72 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
     }
 
     protected Collection<String> extractCandidates(Object value) {
-        if (value instanceof Collection) {
-            return (Collection<String>) value;
-        } else if (value instanceof ArrayNode) {
-            ArrayNode valueArrayNode = (ArrayNode) value;
-            Collection<String> candidates = new ArrayList<>(valueArrayNode.size());
-            for (JsonNode node : valueArrayNode) {
-                candidates.add(node.asText());
-            }
-
-            return candidates;
-        } else if (value != null) {
-            String str = value.toString();
-            if (StringUtils.isNotEmpty(str)) {
-                return Arrays.asList(value.toString().split("[\\s]*,[\\s]*"));
-            }
+        return CandidateUtil.extractCandidates(value);
+    }
+    
+    protected String getNameValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewName() != null) {
+            return migrationContext.getActivityOptions().getWithNewName();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getName(), DynamicBpmnConstants.USER_TASK_NAME, taskElementProperties);
+        
+        } else {
+            return userTask.getName();
         }
-
-        return Collections.emptyList();
-
+    }
+    
+    protected String getDueDateValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewDueDate() != null) {
+            return migrationContext.getActivityOptions().getWithNewDueDate();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getDueDate(), DynamicBpmnConstants.USER_TASK_DUEDATE, taskElementProperties);
+        
+        } else {
+            return userTask.getDueDate();
+        }
+    }
+    
+    protected String getPriorityValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewPriority() != null) {
+            return migrationContext.getActivityOptions().getWithNewPriority();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getPriority(), DynamicBpmnConstants.USER_TASK_PRIORITY, taskElementProperties);
+        
+        } else {
+            return userTask.getPriority();
+        }
+    }
+    
+    protected String getCategoryValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewCategory() != null) {
+            return migrationContext.getActivityOptions().getWithNewCategory();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getCategory(), DynamicBpmnConstants.USER_TASK_CATEGORY, taskElementProperties);
+        
+        } else {
+            return userTask.getCategory();
+        }
+    }
+    
+    protected String getFormKeyValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewFormKey() != null) {
+            return migrationContext.getActivityOptions().getWithNewFormKey();
+            
+        } else if (taskElementProperties != null) {
+            return DynamicPropertyUtil.getActiveValue(userTask.getFormKey(), DynamicBpmnConstants.USER_TASK_FORM_KEY, taskElementProperties);
+        
+        } else {
+            return userTask.getFormKey();
+        }
     }
     
     protected String getAssigneeValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
-        if (migrationContext != null && migrationContext.getAssignee() != null) {
-            return migrationContext.getAssignee();
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewAssignee() != null) {
+            return migrationContext.getActivityOptions().getWithNewAssignee();
             
         } else if (taskElementProperties != null) {
             return DynamicPropertyUtil.getActiveValue(userTask.getAssignee(), DynamicBpmnConstants.USER_TASK_ASSIGNEE, taskElementProperties);
@@ -523,14 +563,38 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
     }
 
     protected String getOwnerValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
-        if (migrationContext != null && migrationContext.getOwner() != null) {
-            return migrationContext.getOwner();
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewOwner() != null) {
+            return migrationContext.getActivityOptions().getWithNewOwner();
 
         } else if (taskElementProperties != null) {
             return DynamicPropertyUtil.getActiveValue(userTask.getOwner(), DynamicBpmnConstants.USER_TASK_OWNER, taskElementProperties);
 
         } else {
             return userTask.getOwner();
+        }
+    }
+    
+    protected List<String> getCandidateUsersValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewCandidateUsers() != null) {
+            return migrationContext.getActivityOptions().getWithNewCandidateUsers();
+            
+        } else if (taskElementProperties != null) {
+            return getActiveValueList(userTask.getCandidateUsers(), DynamicBpmnConstants.USER_TASK_CANDIDATE_USERS, taskElementProperties);
+        
+        } else {
+            return userTask.getCandidateUsers();
+        }
+    }
+    
+    protected List<String> getCandidateGroupsValue(UserTask userTask, MigrationContext migrationContext, ObjectNode taskElementProperties) {
+        if (migrationContext != null && migrationContext.getActivityOptions() != null && migrationContext.getActivityOptions().getWithNewCandidateGroups() != null) {
+            return migrationContext.getActivityOptions().getWithNewCandidateGroups();
+            
+        } else if (taskElementProperties != null) {
+            return getActiveValueList(userTask.getCandidateGroups(), DynamicBpmnConstants.USER_TASK_CANDIDATE_GROUPS, taskElementProperties);
+        
+        } else {
+            return userTask.getCandidateGroups();
         }
     }
 }

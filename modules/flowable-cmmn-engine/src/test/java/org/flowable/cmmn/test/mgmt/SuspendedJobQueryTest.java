@@ -17,13 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Simon Amport

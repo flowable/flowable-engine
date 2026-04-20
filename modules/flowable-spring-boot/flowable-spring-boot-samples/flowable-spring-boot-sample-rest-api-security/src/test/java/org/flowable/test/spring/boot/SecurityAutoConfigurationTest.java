@@ -26,8 +26,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,7 +66,7 @@ public class SecurityAutoConfigurationTest {
             IdmEngineAutoConfiguration.class,
             ProcessEngineAutoConfiguration.class,
             IdmEngineServicesAutoConfiguration.class,
-            org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class,
+            SecurityAutoConfiguration.class,
             FlowableSecurityAutoConfiguration.class })
     public static class SecurityConfiguration {
 

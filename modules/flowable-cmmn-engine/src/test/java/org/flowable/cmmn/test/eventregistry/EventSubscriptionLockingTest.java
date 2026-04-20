@@ -25,7 +25,7 @@ import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez

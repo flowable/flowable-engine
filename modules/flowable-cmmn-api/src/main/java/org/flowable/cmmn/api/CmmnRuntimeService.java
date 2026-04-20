@@ -13,16 +13,19 @@
 package org.flowable.cmmn.api;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.api.runtime.GenericEventListenerInstanceQuery;
+import org.flowable.cmmn.api.runtime.IntentEventListenerInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
@@ -48,6 +51,14 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 public interface CmmnRuntimeService {
 
     CaseInstanceBuilder createCaseInstanceBuilder();
+
+    /**
+     * Create a {@link CaseInstanceUpdateBuilder}, that allows to update various properties of a case instance.
+     *
+     * @param caseInstanceId
+     *     id of the case instance to update, cannot be null
+     */
+    CaseInstanceUpdateBuilder createCaseInstanceUpdateBuilder(String caseInstanceId);
 
     PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
     
@@ -80,6 +91,8 @@ public interface CmmnRuntimeService {
     void completeGenericEventListenerInstance(String genericEventListenerInstanceId);
 
     void completeUserEventListenerInstance(String userEventListenerInstanceId);
+    
+    void completeIntentEventListenerInstance(String intentEventListenerInstanceId);
     
     /**
      * All variables visible from the given case instance scope.
@@ -216,6 +229,14 @@ public interface CmmnRuntimeService {
     
     void setLocalVariable(String planItemInstanceId, String variableName, Object variableValue);
     
+    void setVariablesAsync(String caseInstanceId, Map<String, Object> variables);
+    
+    void setVariableAsync(String caseInstanceId, String variableName, Object variableValue);
+    
+    void setLocalVariablesAsync(String planItemInstanceId, Map<String, Object> variables);
+    
+    void setLocalVariableAsync(String planItemInstanceId, String variableName, Object variableValue);
+    
     void removeVariable(String caseInstanceId, String variableName);
     
     void removeVariables(String caseInstanceId, Collection<String> variableNames);
@@ -243,6 +264,8 @@ public interface CmmnRuntimeService {
     GenericEventListenerInstanceQuery createGenericEventListenerInstanceQuery();
     
     SignalEventListenerInstanceQuery createSignalEventListenerInstanceQuery();
+    
+    IntentEventListenerInstanceQuery createIntentEventListenerInstanceQuery();
 
     UserEventListenerInstanceQuery createUserEventListenerInstanceQuery();
     
@@ -407,6 +430,35 @@ public interface CmmnRuntimeService {
      *     new business status value
      */
     void updateBusinessStatus(String caseInstanceId, String businessStatus);
+
+    /**
+     * Sets the due date for the provided case instance.
+     *
+     * @param caseInstanceId
+     *     id of the case instance to set the due date, cannot be null
+     * @param dueDate
+     *     new due date value
+     */
+    void setCaseInstanceDueDate(String caseInstanceId, Date dueDate);
+
+    /**
+     * Claims the case instance by setting the given user as the assignee.
+     * When the case instance is already claimed by another user, an exception is thrown.
+     *
+     * @param caseInstanceId
+     *     id of the case instance to claim, cannot be null
+     * @param userId
+     *     user id of the user to claim the case instance
+     */
+    void claimCaseInstance(String caseInstanceId, String userId);
+
+    /**
+     * Unclaims the case instance by removing the assignee.
+     *
+     * @param caseInstanceId
+     *     id of the case instance to unclaim, cannot be null
+     */
+    void unclaimCaseInstance(String caseInstanceId);
 
     /**
      * Adds an event-listener which will be notified of ALL events by the dispatcher.

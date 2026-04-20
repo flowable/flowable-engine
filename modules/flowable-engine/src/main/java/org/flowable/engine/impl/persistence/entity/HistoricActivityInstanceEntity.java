@@ -35,6 +35,8 @@ public interface HistoricActivityInstanceEntity extends HistoricActivityInstance
 
     void setAssignee(String assignee);
 
+    void setCompletedBy(String completedBy);
+
     void setTaskId(String taskId);
 
     void setCalledProcessInstanceId(String calledProcessInstanceId);

@@ -23,10 +23,12 @@ import org.flowable.eventregistry.model.EventModel;
 @FunctionalInterface
 public interface InboundEventInfoAwarePayloadExtractor<T> extends InboundEventPayloadExtractor<T> {
 
-    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload) {
+    @Override
+    default Collection<EventPayloadInstance> extractPayload(EventModel eventModel, T payload, String parentDeploymentId, String tenantId) {
         throw new UnsupportedOperationException("Payload extraction should never call this ");
     }
 
-    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event);
+    @Override
+    Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId);
 
 }

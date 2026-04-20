@@ -12,8 +12,7 @@
  */
 package org.flowable.osgi;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,8 +40,8 @@ public class BundleScriptEngineResolverTest {
         URL configFile = getClass().getClassLoader().getResource("META-INF/services/javax.script.ScriptEngineFactory");
         BundleScriptEngineResolver resolver = new BundleScriptEngineResolver(bundle, configFile);
         ScriptEngine resolvedEngine = resolver.resolveScriptEngine("mockengine");
-        assertNotNull(resolvedEngine);
-        assertEquals("mockengine", resolvedEngine.get("name"));
+        assertThat(resolvedEngine).isNotNull();
+        assertThat(resolvedEngine.get("name")).isEqualTo("mockengine");
     }
 
     /**

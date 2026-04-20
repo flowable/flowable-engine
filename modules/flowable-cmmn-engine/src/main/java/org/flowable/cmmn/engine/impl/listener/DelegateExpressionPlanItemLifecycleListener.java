@@ -53,8 +53,7 @@ public class DelegateExpressionPlanItemLifecycleListener implements PlanItemInst
     public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, planItemInstance, fieldExtensions);
 
-        if (delegate instanceof PlanItemInstanceLifecycleListener) {
-            PlanItemInstanceLifecycleListener listener = (PlanItemInstanceLifecycleListener) delegate;
+        if (delegate instanceof PlanItemInstanceLifecycleListener listener) {
             listener.stateChanged(planItemInstance, oldState, newState);
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + PlanItemInstanceLifecycleListener.class);

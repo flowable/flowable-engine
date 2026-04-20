@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +128,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseDefinitionKeys(Set<String> caseDefinitionKeys);
     
     /**
+     * Only select historic case instances that don't match the given case definition keys.
+     */
+    HistoricCaseInstanceQuery excludeCaseDefinitionKeys(Set<String> caseDefinitionKeys);
+    
+    /**
      * Only select historic case instances with the given case definition identifier.
      */
     HistoricCaseInstanceQuery caseDefinitionId(String caseDefinitionId);
@@ -177,6 +183,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery includeCaseVariables();
 
     /**
+     * Include the historic case variables with the given names into the query result.
+     */
+    HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
+
+    /**
      * Only select historic case instances that are defined by a case definition with the given deployment identifier.
      */
     HistoricCaseInstanceQuery deploymentId(String deploymentId);
@@ -220,6 +231,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that are started by the provided user identifier.
      */
     HistoricCaseInstanceQuery startedBy(String userId);
+
+    /**
+     * Only select historic case instances that are ended by the provided user identifier.
+     */
+    HistoricCaseInstanceQuery finishedBy(String userId);
     
     /**
      * Only select historic case instances that have a state that is equal to the provided value.
@@ -245,11 +261,21 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have the provided callback identifier.
      */
     HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId);
+
+    /**
+     * Only select historic case instances that have the provided callback identifiers.
+     */
+    HistoricCaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackId);
     
     /**
      * Only select historic case instances that have the provided callback type.
      */
     HistoricCaseInstanceQuery caseInstanceCallbackType(String callbackType);
+    
+    /**
+     * Only select historic case instances that have a parent case instance with the provided id.
+     */
+    HistoricCaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
      * Only select historic case instances that do not have a callback identifier.
@@ -450,6 +476,16 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     HistoricCaseInstanceQuery withLocalizationFallback();
+    
+    /**
+     * Perform the query without applying sorting parameters. By default sorting will be applied.
+     */
+    HistoricCaseInstanceQuery withoutSorting();
+    
+    /**
+     * Return only the id value of the case instances, to reduce any additional instance data to be returned.
+     */
+    HistoricCaseInstanceQuery returnIdsOnly();
 
     HistoricCaseInstanceQuery orderByCaseInstanceId();
     HistoricCaseInstanceQuery orderByCaseInstanceName();

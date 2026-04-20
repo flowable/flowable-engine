@@ -32,8 +32,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Filip Hrisafov
@@ -49,6 +51,7 @@ public class CmmnWithEventRegistryTestConfiguration {
         @Value("${jdbc.password:}") String jdbcPassword
     ) {
         HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setMinimumIdle(0);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriverClass);
         dataSource.setUsername(jdbcUsername);
@@ -64,7 +67,7 @@ public class CmmnWithEventRegistryTestConfiguration {
     
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return JsonMapper.shared();
     }
     
     @Bean

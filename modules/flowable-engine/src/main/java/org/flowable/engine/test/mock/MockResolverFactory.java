@@ -51,7 +51,8 @@ import org.flowable.common.engine.impl.scripting.ResolverFactory;
  */
 public class MockResolverFactory implements ResolverFactory {
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer variableContainer) {
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer) {
         return new Resolver() {
 
             @Override

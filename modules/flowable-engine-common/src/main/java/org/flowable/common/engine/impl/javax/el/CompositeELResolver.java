@@ -15,32 +15,10 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
-import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
-/**
- * Maintains an ordered composite list of child ELResolvers. Though only a single ELResolver is
- * associated with an ELContext, there are usually multiple resolvers considered for any given
- * variable or property resolution. ELResolvers are combined together using a CompositeELResolver,
- * to define rich semantics for evaluating an expression. For the
- * {@link #getValue(ELContext, Object, Object)}, {@link #getType(ELContext, Object, Object)},
- * {@link #setValue(ELContext, Object, Object, Object)} and
- * {@link #isReadOnly(ELContext, Object, Object)} methods, an ELResolver is not responsible for
- * resolving all possible (base, property) pairs. In fact, most resolvers will only handle a base of
- * a single type. To indicate that a resolver has successfully resolved a particular (base,
- * property) pair, it must set the propertyResolved property of the ELContext to true. If it could
- * not handle the given pair, it must leave this property alone. The caller must ignore the return
- * value of the method if propertyResolved is false. The CompositeELResolver initializes the
- * ELContext.propertyResolved flag to false, and uses it as a stop condition for iterating through
- * its component resolvers. The ELContext.propertyResolved flag is not used for the design-time
- * methods {@link #getFeatureDescriptors(ELContext, Object)} and
- * {@link #getCommonPropertyType(ELContext, Object)}. Instead, results are collected and combined
- * from all child ELResolvers for these methods.
- */
 public class CompositeELResolver extends ELResolver {
 	private final List<ELResolver> resolvers = new ArrayList<>();
 
@@ -98,58 +76,6 @@ public class CompositeELResolver extends ELResolver {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * Returns information about the set of variables or properties that can be resolved for the
-	 * given base object. One use for this method is to assist tools in auto-completion. The results
-	 * are collected from all component resolvers. The propertyResolved property of the ELContext is
-	 * not relevant to this method. The results of all ELResolvers are concatenated. The Iterator
-	 * returned is an iterator over the collection of FeatureDescriptor objects returned by the
-	 * iterators returned by each component resolver's getFeatureDescriptors method. If null is
-	 * returned by a resolver, it is skipped.
-	 * 
-	 * @param context
-	 *            The context of this evaluation.
-	 * @param base
-	 *            The base object to return the most general property type for, or null to enumerate
-	 *            the set of top-level variables that this resolver can evaluate.
-	 * @return An Iterator containing zero or more (possibly infinitely more) FeatureDescriptor
-	 *         objects, or null if this resolver does not handle the given base object or that the
-	 *         results are too complex to represent with this method
-	 */
-	@Override
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext context, final Object base) {
-		return new Iterator<FeatureDescriptor>() {
-			Iterator<FeatureDescriptor> empty = Collections.<FeatureDescriptor> emptyList().iterator();
-			Iterator<ELResolver> resolvers = CompositeELResolver.this.resolvers.iterator();
-			Iterator<FeatureDescriptor> features = empty;
-
-			Iterator<FeatureDescriptor> features() {
-				while (!features.hasNext() && resolvers.hasNext()) {
-					features = resolvers.next().getFeatureDescriptors(context, base);
-					if (features == null) {
-						features = empty;
-					}
-				}
-				return features;
-			}
-
-            @Override
-			public boolean hasNext() {
-				return features().hasNext();
-			}
-
-            @Override
-			public FeatureDescriptor next() {
-				return features().next();
-			}
-
-            @Override
-			public void remove() {
-				features().remove();
-			}
-		};
 	}
 
 	/**
@@ -406,6 +332,19 @@ public class CompositeELResolver extends ELResolver {
 		context.setPropertyResolved(false);
 		for (int i = 0, l = resolvers.size(); i < l; i++) {
 			Object result = resolvers.get(i).invoke(context, base, method, paramTypes, params);
+			if (context.isPropertyResolved()) {
+				return result;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
+		context.setPropertyResolved(false);
+
+		for (int i = 0; i < resolvers.size(); i++) {
+			T result = resolvers.get(i).convertToType(context, obj, type);
 			if (context.isPropertyResolved()) {
 				return result;
 			}

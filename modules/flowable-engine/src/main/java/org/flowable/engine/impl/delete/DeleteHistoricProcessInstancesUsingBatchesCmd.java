@@ -37,8 +37,8 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.service.impl.QueryVariableValue;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -190,9 +190,13 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfTrue(queryNode, "deleted", query.isDeleted());
         putIfTrue(queryNode, "notDeleted", query.isNotDeleted());
         putIfNotNull(queryNode, "startedBy", query.getStartedBy());
+        putIfNotNull(queryNode, "finishedBy", query.getFinishedBy());
+        putIfNotNull(queryNode, "state", query.getState());
+        putIfNotNull(queryNode, "startedBy", query.getStartedBy());
         putIfNotNull(queryNode, "superProcessInstanceId", query.getSuperProcessInstanceId());
         putIfTrue(queryNode, "excludeSubprocesses", query.isExcludeSubprocesses());
         putIfNotNullOrEmpty(queryNode, "processDefinitionKeyIn", query.getProcessDefinitionKeyIn());
+        putIfNotNullOrEmpty(queryNode, "excludeProcessDefinitionKeys", query.getExcludeProcessDefinitionKeys());
         putIfNotNullOrEmpty(queryNode, "processKeyNotIn", query.getProcessKeyNotIn());
         putIfNotNull(queryNode, "startedBefore", query.getStartedBefore());
         putIfNotNull(queryNode, "startedAfter", query.getStartedAfter());
@@ -224,6 +228,7 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "nameLike", query.getNameLike());
         putIfNotNull(queryNode, "nameLikeIgnoreCase", query.getNameLikeIgnoreCase());
         putIfNotNull(queryNode, "callbackId", query.getCallbackId());
+        putIfNotNullOrEmpty(queryNode, "callbackIds", query.getCallbackIds());
         putIfNotNull(queryNode, "callbackType", query.getCallbackType());
         putIfTrue(queryNode, "withoutCallbackId", query.isWithoutCallbackId());
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());

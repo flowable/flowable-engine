@@ -36,8 +36,7 @@ public class CmmnEngineScriptTraceEnhancer implements ScriptTraceEnhancer {
     }
 
     protected void enhanceScriptTrace(ScriptTraceContext scriptTrace, VariableContainer container) {
-        if (container instanceof Task) {
-            Task task = (Task) container;
+        if (container instanceof Task task) {
             if (ScopeTypes.CMMN.equals((task.getScopeType()))) {
                 scriptTrace.addTraceTag("scopeType", ScopeTypes.CMMN);
                 CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(task.getScopeDefinitionId());
@@ -45,17 +44,15 @@ public class CmmnEngineScriptTraceEnhancer implements ScriptTraceEnhancer {
                 scriptTrace.addTraceTag("scopeDefinitionId", caseDefinition.getId());
                 scriptTrace.addTraceTag("subScopeDefinitionKey", task.getTaskDefinitionKey());
             }
-        } else if (container instanceof DelegatePlanItemInstance) {
+        } else if (container instanceof DelegatePlanItemInstance planItemInstance) {
             scriptTrace.addTraceTag("scopeType", ScopeTypes.CMMN);
-            DelegatePlanItemInstance planItemInstance = (DelegatePlanItemInstance) container;
             CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(planItemInstance.getCaseDefinitionId());
             scriptTrace.addTraceTag("scopeDefinitionKey", caseDefinition.getKey());
             scriptTrace.addTraceTag("scopeDefinitionId", planItemInstance.getCaseDefinitionId());
             scriptTrace.addTraceTag("subScopeDefinitionKey", planItemInstance.getPlanItemDefinitionId());
             addTenantId(scriptTrace, planItemInstance.getTenantId());
-        } else if (container instanceof CaseInstance) {
+        } else if (container instanceof CaseInstance caseInstance) {
             scriptTrace.addTraceTag("scopeType", ScopeTypes.CMMN);
-            CaseInstance caseInstance = (CaseInstance) container;
             CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(caseInstance.getCaseDefinitionId());
             scriptTrace.addTraceTag("scopeDefinitionKey", caseDefinition.getKey());
             scriptTrace.addTraceTag("scopeDefinitionId", caseDefinition.getId());

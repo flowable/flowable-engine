@@ -12,9 +12,11 @@
  */
 package org.flowable.cmmn.engine.configurator.impl.deployer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineDeployment;
@@ -29,6 +31,8 @@ import org.slf4j.LoggerFactory;
 public class CmmnDeployer implements EngineDeployer {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeployer.class);
+
+    public static final int CMMN_DEFAULT_UNDEPLOY_ORDER = EngineDeployer.DEFAULT_UNDEPLOY_ORDER - 200;
     
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -61,4 +65,21 @@ public class CmmnDeployer implements EngineDeployer {
         }
     }
 
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        CmmnRepositoryService repositoryService = CommandContextUtil.getCmmnRepositoryService();
+        List<CmmnDeployment> deployments = repositoryService
+                .createDeploymentQuery()
+                .parentDeploymentId(parentDeployment.getId())
+                .list();
+
+        for (CmmnDeployment deployment : deployments) {
+            repositoryService.deleteDeployment(deployment.getId(), cascade);
+        }
+    }
+
+    @Override
+    public int getUndeployOrder() {
+        return CMMN_DEFAULT_UNDEPLOY_ORDER;
+    }
 }

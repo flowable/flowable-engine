@@ -16,6 +16,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -26,7 +32,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Stream;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.assertj.core.groups.Tuple;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.RuntimeService;
@@ -48,6 +58,11 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Testing various constructs with variables.
@@ -78,6 +93,16 @@ public class VariablesTest extends PluggableFlowableTestCase {
         for (int i = 0; i < 10; i++) {
             vars.put("localdateVar" + i, new LocalDate());
         }
+        
+        // 10 big decimals
+        for (int i = 0; i < 10; i++) {
+            vars.put("bigDecimalVar" + i, new BigDecimal(24.5 + i));
+        }
+        
+        // 10 big integers
+        for (int i = 0; i < 10; i++) {
+            vars.put("bigIntegerVar" + i, new BigInteger("" + (24 + i)));
+        }
 
         // 10 joda local dates
         for (int i = 0; i < 10; i++) {
@@ -106,7 +131,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Regular getVariables after process instance start
         vars = runtimeService.getVariables(processInstanceId);
-        assertThat(vars).hasSize(70);
+        assertThat(vars).hasSize(90);
         int nrOfStrings = 0;
         int nrOfInts = 0;
         int nrOfDates = 0;
@@ -150,7 +175,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(processInstanceId).isNotEqualTo(executionId);
 
         vars = runtimeService.getVariables(processInstanceId);
-        assertThat(vars).hasSize(70);
+        assertThat(vars).hasSize(90);
         nrOfStrings = 0;
         nrOfInts = 0;
         nrOfDates = 0;
@@ -195,7 +220,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Regular getVariables after process instance start
         vars = runtimeService.getVariablesLocal(processInstanceId);
-        assertThat(vars).hasSize(70);
+        assertThat(vars).hasSize(90);
         int nrOfStrings = 0;
         int nrOfInts = 0;
         int nrOfDates = 0;
@@ -278,11 +303,13 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariableLocal(executionId, "myVar", "test123");
 
         vars = runtimeService.getVariables(processInstanceId);
-        assertThat(vars).hasSize(70);
+        assertThat(vars).hasSize(90);
         int nrOfStrings = 0;
         int nrOfInts = 0;
         int nrOfDates = 0;
         int nrOfLocalDates = 0;
+        int nrOfBigDecimals = 0;
+        int nrOfBigIntegers = 0;
         int nrOfDateTimes = 0;
         int nrOfBooleans = 0;
         int nrOfSerializable = 0;
@@ -298,6 +325,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfDates++;
             } else if (variableValue instanceof LocalDate) {
                 nrOfLocalDates++;
+            } else if (variableValue instanceof BigDecimal) {
+                nrOfBigDecimals++;
+            } else if (variableValue instanceof BigInteger) {
+                nrOfBigIntegers++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
             } else if (variableValue instanceof TestSerializableVariable) {
@@ -309,6 +340,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfBooleans).isEqualTo(10);
         assertThat(nrOfDates).isEqualTo(10);
         assertThat(nrOfLocalDates).isEqualTo(10);
+        assertThat(nrOfBigDecimals).isEqualTo(10);
+        assertThat(nrOfBigIntegers).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
         assertThat(nrOfSerializable).isEqualTo(10);
@@ -328,6 +361,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
         nrOfInts = 0;
         nrOfDates = 0;
         nrOfLocalDates = 0;
+        nrOfBigDecimals = 0;
+        nrOfBigIntegers = 0;
         nrOfDateTimes = 0;
         nrOfBooleans = 0;
         nrOfSerializable = 0;
@@ -343,6 +378,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfDates++;
             } else if (variableValue instanceof LocalDate) {
                 nrOfLocalDates++;
+            } else if (variableValue instanceof BigDecimal) {
+                nrOfBigDecimals++;
+            } else if (variableValue instanceof BigInteger) {
+                nrOfBigIntegers++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
             } else if (variableValue instanceof TestSerializableVariable) {
@@ -354,6 +393,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfBooleans).isEqualTo(10);
         assertThat(nrOfDates).isEqualTo(10);
         assertThat(nrOfLocalDates).isEqualTo(10);
+        assertThat(nrOfBigDecimals).isEqualTo(10);
+        assertThat(nrOfBigIntegers).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
         assertThat(nrOfSerializable).isEqualTo(10);
@@ -409,7 +450,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         taskService.complete(taskService.createTaskQuery().taskName("Task B").singleResult().getId()); // Triggers service task invocation
 
         vars = runtimeService.getVariables(processInstanceId);
-        assertThat(vars).hasSize(71);
+        assertThat(vars).hasSize(91);
 
         String varValue = (String) runtimeService.getVariable(processInstanceId, "testVar");
         assertThat(varValue).isEqualTo("HELLO world");
@@ -485,7 +526,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
         vars = taskService.getVariables(task.getId());
-        assertThat(vars).hasSize(70);
+        assertThat(vars).hasSize(90);
         int nrOfStrings = 0;
         int nrOfInts = 0;
         int nrOfDates = 0;
@@ -534,7 +575,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
         // Set local variable
         taskService.setVariableLocal(task.getId(), "localTaskVar", "localTaskVarValue");
-        assertThat(taskService.getVariables(task.getId())).hasSize(71);
+        assertThat(taskService.getVariables(task.getId())).hasSize(91);
         assertThat(taskService.getVariablesLocal(task.getId())).hasSize(1);
         assertThat(taskService.getVariables(task.getId(), Arrays.asList("intVar2", "intVar5"))).hasSize(2);
         assertThat(taskService.getVariablesLocal(task.getId(), Arrays.asList("intVar2", "intVar5"))).isEmpty();
@@ -547,7 +588,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(taskService.getVariable(task.getId(), "stringVar1")).isEqualTo("stringVarValue-1");
         assertThat(taskService.getVariables(task.getId(), varNames)).containsEntry("stringVar1", "stringVarValue-1");
         taskService.setVariableLocal(task.getId(), "stringVar1", "Override");
-        assertThat(taskService.getVariables(task.getId())).hasSize(71);
+        assertThat(taskService.getVariables(task.getId())).hasSize(91);
         assertThat(taskService.getVariable(task.getId(), "stringVar1")).isEqualTo("Override");
         assertThat(taskService.getVariables(task.getId(), varNames)).containsEntry("stringVar1", "Override");
     }
@@ -589,6 +630,36 @@ public class VariablesTest extends PluggableFlowableTestCase {
         processInstance = runtimeService.createProcessInstanceQuery().variableValueGreaterThanOrEqual("localdateVar1", queryDate).singleResult();
         assertThat(processInstance).isNotNull();
         assertThat(processInstance.getId()).isEqualTo(processInstanceId);
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void testBigDecimalVariable() {
+        Map<String, Object> vars = generateVariables();
+        String processInstanceId = runtimeService.startProcessInstanceByKey("variablesTest", vars).getId();
+
+        BigDecimal decimal1 = (BigDecimal) runtimeService.getVariable(processInstanceId, "bigDecimalVar1");
+        assertThat(decimal1).isEqualTo(new BigDecimal(25.5));
+
+        decimal1 = new BigDecimal(34.1);
+        runtimeService.setVariable(processInstanceId, "bigDecimalVar1", decimal1);
+        decimal1 = (BigDecimal) runtimeService.getVariable(processInstanceId, "bigDecimalVar1");
+        assertThat(decimal1).isEqualTo(new BigDecimal(34.1));
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void testBigIntegerVariable() {
+        Map<String, Object> vars = generateVariables();
+        String processInstanceId = runtimeService.startProcessInstanceByKey("variablesTest", vars).getId();
+
+        BigInteger integerVar = (BigInteger) runtimeService.getVariable(processInstanceId, "bigIntegerVar1");
+        assertThat(integerVar).isEqualTo(new BigInteger("25"));
+
+        integerVar = new BigInteger("34");
+        runtimeService.setVariable(processInstanceId, "bigIntegerVar1", integerVar);
+        integerVar = (BigInteger) runtimeService.getVariable(processInstanceId, "bigIntegerVar1");
+        assertThat(integerVar).isEqualTo(new BigInteger("34"));
     }
 
     @Test
@@ -754,6 +825,82 @@ public class VariablesTest extends PluggableFlowableTestCase {
         for (String variableName : variables.keySet()) {
             assertThat(variables.get(variableName)).isNotNull();
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("accessingVariableShouldReturnCachedValueParameters")
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void accessingVariableShouldReturnCachedValue(String typeName, Object initialValue, Object newValue) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("variablesTest")
+                .variable("testVar", initialValue)
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "testVar");
+        assertThat(variableInstance.getTypeName()).isEqualTo(typeName);
+
+        Pair<Object, Object> variables = managementService.executeCommand(commandContext -> {
+            Object variableBeforeUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            runtimeService.setVariable(processInstance.getId(), "testVar", newValue);
+            Object variableAfterUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            return Pair.of(variableBeforeUpdate, variableAfterUpdate);
+        });
+
+        Object variableBeforeUpdate = variables.getLeft();
+        Object variableAfterUpdate = variables.getRight();
+        assertThat(variableBeforeUpdate).as(typeName + " variable before update").isEqualTo(initialValue);
+        assertThat(variableAfterUpdate).as(typeName + " variable after update").isEqualTo(newValue);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/variables/VariablesTest.bpmn20.xml")
+    public void accessingJsonVariableShouldReturnCachedValue() {
+        ObjectNode initialValue = processEngineConfiguration.getObjectMapper()
+                .createObjectNode()
+                .put("name", "Kermit");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("variablesTest")
+                .variable("testVar", initialValue)
+                .start();
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "testVar");
+        assertThat(variableInstance.getTypeName()).isEqualTo("json");
+
+        ObjectNode newValue = processEngineConfiguration.getObjectMapper()
+                .createObjectNode()
+                .put("name", "Fozzie");
+
+        Pair<Object, Object> variables = managementService.executeCommand(commandContext -> {
+            Object variableBeforeUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            runtimeService.setVariable(processInstance.getId(), "testVar", newValue);
+            Object variableAfterUpdate = runtimeService.getVariable(processInstance.getId(), "testVar");
+            return Pair.of(variableBeforeUpdate, variableAfterUpdate);
+        });
+
+        Object variableBeforeUpdate = variables.getLeft();
+        Object variableAfterUpdate = variables.getRight();
+        assertThat(variableBeforeUpdate).as("json variable before update").isEqualTo(initialValue);
+        assertThat(variableAfterUpdate).as("json variable after update").isEqualTo(newValue);
+    }
+
+    static Stream<Arguments> accessingVariableShouldReturnCachedValueParameters() {
+        return Stream.of(
+                Arguments.of("string", "Test String", "Test String v2"),
+                Arguments.of("longString", RandomStringUtils.insecure().nextAlphanumeric(4500), RandomStringUtils.insecure().nextAlphanumeric(6500)),
+                Arguments.of("integer", 10, 42),
+                Arguments.of("long", 150L, 420L),
+                Arguments.of("localdatetime", LocalDateTime.of(2025, Month.SEPTEMBER, 26, 10, 10), LocalDateTime.of(2024, Month.DECEMBER, 15, 18, 45)),
+                Arguments.of("localdate", java.time.LocalDate.of(2025, Month.APRIL, 10), java.time.LocalDate.of(2026, Month.JANUARY, 5)),
+                Arguments.of("instant", Instant.parse("2025-07-16T14:24:45.583Z"), Instant.parse("2026-02-21T08:56:18.163Z")),
+                Arguments.of("date", Date.from(Instant.parse("2025-07-16T14:24:45.583Z")), Date.from(Instant.parse("2026-02-21T08:56:18.163Z"))),
+                Arguments.of("double", 45.5d, 142.6d),
+                Arguments.of("uuid", UUID.fromString("239969dd-3310-4068-b558-e4cbce5650ea"), UUID.fromString("c5b16e77-0c15-4d7b-ac12-15352af76355")),
+                Arguments.of("short", (short) 8, (short) 12),
+                Arguments.of("boolean", true, false),
+                Arguments.of("bytes", "Initial".getBytes(StandardCharsets.UTF_8), "Updated".getBytes(StandardCharsets.UTF_8)),
+                Arguments.of("biginteger", BigInteger.valueOf(1450), BigInteger.valueOf(9568)),
+                Arguments.of("bigdecimal", BigDecimal.valueOf(5896.48), BigDecimal.valueOf(4886.79))
+        );
     }
 
     // Class to test variable serialization

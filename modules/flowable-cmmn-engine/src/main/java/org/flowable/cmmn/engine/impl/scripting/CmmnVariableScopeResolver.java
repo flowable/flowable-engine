@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.scripting;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -35,118 +35,102 @@ import org.flowable.task.api.Task;
  */
 public class CmmnVariableScopeResolver implements Resolver {
 
-    protected static final String ENGINE_CONFIG_KEY = "engineConfiguration";
-    protected static final String CMMN_ENGINE_CONFIG_KEY = "cmmnEngineConfiguration";
-
-    protected static final String RUNTIME__SERVICE_KEY = "runtimeService";
-    protected static final String CMMN_RUNTIME__SERVICE_KEY = "cmmnRuntimeService";
-
-    protected static final String HISTORY_SERVICE_KEY = "historyService";
-    protected static final String CMMN_HISTORY_SERVICE_KEY = "cmmnHistoryService";
-
-    protected static final String MANAGEMENT_SERVICE_KEY = "managementService";
-    protected static final String CMMN_MANAGEMENT_SERVICE_KEY = "cmmnManagementService";
-
-    protected static final String TASK_SERVICE_KEY = "taskService";
-    protected static final String CMMN_TASK_SERVICE_KEY = "cmmnTaskService";
-
     protected static final String CASE_INSTANCE_KEY = "caseInstance";
     protected static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
     protected static final String TASK_KEY = "task";
 
-    protected static final Set<String> KEYS = new HashSet<>(Arrays.asList(
-        ENGINE_CONFIG_KEY, CMMN_ENGINE_CONFIG_KEY,
-        RUNTIME__SERVICE_KEY, CMMN_RUNTIME__SERVICE_KEY,
-        HISTORY_SERVICE_KEY, CMMN_HISTORY_SERVICE_KEY,
-        MANAGEMENT_SERVICE_KEY, CMMN_MANAGEMENT_SERVICE_KEY,
-        TASK_SERVICE_KEY, CMMN_TASK_SERVICE_KEY,
+    protected static final Map<String, Function<CmmnEngineConfiguration, ?>> SERVICE_RESOLVERS = Map.of(
+            "engineConfiguration", Function.identity(),
+            "cmmnEngineConfiguration", Function.identity(),
+            "runtimeService", CmmnEngineConfiguration::getCmmnRuntimeService,
+            "cmmnRuntimeService", CmmnEngineConfiguration::getCmmnRuntimeService,
+            "historyService", CmmnEngineConfiguration::getCmmnHistoryService,
+            "cmmnHistoryService", CmmnEngineConfiguration::getCmmnHistoryService,
+            "managementService", CmmnEngineConfiguration::getCmmnManagementService,
+            "cmmnManagementService", CmmnEngineConfiguration::getCmmnManagementService,
+            "taskService", CmmnEngineConfiguration::getCmmnTaskService,
+            "cmmnTaskService", CmmnEngineConfiguration::getCmmnTaskService
+    );
+
+    protected static final Set<String> KEYS = Set.of(
         CASE_INSTANCE_KEY,
         PLAN_ITEM_INSTANCE_KEY,
         TASK_KEY
-    ));
+    );
 
     protected CmmnEngineConfiguration engineConfiguration;
-    protected VariableContainer variableContainer;
+    protected VariableContainer scopeContainer;
+    protected VariableContainer inputVariableContainer;
 
-    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer variableContainer) {
-        if (variableContainer == null) {
-            throw new FlowableIllegalArgumentException("variableContainer cannot be null");
+    public CmmnVariableScopeResolver(CmmnEngineConfiguration engineConfiguration, VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer) {
+        if (scopeContainer == null) {
+            throw new FlowableIllegalArgumentException("scopeContainer cannot be null");
         }
-        this.variableContainer = variableContainer;
+        this.scopeContainer = scopeContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.engineConfiguration = engineConfiguration;
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return variableContainer.hasVariable((String) key) || KEYS.contains(key);
+        return inputVariableContainer.hasVariable((String) key) || KEYS.contains(key)
+                || SERVICE_RESOLVERS.containsKey(key) && engineConfiguration.isServicesEnabledInScripting();
     }
 
     @Override
     public Object get(Object key) {
-        if (ENGINE_CONFIG_KEY.equals(key) || CMMN_ENGINE_CONFIG_KEY.equals(key)) {
-            return engineConfiguration;
-
-        } else if (RUNTIME__SERVICE_KEY.equals(key) || CMMN_RUNTIME__SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnRuntimeService();
-
-        } else if (HISTORY_SERVICE_KEY.equals(key) || CMMN_HISTORY_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnHistoryService();
-
-        } else if (MANAGEMENT_SERVICE_KEY.equals(key) || CMMN_MANAGEMENT_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnManagementService();
-
-        } else if (TASK_SERVICE_KEY.equals(key) || CMMN_TASK_SERVICE_KEY.equals(key)) {
-            return engineConfiguration.getCmmnTaskService();
-
+        if (SERVICE_RESOLVERS.containsKey((String) key)) {
+            if (engineConfiguration.isServicesEnabledInScripting()) {
+                return SERVICE_RESOLVERS.get(key).apply(engineConfiguration);
+            } else {
+                throw new FlowableException("The service '" + key + "' is not available in the current context. Please enable services in scripting.");
+            }
         } else if (CASE_INSTANCE_KEY.equals(key)) {
-            if (variableContainer instanceof CaseInstance) {
-                return variableContainer;
+            if (scopeContainer instanceof CaseInstance) {
+                return scopeContainer;
 
-            } else if (variableContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
+            } else if (scopeContainer instanceof PlanItemInstance planItemInstance) {
                 if (StringUtils.isNotEmpty(planItemInstance.getCaseInstanceId())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstance.getCaseInstanceId());
                 }
 
-            } else if (variableContainer instanceof Task) {
-                Task task = (Task) variableContainer;
+            } else if (scopeContainer instanceof Task task) {
                 if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getCaseInstanceEntityManager().findById(task.getScopeId());
                 }
 
             }
 
-            throw new FlowableException("Unsupported variableContainer for key '" + CASE_INSTANCE_KEY + "': " + variableContainer.getClass().getName());
+            throw new FlowableException("Unsupported variableContainer for key '" + CASE_INSTANCE_KEY + "': " + scopeContainer.getClass().getName());
 
         } else if (PLAN_ITEM_INSTANCE_KEY.equals(key)) {
-            if (variableContainer instanceof PlanItemInstance) {
-                return variableContainer;
+            if (scopeContainer instanceof PlanItemInstance) {
+                return scopeContainer;
 
-            }  else if (variableContainer instanceof Task) {
-                Task task = (Task) variableContainer;
+            }  else if (scopeContainer instanceof Task task) {
                 if (StringUtils.isNotEmpty(task.getSubScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
                     return CommandContextUtil.getPlanItemInstanceEntityManager().findById(task.getSubScopeId());
                 }
 
             }
 
-            throw new FlowableException("Unsupported variableContainer for key '" + PLAN_ITEM_INSTANCE_KEY + "': " + variableContainer.getClass().getName());
+            throw new FlowableException("Unsupported variableContainer for key '" + PLAN_ITEM_INSTANCE_KEY + "': " + scopeContainer.getClass().getName());
 
         } else if (TASK_KEY.equals(key)) {
-            if (variableContainer instanceof Task) {
-                return variableContainer;
+            if (scopeContainer instanceof Task) {
+                return scopeContainer;
 
-            } else  if (variableContainer instanceof PlanItemInstance) {
-                PlanItemInstance planItemInstance = (PlanItemInstance) variableContainer;
+            } else  if (scopeContainer instanceof PlanItemInstance planItemInstance) {
                 return CommandContextUtil.getTaskService().findTasksBySubScopeIdScopeType(planItemInstance.getId(), ScopeTypes.CMMN);
 
             } else {
-                throw new FlowableException("Unsupported variableContainer for key '" + TASK_KEY + "': " + variableContainer.getClass().getName());
+                throw new FlowableException("Unsupported variableContainer for key '" + TASK_KEY + "': " + scopeContainer.getClass().getName());
 
             }
 
         } else {
-            return variableContainer.getVariable((String) key);
+            return inputVariableContainer.getVariable((String) key);
 
         }
     }

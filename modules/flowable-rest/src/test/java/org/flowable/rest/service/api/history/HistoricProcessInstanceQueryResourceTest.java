@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.HashMap;
 
@@ -22,16 +23,17 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -164,6 +166,17 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionKey", "oneTaskProcess");
         assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId(), processInstance2.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("finishedBy", "historyQueryAndSortUser");
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("state", ProcessInstanceState.COMPLETED);
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance.getId());
+
+        requestNode.put("state", ProcessInstanceState.RUNNING);
+        assertResultsPresentInPostDataResponse(url, requestNode, processInstance2.getId());
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionKey", "oneTaskProcess");
@@ -309,5 +322,152 @@ public class HistoricProcessInstanceQueryResourceTest extends BaseSpringRestTest
                 + "   processDefinitionId: '" + processInstance.getProcessDefinitionId() + "'"
                 + "} ]"
                 + "}");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testQueryProcessInstancesByProcessDefinitionKeys() throws Exception {
+        ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode keyArray = requestNode.putArray("processDefinitionKeys");
+        keyArray.add("oneTaskProcess");
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "data: [ "
+                        + " {"
+                        + "   id: '" + instance1.getId() + "'"
+                        + " }, "
+                        + " {"
+                        + "   id: '" + instance2.getId() + "'"
+                        + " }"
+                        + "]"
+                        + "}");
+
+        keyArray.removeAll();
+        keyArray.add("undefined");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ ]"
+                        + "}");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/twoTaskProcess.bpmn20.xml" })
+    public void testQueryProcessInstancesByExcludeProcessDefinitionKeys() throws Exception {
+        ProcessInstance instance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance instance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode keyArray = requestNode.putArray("excludeProcessDefinitionKeys");
+        keyArray.add("oneTaskProcess");
+        
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "data: [ ]"
+                        + "}");
+        
+        keyArray.removeAll();
+        keyArray.add("undefined");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "data: [ "
+                        + " {"
+                        + "   id: '" + instance1.getId() + "'"
+                        + " }, "
+                        + " {"
+                        + "   id: '" + instance2.getId() + "'"
+                        + " }"
+                        + "]"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryProcessInstancesByCallbackId() throws Exception {
+        ProcessInstance instance1 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("callbackId1").start();
+        ProcessInstance instance2 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("callbackId2").start();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("callbackIds").add("callbackId1").add("callbackId1");
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "data: [ "
+                        + " {"
+                        + "   id: '" + instance1.getId() + "'"
+                        + " }"
+                        + "]"
+                        + "}");
+        requestNode.removeAll();
+        requestNode.put("callbackId", "callbackId2");
+
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(rootNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "data: [ "
+                        + " {"
+                        + "   id: '" + instance2.getId() + "'"
+                        + " }"
+                        + "]"
+                        + "}");
+
     }
 }

@@ -29,11 +29,9 @@ public class VariableAggregationDefinitionParser extends BaseChildElementParser 
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof MultiInstanceLoopCharacteristics)) {
+        if (!(parentElement instanceof MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics)) {
             return;
         }
-
-        MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = (MultiInstanceLoopCharacteristics) parentElement;
 
         VariableAggregationDefinition aggregationDefinition = new VariableAggregationDefinition();
 

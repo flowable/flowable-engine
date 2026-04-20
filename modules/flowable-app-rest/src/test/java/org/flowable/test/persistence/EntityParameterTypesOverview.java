@@ -126,6 +126,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TRANSACTION_ORDER_", "transactionOrder", PARAMETER_TYPE_INTEGER);
@@ -275,6 +276,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("START_ACT_ID_", "startActivityId", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("IS_COUNT_ENABLED_", "isCountEnabled", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("EVT_SUBSCR_COUNT_", "eventSubscriptionCount", PARAMETER_TYPE_INTEGER);
         info.addColumn("TASK_COUNT_", "taskCount", PARAMETER_TYPE_INTEGER);
@@ -321,6 +325,9 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
 
         // Event
         info.addQueryParameter("eventSubscriptionValue.eventType", PARAMETER_TYPE_NVARCHAR);
@@ -402,6 +409,7 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("ACT_NAME_", "activityName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ACT_TYPE_", "activityType", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("OWNER_", "owner", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_TIME_", "startTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("END_TIME_", "endTime", PARAMETER_TYPE_TIMESTAMP);
@@ -461,6 +469,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("START_USER_ID_", "startUserId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("START_ACT_ID_", "startActivityId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("END_ACT_ID_", "endActivityId",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("SUPER_PROCESS_INSTANCE_ID_", "superProcessInstanceId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("DELETE_REASON_", "deleteReason",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("TENANT_ID_", "tenantId",  PARAMETER_TYPE_NVARCHAR);
@@ -470,6 +481,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("REFERENCE_ID_", "referenceId",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType",  PARAMETER_TYPE_NVARCHAR);
         info.addColumn("PROPAGATED_STAGE_INST_ID_", "propagatedStageInstanceId",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("STATE_", "state",  PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("END_USER_ID_", "endUserId",  PARAMETER_TYPE_NVARCHAR);
+
 
         addVariableColumnsWhenUsedInQueries(info);
 
@@ -497,6 +511,12 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("involvedGroupIdentityLink.groupId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("involvedGroupIdentityLink.type", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("group", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+        
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
+
+        info.addQueryParameter("state", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("finishedBy", PARAMETER_TYPE_NVARCHAR);
 
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
@@ -885,6 +905,9 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("IS_COMPLETEABLE_", "completeable", PARAMETER_TYPE_BOOLEAN);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("LOCK_TIME_", "lockTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LOCK_OWNER_", "lockOwner", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
@@ -919,6 +942,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
@@ -939,6 +963,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
         info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addCmmnDeploymentParams() {
@@ -992,6 +1017,10 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("TENANT_ID_", "tenantId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("BUSINESS_STATUS_", "businessStatus", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("END_USER_ID_", "endUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("DUE_DATE_", "dueDate", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIM_TIME_", "claimTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("CLAIMED_BY_", "claimedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CaseDefinitionKey", "caseDefinitionKey", PARAMETER_TYPE_VARCHAR);
         info.addColumn("CaseDefinitionName", "caseDefinitionName", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("CaseDefinitionVersion", "caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
@@ -1026,6 +1055,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1047,6 +1077,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("queryVariableValue.textValue2", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("queryVariableValue.longValue", PARAMETER_TYPE_BIGINT);
         info.addQueryParameter("queryVariableValue.doubleValue", PARAMETER_TYPE_DOUBLE);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("finishedBy", PARAMETER_TYPE_VARCHAR);
     }
     
     protected static void addHistoricMilestoneInstanceParams() {
@@ -1088,10 +1120,13 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("FAILED_TIME_", "failedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("LAST_UPDATED_TIME_", "lastUpdatedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);
@@ -1149,6 +1184,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);
@@ -1168,6 +1205,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("parameter.planItemId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter.stageInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parameter", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("variableName", PARAMETER_TYPE_NVARCHAR);
     }
     
     protected static void addMilestoneInstanceParams() {
@@ -1209,9 +1247,12 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("COMPLETED_TIME_", "completedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("OCCURRED_TIME_", "occurredTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("TERMINATED_TIME_", "terminatedTime", PARAMETER_TYPE_TIMESTAMP);
+        info.addColumn("FAILED_TIME_", "failedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("EXIT_TIME_", "exitTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("ENDED_TIME_", "endedTime", PARAMETER_TYPE_TIMESTAMP);
         info.addColumn("START_USER_ID_", "startUserId", PARAMETER_TYPE_VARCHAR);
+        info.addColumn("ASSIGNEE_", "assignee", PARAMETER_TYPE_NVARCHAR);
+        info.addColumn("COMPLETED_BY_", "completedBy", PARAMETER_TYPE_NVARCHAR);
         info.addColumn("REFERENCE_ID_", "referenceId", PARAMETER_TYPE_VARCHAR);
         info.addColumn("REFERENCE_TYPE_", "referenceType", PARAMETER_TYPE_VARCHAR);
         info.addColumn("IS_COMPLETEABLE_", "completable", PARAMETER_TYPE_BOOLEAN);
@@ -1270,6 +1311,8 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("occurredAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("terminatedAfter", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedBefore", PARAMETER_TYPE_TIMESTAMP);
+        info.addQueryParameter("failedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("exitAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("endedBefore", PARAMETER_TYPE_TIMESTAMP);

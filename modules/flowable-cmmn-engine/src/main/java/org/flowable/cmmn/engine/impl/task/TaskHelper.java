@@ -41,7 +41,7 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -63,6 +63,7 @@ public class TaskHelper {
     }
     
     public static void completeTask(TaskEntity task, String userId, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        cmmnEngineConfiguration.getPlanItemInstanceEntityManager().updateHumanTaskPlanItemInstanceCompletedBy(task, userId);
         internalDeleteTask(task, userId, null, false, true, cmmnEngineConfiguration);
     }
 
@@ -143,6 +144,7 @@ public class TaskHelper {
                 || (taskEntity.getAssignee() == null && assignee != null)) {
             
             cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().changeTaskAssignee(taskEntity, assignee);
+            cmmnEngineConfiguration.getPlanItemInstanceEntityManager().updateHumanTaskPlanItemInstanceAssignee(taskEntity, assignee);
             fireAssignmentEvents(taskEntity, cmmnEngineConfiguration);
 
             if (taskEntity.getId() != null) {
@@ -164,12 +166,18 @@ public class TaskHelper {
     }
     
     protected static void addAssigneeIdentityLinks(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (taskEntity.getAssignee() == null) {
+            return;
+        }
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddAssigneeIdentityLinkToTask(taskEntity, taskEntity.getAssignee());
         }
     }
 
     protected static void addOwnerIdentityLink(TaskEntity taskEntity, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (taskEntity.getOwner() == null) {
+            return;
+        }
         if (cmmnEngineConfiguration.getIdentityLinkInterceptor() != null) {
             cmmnEngineConfiguration.getIdentityLinkInterceptor().handleAddOwnerIdentityLinkToTask(taskEntity, taskEntity.getOwner());
         }

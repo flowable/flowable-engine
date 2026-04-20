@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.el;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -77,6 +78,11 @@ public class VariableContainerWrapper implements VariableContainer {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public Set<String> getVariableNames() {
+        return variables.keySet();
     }
 
     @Override

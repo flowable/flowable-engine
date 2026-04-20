@@ -106,6 +106,9 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getProcessDefinitionKeys() != null) {
             query.processDefinitionKeys(queryRequest.getProcessDefinitionKeys());
         }
+        if (queryRequest.getExcludeProcessDefinitionKeys() != null) {
+            query.excludeProcessDefinitionKeys(queryRequest.getExcludeProcessDefinitionKeys());
+        }
         if (queryRequest.getProcessDefinitionId() != null) {
             query.processDefinitionId(queryRequest.getProcessDefinitionId());
         }
@@ -196,6 +199,9 @@ public class BaseProcessInstanceResource {
                 query.includeProcessVariables();
             }
         }
+        if (queryRequest.getIncludeProcessVariablesNames() != null) {
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames());
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
@@ -203,8 +209,17 @@ public class BaseProcessInstanceResource {
         if (queryRequest.getCallbackId() != null) {
             query.processInstanceCallbackId(queryRequest.getCallbackId());
         }
+
+        if(queryRequest.getCallbackIds() != null && !queryRequest.getCallbackIds().isEmpty()) {
+            query.processInstanceCallbackIds(queryRequest.getCallbackIds());
+        }
+
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
+        }
+        
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
         }
 
         if (queryRequest.getTenantId() != null) {

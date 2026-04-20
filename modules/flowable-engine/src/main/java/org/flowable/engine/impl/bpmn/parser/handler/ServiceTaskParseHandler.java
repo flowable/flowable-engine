@@ -12,21 +12,15 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.Set;
+
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
-import org.flowable.engine.impl.bpmn.behavior.WebServiceActivityBehavior;
-import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
-public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<ServiceTask> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
+public class ServiceTaskParseHandler extends AbstractServiceTaskParseHandler<ServiceTask> {
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -34,60 +28,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
     }
 
     @Override
-    protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
-
-        // Email, Http and Shell service tasks
-        if (StringUtils.isNotEmpty(serviceTask.getType())) {
-
-            if ("mail".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createMailActivityBehavior(serviceTask));
-
-            } else if ("camel".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createCamelActivityBehavior(serviceTask));
-
-            } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createShellActivityBehavior(serviceTask));
-
-            } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createDmnActivityBehavior(serviceTask));
-
-            } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
-
-            } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskDelegateExpressionActivityBehavior(serviceTask));
-                
-            } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-                serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskExpressionActivityBehavior(serviceTask));
-                
-            } else {
-                LOGGER.warn("Invalid type: '{}' for service task {}", serviceTask.getType(), serviceTask.getId());
-            }
-
-            // flowable:class
-        } else if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createClassDelegateServiceTask(serviceTask));
-
-            // flowable:delegateExpression
-        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskDelegateExpressionActivityBehavior(serviceTask));
-
-            // flowable:expression
-        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(serviceTask.getImplementationType())) {
-
-            serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createServiceTaskExpressionActivityBehavior(serviceTask));
-
-            // Webservice
-        } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
-
-            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask, bpmnParse.getBpmnModel());
-            serviceTask.setBehavior(webServiceActivityBehavior);
-
-        } else {
-            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on service task {}", serviceTask.getId());
-        }
-
+    public Set<Class<? extends BaseElement>> getHandledTypes() {
+        return Set.of(ServiceTask.class);
     }
 }

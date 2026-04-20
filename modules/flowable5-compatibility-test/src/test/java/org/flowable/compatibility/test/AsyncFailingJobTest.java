@@ -12,9 +12,9 @@
  */
 package org.flowable.compatibility.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.concurrent.Callable;
 
@@ -22,7 +22,7 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AsyncFailingJobTest extends AbstractFlowable6CompatibilityTest {
 

@@ -30,11 +30,11 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -48,6 +48,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying case instance based on variables. POST query/case-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -66,6 +67,20 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
 
         ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceIds").add(caseInstance.getId()).add(caseInstance2.getId());
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId(), caseInstance2.getId());
+
+        runtimeService.terminateCaseInstance(caseInstance2.getId());
+        runtimeService.terminateCaseInstance(caseInstance3.getId());
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceBusinessKey", "myBusinessKey");
         assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
         
@@ -201,6 +216,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying case instance based on variables. POST query/case-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
             "org/flowable/cmmn/rest/service/api/repository/repeatingStage.cmmn" })
     public void testQueryCaseInstancesPagingAndSorting() throws Exception {
@@ -266,12 +282,13 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                         + "    id: '" + caseInstance1.getId() + "',"
                         + "    caseDefinitionName: 'One Human Task Case',"
                         + "    caseDefinitionDescription: 'A human task case',"
-                        + "    startTime: " + new TextNode(getISODateStringWithTZ(caseInstance1.getStartTime())) + ","
+                        + "    startTime: '" + getISODateString(caseInstance1.getStartTime()) + "',"
                         + "    startUserId: 'queryCaseUser'"
                         + "  }"
                         + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByActivePlanItemDefinitionId() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -335,6 +352,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                     + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByActivePlanItemDefinitionIds() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -404,6 +422,7 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                     + "]");
     }
     
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
             "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryCaseInstancesByCaseDefinitionKeys() throws Exception {
@@ -477,10 +496,85 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertThatJson(dataNode)
             .isEqualTo("[]");
     }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn",
+        "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testQueryCaseInstancesByExcludeCaseDefinitionKeys() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        CaseInstance caseInstance3 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode itemArrayNode = requestNode.putArray("excludeCaseDefinitionKeys");
+        itemArrayNode.add("myCase");
+        
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("["
+                        + "  {"
+                        + "    id: '" + caseInstance3.getId() + "'"
+                        + "  }"
+                        + "]");
+        
+        requestNode = objectMapper.createObjectNode();
+        itemArrayNode = requestNode.putArray("excludeCaseDefinitionKeys");
+        itemArrayNode.add("myCase");
+        itemArrayNode.add("oneHumanTaskCase");
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+            .isEqualTo("[]");
+        
+        requestNode = objectMapper.createObjectNode();
+        itemArrayNode = requestNode.putArray("excludeCaseDefinitionKeys");
+        itemArrayNode.add("notExisting");
+        
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        response = executeRequest(httpPost, HttpStatus.SC_OK);
+        
+        rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        dataNode = rootNode.get("data");
+        
+        assertThatJson(dataNode)
+            .when(Option.IGNORING_EXTRA_FIELDS)
+            .when(Option.IGNORING_ARRAY_ORDER)
+            .isEqualTo("["
+                    + "  {"
+                    + "    id: '" + caseInstance.getId() + "'"
+                    + "  },"
+                    + "  {"
+                    + "    id: '" + caseInstance2.getId() + "'"
+                    + "  },"
+                    + "  {"
+                    + "    id: '" + caseInstance3.getId() + "'"
+                    + "  }"
+                    + "]");
+    }
 
     /**
      * Test querying case instance sort by businessKey. POST query/case-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testSortByBusinessKey() throws Exception {
         Authentication.setAuthenticatedUserId("queryCaseUser");
@@ -538,6 +632,72 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                         + "  },"
                         + "  {"
                         + "    businessKey: 'businessKey1'"
+                        + "  }"
+                        + "]");
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
+    public void testQueryCaseInstancesByCaseInstanceIds() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode itemArrayNode = requestNode.putArray("caseInstanceIds");
+        itemArrayNode.add(caseInstance.getId());
+        itemArrayNode.add(caseInstance2.getId());
+        itemArrayNode.add("someId");
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "  {"
+                        + "    id: '" + caseInstance.getId() + "'"
+                        + "  },"
+                        + "  {"
+                        + "    id: '" + caseInstance2.getId() + "'"
+                        + "  }"
+                        + "]");
+
+    }
+
+    @Test
+    @CmmnDeployment(resources = {"org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn"})
+    public void testQueryCaseInstancesByCaseInstanceCallbackIds() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().callbackId("callBackId1").caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().callbackId("callBackId2").caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.createCaseInstanceBuilder().callbackId("callBackId3").caseDefinitionKey("oneHumanTaskCase").start();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode itemArrayNode = requestNode.putArray("caseInstanceCallbackIds");
+        itemArrayNode.add("callBackId1");
+        itemArrayNode.add("callBackId2");
+        itemArrayNode.add("someId");
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("["
+                        + "  {"
+                        + "    id: '" + caseInstance.getId() + "'"
+                        + "  },"
+                        + "  {"
+                        + "    id: '" + caseInstance2.getId() + "'"
                         + "  }"
                         + "]");
 

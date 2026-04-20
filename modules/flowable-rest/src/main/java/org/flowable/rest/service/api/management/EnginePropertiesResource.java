@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Properties" }, description = "Manage engine properties", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Properties" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EnginePropertiesResource {
 
     @Autowired(required=false)

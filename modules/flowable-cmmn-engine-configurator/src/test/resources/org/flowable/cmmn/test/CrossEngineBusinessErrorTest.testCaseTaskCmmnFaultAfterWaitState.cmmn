@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="throwCmmnFaultAfterWaitState" name="Throw CmmnFault After Wait State">
+        <casePlanModel id="casePlanModel" name="Case plan model" autoComplete="true">
+            <planItem id="planItemA" name="Wait Task" definitionRef="humanTaskA" />
+            <planItem id="planItemB" name="Throw Fault" definitionRef="serviceTaskB">
+                <entryCriterion id="entryB" sentryRef="sentryOnAComplete" />
+            </planItem>
+            <sentry id="sentryOnAComplete">
+                <planItemOnPart id="onPartA" sourceRef="planItemA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="humanTaskA" name="Wait Task" />
+            <task id="serviceTaskB" name="Throw Fault" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.ThrowCmmnFaultPlanItemDelegate" />
+        </casePlanModel>
+    </case>
+</definitions>

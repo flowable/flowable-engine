@@ -43,7 +43,8 @@ import org.springframework.jms.connection.CachingConnectionFactory;
 import org.springframework.jms.core.JmsOperations;
 import org.springframework.jms.core.JmsTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Filip Hrisafov
@@ -73,7 +74,7 @@ public class EventRegistryJmsConfiguration {
     
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return JsonMapper.shared();
     }
 
     @Bean
@@ -94,7 +95,7 @@ public class EventRegistryJmsConfiguration {
         configuration.getAcceptorConfigurations().add(transportConfiguration);
         configuration.setClusterPassword("flowable");
         AddressSettings deadLetterSetting = new AddressSettings();
-        deadLetterSetting.setDeadLetterAddress(SimpleString.toSimpleString("ActiveMQ.DLQ"));
+        deadLetterSetting.setDeadLetterAddress(SimpleString.of("ActiveMQ.DLQ"));
         deadLetterSetting.setAutoCreateDeadLetterResources(true);
         deadLetterSetting.setMaxDeliveryAttempts(3);
         configuration.addAddressSetting("#", deadLetterSetting);

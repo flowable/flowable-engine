@@ -31,12 +31,11 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -46,8 +45,6 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Tijs Rademakers
  */
 public class FormDataResourceTest extends BaseSpringRestTestCase {
-
-    protected ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @Deployment
@@ -289,7 +286,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
                         + "id: '${json-unit.any-string}',"
                         + "processDefinitionId: '" + processDefinitionId + "'"
                         + "}");
-        task = taskService.createTaskQuery().processInstanceId(responseNode.get("id").asText()).singleResult();
+        task = taskService.createTaskQuery().processInstanceId(responseNode.get("id").asString()).singleResult();
         assertThat(task).isNotNull();
     }
 }

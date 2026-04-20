@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -37,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instance Identity Links" }, description = "Manage Case Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstanceResource {
 
     @ApiOperation(value = "Get involved people for case instance", tags = {"Case Instance Identity Links" }, nickname = "listCaseInstanceIdentityLinks",
@@ -71,12 +72,12 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
 
         CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
-        if (identityLink.getGroup() != null) {
-            throw new FlowableIllegalArgumentException("Only user identity links are supported on a case instance.");
+        if (identityLink.getGroup() == null && identityLink.getUser() == null) {
+            throw new FlowableIllegalArgumentException("User or group are required.");
         }
-
-        if (identityLink.getUser() == null) {
-            throw new FlowableIllegalArgumentException("The user is required.");
+        
+        if (StringUtils.isEmpty(identityLink.getGroup()) && StringUtils.isEmpty(identityLink.getUser())) {
+            throw new FlowableIllegalArgumentException("Only one value of user or group is supported.");
         }
 
         if (identityLink.getType() == null) {
@@ -87,7 +88,12 @@ public class CaseInstanceIdentityLinkCollectionResource extends BaseCaseInstance
             restApiInterceptor.createCaseInstanceIdentityLink(caseInstance, identityLink);
         }
 
-        runtimeService.addUserIdentityLink(caseInstance.getId(), identityLink.getUser(), identityLink.getType());
+        if (StringUtils.isNotEmpty(identityLink.getGroup())) {
+            runtimeService.addGroupIdentityLink(caseInstance.getId(), identityLink.getGroup(), identityLink.getType());
+            
+        } else {
+            runtimeService.addUserIdentityLink(caseInstance.getId(), identityLink.getUser(), identityLink.getType());
+        }
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), null, null, caseInstance.getId());
     }

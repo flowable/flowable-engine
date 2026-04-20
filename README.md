@@ -1,14 +1,9 @@
-Flowable (V7)
+Flowable
 ========
 
-[Maven Central:  
-    ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
-
-[Docker Images:  
-    ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/u/flowable/flowable-rest)
-
-[License:  
-	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/main/LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/org.flowable/flowable-engine?label=Maven%20Central)](https://central.sonatype.com/search?q=g:org.flowable%20%26%26%20%28a:flowable-engine%20a:flowable-cmmn-engine%20a:flowable-dmn-engine%29)
+[![Docker](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/r/flowable/flowable-rest)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/flowable/flowable-engine/blob/main/LICENSE)
 
 ![Flowable Actions CI](https://github.com/flowable/flowable-engine/actions/workflows/main.yml/badge.svg?branch=main)
 
@@ -16,7 +11,7 @@ Homepage: https://www.flowable.org/
 
 ## flowable / flowəb(ə)l /
 * a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.
-* a lightning fast, tried and tested BPMN 2 process engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
+* a lightning fast, tried and tested BPMN process engine, CMMN case engine and DMN rule engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
 * can run embedded in a Java application, or as a service on a server, a cluster, and in the cloud.  It integrates perfectly with Spring.  With a rich Java and REST API, it is the ideal engine for orchestrating human or system activities.
 
 ## Introduction

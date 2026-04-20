@@ -69,6 +69,9 @@ create table ACT_RU_EXECUTION (
     REFERENCE_TYPE_ nvarchar(255),
     PROPAGATED_STAGE_INST_ID_ nvarchar(255),
     BUSINESS_STATUS_ nvarchar(255),
+    DUE_DATE_ datetime,
+    CLAIM_TIME_ datetime,
+    CLAIMED_BY_ nvarchar(255),
     primary key (ID_)
 );
 
@@ -130,6 +133,7 @@ create table ACT_RU_ACTINST (
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
     ASSIGNEE_ nvarchar(255),
+    COMPLETED_BY_ nvarchar(255),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     DURATION_ numeric(19,0),
@@ -169,6 +173,8 @@ create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ACT_RU_DEADLETTER_JOB(EXECUT
 create index ACT_IDX_DEADLETTER_JOB_PROCESS_INSTANCE_ID on ACT_RU_DEADLETTER_JOB(PROCESS_INSTANCE_ID_);
 create index ACT_IDX_DEADLETTER_JOB_PROC_DEF_ID on ACT_RU_DEADLETTER_JOB(PROC_DEF_ID_);
 create index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO(PROC_DEF_ID_);
+
+create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 
 create index ACT_IDX_RU_ACTI_START on ACT_RU_ACTINST(START_TIME_);
 create index ACT_IDX_RU_ACTI_END on ACT_RU_ACTINST(END_TIME_);
@@ -337,7 +343,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.1.0.2', 1);
+values ('schema.version', '8.1.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.1.0.2)', 1);
+values ('schema.history', 'create(8.1.0.1)', 1);

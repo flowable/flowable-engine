@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.configurator.impl.deployer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineDeployment;
@@ -20,6 +21,7 @@ import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,8 @@ import org.slf4j.LoggerFactory;
 public class BpmnDeployer implements EngineDeployer {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDeployer.class);
+
+    public static final int BPMN_DEFAULT_UNDEPLOY_ORDER = EngineDeployer.DEFAULT_UNDEPLOY_ORDER - 100;
     
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -70,5 +74,23 @@ public class BpmnDeployer implements EngineDeployer {
         }
 
         return false;
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        RepositoryService repositoryService = CommandContextUtil.getProcessEngineConfiguration().getRepositoryService();
+        List<Deployment> deployments = repositoryService
+                .createDeploymentQuery()
+                .parentDeploymentId(parentDeployment.getId())
+                .list();
+
+        for (Deployment deployment : deployments) {
+            repositoryService.deleteDeployment(deployment.getId(), cascade);
+        }
+    }
+
+    @Override
+    public int getUndeployOrder() {
+        return BPMN_DEFAULT_UNDEPLOY_ORDER;
     }
 }

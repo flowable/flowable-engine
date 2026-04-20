@@ -335,6 +335,10 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         if (executionQuery.getInvolvedGroups() != null) {
             executionQuery.setSafeInvolvedGroups(createSafeInValuesList(executionQuery.getInvolvedGroups()));
         }
+
+        if (executionQuery.getProcessInstanceIds() != null) {
+            executionQuery.setSafeProcessInstanceIds(createSafeInValuesList(executionQuery.getProcessInstanceIds()));
+        }
         
         if (executionQuery.getOrQueryObjects() != null && !executionQuery.getOrQueryObjects().isEmpty()) {
             for (ExecutionQueryImpl orExecutionQuery : executionQuery.getOrQueryObjects()) {
@@ -344,6 +348,10 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
     
     protected void setSafeInValueLists(ProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getProcessInstanceIds() != null) {
+            processInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(processInstanceQuery.getProcessInstanceIds()));
+        }
+        
         if (processInstanceQuery.getInvolvedGroups() != null) {
             processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
         }

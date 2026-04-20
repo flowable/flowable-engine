@@ -19,7 +19,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
@@ -81,7 +81,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
             try {
                 executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_START);
-            } catch (BpmnError e) {
+            } catch (BusinessError e) {
                 ErrorPropagation.propagateError(e, execution);
                 return;
             }
@@ -104,7 +104,7 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
 
         try {
             activityBehavior.execute(execution);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             // re-throw business fault so that it can be caught by an Error Intermediate Event or Error Event Sub-Process in the process
             ErrorPropagation.propagateError(error, execution);
         } catch (RuntimeException e) {
@@ -127,10 +127,9 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
     
     protected ActivityBehavior setLoopCounterVariable(FlowNode flowNode) {
         ActivityBehavior activityBehavior = (ActivityBehavior) flowNode.getBehavior();
-        if (!(activityBehavior instanceof MultiInstanceActivityBehavior)) {
+        if (!(activityBehavior instanceof MultiInstanceActivityBehavior multiInstanceActivityBehavior)) {
             throw new FlowableException("Programmatic error: expected multi instance activity behavior, but got " + activityBehavior.getClass());
         }
-        MultiInstanceActivityBehavior multiInstanceActivityBehavior = (MultiInstanceActivityBehavior) activityBehavior;
         String elementIndexVariable = multiInstanceActivityBehavior.getCollectionElementIndexVariable();
         execution.setVariableLocal(elementIndexVariable, loopCounter);
         return activityBehavior;

@@ -15,7 +15,6 @@ package org.flowable.cmmn.rest.service.api.management;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -35,11 +34,10 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -75,10 +73,10 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Timer listener',"
                         + "handlerType: 'cmmn-trigger-timer',"
                         + "retries: " + timerJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(timerJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(timerJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TIMER_JOB, timerJob.getId()));
     }
 
@@ -116,10 +114,10 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Timer listener',"
                         + "handlerType: 'cmmn-trigger-timer',"
                         + "retries: " + deadLetterJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(deadLetterJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(deadLetterJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId()));
     }
 
@@ -175,12 +173,12 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Timer listener',"
                         + "handlerType: 'cmmn-trigger-timer',"
                         + "retries: " + lockedJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(lockedJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(lockedJob.getDuedate()) + "',"
                         + "lockOwner: 'test',"
-                        + "lockExpirationTime: " + new TextNode(getISODateStringWithTZ(lockedJob.getLockExpirationTime())) + ","
+                        + "lockExpirationTime: '" + getISODateString(lockedJob.getLockExpirationTime()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_JOB, lockedJob.getId()));
     }
 

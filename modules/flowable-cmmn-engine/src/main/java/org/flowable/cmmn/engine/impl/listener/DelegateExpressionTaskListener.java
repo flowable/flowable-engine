@@ -38,8 +38,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldExtensions);
 
-        if (delegate instanceof TaskListener) {
-            TaskListener taskListener = (TaskListener) delegate;
+        if (delegate instanceof TaskListener taskListener) {
             taskListener.notify(delegateTask);
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TaskListener.class);

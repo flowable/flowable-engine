@@ -69,6 +69,9 @@ create table ACT_RU_EXECUTION (
     REFERENCE_TYPE_ varchar(255),
     PROPAGATED_STAGE_INST_ID_ varchar(255),
     BUSINESS_STATUS_ varchar(255),
+    DUE_DATE_ timestamp,
+    CLAIM_TIME_ timestamp,
+    CLAIMED_BY_ varchar(255),
     primary key (ID_)
 );
 
@@ -129,6 +132,7 @@ create table ACT_RU_ACTINST (
     ACT_NAME_ varchar(255),
     ACT_TYPE_ varchar(255) not null,
     ASSIGNEE_ varchar(255),
+    COMPLETED_BY_ varchar(255),
     START_TIME_ timestamp not null,
     END_TIME_ timestamp,
     DURATION_ bigint,
@@ -348,7 +352,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '7.1.0.2', 1);
+values ('schema.version', '8.1.0.1', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(7.1.0.2)', 1);
+values ('schema.history', 'create(8.1.0.1)', 1);

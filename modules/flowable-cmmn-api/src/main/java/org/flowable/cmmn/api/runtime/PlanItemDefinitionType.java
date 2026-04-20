@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.IntentEventListener;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.ProcessTask;
@@ -52,6 +53,8 @@ public interface PlanItemDefinitionType {
     String VARIABLE_EVENT_LISTENER = VariableEventListener.class.getSimpleName().toLowerCase();
     
     String GENERIC_EVENT_LISTENER = GenericEventListener.class.getSimpleName().toLowerCase();
+    
+    String INTENT_EVENT_LISTENER = IntentEventListener.class.getSimpleName().toLowerCase();
     
     String HUMAN_TASK = HumanTask.class.getSimpleName().toLowerCase();
     

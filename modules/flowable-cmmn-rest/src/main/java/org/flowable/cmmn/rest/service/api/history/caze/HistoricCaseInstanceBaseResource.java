@@ -86,6 +86,9 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseDefinitionKeys() != null && !queryRequest.getCaseDefinitionKeys().isEmpty()) {
             query.caseDefinitionKeys(queryRequest.getCaseDefinitionKeys());
         }
+        if (queryRequest.getExcludeCaseDefinitionKeys() != null && !queryRequest.getExcludeCaseDefinitionKeys().isEmpty()) {
+            query.excludeCaseDefinitionKeys(queryRequest.getExcludeCaseDefinitionKeys());
+        }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
         }
@@ -152,8 +155,14 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getCaseInstanceCallbackId() != null) {
             query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
         }
+        if (queryRequest.getCaseInstanceCallbackIds() != null && !queryRequest.getCaseInstanceCallbackIds().isEmpty()) {
+            query.caseInstanceCallbackIds(queryRequest.getCaseInstanceCallbackIds());
+        }
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
+        }
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
         }
         if (queryRequest.getCaseInstanceReferenceId() != null) {
             query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
@@ -175,6 +184,9 @@ public class HistoricCaseInstanceBaseResource {
         }
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
+        }
+        if (queryRequest.getFinishedBy() != null) {
+            query.finishedBy(queryRequest.getFinishedBy());
         }
         if (queryRequest.getLastReactivatedAfter() != null) {
             query.lastReactivatedAfter(queryRequest.getLastReactivatedAfter());
@@ -202,6 +214,9 @@ public class HistoricCaseInstanceBaseResource {
             if (queryRequest.getIncludeCaseVariables()) {
                 query.includeCaseVariables();
             }
+        }
+        if (queryRequest.getIncludeCaseVariablesNames() != null) {
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());

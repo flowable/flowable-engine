@@ -23,6 +23,7 @@ public class ScriptExecutionListener extends AbstractScriptEvaluator implements 
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     protected ScriptingEngines getScriptingEngines() {
         return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
     }

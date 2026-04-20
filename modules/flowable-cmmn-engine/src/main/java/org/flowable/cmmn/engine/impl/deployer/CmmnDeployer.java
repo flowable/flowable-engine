@@ -431,7 +431,8 @@ public class CmmnDeployer implements EngineDeployer {
 
         @Override
         public boolean validateXml() {
-            return !cmmnEngineConfiguration.isDisableCmmnXmlValidation();
+            // On redeploy, we assume it is validated at the first deploy
+            return newDeployment && !cmmnEngineConfiguration.isDisableCmmnXmlValidation();
         }
 
         @Override
@@ -444,5 +445,10 @@ public class CmmnDeployer implements EngineDeployer {
         public CaseValidator caseValidator() {
             return cmmnEngineConfiguration.getCaseValidator();
         }
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
     }
 }

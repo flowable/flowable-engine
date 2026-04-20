@@ -170,12 +170,12 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
     @Override
     public ReceiveTaskActivityBehavior createReceiveTaskActivityBehavior(ReceiveTask receiveTask) {
-        return new ReceiveTaskActivityBehavior();
+        return new ReceiveTaskActivityBehavior(receiveTask.getId(), receiveTask.getSkipExpression());
     }
 
     @Override
     public ReceiveEventTaskActivityBehavior createReceiveEventTaskActivityBehavior(ReceiveTask receiveTask, String eventDefinitionKey) {
-        return new ReceiveEventTaskActivityBehavior(eventDefinitionKey);
+        return new ReceiveEventTaskActivityBehavior(eventDefinitionKey, receiveTask.getId(), receiveTask.getSkipExpression());
     }
 
     @Override

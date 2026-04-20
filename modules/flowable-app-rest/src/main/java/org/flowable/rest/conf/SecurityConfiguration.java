@@ -12,15 +12,13 @@
  */
 package org.flowable.rest.conf;
 
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.security.BasicAuthenticationProvider;
 import org.flowable.rest.security.SecurityConstants;
-import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
-import org.springframework.boot.actuate.health.HealthEndpoint;
 import org.springframework.boot.actuate.info.InfoEndpoint;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -30,6 +28,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
@@ -61,11 +60,13 @@ public class SecurityConfiguration {
         // Swagger docs
         if (isSwaggerDocsEnabled()) {
             httpSecurity
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(antMatcher("/docs/**")).permitAll());
+                    .authorizeHttpRequests(
+                            authorizeRequests -> authorizeRequests.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/docs/**")).permitAll());
 
         } else {
             httpSecurity
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers(antMatcher("/docs/**")).denyAll());
+                    .authorizeHttpRequests(
+                            authorizeRequests -> authorizeRequests.requestMatchers(PathPatternRequestMatcher.withDefaults().matcher("/docs/**")).denyAll());
             
         }
 

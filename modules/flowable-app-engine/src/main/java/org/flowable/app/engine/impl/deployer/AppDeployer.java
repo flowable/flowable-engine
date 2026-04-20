@@ -122,4 +122,9 @@ public class AppDeployer implements EngineDeployer {
         deployment.addDeployedArtifact(appDefinition);
         deployment.addAppDefinitionCacheEntry(appDefinition.getId(), cacheEntry);
     }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
+    }
 }

@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.delegate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
@@ -47,9 +48,12 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     protected final Date completedTime;
     protected final Date occurredTime;
     protected final Date terminatedTime;
+    protected final Date failedTime;
     protected final Date exitTime;
     protected final Date endedTime;
     protected final String startUserId;
+    protected final String assignee;
+    protected final String completedBy;
     protected final String referenceId;
     protected final String referenceType;
     protected final boolean completable;
@@ -84,9 +88,12 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
         this.completedTime = planItemInstance.getCompletedTime();
         this.occurredTime = planItemInstance.getOccurredTime();
         this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.failedTime = planItemInstance.getFailedTime();
         this.exitTime = planItemInstance.getExitTime();
         this.endedTime = planItemInstance.getEndedTime();
         this.startUserId = planItemInstance.getStartUserId();
+        this.assignee = planItemInstance.getAssignee();
+        this.completedBy = planItemInstance.getCompletedBy();
         this.referenceId = planItemInstance.getReferenceId();
         this.referenceType = planItemInstance.getReferenceType();
         this.completable = planItemInstance.isCompletable();
@@ -206,6 +213,11 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     }
 
     @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+
+    @Override
     public Date getExitTime() {
         return exitTime;
     }
@@ -218,6 +230,16 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public String getStartUserId() {
         return startUserId;
+    }
+
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
     }
 
     @Override
@@ -268,6 +290,11 @@ public class ReadOnlyDelegatePlanItemInstanceImpl implements ReadOnlyDelegatePla
     @Override
     public String getTenantId() {
         return tenantId;
+    }
+
+    @Override
+    public Set<String> getVariableNames() {
+        return variables.keySet();
     }
 
     @Override

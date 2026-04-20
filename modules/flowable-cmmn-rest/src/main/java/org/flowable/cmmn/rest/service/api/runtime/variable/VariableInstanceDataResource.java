@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Runtime" }, authorizations = { @Authorization(value = "basicAuth") })
 public class VariableInstanceDataResource extends VariableInstanceBaseResource {
 
     @GetMapping(value = "/cmmn-runtime/variable-instances/{varInstanceId}/data")

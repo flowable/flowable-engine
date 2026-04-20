@@ -23,8 +23,9 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -36,6 +37,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
     /**
      * Test getting case definitions. GET cmmn-repository/case-definitions
      */
+    @Test
     public void testGetCaseDefinitions() throws Exception {
 
         try {
@@ -76,7 +78,7 @@ public class CaseDefinitionCollectionResourceTest extends BaseSpringRestTestCase
             for (int i = 0; i < dataNode.size(); i++) {
                 JsonNode caseDefinitionJson = dataNode.get(i);
 
-                String key = caseDefinitionJson.get("key").asText();
+                String key = caseDefinitionJson.get("key").asString();
                 JsonNode graphicalNotationNode = caseDefinitionJson.get("graphicalNotationDefined");
                 if ("testRepeatingStage".equals(key)) {
                     assertThat(graphicalNotationNode.asBoolean()).isTrue();

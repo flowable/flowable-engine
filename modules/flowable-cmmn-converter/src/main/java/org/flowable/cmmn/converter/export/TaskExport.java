@@ -55,8 +55,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport<Task> {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE_EXCLUSIVE, String.valueOf(asyncLeaveExclusive));
         }
 
-        if (task instanceof SendEventServiceTask) {
-            SendEventServiceTask sendEventServiceTask = (SendEventServiceTask) task;
+        if (task instanceof SendEventServiceTask sendEventServiceTask) {
             if (StringUtils.isNotEmpty(sendEventServiceTask.getEventType()) && sendEventServiceTask.getExtensionElements().get("eventType") == null) {
                 ExtensionElement extensionElement = new ExtensionElement();
                 extensionElement.setNamespace(FLOWABLE_EXTENSIONS_NAMESPACE);

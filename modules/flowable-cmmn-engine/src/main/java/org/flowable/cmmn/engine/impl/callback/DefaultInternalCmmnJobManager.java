@@ -164,8 +164,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
 
         // In CMMN (and contrary to BPMN), when a timer is repeated a new plan item instance needs to be created
         // as the original one is removed when the timer event has occurred.
-        if (variableScope instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+        if (variableScope instanceof PlanItemInstanceEntity planItemInstanceEntity) {
 
             PlanItemInstance stagePlanItem = planItemInstanceEntity.getStagePlanItemInstanceEntity();
             if (stagePlanItem == null && planItemInstanceEntity.getStageInstanceId() != null) {
@@ -199,8 +198,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
             // Switch job references to new plan item instance
             timerJobEntity.setSubScopeId(newPlanItemInstanceEntity.getId());
 
-            if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof TimerEventListener) {
-               TimerEventListener timerEventListener = (TimerEventListener) planItem.getPlanItemDefinition();
+            if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof TimerEventListener timerEventListener) {
                 timerJobEntity.setElementId(timerEventListener.getId());
                 timerJobEntity.setElementName(timerEventListener.getName());
             }

@@ -37,7 +37,7 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl planItemControl) {
             
             RepetitionRule repetitionRule = new RepetitionRule();
             repetitionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
@@ -74,8 +74,7 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
 
             repetitionRule.setElementIndexVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
                 CmmnXmlConstants.ATTRIBUTE_REPETITION_ELEMENT_INDEX_VARIABLE_NAME));
-            
-            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+
             planItemControl.setRepetitionRule(repetitionRule);
             
             return repetitionRule;

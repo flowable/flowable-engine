@@ -12,6 +12,8 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
@@ -23,6 +25,16 @@ public class ByteArrayType implements VariableType {
     public static final String TYPE_NAME = "bytes";
 
     private static final long serialVersionUID = 1L;
+
+    protected final VariableLengthVerifier lengthVerifier;
+
+    public ByteArrayType() {
+        this(NoopVariableLengthVerifier.INSTANCE);
+    }
+
+    public ByteArrayType(VariableLengthVerifier lengthVerifier) {
+        this.lengthVerifier = lengthVerifier != null ? lengthVerifier : NoopVariableLengthVerifier.INSTANCE;
+    }
 
     @Override
     public String getTypeName() {
@@ -41,6 +53,14 @@ public class ByteArrayType implements VariableType {
 
     @Override
     public void setValue(Object value, ValueFields valueFields) {
+        if (value == null) {
+            valueFields.setBytes(null);
+            return;
+        }
+
+        byte[] bytes = (byte[]) value;
+        lengthVerifier.verifyLength(bytes.length, valueFields, this);
+
         valueFields.setBytes((byte[]) value);
     }
 

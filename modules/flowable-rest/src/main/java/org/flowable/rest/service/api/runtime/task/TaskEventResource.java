@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskEventResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get an event on a task", tags = { "Tasks" })

@@ -61,6 +61,11 @@ public class InParameterParser extends BaseChildElementParser {
 
             parameter.setTarget(target);
 
+            String targetType = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE);
+            if (StringUtils.isNotEmpty(targetType)) {
+                parameter.setTargetType(targetType);
+            }
+
             String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
             if ("true".equalsIgnoreCase(transientValue)) {
                 parameter.setTransient(true);
@@ -72,8 +77,7 @@ public class InParameterParser extends BaseChildElementParser {
 
             BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultInParameterAttributes);
 
-        } else if (parentElement instanceof CallActivity) {
-            CallActivity callActivity = (CallActivity) parentElement;
+        } else if (parentElement instanceof CallActivity callActivity) {
 
             String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
             if ("all".equalsIgnoreCase(variables)) {

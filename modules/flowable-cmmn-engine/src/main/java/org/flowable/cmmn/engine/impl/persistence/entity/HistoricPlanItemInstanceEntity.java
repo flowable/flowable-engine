@@ -69,6 +69,8 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
 
     void setTerminatedTime(Date terminatedTime);
 
+    void setFailedTime(Date failedTime);
+
     void setExitTime(Date exitTime);
 
     void setEndedTime(Date endedTime);
@@ -76,6 +78,10 @@ public interface HistoricPlanItemInstanceEntity extends Entity, HasRevision, His
     void setLastUpdatedTime(Date lastUpdatedTime);
 
     void setStartUserId(String startUserId);
+
+    void setAssignee(String assignee);
+
+    void setCompletedBy(String completedBy);
 
     void setReferenceId(String referenceId);
 

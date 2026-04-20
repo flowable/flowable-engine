@@ -41,11 +41,11 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -143,10 +143,10 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         boolean foundOverlapping = false;
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            if (var.get("name") != null && "overlappingVariable".equals(var.get("name").asText())) {
+            if (var.get("name") != null && "overlappingVariable".equals(var.get("name").asString())) {
                 foundOverlapping = true;
-                assertThat(var.get("value").asText()).isEqualTo("task-value");
-                assertThat(var.get("scope").asText()).isEqualTo("local");
+                assertThat(var.get("value").asString()).isEqualTo("task-value");
+                assertThat(var.get("scope").asString()).isEqualTo("local");
                 break;
             }
         }
@@ -165,7 +165,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
 
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            assertThat(var.get("scope").asText()).isEqualTo("local");
+            assertThat(var.get("scope").asString()).isEqualTo("local");
         }
 
         // Check global variables filtering
@@ -182,10 +182,10 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
         foundOverlapping = false;
         for (int i = 0; i < responseNode.size(); i++) {
             JsonNode var = responseNode.get(i);
-            assertThat(var.get("scope").asText()).isEqualTo("global");
-            if ("overlappingVariable".equals(var.get("name").asText())) {
+            assertThat(var.get("scope").asString()).isEqualTo("global");
+            if ("overlappingVariable".equals(var.get("name").asString())) {
                 foundOverlapping = true;
-                assertThat(var.get("value").asText()).isEqualTo("process-value");
+                assertThat(var.get("value").asString()).isEqualTo("process-value");
             }
         }
         assertThat(foundOverlapping).isTrue();
@@ -592,7 +592,7 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
                             entry("longVariable", 4567890L),
                             entry("doubleVariable", 123.456),
                             entry("booleanVariable", Boolean.TRUE),
-                            entry("dateVariable", dateFormat.parse(isoString))
+                            entry("dateVariable", getDateFromISOString(isoString))
                     );
         } finally {
             // Clean adhoc-tasks even if test fails

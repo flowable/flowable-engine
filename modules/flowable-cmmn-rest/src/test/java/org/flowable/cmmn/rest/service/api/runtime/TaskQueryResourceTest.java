@@ -13,8 +13,6 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -23,17 +21,16 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
-import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
@@ -45,6 +42,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasks() throws Exception {
         try {
@@ -229,7 +227,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             caseDefinitionKeyIn.add("oneHumanTaskCase");
             caseDefinitionKeyIn.add("another");
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
-            
+
+            requestNode.removeAll();
+            requestNode.putArray("scopeIds").add("someId").add(caseInstance.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
             // Without scope id filtering
             requestNode.removeAll();
             requestNode.put("withoutScopeId", true);
@@ -327,6 +329,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks using task and case variables. GET cmmn-runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasksWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -486,6 +489,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET cmmn-runtime/tasks
      */
+    @Test
     public void testQueryTasksWithPaging() throws Exception {
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();

@@ -154,23 +154,12 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
     protected void restoreTimerStartEvent(ProcessDefinition previousProcessDefinition, StartEvent startEvent, EventDefinition eventDefinition) {
         TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
-        TimerJobEntity timer = TimerUtil.createTimerEntityForTimerEventDefinition((TimerEventDefinition) eventDefinition, startEvent,
-                false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                false, previousProcessDefinition, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
                         timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
-        if (timer != null) {
-            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
-                    false, null, TimerStartEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
-                            timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
-            timerJob.setProcessDefinitionId(previousProcessDefinition.getId());
-
-            if (previousProcessDefinition.getTenantId() != null) {
-                timerJob.setTenantId(previousProcessDefinition.getTenantId());
-            }
-
-            engineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
-        }
+        engineConfiguration.getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
     }
 
     protected void restoreSignalStartEvent(ProcessDefinition previousProcessDefinition, BpmnModel bpmnModel, StartEvent startEvent, EventDefinition eventDefinition) {
@@ -178,7 +167,7 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
         SignalEventDefinition signalEventDefinition = (SignalEventDefinition) eventDefinition;
         SignalEventSubscriptionEntity subscriptionEntity = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createSignalEventSubscription();
 
-        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, null);
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(commandContext, signalEventDefinition, bpmnModel, previousProcessDefinition);
         subscriptionEntity.setEventName(eventName);
         subscriptionEntity.setActivityId(startEvent.getId());
         subscriptionEntity.setProcessDefinitionId(previousProcessDefinition.getId());
@@ -199,7 +188,7 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
 
         CommandContext commandContext = Context.getCommandContext();
         MessageEventSubscriptionEntity newSubscription = engineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createMessageEventSubscription();
-        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, null);
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, previousProcessDefinition);
         newSubscription.setEventName(messageName);
         newSubscription.setActivityId(startEvent.getId());
         newSubscription.setConfiguration(previousProcessDefinition.getId());

@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Channel Definitions" }, description = "Manage Channel Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Channel Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ChannelDefinitionCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();
@@ -92,6 +92,9 @@ public class ChannelDefinitionCollectionResource {
             @ApiImplicitParam(name = "onlyOutbound", dataType = "boolean", value = "Only return the outbound channel definitions. Mutually exclusive with onlyInbound", paramType = "query"),
             @ApiImplicitParam(name = "implementation", dataType = "string", value = "Only return the channel definitions with the given implementation type.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name,id,key,category,deploymentId,version", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the channel definitions are returned"),

@@ -50,7 +50,7 @@ import io.swagger.annotations.Authorization;
  * @author Christopher Welsch
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
@@ -85,6 +85,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
@@ -235,6 +236,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("scopeId")) {
             request.setScopeId(requestParams.get("scopeId"));
+        }
+
+        if (requestParams.containsKey("scopeIds")) {
+            request.setScopeIds(RequestUtil.parseToSet(requestParams.get("scopeIds")));
         }
         
         if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {

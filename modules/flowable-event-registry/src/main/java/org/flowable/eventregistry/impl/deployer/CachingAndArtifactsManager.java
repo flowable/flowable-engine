@@ -82,9 +82,7 @@ public class CachingAndArtifactsManager {
             throw new FlowableIllegalArgumentException("No key set for channel model");
         }
 
-        if (channelModel instanceof InboundChannelModel) {
-
-            InboundChannelModel inboundChannelModel = (InboundChannelModel) channelModel;
+        if (channelModel instanceof InboundChannelModel inboundChannelModel) {
 
             if (inboundChannelModel.getInboundEventChannelAdapter() != null) {
                 InboundEventChannelAdapter inboundEventChannelAdapter = (InboundEventChannelAdapter) inboundChannelModel.getInboundEventChannelAdapter();

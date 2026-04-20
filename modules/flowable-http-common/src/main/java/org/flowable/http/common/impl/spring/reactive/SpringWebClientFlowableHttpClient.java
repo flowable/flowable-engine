@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -39,6 +41,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -149,9 +152,8 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(headersSpec, requestInfo.getHttpHeaders());
-            }
+            setHeaders(headersSpec, requestInfo.getHttpHeaders());
+            setHeaders(headersSpec, requestInfo.getSecureHttpHeaders());
 
             return new WebClientExecutableHttpRequest(headersSpec);
         } catch (URISyntaxException ex) {
@@ -198,18 +200,27 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 if (value instanceof byte[]) {
                     value = new ByteArrayResourceWithFileName((byte[]) value, part.getFilename());
                 }
-
-                MultipartBodyBuilder.PartBuilder partBuilder = multipartBodyBuilder.part(name, value);
+                MultipartBodyBuilder.PartBuilder partBuilder;
+                if (StringUtils.isNotBlank(part.getMimeType())) {
+                    partBuilder = multipartBodyBuilder.part(name, value, MediaType.parseMediaType(part.getMimeType()));
+                } else {
+                    partBuilder = multipartBodyBuilder.part(name, value);
+                }
                 if (StringUtils.isNotEmpty(part.getFilename())) {
                     partBuilder.filename(part.getFilename());
                 }
             }
 
             requestBodySpec.body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()));
+        } else if (requestInfo.getFormParameters() != null) {
+            requestBodySpec.body(BodyInserters.fromFormData(CollectionUtils.toMultiValueMap(requestInfo.getFormParameters())));
         }
     }
 
     protected void setHeaders(WebClient.RequestHeadersSpec<?> base, org.flowable.http.common.api.HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         base.headers(httpHeaders -> {
             httpHeaders.putAll(headers);
         });
@@ -246,7 +257,13 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
 
     protected org.flowable.http.common.api.HttpHeaders toFlowableHeaders(HttpHeaders httpHeaders) {
         org.flowable.http.common.api.HttpHeaders headers = new org.flowable.http.common.api.HttpHeaders();
-        headers.putAll(httpHeaders);
+        for (Map.Entry<String, List<String>> entry : httpHeaders.headerSet()) {
+            String headerName = entry.getKey();
+            List<String> headerValues = entry.getValue();
+            for (String headerValue : headerValues) {
+                headers.add(headerName, headerValue);
+            }
+        }
         return headers;
     }
 

@@ -45,13 +45,12 @@ public class AsyncSendEventJobHandler implements JobHandler {
         }
 
         Object behavior = ((SendEventServiceTask) flowElement).getBehavior();
-        if (!(behavior instanceof ActivityBehavior)) {
+        if (!(behavior instanceof ActivityBehavior activityBehavior)) {
             throw new FlowableException(
                     "Unexpected activity behavior (" + behavior.getClass() + ") found for " + job + " at " + executionEntity);
         }
 
         try {
-            ActivityBehavior activityBehavior = (ActivityBehavior) behavior;
             commandContext.addAttribute(TYPE, true); // Will be read in the SendEventTaskActivityBehavior
             activityBehavior.execute(executionEntity);
         } finally {

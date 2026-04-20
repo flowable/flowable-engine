@@ -8,9 +8,9 @@
 
     <parent>
         <groupId>org.flowable</groupId>
-        <artifactId>flowable-root</artifactId>
-        <relativePath>../..</relativePath>
-        <version>7.1.0</version>
+        <artifactId>flowable-parent</artifactId>
+        <version>8.1.0-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
     </parent>
 
     <dependencies>
@@ -123,11 +123,6 @@
             <artifactId>spring-beans</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>provided</scope>
@@ -135,11 +130,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -228,11 +218,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>net.sourceforge.jtds</groupId>
-            <artifactId>jtds</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.uuid</groupId>
             <artifactId>java-uuid-generator</artifactId>
             <scope>provided</scope>
@@ -258,7 +243,7 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-reload4j</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -288,12 +273,16 @@
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.openjdk.nashorn</groupId>
             <artifactId>nashorn-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -310,7 +299,6 @@
             org.flowable.db.mapping.entity,
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            junit*;resolution:=optional,
             org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
             jakarta.activation*;resolution:=optional,
@@ -323,6 +311,8 @@
             org.drools*;resolution:=optional,
             org.kie*;resolution:=optional,
             com.fasterxml*;resolution:=optional,
+            tools.jackson*;resolution:=optional,
+            tools.jackson*;resolution:=optional,
             jakarta.transaction;resolution:=optional,
             jakarta.enterprise.concurrent;resolution:=optional,
         </flowable.osgi.import.additional>
@@ -347,69 +337,7 @@
                     <argLine>${argLine} -Xmx5g</argLine>
                 </configuration>
             </plugin>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>cleanVersions</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
-        <pluginManagement>
-            <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
-                    m2e settings only. It has no influence on the Maven build itself. -->
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.felix</groupId>
-                                        <artifactId>
-                                            maven-bundle-plugin
-                                        </artifactId>
-                                        <versionRange>
-                                            [2.1.0,)
-                                        </versionRange>
-                                        <goals>
-                                            <goal>cleanVersions</goal>
-                                            <goal>manifest</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
     </build>
 
     <profiles>

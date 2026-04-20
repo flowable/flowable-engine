@@ -29,8 +29,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -40,12 +40,18 @@ import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -55,13 +61,13 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
 
     protected String oneTaskCaseDeploymentId;
 
-    @Before
+    @BeforeEach
     public void deployOneTaskCaseDefinition() {
         oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").deploy().getId();
     }
 
-    @After
+    @AfterEach
     public void deleteOneTaskCaseDefinition() {
         cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
     }
@@ -1066,6 +1072,78 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
+    public void testCaseTaskWithHumanTaskAndIOParameters() {
+        String innerCaseDeploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+                .deploy()
+                .getId();
+
+        String inVar1Content = "First input value";
+        String inVar2Content = "Second input value";
+        String outVarContent = "Result from sub case";
+
+        // Start the parent case with 2 input variables
+        CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("parentCaseWithHumanTaskAndSubCase")
+                .variable("parentVar1", inVar1Content)
+                .variable("parentVar2", inVar2Content)
+                .start();
+
+        // Verify parent has both a human task and a case task active
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(parentCaseInstance.getId())
+                .planItemInstanceStateActive()
+                .orderByName().asc()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(PlanItemInstance::getName, PlanItemInstance::getPlanItemDefinitionType)
+                .containsExactly(
+                        tuple("Parent Human Task", PlanItemDefinitionType.HUMAN_TASK),
+                        tuple("Sub Case", PlanItemDefinitionType.CASE_TASK)
+                );
+
+        // Verify the child case was started and received both input variables
+        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .caseInstanceParentId(parentCaseInstance.getId())
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(childCaseInstance).isNotNull();
+        assertThat(childCaseInstance.getCaseVariables())
+                .containsEntry("childVar1", inVar1Content)
+                .containsEntry("childVar2", inVar2Content);
+        
+        cmmnRuntimeService.setVariable(childCaseInstance.getId(), "childResult", outVarContent);
+
+        // Complete the child human task with a variable that maps to the out parameter
+        Task childTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(childCaseInstance.getId())
+                .singleResult();
+        assertThat(childTask).isNotNull();
+        cmmnTaskService.complete(childTask.getId());
+
+        // Verify the child case has ended
+        assertCaseInstanceEnded(childCaseInstance);
+
+        // Verify the out parameter variable is now available on the parent case
+        Object parentResultValue = cmmnRuntimeService.getVariable(parentCaseInstance.getId(), "parentResult");
+        assertThat(parentResultValue).isEqualTo(outVarContent);
+
+        // Complete the parent human task
+        Task parentTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(parentCaseInstance.getId())
+                .singleResult();
+        assertThat(parentTask.getName()).isEqualTo("Parent Human Task");
+        cmmnTaskService.complete(parentTask.getId());
+
+        // Verify the parent case has ended
+        assertCaseInstanceEnded(parentCaseInstance);
+
+        cmmnRepositoryService.deleteDeployment(innerCaseDeploymentId, true);
+    }
+
+    @Test
+    @CmmnDeployment
     public void testWithSpecifiedBusinessKey() {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
@@ -1372,6 +1450,93 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
             assertThat(historicVariableInstance.getValue()).isEqualTo("test");
         }
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseWithInAndOutMapping.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseWithInAndOutMappingChildCaseAsync.cmmn",
+    })
+    public void testInMappingArrayNodeWithAsyncFirstStep() {
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (int i = 0; i < 10; i++) {
+            ObjectNode arrayElement = objectMapper.createObjectNode();
+            arrayElement.put("field", "value-" + i);
+            arrayNode.add(arrayElement);
+        }
+
+        CaseInstance rootCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("caseTaskMapping")
+                .variable("myRootVariable", arrayNode)
+                .start();
+
+        List<CaseInstance> childCaseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+        childCaseInstances.removeIf(caseInstance -> caseInstance.getParentId() == null);
+        assertThat(childCaseInstances).hasSize(10);
+
+        // As the first step is an async step, there should be one job.
+        // The variable myElementVariable is mapped as 'myInMappedVariable' into the called process instance
+        // The variable at this point should not have changed at this point.
+        for (CaseInstance childCaseInstance : childCaseInstances) {
+            JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("value-");
+        }
+
+        // Executing the async job should now change the variable in the child process instances
+        List<Job> jobs = cmmnManagementService.createJobQuery().list();
+        assertThat(jobs).hasSize(10);
+        for (Job job : jobs) {
+            cmmnManagementService.executeJob(job.getId());
+        }
+
+        for (CaseInstance childCaseInstance : childCaseInstances) {
+            JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
+        }
+
+        // The variable should not have changed on the root process instance level
+        ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
+        assertThat(rootArrayNode).hasSize(10);
+        for (JsonNode rootArrayNodeElement : rootArrayNode) {
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseWithInAndOutMapping.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseWithInAndOutMappingChildCaseSync.cmmn",
+    })
+    public void testInMappingArrayNodeWithSyncFirstStep() {
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+        ArrayNode arrayNode = objectMapper.createArrayNode();
+        for (int i = 0; i < 10; i++) {
+            ObjectNode arrayElement = objectMapper.createObjectNode();
+            arrayElement.put("field", "value-" + i);
+            arrayNode.add(arrayElement);
+        }
+
+        CaseInstance rootCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("caseTaskMapping")
+                .variable("myRootVariable", arrayNode)
+                .start();
+
+        List<CaseInstance> childCaseInstances = cmmnRuntimeService.createCaseInstanceQuery().list();
+        childCaseInstances.removeIf(caseInstance -> caseInstance.getParentId() == null);
+        assertThat(childCaseInstances).hasSize(10);
+
+        for (CaseInstance childCaseInstance : childCaseInstances) {
+            JsonNode inMappedJsonNodeVariable = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "myInMappedVariable");
+            assertThat(inMappedJsonNodeVariable.path("field").asString()).startsWith("CHANGED");
+        }
+
+        // The variable should not have changed on the root process instance level
+        ArrayNode rootArrayNode = (ArrayNode) cmmnRuntimeService.getVariable(rootCaseInstance.getId(), "myRootVariable");
+        assertThat(rootArrayNode).hasSize(10);
+        for (JsonNode rootArrayNodeElement : rootArrayNode) {
+            assertThat(rootArrayNodeElement.path("field").asString()).startsWith("value-");
+        }
     }
 
 }

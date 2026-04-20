@@ -284,6 +284,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
         return metaInfo;
     }
 
+    @Override
     public void setMetaInfo(String metaInfo) {
         this.metaInfo = metaInfo;
     }

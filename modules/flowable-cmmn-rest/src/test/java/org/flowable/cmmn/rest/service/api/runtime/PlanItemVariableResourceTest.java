@@ -37,9 +37,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -50,6 +52,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdatePlanItemInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -83,9 +86,9 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
 
         // Check resulting instance
         assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
-
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdatePlanItemInstanceVariableExceptions() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -108,7 +111,42 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST);
         closeResponse(response);
     }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdatePlanItemInstanceVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
 
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        runtimeService.setLocalVariable(planItem.getId(), "testLocalVar", "testVarValue");
+
+        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_ASYNC, planItem.getId(), "testLocalVar");
+        ObjectNode body = objectMapper.createObjectNode();
+
+        body.put("name", "testLocalVar");
+        body.put("value", "newTestValue");
+        body.put("type", "string");
+
+        HttpPut putRequest = new HttpPut(url);
+        putRequest.setEntity(new StringEntity(body.toString()));
+        CloseableHttpResponse response = executeRequest(putRequest, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("testVarValue");
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+
+        // Check resulting instance
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteExecutionVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -132,6 +170,7 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetBinaryVariableData() throws Exception {
 
@@ -153,6 +192,7 @@ public class PlanItemVariableResourceTest extends BaseSpringRestTestCase {
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateBinaryCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")

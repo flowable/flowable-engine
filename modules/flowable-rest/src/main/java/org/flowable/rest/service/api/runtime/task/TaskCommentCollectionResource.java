@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Comments" }, description = "Manage Tasks Comments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Comments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCommentCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List comments on a task", tags = { "Task Comments" }, nickname = "listTaskComments")

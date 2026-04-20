@@ -20,7 +20,7 @@ import java.util.List;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -66,6 +66,8 @@ public class HistoricPlanItemInstanceResponse {
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date lastUpdatedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected String entryCriterionId;
@@ -293,6 +295,22 @@ public class HistoricPlanItemInstanceResponse {
 
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
     }
 
     @ApiModelProperty(example = "referenceId")

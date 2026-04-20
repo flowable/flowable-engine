@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+    xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel" flowable:formKey="formKey" flowable:formFieldValidation="formFieldValidationValue">
+
+            <planItem id="planItemTaskA" definitionRef="taskA">
+                <extensionElements>
+                    <flowable:test>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</flowable:test>
+                </extensionElements>
+            </planItem>
+            <planItem id="planItemMileStoneOne" definitionRef="mileStoneOne">
+                <entryCriterion id="criterion1" sentryRef="sentryMileStoneOne" />
+            </planItem>
+            <planItem id="planItemTaskB" definitionRef="taskB">
+                <entryCriterion id="criterion2" sentryRef="sentryTaskB" />
+            </planItem>
+            <planItem id="planItemMileStoneTwo" definitionRef="mileStoneTwo">
+                <entryCriterion id="criterion3" sentryRef="sentryMileStoneTwo" />
+            </planItem>
+
+            <sentry id="sentryMileStoneTwo">
+                <extensionElements>
+                    <flowable:sentryTest>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</flowable:sentryTest>
+                </extensionElements>
+                <planItemOnPart id="onPart1" sourceRef="planItemTaskA">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryTaskB">
+                <planItemOnPart id="onPart2" sourceRef="planItemMileStoneTwo">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryMileStoneOne">
+                <planItemOnPart id="onPart3" sourceRef="planItemTaskB">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="taskA" name="A">
+                <extensionElements>
+                    <flowable:taskTest>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</flowable:taskTest>
+                </extensionElements>
+            </task>
+            <milestone id="mileStoneOne" name="Milestone 2">
+                <extensionElements>
+                    <flowable:milestoneTest>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</flowable:milestoneTest>
+                </extensionElements>
+            </milestone>
+            <task id="taskB" name="B" isBlocking="false"/>
+            <milestone id="mileStoneTwo" name="Milestone 1" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

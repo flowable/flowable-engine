@@ -42,7 +42,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInitializin
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -69,9 +69,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected Date completedTime;
     protected Date occurredTime;
     protected Date terminatedTime;
+    protected Date failedTime;
     protected Date exitTime;
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -126,6 +129,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         setExitTime(historicPlanItemInstance.getExitTime());
         setEndedTime(historicPlanItemInstance.getEndedTime());
         setStartUserId(historicPlanItemInstance.getStartUserId());
+        setAssignee(historicPlanItemInstance.getAssignee());
+        setCompletedBy(historicPlanItemInstance.getCompletedBy());
         setReferenceId(historicPlanItemInstance.getReferenceId());
         setReferenceType(historicPlanItemInstance.getReferenceType());
         setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
@@ -158,12 +163,15 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("completedTime", completedTime);
         persistentState.put("occurredTime", occurredTime);
         persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("failedTime", failedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("assignee", assignee);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completable);
+        persistentState.put("completable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
         persistentState.put("extraValue", extraValue);
@@ -367,6 +375,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.terminatedTime = terminatedTime;
     }
     @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+    @Override
+    public void setFailedTime(Date failedTime) {
+        this.failedTime = failedTime;
+    }
+    @Override
     public Date getExitTime() {
         return exitTime;
     }
@@ -398,6 +414,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+    @Override
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
     @Override
     public String getReferenceId() {

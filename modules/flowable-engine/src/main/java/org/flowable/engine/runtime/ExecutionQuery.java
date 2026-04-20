@@ -37,6 +37,9 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /** Only select executions which have process definitions with the given keys. **/
     ExecutionQuery processDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /** Only select executions which have process definitions that don't match with the given keys. **/
+    ExecutionQuery excludeProcessDefinitionKeys(Set<String> processDefinitionKeys);
 
     /** Only select executions which have the given process definition id. **/
     ExecutionQuery processDefinitionId(String processDefinitionId);
@@ -69,6 +72,9 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution> {
 
     /** Only select executions which have the given process instance id. **/
     ExecutionQuery processInstanceId(String processInstanceId);
+
+    /** Only select executions which have the given process instance ids. **/
+    ExecutionQuery processInstanceIds(Set<String> processInstanceIds);
 
     /** Only select executions which have the given root process instance id. **/
     ExecutionQuery rootProcessInstanceId(String rootProcessInstanceId);

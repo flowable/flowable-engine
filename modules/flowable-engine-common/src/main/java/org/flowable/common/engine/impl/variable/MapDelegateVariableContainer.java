@@ -13,7 +13,9 @@
 package org.flowable.common.engine.impl.variable;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringJoiner;
 
 import org.flowable.common.engine.api.variable.VariableContainer;
@@ -145,6 +147,19 @@ public class MapDelegateVariableContainer implements VariableContainer {
     @Override
     public String getTenantId() {
         return this.delegate.getTenantId();
+    }
+
+    @Override
+    public Set<String> getVariableNames() {
+        if (delegate == null || delegate == VariableContainer.empty()) {
+            return this.transientVariables.keySet();
+        }
+        if (transientVariables.isEmpty()) {
+            return delegate.getVariableNames();
+        }
+        Set<String> keys = new LinkedHashSet<>(delegate.getVariableNames());
+        keys.addAll(transientVariables.keySet());
+        return keys;
     }
 
     @Override

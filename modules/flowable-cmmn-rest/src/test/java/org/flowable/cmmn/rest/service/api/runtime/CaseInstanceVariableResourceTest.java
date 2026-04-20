@@ -19,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -41,9 +43,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -58,6 +62,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a process instance variable. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariable() throws Exception {
 
@@ -88,7 +93,58 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE,
                 caseInstance.getId(), "unexistingVariable")), HttpStatus.SC_NOT_FOUND));
     }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetCaseInstanceBigDecimalVariable() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        BigDecimal decimal = new BigDecimal("25.67");
+        runtimeService.setVariable(caseInstance.getId(), "variable", decimal);
 
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(
+                        SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "variable")),
+                HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'variable',"
+                        + "  type: 'bigDecimal',"
+                        + "  value: '" + decimal.toPlainString() + "'"
+                        + "}");
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testGetCaseInstanceBigIntegerVariable() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        BigInteger integer = new BigInteger("123456789123456789123456789123456789123456789");
+        runtimeService.setVariable(caseInstance.getId(), "variable", integer);
+
+        CloseableHttpResponse response = executeRequest(
+                new HttpGet(
+                        SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "variable")),
+                HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  name: 'variable',"
+                        + "  type: 'bigInteger',"
+                        + "  value: '" + integer + "'"
+                        + "}");
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceInstantVariable() throws Exception {
 
@@ -114,6 +170,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceLocalDateVariable() throws Exception {
 
@@ -138,6 +195,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceLocalDateTimeVariable() throws Exception {
 
@@ -163,6 +221,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceUUIDVariable() throws Exception {
 
@@ -190,6 +249,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable data. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableData() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -208,6 +268,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable data. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableDataSerializable() throws Exception {
 
@@ -233,6 +294,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a case instance variable, for illegal vars. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetCaseInstanceVariableDataForIllegalVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
@@ -252,6 +314,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
      * <p>
      * DELETE cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testDeleteProcessVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -273,6 +336,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
      * <p>
      * PUT cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -312,7 +376,70 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         httpPut.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
     }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateBigDecimalProcessVariable() throws Exception {
+        BigDecimal decimal = new BigDecimal("25.67");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.setVariable(caseInstance.getId(), "myVar", decimal);
 
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "11.66778899");
+        requestNode.put("type", "bigDecimal");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(new BigDecimal("11.66778899"));
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  scope: 'global',"
+                        + "  value: '11.66778899'"
+                        + "}");
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateBigIntegerProcessVariable() throws Exception {
+        BigInteger integer = new BigInteger("123456789123456789123456789123456789123456789");
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        runtimeService.setVariable(caseInstance.getId(), "myVar", integer);
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "8888999999777777766666");
+        requestNode.put("type", "bigInteger");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo(new BigInteger("8888999999777777766666"));
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  scope: 'global',"
+                        + "  value: '8888999999777777766666'"
+                        + "}");
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateInstantCaseVariable() throws Exception {
 
@@ -347,6 +474,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateLocalDateCaseVariable() throws Exception {
 
@@ -380,6 +508,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateLocalDateTimeCaseVariable() throws Exception {
 
@@ -416,6 +545,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single case variable using a binary stream. PUT cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateBinaryCaseVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -453,6 +583,7 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testUpdateUUIDCaseVariable() throws Exception {
 
@@ -484,5 +615,39 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
                         + "  scope: 'global',"
                         + "  value: 'b2233abf-f84f-426f-b978-0d249b90cc45'"
                         + "}");
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testUpdateCaseVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
+                .variables(Collections.singletonMap("overlappingVariable", (Object) "processValue")).start();
+        runtimeService.setVariable(caseInstance.getId(), "myVar", "value");
+
+        // Update variable
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("name", "myVar");
+        requestNode.put("value", "updatedValue");
+        requestNode.put("type", "string");
+
+        HttpPut httpPut = new HttpPut(
+                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_ASYNC, caseInstance.getId(), "myVar"));
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_NO_CONTENT);
+        closeResponse(response);
+        
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo("value");
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        assertThat(runtimeService.getVariable(caseInstance.getId(), "myVar")).isEqualTo("updatedValue");
+
+        // Try updating with mismatch between URL and body variableName
+        requestNode.put("name", "unexistingVariable");
+        httpPut.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_BAD_REQUEST));
     }
 }

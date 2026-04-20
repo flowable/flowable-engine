@@ -41,8 +41,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
+
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -62,6 +63,7 @@ public class EngineConfiguration {
     @Bean
     public DataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setMinimumIdle(0);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriver);
         dataSource.setUsername(jdbcUsername);

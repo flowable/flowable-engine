@@ -40,7 +40,11 @@ public interface HistoricCaseInstance {
     String getCallbackType();
     String getReferenceId();
     String getReferenceType();
+    Date getDueDate();
+    Date getClaimTime();
+    String getClaimedBy();
     String getTenantId();
+    String getEndUserId();
 
     Map<String, Object> getCaseVariables();
 

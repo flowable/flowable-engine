@@ -27,7 +27,7 @@ import org.flowable.engine.repository.Model;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Frederik Heremans

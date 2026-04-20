@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
+import org.flowable.job.service.impl.asyncexecutor.JobExecutionObservationProvider;
 
 /**
  * Extends the default {@link ExecuteAsyncRunnable} by setting the 'tenant' context before executing.
@@ -28,8 +29,9 @@ public class TenantAwareExecuteAsyncRunnable extends ExecuteAsyncRunnable {
     protected TenantInfoHolder tenantInfoHolder;
     protected String tenantId;
 
-    public TenantAwareExecuteAsyncRunnable(JobInfo job, JobServiceConfiguration jobServiceConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId) {
-        super(job, jobServiceConfiguration, jobServiceConfiguration.getJobEntityManager(), null);
+    public TenantAwareExecuteAsyncRunnable(JobInfo job, JobServiceConfiguration jobServiceConfiguration, TenantInfoHolder tenantInfoHolder, String tenantId,
+            JobExecutionObservationProvider jobExecutionObservationProvider) {
+        super(job, jobServiceConfiguration, jobServiceConfiguration.getJobEntityManager(), null, jobExecutionObservationProvider);
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
     }

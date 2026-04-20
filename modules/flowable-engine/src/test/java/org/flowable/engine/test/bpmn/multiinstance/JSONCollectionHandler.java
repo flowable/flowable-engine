@@ -20,8 +20,8 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Lori Small
@@ -40,7 +40,7 @@ public class JSONCollectionHandler implements FlowableCollectionHandler {
             ArrayList<String> collection = new ArrayList<>();
     
             for (JsonNode itemValue : jsonValue) {
-                collection.add(itemValue.get("principal").asText());
+                collection.add(itemValue.get("principal").asString());
             }
     
             return collection;

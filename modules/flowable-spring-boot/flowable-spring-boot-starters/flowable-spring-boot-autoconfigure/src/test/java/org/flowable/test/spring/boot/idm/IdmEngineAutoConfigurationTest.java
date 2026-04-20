@@ -43,8 +43,8 @@ import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -141,7 +141,8 @@ public class IdmEngineAutoConfigurationTest {
                 assertThatThrownBy(() -> flowablePasswordEncoder.isMatches("test", "test", null))
                     .as("encoder matches password")
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("You have entered a password with no PasswordEncoder. If that is your intent, it should be prefixed with `{noop}`.");
+                    .hasMessage("Given that there is no default password encoder configured, each password must have a password encoding prefix."
+                            + " Please either prefix this password with '{noop}' or set a default password encoder in `DelegatingPasswordEncoder`.");
             });
     }
 

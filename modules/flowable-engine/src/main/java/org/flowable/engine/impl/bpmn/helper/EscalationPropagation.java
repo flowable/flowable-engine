@@ -231,10 +231,9 @@ public class EscalationPropagation {
         List<EventSubProcess> subProcesses = process.findFlowElementsOfType(EventSubProcess.class, true);
         for (EventSubProcess eventSubProcess : subProcesses) {
             for (FlowElement flowElement : eventSubProcess.getFlowElements()) {
-                if (flowElement instanceof StartEvent) {
-                    StartEvent startEvent = (StartEvent) flowElement;
-                    if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions().get(0) instanceof EscalationEventDefinition) {
-                        EscalationEventDefinition escalationEventDef = (EscalationEventDefinition) startEvent.getEventDefinitions().get(0);
+                if (flowElement instanceof StartEvent startEvent) {
+                    if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions()) && startEvent.getEventDefinitions()
+                            .get(0) instanceof EscalationEventDefinition escalationEventDef) {
                         String eventEscalationCode = null;
                         if (StringUtils.isNotEmpty(escalationEventDef.getEscalationCode()) && bpmnModel.containsEscalationRef(escalationEventDef.getEscalationCode())) {
                             eventEscalationCode = bpmnModel.getEscalation(escalationEventDef.getEscalationCode()).getEscalationCode();
@@ -254,9 +253,9 @@ public class EscalationPropagation {
 
         List<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
-            if (boundaryEvent.getAttachedToRefId() != null && CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) && boundaryEvent.getEventDefinitions().get(0) instanceof EscalationEventDefinition) {
+            if (boundaryEvent.getAttachedToRefId() != null && CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) && boundaryEvent.getEventDefinitions()
+                    .get(0) instanceof EscalationEventDefinition escalationEventDef) {
 
-                EscalationEventDefinition escalationEventDef = (EscalationEventDefinition) boundaryEvent.getEventDefinitions().get(0);
                 String eventEscalationCode = null;
                 if (StringUtils.isNotEmpty(escalationEventDef.getEscalationCode()) && bpmnModel.containsEscalationRef(escalationEventDef.getEscalationCode())) {
                     eventEscalationCode = bpmnModel.getEscalation(escalationEventDef.getEscalationCode()).getEscalationCode();

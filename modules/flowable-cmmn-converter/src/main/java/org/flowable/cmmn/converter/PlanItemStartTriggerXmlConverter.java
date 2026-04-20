@@ -34,8 +34,7 @@ public class PlanItemStartTriggerXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
+        if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener timerEventListener) {
             timerEventListener.setTimerStartTriggerSourceRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF));
         }
         return null;

@@ -22,19 +22,18 @@ import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.test.impl.beans.SpecializedTestBean;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
  * @author Ronny Bräunlich
  * 
  */
-@RunWith(Arquillian.class)
+@ArquillianTest
 public class ProgrammaticBeanLookupTest {
 
     /**

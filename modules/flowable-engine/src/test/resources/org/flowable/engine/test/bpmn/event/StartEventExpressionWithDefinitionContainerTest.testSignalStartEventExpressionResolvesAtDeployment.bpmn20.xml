@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://flowable.org/test">
+
+  <process id="signalExpressionProcess" name="Signal Expression Process" isExecutable="true">
+    <startEvent id="startEvent">
+      <signalEventDefinition flowable:signalExpression="${variableContainer.definitionKey}Signal"/>
+    </startEvent>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="task1"/>
+    <userTask id="task1" name="Task"/>
+    <sequenceFlow id="flow2" sourceRef="task1" targetRef="endEvent"/>
+    <endEvent id="endEvent"/>
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_signalExpressionProcess">
+    <bpmndi:BPMNPlane bpmnElement="signalExpressionProcess" id="BPMNPlane_signalExpressionProcess">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="185.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="task1" id="BPMNShape_task1">
+        <omgdc:Bounds height="80.0" width="100.0" x="200.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endEvent" id="BPMNShape_endEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="370.0" y="186.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="130.0" y="200.0"/>
+        <omgdi:waypoint x="200.0" y="200.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="300.0" y="200.0"/>
+        <omgdi:waypoint x="370.0" y="200.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

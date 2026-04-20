@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.spring.CommonAutoDeploymentStrategy;
 import org.flowable.dmn.api.DmnDecision;
@@ -32,11 +33,13 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
 import org.flowable.dmn.spring.DmnEngineFactoryBean;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.xml.exception.DmnXMLException;
 import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -54,7 +57,8 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class SpringAutoDeployTest extends AbstractDmnTestCase {
+@ExtendWith(LoggingExtension.class)
+class SpringAutoDeployTest {
 
     protected static final String DEFAULT_VALID_DEPLOYMENT_RESOURCES = "classpath*:/org/flowable/spring/test/autodeployment/simple*.dmn";
 
@@ -103,17 +107,17 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         this.repositoryService = applicationContext.getBean(DmnRepositoryService.class);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @AfterEach
+    void tearDown() {
         removeAllDeployments();
         if (this.applicationContext != null) {
             this.applicationContext.close();
             this.applicationContext = null;
         }
         this.repositoryService = null;
-        super.tearDown();
     }
 
+    @Test
     public void testBasicActivitiSpringIntegration() {
         createAppContextWithoutDeploymentMode();
         List<DmnDecision> decisionTables = repositoryService.createDecisionQuery().orderByDecisionKey().asc().list();
@@ -130,6 +134,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(decisionTableKeys).isEqualTo(expectedDecisionTableKeys);
     }
 
+    @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContextWithoutDeploymentMode();
         DmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -145,6 +150,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
     }
 
     // Updating the DMN file should lead to a new deployment when restarting the Spring container
+    @Test
     public void testResourceRedeploymentAfterDecisionTableChange() throws Exception {
         createAppContextWithoutDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
@@ -174,12 +180,14 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(4);
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContextWithDefaultDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(1);
         assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(2);
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeDefault() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "default");
@@ -197,6 +205,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionWithDeploymentModeDefault() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "default");
@@ -210,12 +219,14 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContextWithSingleResourceDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
         assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(2);
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeSingleResource() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "single-resource");
@@ -233,6 +244,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeSingleResource() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "single-resource");
@@ -246,12 +258,14 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContextWithResourceParenFolderDeploymentMode();
         assertThat(repositoryService.createDeploymentQuery().count()).isEqualTo(2);
         assertThat(repositoryService.createDecisionQuery().count()).isEqualTo(3);
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesWithDeploymentModeResourceParentFolder() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "resource-parent-folder");
@@ -270,6 +284,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
     }
 
+    @Test
     public void testAutoDeployWithInvalidResourcesAndIgnoreExceptionOnDeploymentWithDeploymentModeResourceParentFolder() {
         Map<String, Object> properties = new HashMap<>();
         properties.put("deploymentMode", "resource-parent-folder");
@@ -304,6 +319,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
             @Value("${jdbc.password:}") String password
         ) {
             HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setMinimumIdle(0);
             dataSource.setJdbcUrl(url);
             dataSource.setDriverClassName(driver);
             dataSource.setUsername(username);

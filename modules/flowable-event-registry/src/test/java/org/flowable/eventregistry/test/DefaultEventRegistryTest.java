@@ -16,8 +16,6 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,11 +47,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import net.javacrumbs.jsonunit.core.Option;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -316,7 +312,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
     }
 
     protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(eventEngineConfiguration.getObjectMapper());
         eventEngineConfiguration.getExpressionManager().getBeans()
                 .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -344,7 +340,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
                 .jsonFieldsMapDirectlyToPayload()
                 .deploy();
 
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(eventEngineConfiguration.getObjectMapper());
         InboundChannelModel inboundChannelModel = (InboundChannelModel) eventEngineConfiguration.getEventRepositoryService()
                 .getChannelModelByKey("test-channel");
         DefaultInboundEventProcessingPipeline<Customer> inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline<Customer>) inboundChannelModel
@@ -353,11 +349,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
             @Override
             public Customer deserialize(Object rawEvent) {
-                try {
-                    return new ObjectMapper().readValue(rawEvent.toString(), Customer.class);
-                } catch (IOException e) {
-                    throw new UncheckedIOException(e);
-                }
+                return eventEngineConfiguration.getObjectMapper().readValue(rawEvent.toString(), Customer.class);
             }
 
         });
@@ -373,7 +365,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         inboundEventProcessingPipeline.setInboundEventPayloadExtractor(new InboundEventPayloadExtractor<>() {
 
             @Override
-            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer) {
+            public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Customer customer, String parentDeploymentId, String tenantId) {
                 Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
                 for (EventPayload eventPayloadDefinition : eventModel.getPayload()) {
                     switch (eventPayloadDefinition.getName()) {
@@ -407,7 +399,7 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         public String getConsumerKey() {
             return "myTestEventConsumer";
         }
-
+        
         @Override
         public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
             eventsReceived.add(event);
@@ -422,6 +414,11 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -434,18 +431,12 @@ public class DefaultEventRegistryTest extends AbstractFlowableEventTest {
         }
 
         public void triggerTestEvent() {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "myEvent");
             json.put("customerId", "test");
             json.put("payload1", "Hello World");
             json.put("payload2", 123);
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
     }
     

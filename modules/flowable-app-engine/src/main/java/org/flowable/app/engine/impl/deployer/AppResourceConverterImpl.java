@@ -16,7 +16,7 @@ import org.flowable.app.api.repository.AppModel;
 import org.flowable.app.api.repository.AppResourceConverter;
 import org.flowable.common.engine.api.FlowableException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public class AppResourceConverterImpl implements AppResourceConverter {
 

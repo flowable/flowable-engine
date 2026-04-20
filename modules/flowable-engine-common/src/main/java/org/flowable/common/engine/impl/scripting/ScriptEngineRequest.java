@@ -27,7 +27,8 @@ public class ScriptEngineRequest {
 
     protected final String language;
     protected final String script;
-    protected final VariableContainer variableContainer;
+    protected final VariableContainer scopeContainer;
+    protected final VariableContainer inputVariableContainer;
     protected final List<Resolver> additionalResolvers;
     protected final boolean storeScriptVariables;
     protected final ScriptTraceEnhancer traceEnhancer;
@@ -46,7 +47,8 @@ public class ScriptEngineRequest {
 
         protected String language;
         protected String script;
-        protected VariableContainer variableContainer;
+        protected VariableContainer scopeContainer;
+        protected VariableContainer inputVariableContainer;
         protected List<Resolver> additionalResolvers = new LinkedList<>();
         protected boolean storeScriptVariables;
         protected ScriptTraceEnhancer traceEnhancer;
@@ -71,13 +73,31 @@ public class ScriptEngineRequest {
         }
 
         /**
-         * The variable container used to create {@link Resolver}s for the script context.
+         * The scope variable container in which the script is being executed in.
+         * Used to create {@link Resolver}s for the script context.
          *
          * The variable container will be passed to {@link ResolverFactory} to create specialized Resolvers
          * for the specific VariableContainer implementations.
+         * @see #inputVariableContainer(VariableContainer)
          */
-        public Builder variableContainer(VariableContainer variableContainer) {
-            this.variableContainer = variableContainer;
+        public Builder scopeContainer(VariableContainer variableContainer) {
+            this.scopeContainer = variableContainer;
+            return this;
+        }
+
+        /**
+         * The variable container that can be used to provide different dynamic variables for the script context.
+         * If not provided then the {@link #scopeContainer} will be used.
+         * <p>
+         *     e.g. if we have the following script <code>var sum = a + b</code>.
+         *     When <code>inputVariableContainer</code> is defined the variables <code>a</code> and <code>b</code> will come from it.
+         *     Otherwise, they will come from the variable container defined in {@link #scopeContainer(VariableContainer)}.
+         *  <p>
+         * The variable container will be passed to {@link ResolverFactory} to create specialized Resolvers
+         * for the specific VariableContainer implementations.
+         */
+        public Builder inputVariableContainer(VariableContainer variableContainer) {
+            this.inputVariableContainer = variableContainer;
             return this;
         }
 
@@ -95,7 +115,7 @@ public class ScriptEngineRequest {
          * Adds additional resolver to the end of the list of resolvers.
          * The order of the resolvers matter, as the first resolver returning containsKey = true
          * will be used to resolve a variable during script execution.
-         * The resolvers take precedence over the resolvers created for the {@link #variableContainer}.
+         * The resolvers take precedence over the resolvers created for the {@link #scopeContainer}.
          * Useful to provide context objects to the scripting environment.
          */
         public Builder additionalResolver(Resolver additionalResolver) {
@@ -121,7 +141,8 @@ public class ScriptEngineRequest {
             }
             return new ScriptEngineRequest(script,
                     language,
-                    variableContainer,
+                    scopeContainer,
+                    inputVariableContainer != null ? inputVariableContainer : scopeContainer,
                     storeScriptVariables,
                     additionalResolvers,
                     traceEnhancer);
@@ -130,13 +151,15 @@ public class ScriptEngineRequest {
 
     private ScriptEngineRequest(String script,
             String language,
-            VariableContainer variableContainer,
+            VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer,
             boolean storeScriptVariables,
             List<Resolver> additionalResolvers,
             ScriptTraceEnhancer errorTraceEnhancer) {
         this.script = script;
         this.language = language;
-        this.variableContainer = variableContainer;
+        this.scopeContainer = scopeContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.storeScriptVariables = storeScriptVariables;
         this.additionalResolvers = additionalResolvers;
         this.traceEnhancer = errorTraceEnhancer;
@@ -157,10 +180,17 @@ public class ScriptEngineRequest {
     }
 
     /**
-     * @see Builder#variableContainer(VariableContainer)
+     * @see Builder#scopeContainer(VariableContainer)
      */
-    public VariableContainer getVariableContainer() {
-        return variableContainer;
+    public VariableContainer getScopeContainer() {
+        return scopeContainer;
+    }
+
+    /**
+     * @see Builder#inputVariableContainer(VariableContainer)
+     */
+    public VariableContainer getInputVariableContainer() {
+        return inputVariableContainer;
     }
 
     /**
@@ -190,7 +220,7 @@ public class ScriptEngineRequest {
         return new StringJoiner(", ", ScriptEngineRequest.class.getSimpleName() + "[", "]")
                 .add("language='" + language + "'")
                 .add("script='" + script + "'")
-                .add("variableContainer=" + variableContainer)
+                .add("variableContainer=" + scopeContainer)
                 .add("storeScriptVariables=" + storeScriptVariables)
                 .toString();
     }

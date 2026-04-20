@@ -49,8 +49,7 @@ public class DebugInfoEntityEventListener extends BaseEntityEventListener {
     protected ExecutionEntity getExecutionEntity(FlowableEvent event) {
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
         Object entity = entityEvent.getEntity();
-        if (entity instanceof ExecutionEntity) {
-            ExecutionEntity executionEntity = (ExecutionEntity) entity;
+        if (entity instanceof ExecutionEntity executionEntity) {
             return executionEntity;
         }
         return null;

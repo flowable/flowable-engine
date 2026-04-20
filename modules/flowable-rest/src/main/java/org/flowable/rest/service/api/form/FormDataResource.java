@@ -45,7 +45,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Forms" }, description = "Manage Forms", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Forms" }, authorizations = { @Authorization(value = "basicAuth") })
 public class FormDataResource {
 
     @Autowired

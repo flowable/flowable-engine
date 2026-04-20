@@ -30,12 +30,11 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -228,7 +227,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
                         + "eventName: '" + eventSubscription.getEventName() + "',"
                         + "activityId: '" + eventSubscription.getActivityId() + "',"
                         + "processDefinitionId: '" + eventSubscription.getProcessDefinitionId() + "',"
-                        + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
+                        + "created: '" + getISODateString(eventSubscription.getCreated()) + "',"
                         + "tenantId: 'acme'"
                         + "}");
     }

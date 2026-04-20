@@ -24,8 +24,8 @@ import java.util.Date;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Test;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez

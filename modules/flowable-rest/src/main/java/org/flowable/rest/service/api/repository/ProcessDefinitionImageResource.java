@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionImageResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "Get a process definition image", tags = { "Process Definitions" })

@@ -70,6 +70,9 @@ CREATE TABLE ACT_CMMN_RU_CASE_INST
     LAST_REACTIVATION_TIME_    datetime(3)             NULL,
     LAST_REACTIVATION_USER_ID_ VARCHAR(255)            NULL,
     BUSINESS_STATUS_           VARCHAR(255)            NULL,
+    DUE_DATE_                  datetime(3)             NULL,
+    CLAIM_TIME_                datetime(3)             NULL,
+    CLAIMED_BY_                VARCHAR(255)            NULL,
     TENANT_ID_                 VARCHAR(255) DEFAULT '' NULL,
     CONSTRAINT PK_ACT_CMMN_RU_CASE_INST PRIMARY KEY (ID_)
 );
@@ -94,6 +97,8 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     STATE_                  VARCHAR(255)            NULL,
     CREATE_TIME_            datetime(3)             NULL,
     START_USER_ID_          VARCHAR(255)            NULL,
+    ASSIGNEE_               VARCHAR(255)            NULL,
+    COMPLETED_BY_           VARCHAR(255)            NULL,
     REFERENCE_ID_           VARCHAR(255)            NULL,
     REFERENCE_TYPE_         VARCHAR(255)            NULL,
     ITEM_DEFINITION_ID_     VARCHAR(255)            NULL,
@@ -110,6 +115,7 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     COMPLETED_TIME_         datetime(3)             NULL,
     OCCURRED_TIME_          datetime(3)             NULL,
     TERMINATED_TIME_        datetime(3)             NULL,
+    FAILED_TIME_            datetime(3)             NULL,
     EXIT_TIME_              datetime(3)             NULL,
     ENDED_TIME_             datetime(3)             NULL,
     ENTRY_CRITERION_ID_     VARCHAR(255)            NULL,
@@ -195,7 +201,11 @@ CREATE TABLE ACT_CMMN_HI_CASE_INST
     LAST_REACTIVATION_TIME_    datetime(3)             NULL,
     LAST_REACTIVATION_USER_ID_ VARCHAR(255)            NULL,
     BUSINESS_STATUS_           VARCHAR(255)            NULL,
+    DUE_DATE_                  datetime(3)             NULL,
+    CLAIM_TIME_                datetime(3)             NULL,
+    CLAIMED_BY_                VARCHAR(255)            NULL,
     TENANT_ID_                 VARCHAR(255) DEFAULT '' NULL,
+    END_USER_ID_               VARCHAR(255)            NULL,
     CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_)
 );
 
@@ -236,10 +246,13 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
     COMPLETED_TIME_        datetime(3)             NULL,
     OCCURRED_TIME_         datetime(3)             NULL,
     TERMINATED_TIME_       datetime(3)             NULL,
+    FAILED_TIME_           datetime(3)             NULL,
     EXIT_TIME_             datetime(3)             NULL,
     ENDED_TIME_            datetime(3)             NULL,
     LAST_UPDATED_TIME_     datetime(3)             NULL,
     START_USER_ID_         VARCHAR(255)            NULL,
+    ASSIGNEE_              VARCHAR(255)            NULL,
+    COMPLETED_BY_          VARCHAR(255)            NULL,
     REFERENCE_ID_          VARCHAR(255)            NULL,
     REFERENCE_TYPE_        VARCHAR(255)            NULL,
     ENTRY_CRITERION_ID_    VARCHAR(255)            NULL,
@@ -255,4 +268,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST (CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '7.1.0.2', 1);
+values ('cmmn.schema.version', '8.1.0.1', 1);

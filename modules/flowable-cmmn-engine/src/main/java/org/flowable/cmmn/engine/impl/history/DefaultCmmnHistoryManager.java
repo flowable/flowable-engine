@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
@@ -84,6 +85,9 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(endTime);
                 historicCaseInstanceEntity.setState(state);
+
+                String authenticatedUserId = Authentication.getAuthenticatedUserId();
+                historicCaseInstanceEntity.setEndUserId(authenticatedUserId);
             }
         }
     }
@@ -96,6 +100,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
             if (historicCaseInstanceEntity != null) {
                 historicCaseInstanceEntity.setEndTime(null);
+                historicCaseInstanceEntity.setEndUserId(null);
                 historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
                 historicCaseInstanceEntity.setLastReactivationTime(caseInstanceEntity.getLastReactivationTime());
                 historicCaseInstanceEntity.setLastReactivationUserId(caseInstanceEntity.getLastReactivationUserId());
@@ -141,6 +146,33 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordUpdateDueDate(CaseInstanceEntity caseInstanceEntity, Date dueDate) {
+        if (caseInstanceEntity != null) {
+            if (getHistoryConfigurationSettings().isHistoryEnabledForCaseInstance(caseInstanceEntity)) {
+                HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+                HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
+                if (historicCaseInstanceEntity != null) {
+                    historicCaseInstanceEntity.setDueDate(dueDate);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void recordUpdateClaimTime(CaseInstanceEntity caseInstanceEntity, Date claimTime, String claimedBy) {
+        if (caseInstanceEntity != null) {
+            if (getHistoryConfigurationSettings().isHistoryEnabledForCaseInstance(caseInstanceEntity)) {
+                HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+                HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceEntity.getId());
+                if (historicCaseInstanceEntity != null) {
+                    historicCaseInstanceEntity.setClaimTime(claimTime);
+                    historicCaseInstanceEntity.setClaimedBy(claimedBy);
+                }
+            }
+        }
+    }
+
+    @Override
     public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstance) {
         if (getHistoryConfigurationSettings().isHistoryEnabledForMilestone(milestoneInstance)) {
             HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
@@ -172,6 +204,11 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
+        this.recordIdentityLinkCreated(null, identityLink);
+    }
+
+    @Override
+    public void recordIdentityLinkCreated(CaseInstanceEntity caseInstance, IdentityLinkEntity identityLink) {
         if (getHistoryConfigurationSettings().isHistoryEnabledForIdentityLink(identityLink)
                 && (identityLink.getScopeId() != null || identityLink.getTaskId() != null)) {
             HistoricIdentityLinkService historicIdentityLinkService = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService();
@@ -312,6 +349,8 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
                 historicPlanItemInstanceEntity.setFormKey(planItemInstanceEntity.getFormKey());
                 historicPlanItemInstanceEntity.setElementId(planItemInstanceEntity.getElementId());
                 historicPlanItemInstanceEntity.setPlanItemDefinitionId(planItemInstanceEntity.getPlanItemDefinitionId());
+                historicPlanItemInstanceEntity.setAssignee(planItemInstanceEntity.getAssignee());
+                historicPlanItemInstanceEntity.setCompletedBy(planItemInstanceEntity.getCompletedBy());
             }
         }
     }
@@ -377,6 +416,17 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             h -> {
                 h.setEndedTime(terminatedTime);
                 h.setTerminatedTime(terminatedTime);
+                h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
+            });
+    }
+
+    @Override
+    public void recordPlanItemInstanceFailed(PlanItemInstanceEntity planItemInstanceEntity) {
+        Date failedTime = planItemInstanceEntity.getFailedTime();
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, failedTime,
+            h -> {
+                h.setEndedTime(failedTime);
+                h.setFailedTime(failedTime);
                 h.setShowInOverview(evaluateShowInOverview(planItemInstanceEntity));
             });
     }
@@ -485,13 +535,11 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
             String includeInStageOverviewValue = null;
             if (planItemInstanceEntity.isStage()) {
-                if (planItemDefinition instanceof Stage) {
-                    Stage stage = (Stage) planItemDefinition;
+                if (planItemDefinition instanceof Stage stage) {
                     includeInStageOverviewValue = stage.getIncludeInStageOverview();
                 }
                 
-            } else if (planItemDefinition instanceof Milestone) {
-                Milestone milestone = (Milestone) planItemDefinition;
+            } else if (planItemDefinition instanceof Milestone milestone) {
                 includeInStageOverviewValue = milestone.getIncludeInStageOverview();
             }
             

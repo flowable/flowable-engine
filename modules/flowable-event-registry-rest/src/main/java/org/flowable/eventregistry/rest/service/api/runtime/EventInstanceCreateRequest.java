@@ -16,7 +16,8 @@ package org.flowable.eventregistry.rest.service.api.runtime;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import tools.jackson.databind.node.ObjectNode;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

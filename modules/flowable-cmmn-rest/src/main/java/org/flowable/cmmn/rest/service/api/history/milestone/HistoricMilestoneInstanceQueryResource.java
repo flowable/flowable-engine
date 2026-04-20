@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -33,11 +35,14 @@ import io.swagger.annotations.Authorization;
  * @author Dennis Federico
  */
 @RestController
-@Api(tags = {"History Milestone"}, description = "Manage History Milestone Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History Milestone"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricMilestoneInstanceQueryResource extends HistoricMilestoneInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic milestone instances", tags = {"History Milestone", "Query"}, nickname = "queryHistoricMilestoneInstance",
             notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic milestone instances, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'timestamp'.", allowableValues = "milestoneName,timestamp", paramType = "body"),
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the milestone instances are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})

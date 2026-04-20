@@ -229,7 +229,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot receive message for a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -237,7 +237,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot receive message for a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -245,7 +245,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot remove variables from a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -253,7 +253,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot remove variables from a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -261,7 +261,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot remove variables from a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -269,7 +269,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot remove variables from a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -277,7 +277,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot set variables to a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -285,7 +285,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot set variables to a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -293,7 +293,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot set variables to a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -301,7 +301,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot set variables to a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -309,7 +309,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot trigger a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -317,7 +317,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("Cannot trigger a suspended ProcessInstance", e.getMessage());
         }
 
         try {
@@ -325,7 +325,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("is suspended", e.getMessage());
         }
 
         try {
@@ -333,7 +333,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             // This is expected
-            assertTrue(e.getMessage().contains("is suspended"));
+            assertTextPresent("is suspended", e.getMessage());
         }
     }
 

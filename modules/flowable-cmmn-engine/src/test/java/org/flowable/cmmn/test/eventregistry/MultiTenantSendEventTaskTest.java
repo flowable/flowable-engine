@@ -24,11 +24,11 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -43,7 +43,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         outboundEventChannelAdapter = setupTestChannel();
@@ -78,7 +78,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
         return outboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         getEventRepositoryService().createDeploymentQuery().list()
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
@@ -105,7 +105,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("tenantACustomerId").asText()).isEqualTo("Hello tenantA");
+        assertThat(jsonNode.get("tenantACustomerId").asString()).isEqualTo("Hello tenantA");
 
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testSendEvent")
@@ -116,7 +116,7 @@ public class MultiTenantSendEventTaskTest extends FlowableEventRegistryCmmnTestC
 
         jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(1));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("tenantBCustomerId").asText())
+        assertThat(jsonNode.get("tenantBCustomerId").asString())
                 .isEqualTo("Hello tenantB"); // Note: a different json (different event definition for different tenant)
     }
 

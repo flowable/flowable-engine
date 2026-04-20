@@ -13,6 +13,8 @@
 
 package org.flowable.app.engine.impl.deployer;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -125,10 +127,17 @@ public class AppDeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", AppDeploymentEntity.class);
         }
         
+        List<EngineDeployer> engineUnDeployers = new ArrayList<>(deployers);
+        engineUnDeployers.sort(Comparator.comparingInt(EngineDeployer::getUndeployOrder));
+
+        for (EngineDeployer deployer : engineUnDeployers) {
+            deployer.undeploy(deployment, cascade);
+        }
+
         for (AppDefinition appDefinition : new AppDefinitionQueryImpl().deploymentId(deploymentId).list()) {
             appDefinitionCache.remove(appDefinition.getId());
         }
-        
+
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
     }
 

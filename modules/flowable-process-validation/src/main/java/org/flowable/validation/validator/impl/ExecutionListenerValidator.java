@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -29,26 +29,26 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class ExecutionListenerValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
 
-        validateListeners(process, null, process.getExecutionListeners(), errors);
+        validateListeners(process, null, process.getExecutionListeners(), validationContext);
 
         for (FlowElement flowElement : process.getFlowElements()) {
-            validateListeners(process, flowElement, flowElement.getExecutionListeners(), errors);
+            validateListeners(process, flowElement, flowElement.getExecutionListeners(), validationContext);
         }
     }
 
-    protected void validateListeners(Process process, FlowElement flowElement, List<FlowableListener> listeners, List<ValidationError> errors) {
+    protected void validateListeners(Process process, FlowElement flowElement, List<FlowableListener> listeners, ProcessValidationContext validationContext) {
         if (listeners != null) {
             for (FlowableListener listener : listeners) {
 
                 if (ImplementationType.IMPLEMENTATION_TYPE_SCRIPT.equals(listener.getImplementationType())) {
                     if (listener.getScriptInfo() == null) {
-                        addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, listener,
+                        validationContext.addError(Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, listener,
                                 "executionListener of type 'script' expects a <script> child element.");
                     }
                 } else if (listener.getImplementation() == null || listener.getImplementationType() == null) {
-                    addError(errors, Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, flowElement, listener,
+                    validationContext.addError(Problems.EXECUTION_LISTENER_IMPLEMENTATION_MISSING, process, flowElement, listener,
                             "Element 'class' or 'expression' or type=\"script\" is mandatory on executionListener");
                 }
             }

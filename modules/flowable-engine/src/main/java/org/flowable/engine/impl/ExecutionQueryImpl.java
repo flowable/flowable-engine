@@ -33,8 +33,8 @@ import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -66,6 +66,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected boolean onlySubProcessExecutions;
     protected boolean onlyProcessInstanceExecutions;
     protected String processInstanceId;
+    protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String rootProcessInstanceId;
     protected List<EventSubscriptionQueryValue> eventSubscriptions;
 
@@ -94,6 +96,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected Set<String> involvedGroups;
     private List<List<String>> safeInvolvedGroups;
     protected Set<String> processDefinitionKeys;
+    protected Set<String> excludeProcessDefinitionKeys;
     protected Set<String> processDefinitionIds;
 
     // Not exposed in API, but here for the ProcessInstanceQuery support, since
@@ -107,7 +110,9 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected String referenceId;
     protected String referenceType;
     
@@ -302,6 +307,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     }
 
     @Override
+    public ExecutionQuery processInstanceIds(Set<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is null");
+        }
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is empty");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.processInstanceIds = processInstanceIds;
+        } else {
+            this.processInstanceIds = processInstanceIds;
+        }
+        return this;
+    }
+
+    @Override
     public ExecutionQueryImpl rootProcessInstanceId(String rootProcessInstanceId) {
         if (rootProcessInstanceId == null) {
             throw new FlowableIllegalArgumentException("Root process instance id is null");
@@ -425,6 +447,19 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
         } else {
             this.processDefinitionKeys = processDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public ExecutionQuery excludeProcessDefinitionKeys(Set<String> excludeProcessDefinitionKeys) {
+        if (excludeProcessDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Process definition keys is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+        } else {
+            this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
         }
         return this;
     }
@@ -1055,12 +1090,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             if (languageNode != null) {
                 JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                 if (languageNameNode != null && !languageNameNode.isNull()) {
-                    executionEntity.setLocalizedName(languageNameNode.asText());
+                    executionEntity.setLocalizedName(languageNameNode.asString());
                 }
 
                 JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                 if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                    executionEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                    executionEntity.setLocalizedDescription(languageDescriptionNode.asString());
                 }
             }
         }
@@ -1141,8 +1176,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return rootProcessInstanceId;
     }
 
-    public String getProcessInstanceIds() {
-        return null;
+    public Set<String> getProcessInstanceIds() {
+        return processInstanceIds;
     }
 
     public String getBusinessKey() {
@@ -1244,6 +1279,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public Set<String> getProcessDefinitionKeys() {
         return processDefinitionKeys;
+    }
+
+    public Set<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
     }
 
     public String getParentId() {
@@ -1378,12 +1417,29 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return callbackId;
     }
 
+    public Set<String> getCallBackIds() {
+        return callbackIds;
+    }
+
+
     public String getCallbackType() {
         return callbackType;
     }
     
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
     public List<ExecutionQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+    
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

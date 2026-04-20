@@ -85,6 +85,7 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_EVENT_LISTENER = "eventListener";
     public static final String ELEMENT_TASK_LISTENER = "taskListener";
     public static final String ELEMENT_SCRIPT = "script";
+    public static final String ELEMENT_FORM_REFERENCE = "formreference";
     public static final String ATTRIBUTE_LISTENER_EVENT = "event";
     public static final String ATTRIBUTE_LISTENER_EVENTS = "events";
     public static final String ATTRIBUTE_LISTENER_ENTITY_TYPE = "entityType";
@@ -205,6 +206,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_TASK_SCRIPT_RESULTVARIABLE = "resultVariable";
     public static final String ATTRIBUTE_TASK_SCRIPT_SKIP_EXPRESSION = "skipExpression";
     public static final String ATTRIBUTE_TASK_SCRIPT_AUTO_STORE_VARIABLE = "autoStoreVariables";
+    public static final String ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES = "doNotIncludeVariables";
 
     public static final String ATTRIBUTE_TASK_SERVICE_CLASS = "class";
     public static final String ATTRIBUTE_TASK_SERVICE_EXPRESSION = "expression";

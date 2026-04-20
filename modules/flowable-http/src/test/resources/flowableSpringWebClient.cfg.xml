@@ -15,7 +15,7 @@
         <property name="jdbcPassword" value="${jdbc.password:}"/>
 
         <!-- Database configurations -->
-        <property name="databaseSchemaUpdate" value="drop-create"/>
+        <property name="databaseSchemaUpdate" value="true"/>
 
         <!-- job executor configurations -->
         <property name="asyncExecutorActivate" value="false"/>

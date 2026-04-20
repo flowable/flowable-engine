@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,8 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private String processDefinitionKey;
     private String processDefinitionKeyLike;
     private String processDefinitionKeyLikeIgnoreCase;
+    private List<String> processDefinitionKeys;
+    private List<String> excludeProcessDefinitionKeys;
     private List<String> processDefinitionKeyIn;
     private List<String> processDefinitionKeyNotIn;
     private String processDefinitionName;
@@ -65,10 +68,15 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String finishedBy;
+    private String state;
     private Boolean includeProcessVariables;
+    private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
     private String callbackId;
+    private Set<String> callbackIds;
     private String callbackType;
+    private String parentCaseInstanceId;
     private Boolean withoutCallbackId;
     private String tenantId;
     private String tenantIdLike;
@@ -179,6 +187,22 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
+    }
+
+    public List<String> getProcessDefinitionKeys() {
+        return processDefinitionKeys;
+    }
+
+    public void setProcessDefinitionKeys(List<String> processDefinitionKeys) {
+        this.processDefinitionKeys = processDefinitionKeys;
+    }
+
+    public List<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
+    }
+
+    public void setExcludeProcessDefinitionKeys(List<String> excludeProcessDefinitionKeys) {
+        this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
     }
 
     public List<String> getProcessDefinitionKeyIn() {
@@ -373,12 +397,36 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
         this.startedBy = startedBy;
     }
 
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public void setFinishedBy(String finishedBy) {
+        this.finishedBy = finishedBy;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public Boolean getIncludeProcessVariables() {
         return includeProcessVariables;
     }
 
     public void setIncludeProcessVariables(Boolean includeProcessVariables) {
         this.includeProcessVariables = includeProcessVariables;
+    }
+
+    public Collection<String> getIncludeProcessVariablesNames() {
+        return includeProcessVariablesNames;
+    }
+
+    public void setIncludeProcessVariablesNames(Collection<String> includeProcessVariablesNames) {
+        this.includeProcessVariablesNames = includeProcessVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
@@ -404,6 +452,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
     }
 
     public Boolean getWithoutCallbackId() {
@@ -460,5 +516,13 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setParentScopeId(String parentScopeId) {
         this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
+    public void setCallbackIds(Set<String> callbackIds) {
+        this.callbackIds = callbackIds;
     }
 }

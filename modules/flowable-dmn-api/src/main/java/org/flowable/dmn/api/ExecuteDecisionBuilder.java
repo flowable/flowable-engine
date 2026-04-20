@@ -79,6 +79,11 @@ public interface ExecuteDecisionBuilder {
     ExecuteDecisionBuilder variable(String variableName, Object value);
 
     /**
+     * Disable history persistence for this execution.
+     */
+    ExecuteDecisionBuilder disableHistory();
+
+    /**
      * Executes a decision returning one or more output results with variables
      *
      * @deprecated Use {@link #executeDecision()} to execute a Decision (table)

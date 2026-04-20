@@ -9,12 +9,15 @@
 
 	<parent>
 		<groupId>org.flowable</groupId>
-		<artifactId>flowable-root</artifactId>
-		<relativePath>../..</relativePath>
-		<version>7.1.0</version>
+		<artifactId>flowable-parent</artifactId>
+		<version>8.1.0-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
 	</parent>
 
 	<properties>
+        <flowable.artifact>
+            org.flowable.cdi
+        </flowable.artifact>
 		<skip.test.db.drop>false</skip.test.db.drop>
 	</properties>
 
@@ -23,7 +26,7 @@
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
-				<version>1.7.0.Alpha13</version>
+				<version>1.10.0.Final</version>
 				<scope>import</scope>
 				<type>pom</type>
 			</dependency>
@@ -36,13 +39,13 @@
 			<artifactId>flowable-engine</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jboss.arquillian.junit</groupId>
-			<artifactId>arquillian-junit-container</artifactId>
+			<groupId>org.jboss.arquillian.junit5</groupId>
+			<artifactId>arquillian-junit5-container</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -74,25 +77,24 @@
 		<dependency>
 			<groupId>org.jboss.arquillian.container</groupId>
 			<artifactId>arquillian-weld-embedded</artifactId>
-			<version>3.0.2.Final</version>
+			<version>4.0.0.Final</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.weld</groupId>
 			<artifactId>weld-core-impl</artifactId>
-			<version>5.1.0.Final</version>
+			<version>6.0.3.Final</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.weld.module</groupId>
 			<artifactId>weld-web</artifactId>
-			<version>5.1.0.Final</version>
+			<version>6.0.3.Final</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>2.0.5</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

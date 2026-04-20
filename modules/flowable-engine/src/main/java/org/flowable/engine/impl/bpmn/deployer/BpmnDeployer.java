@@ -49,8 +49,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -114,6 +114,11 @@ public class BpmnDeployer implements EngineDeployer {
             BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
             createLocalizationValues(processDefinition.getId(), bpmnModel.getProcessById(processDefinition.getKey()));
         }
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
     }
 
     /**
@@ -211,8 +216,7 @@ public class BpmnDeployer implements EngineDeployer {
             processDefinition.setId(getIdForNewProcessDefinition(processDefinition));
             Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
             FlowElement initialElement = process.getInitialFlowElement();
-            if (initialElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) initialElement;
+            if (initialElement instanceof StartEvent startEvent) {
                 if (startEvent.getFormKey() != null) {
                     processDefinition.setHasStartFormKey(true);
                 }
@@ -255,8 +259,7 @@ public class BpmnDeployer implements EngineDeployer {
 
             Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
             FlowElement initialElement = process.getInitialFlowElement();
-            if (initialElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) initialElement;
+            if (initialElement instanceof StartEvent startEvent) {
                 if (startEvent.getFormKey() != null) {
                     processDefinition.setHasStartFormKey(true);
                 }
@@ -444,8 +447,7 @@ public class BpmnDeployer implements EngineDeployer {
                     }
                 }
 
-                if (flowElement instanceof SubProcess) {
-                    SubProcess subprocess = (SubProcess) flowElement;
+                if (flowElement instanceof SubProcess subprocess) {
                     boolean isFlowElementLocalizationChanged = localizeFlowElements(subprocess.getFlowElements(), infoNode);
                     boolean isDataObjectLocalizationChanged = localizeDataObjectElements(subprocess.getDataObjects(), infoNode);
                     if (isFlowElementLocalizationChanged || isDataObjectLocalizationChanged) {
@@ -461,7 +463,7 @@ public class BpmnDeployer implements EngineDeployer {
     protected boolean isEqualToCurrentLocalizationValue(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
         boolean isEqual = false;
         JsonNode localizationNode = infoNode.path("localization").path(language).path(id).path(propertyName);
-        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asText().equals(propertyValue)) {
+        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asString().equals(propertyValue)) {
             isEqual = true;
         }
         return isEqual;

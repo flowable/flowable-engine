@@ -23,16 +23,14 @@ import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class JsonVariableContainerExpressionTest extends PluggableFlowableTestCase {
 
     @Test
     public void setNestedJsonVariableValueWithVariableContainerWrapper() {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objectNode = objectMapper.createObjectNode();
+        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
 
         Map<String, Object> variables = new HashMap<>();
         variables.put("muppetshow", objectNode);
@@ -50,8 +48,7 @@ public class JsonVariableContainerExpressionTest extends PluggableFlowableTestCa
     @Test
     public void setNestedJsonVariableValueWithMapDelegateVariableContainer() {
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        ObjectNode objectNode = objectMapper.createObjectNode();
+        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
         MapDelegateVariableContainer simpleVariableContainer = new MapDelegateVariableContainer().addTransientVariable("muppetshow", objectNode);
         assertThatJson(executeSetValueExpression("${muppetshow.characters.frog.name}", "Kermit", simpleVariableContainer)
                 .getVariable("muppetshow"))

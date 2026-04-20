@@ -24,12 +24,11 @@ import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.impl.DefaultInboundEvent;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -39,9 +38,9 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
-        inboundEventChannelAdapter = setupTestChannel();
+        inboundEventChannelAdapter = setupTestChannel(cmmnEngineConfiguration.getObjectMapper());
 
         getEventRepositoryService().createEventModelBuilder()
                 .key("myEvent")
@@ -53,8 +52,8 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
                 .deploy();
     }
 
-    protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+    protected TestInboundEventChannelAdapter setupTestChannel(ObjectMapper objectMapper) {
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(objectMapper);
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
         beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -70,7 +69,7 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
         return inboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
@@ -83,7 +82,11 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
-        protected ObjectMapper objectMapper = new ObjectMapper();
+        protected final ObjectMapper objectMapper;
+
+        protected TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -108,12 +111,8 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
             Map<String, Object> headers = new HashMap<>();
             headers.put("headerProperty1", headerValue1);
             headers.put("headerProperty2", headerValue2);
-            try {
-                String event = objectMapper.writeValueAsString(eventNode);
-                eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            String event = objectMapper.writeValueAsString(eventNode);
+            eventRegistry.eventReceived(inboundChannelModel, new DefaultInboundEvent(event, headers));
         }
 
         public void triggerOrderTestEvent(String orderId) {
@@ -122,19 +121,11 @@ public abstract class AbstractCmmnEventRegistryConsumerTest extends FlowableEven
 
         public void triggerTestEvent(String customerId, String orderId) {
             ObjectNode json = createTestEventNode(customerId, orderId);
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
 
         public void triggerTestEventWithJson(ObjectNode eventJson) {
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventJson));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventJson));
         }
 
         

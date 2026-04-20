@@ -41,8 +41,7 @@ public class FlowableExpressionFactory extends ExpressionFactoryImpl {
 
     public void setAstFunctionCreators(Collection<FlowableAstFunctionCreator> astFunctionCreators) {
         TreeBuilder storeBuilder = this.store.getBuilder();
-        if (storeBuilder instanceof FlowableExpressionBuilder) {
-            FlowableExpressionBuilder expressionBuilder = (FlowableExpressionBuilder) storeBuilder;
+        if (storeBuilder instanceof FlowableExpressionBuilder expressionBuilder) {
 
             expressionBuilder.getAstFunctionCreators().clear();
             for (FlowableAstFunctionCreator astFunctionCreator : astFunctionCreators) {

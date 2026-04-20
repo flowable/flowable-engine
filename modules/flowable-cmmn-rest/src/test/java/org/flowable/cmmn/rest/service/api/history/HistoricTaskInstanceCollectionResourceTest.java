@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -36,9 +35,9 @@ import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -52,6 +51,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
     /**
      * Test querying historic task instance. GET cmmn-history/historic-task-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstances() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -107,6 +107,9 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=" + caseInstance.getId(), 2, task.getId());
 
             assertResultsPresentInDataResponse(url + "?caseInstanceIdWithChildren=nonexisting", 0);
+
+            assertResultsPresentInDataResponse(url + "?scopeId=" + caseInstance.getId(), 2, task1.getId(), task.getId());
+            assertResultsPresentInDataResponse(url + "?scopeIds=someId," + caseInstance.getId(), 2, task1.getId(), task.getId());
             
             // Without scope id
             assertResultsPresentInDataResponse(url + "?withoutScopeId=true", 0);
@@ -132,19 +135,27 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
             assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=" + encode("TASK%"), task1.getId(), task2.getId());
             assertResultsPresentInDataResponse(url + "?taskNameLikeIgnoreCase=NONE");
 
-            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getISODateString(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getIsoDateStringWithoutSeconds(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getIsoDateStringWithoutMS(new GregorianCalendar(2010, 0, 1).getTime()) , 1, task.getId());
 
-            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + longDateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateAfter=" + getISODateString(new GregorianCalendar(2013, 4, 1).getTime()), 0);
 
-            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + longDateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getISODateString(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getIsoDateStringWithoutSeconds(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getIsoDateStringWithoutMS(new GregorianCalendar(2010, 0, 1).getTime()), 0);
 
-            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + longDateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 1, task.getId());
+            assertResultsPresentInDataResponse(url + "?dueDateBefore=" + getISODateString(new GregorianCalendar(2013, 4, 1).getTime()), 1, task.getId());
 
             created.set(Calendar.YEAR, 2002);
-            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + longDateFormat.format(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + getISODateString(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" +getIsoDateStringWithoutSeconds(created.getTime()), 1, task1.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" +getIsoDateStringWithoutMS(created.getTime()), 1, task1.getId());
 
             created.set(Calendar.YEAR, 2000);
-            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + longDateFormat.format(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getISODateString(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getIsoDateStringWithoutSeconds(created.getTime()), 3, task1.getId(), task2.getId());
+            assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + getIsoDateStringWithoutMS(created.getTime()), 3, task1.getId(), task2.getId());
 
             // Without tenant id
             assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 2, task.getId(), task1.getId());
@@ -167,6 +178,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         }
     }
 
+    @Test
     public void testQueryTaskByCategory() throws Exception {
         Task t1 = taskService.newTask();
         t1.setName("t1");
@@ -196,7 +208,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         }
     }
 
-
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryTaskInstancesWithCandidateGroup() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
@@ -214,6 +226,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?taskCandidateGroup=test&ignoreTaskAssignee=true", 1, task.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PropagatedStageInstanceId.cmmn" })
     public void testQueryWithPropagatedStageId() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("propagatedStageInstanceId").start();
@@ -254,6 +267,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
@@ -308,6 +322,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
                         + "}");
     }
 
+    @Test
     @CmmnDeployment(resources = {
             "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
             "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
@@ -349,7 +364,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds)
-            throws JsonProcessingException, IOException {
+            throws IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -362,12 +377,11 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         // Check presence of ID's
         if (expectedTaskIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String id = it.next().get("id").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String id = jsonNode.get("id").stringValue();
                 toBeFound.remove(id);
             }
-            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ").isEmpty());
+            assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
         }
     }
 }

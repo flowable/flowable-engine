@@ -35,10 +35,10 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class DmnActivityBehavior extends TaskActivityBehavior {
 
@@ -110,7 +110,8 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage() + " in " + execution);
+            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed in " + execution,
+                    decisionExecutionAuditContainer.getException());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
@@ -140,8 +141,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         }
 
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 processEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
@@ -152,8 +152,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             } else {

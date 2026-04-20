@@ -51,7 +51,7 @@ import io.swagger.annotations.Authorization;
  * @author Christopher Welsch
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
@@ -102,6 +102,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return tasks with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return tasks with one of the given scopeIds.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
@@ -115,7 +116,10 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return tasks which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
             @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return tasks which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
-    })
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'id'.", allowableValues = "id,name,description,dueDate,createTime,priority,executionId,processInstanceId,tenantId,assignee,owner", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),})
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
@@ -308,6 +312,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         if (requestParams.containsKey("scopeId")) {
             request.setScopeId(requestParams.get("scopeId"));
+        }
+
+        if (requestParams.containsKey("scopeIds")) {
+            request.setScopeIds(RequestUtil.parseToSet(requestParams.get("scopeIds")));
         }
         
         if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {

@@ -18,6 +18,7 @@ import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
@@ -27,6 +28,7 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDecisionTables() throws Exception {
 
         try {

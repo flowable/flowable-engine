@@ -69,6 +69,8 @@ import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
@@ -81,6 +83,8 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -154,6 +158,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
      */
     protected boolean jsonVariableTypeTrackObjects = true;
 
+    protected VariableJsonMapper variableJsonMapper;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -253,6 +258,14 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
     public void initMybatisTypeHandlers(Configuration configuration) {
         super.initMybatisTypeHandlers(configuration);
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
+    }
+
+    @Override
+    public void initObjectMapper() {
+        super.initObjectMapper();
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
+        }
     }
 
     public void initExpressionManager() {
@@ -390,8 +403,8 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
                 }
             }
             variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new StringType(getMaxLengthString(), variableLengthVerifier));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableLengthVerifier));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -403,13 +416,15 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new BigDecimalType());
+            variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
-            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -428,6 +443,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setVariableJsonMapper(this.variableJsonMapper);
     }
 
     public void initVariableServiceConfiguration() {
@@ -733,6 +749,17 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     public AppEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    @Override
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    @Override
+    public AppEngineConfiguration setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
         return this;
     }
 

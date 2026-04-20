@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.job;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.delegate.CmmnFault;
 import org.flowable.cmmn.engine.impl.agenda.operation.OperationSerializationMetadata;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
@@ -25,7 +26,7 @@ import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -41,8 +42,7 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        if (variableScope instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+        if (variableScope instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Executing async job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),
@@ -53,20 +53,30 @@ public class AsyncLeaveActivePlanItemInstanceJobHandler implements JobHandler {
             try {
                 JsonNode jsonConfiguration = cmmnEngineConfiguration.getObjectMapper().readTree(configuration);
 
-                String transition = jsonConfiguration.get(OperationSerializationMetadata.OPERATION_TRANSITION).asText();
+                String transition = jsonConfiguration.get(OperationSerializationMetadata.OPERATION_TRANSITION).asString();
                 if (PlanItemTransition.COMPLETE.equals(transition)) {
                     CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
 
                 } else if (PlanItemTransition.EXIT.equals(transition)) {
-                    String exitCriterionId = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_CRITERION_ID).asText(null);
-                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).asText(null);
-                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).asText(null);
+                    String exitCriterionId = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_CRITERION_ID).stringValue(null);
+                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).stringValue(null);
+                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, exitCriterionId, exitType, exitEventType);
 
                 } else if (PlanItemTransition.TERMINATE.equals(transition)) {
-                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).asText(null);
-                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).asText(null);
+                    String exitType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_TYPE).stringValue(null);
+                    String exitEventType = jsonConfiguration.path(OperationSerializationMetadata.FIELD_EXIT_EVENT_TYPE).stringValue(null);
                     CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, exitType, exitEventType);
+
+                } else if (PlanItemTransition.FAULT.equals(transition)) {
+                    String errorCode = jsonConfiguration.path(OperationSerializationMetadata.FIELD_ERROR_CODE).stringValue(null);
+                    if (errorCode != null) {
+                        String errorMessage = jsonConfiguration.path(OperationSerializationMetadata.FIELD_ERROR_MESSAGE).stringValue(null);
+                        CmmnFault reconstructedError = errorMessage != null ? new CmmnFault(errorCode, errorMessage) : new CmmnFault(errorCode);
+                        CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity, reconstructedError);
+                    } else {
+                        CommandContextUtil.getAgenda(commandContext).planFailPlanItemInstanceOperation(planItemInstanceEntity);
+                    }
 
                 } else {
                     throw new FlowableException("Programmatic error: unsupported transition " + transition + " for " + planItemInstanceEntity);

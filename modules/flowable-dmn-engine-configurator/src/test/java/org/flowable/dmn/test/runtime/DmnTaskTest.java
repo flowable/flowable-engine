@@ -13,11 +13,13 @@
 package org.flowable.dmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.engine.DecisionTableVariableManager;
@@ -33,11 +35,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.DoubleNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.DoubleNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Valentin Zickner
@@ -461,10 +463,10 @@ public class DmnTaskTest {
         JsonNode decisionResult = resultNode.get("decision3");
         assertThat(decisionResult).isInstanceOf(ArrayNode.class);
         assertThat(decisionResult.size()).isEqualTo(4);
-        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1000");
-        assertThat(decisionResult.get(1).get("g").asText()).isEqualTo("100");
-        assertThat(decisionResult.get(2).get("g").asText()).isEqualTo("10");
-        assertThat(decisionResult.get(3).get("g").asText()).isEqualTo("1");
+        assertThat(decisionResult.get(0).get("g").asString()).isEqualTo("1000");
+        assertThat(decisionResult.get(1).get("g").asString()).isEqualTo("100");
+        assertThat(decisionResult.get(2).get("g").asString()).isEqualTo("10");
+        assertThat(decisionResult.get(3).get("g").asString()).isEqualTo("1");
     }
 
     @Test
@@ -487,7 +489,7 @@ public class DmnTaskTest {
         JsonNode decisionResult = resultNode.get("decision3");
         assertThat(decisionResult).isInstanceOf(ArrayNode.class);
         assertThat(decisionResult.size()).isEqualTo(1);
-        assertThat(decisionResult.get(0).get("g").asText()).isEqualTo("1");
+        assertThat(decisionResult.get(0).get("g").asString()).isEqualTo("1");
     }
 
     @Test
@@ -567,6 +569,38 @@ public class DmnTaskTest {
         ObjectNode decisionServiceResult = (ObjectNode) decisionServiceResultObject;
         assertThat(decisionServiceResult.size()).isEqualTo(1);
         assertThat(decisionServiceResult.has("decision4")).isTrue();
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/test/runtime/throwingBeanPropertyDecision.dmn" })
+    void beanPropertyExceptionCausePreservedInBpmnDmnTask() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Threshold value cannot be null.");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/bpmn/test/runtime/DmnTaskTest.oneDecisionTaskProcess.bpmn20.xml",
+            "org/flowable/dmn/test/runtime/throwingBeanMethodDecision.dmn" })
+    void beanMethodExceptionCausePreservedInBpmnDmnTask() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneDecisionTaskProcess")
+                .transientVariable("input1", 1)
+                .transientVariable("testBean", new ThrowingTestBean())
+                .start())
+                .isInstanceOf(FlowableException.class)
+                .rootCause()
+                .isInstanceOf(CustomBeanException.class)
+                .hasMessage("Invalid input: test");
     }
 
     protected void executeWithoutArrays(Runnable runnable) {

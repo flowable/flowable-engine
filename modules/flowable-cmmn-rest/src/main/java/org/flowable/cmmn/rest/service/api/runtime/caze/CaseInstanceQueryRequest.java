@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -29,11 +30,13 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 public class CaseInstanceQueryRequest extends PaginateRequest {
 
     private String caseInstanceId;
+    private Set<String> caseInstanceIds;
     private String caseDefinitionId;
     private String caseDefinitionKey;
     private String caseDefinitionKeyLike;
     private String caseDefinitionKeyLikeIgnoreCase;
     private Set<String> caseDefinitionKeys;
+    private Set<String> excludeCaseDefinitionKeys;
     private String caseDefinitionCategory;
     private String caseDefinitionCategoryLike;
     private String caseDefinitionCategoryLikeIgnoreCase;
@@ -59,13 +62,16 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private String caseInstanceState;
     private String involvedUser;
     private String caseInstanceCallbackId;
+    private Set<String> caseInstanceCallbackIds;
     private String caseInstanceCallbackType;
+    private String parentCaseInstanceId;
     private String caseInstanceReferenceId;
     private String caseInstanceReferenceType;
     private String caseInstanceLastReactivatedBy;
     private Date caseInstanceLastReactivatedBefore;
     private Date caseInstanceLastReactivatedAfter;
     private Boolean includeCaseVariables;
+    private Collection<String> includeCaseVariablesNames;
     private List<QueryVariable> variables;
     private String activePlanItemDefinitionId;
     private Set<String> activePlanItemDefinitionIds;
@@ -80,6 +86,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseInstanceId(String caseInstanceId) {
         this.caseInstanceId = caseInstanceId;
+    }
+
+    public Set<String> getCaseInstanceIds() {
+        return caseInstanceIds;
+    }
+
+    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
+        this.caseInstanceIds = caseInstanceIds;
     }
 
     public String getCaseBusinessKey() {
@@ -128,6 +142,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setCaseDefinitionKeys(Set<String> caseDefinitionKeys) {
         this.caseDefinitionKeys = caseDefinitionKeys;
+    }
+
+    public Set<String> getExcludeCaseDefinitionKeys() {
+        return excludeCaseDefinitionKeys;
+    }
+
+    public void setExcludeCaseDefinitionKeys(Set<String> excludeCaseDefinitionKeys) {
+        this.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
     }
 
     public String getCaseDefinitionCategory() {
@@ -330,6 +352,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
         this.caseInstanceCallbackType = caseInstanceCallbackType;
     }
 
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
+    }
+
     public String getCaseInstanceReferenceId() {
         return caseInstanceReferenceId;
     }
@@ -376,6 +406,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setIncludeCaseVariables(Boolean includeCaseVariables) {
         this.includeCaseVariables = includeCaseVariables;
+    }
+
+    public Collection<String> getIncludeCaseVariablesNames() {
+        return includeCaseVariablesNames;
+    }
+
+    public void setIncludeCaseVariablesNames(Collection<String> includeCaseVariablesNames) {
+        this.includeCaseVariablesNames = includeCaseVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
@@ -433,5 +471,13 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
         this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+    }
+
+    public Set<String> getCaseInstanceCallbackIds() {
+        return caseInstanceCallbackIds;
+    }
+
+    public void setCaseInstanceCallbackIds(Set<String> caseInstanceCallbackIds) {
+        this.caseInstanceCallbackIds = caseInstanceCallbackIds;
     }
 }

@@ -15,6 +15,8 @@ package org.flowable.engine.impl.history;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -35,7 +37,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CompositeHistoryManager implements HistoryManager {
 
-    protected final Collection<HistoryManager> historyManagers;
+    protected final List<HistoryManager> historyManagers;
 
     public CompositeHistoryManager(Collection<HistoryManager> historyManagers) {
         this.historyManagers = new ArrayList<>(historyManagers);
@@ -86,9 +88,9 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime) {
+    public void recordProcessInstanceEnd(ExecutionEntity processInstance, String state, String deleteReason, String activityId, Date endTime) {
         for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceEnd(processInstance, deleteReason, activityId, endTime);
+            historyManager.recordProcessInstanceEnd(processInstance, state, deleteReason, activityId, endTime);
         }
     }
 
@@ -108,22 +110,34 @@ public class CompositeHistoryManager implements HistoryManager {
 
     @Override
     public void recordProcessInstanceDeleted(String processInstanceId, String processDefinitionId, String processTenantId) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordProcessInstanceDeleted(processInstanceId, processDefinitionId, processTenantId);
         }
     }
 
     @Override
     public void recordDeleteHistoricProcessInstancesByProcessDefinitionId(String processDefinitionId) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordDeleteHistoricProcessInstancesByProcessDefinitionId(processDefinitionId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordDeleteHistoricProcessInstancesByProcessDefinitionId(processDefinitionId);
         }
     }
 
     @Override
     public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordBulkDeleteProcessInstances(processInstanceIds);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordBulkDeleteProcessInstances(processInstanceIds);
         }
     }
 
@@ -183,8 +197,12 @@ public class CompositeHistoryManager implements HistoryManager {
 
     @Override
     public void recordHistoricTaskDeleted(HistoricTaskInstance task){
-        for (HistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricTaskDeleted(task);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<HistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricTaskDeleted(task);
         }
     }
 
@@ -289,6 +307,13 @@ public class CompositeHistoryManager implements HistoryManager {
     }
 
     @Override
+    public void recordIdentityLinkCreated(ExecutionEntity processInstance, IdentityLinkEntity identityLink) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.recordIdentityLinkCreated(processInstance,identityLink);
+        }
+    }
+
+    @Override
     public void recordIdentityLinkDeleted(IdentityLinkEntity identityLink) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.recordIdentityLinkDeleted(identityLink);
@@ -320,6 +345,20 @@ public class CompositeHistoryManager implements HistoryManager {
     public void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance) {
         for (HistoryManager historyManager : historyManagers) {
             historyManager.updateProcessBusinessStatusInHistory(processInstance);
+        }
+    }
+    
+    @Override
+    public void updateProcessDueDateInHistory(ExecutionEntity processInstance) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.updateProcessDueDateInHistory(processInstance);
+        }
+    }
+
+    @Override
+    public void updateProcessClaimTimeInHistory(ExecutionEntity processInstance) {
+        for (HistoryManager historyManager : historyManagers) {
+            historyManager.updateProcessClaimTimeInHistory(processInstance);
         }
     }
 

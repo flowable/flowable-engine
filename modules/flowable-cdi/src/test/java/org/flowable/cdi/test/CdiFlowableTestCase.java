@@ -32,15 +32,14 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +48,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Daniel Meyer
  */
-@RunWith(Arquillian.class)
+@ExtendWith(FlowableCdiExtension.class)
+@ArquillianTest
+@RunAsClient
 public abstract class CdiFlowableTestCase {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CdiFlowableTestCase.class);
@@ -59,9 +60,6 @@ public abstract class CdiFlowableTestCase {
 
         return ShrinkWrap.create(JavaArchive.class).addPackages(true, "org.flowable.cdi").addAsManifestResource("META-INF/beans.xml", "beans.xml");
     }
-
-    @Rule
-    public FlowableRule flowableRule = new FlowableRule(getBeanInstance(ProcessEngine.class));
 
     protected BeanManager beanManager;
 
@@ -75,13 +73,12 @@ public abstract class CdiFlowableTestCase {
     protected TaskService taskService;
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
         processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
         processEngineConfiguration = ((ProcessEngineImpl) ProcessEngineLookupForTestsuite.processEngine).getProcessEngineConfiguration();
-        flowableRule.setProcessEngineConfiguration(processEngineConfiguration);
         formService = processEngine.getFormService();
         historyService = processEngine.getHistoryService();
         identityService = processEngine.getIdentityService();

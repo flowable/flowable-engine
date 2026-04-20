@@ -12,12 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.el;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.VariableContainerELResolver;
 import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.task.api.TaskInfo;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -40,16 +44,30 @@ public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
                 context.setPropertyResolved(true);
                 return variableContainer;
 
-            } else if ((CASE_INSTANCE_KEY.equals(property) && variableContainer instanceof PlanItemInstanceEntity)) {
-                context.setPropertyResolved(true);
-                String caseInstanceId = ((PlanItemInstanceEntity) variableContainer).getCaseInstanceId();
-                return CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
-
-            } else if (PLAN_ITEM_INSTANCE_KEY.equals(property) && variableContainer instanceof CaseInstanceEntity) {
-                // Special case: using planItemInstance as key, but only a caseInstance available
-                // (Happens for example for cross boundary plan items)
-                context.setPropertyResolved(true);
-                return variableContainer;
+            } else if ((CASE_INSTANCE_KEY.equals(property))) {
+                if (variableContainer instanceof PlanItemInstance planItemInstance) {
+                    context.setPropertyResolved(true);
+                    String caseInstanceId = planItemInstance.getCaseInstanceId();
+                    return CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
+                } else if (variableContainer instanceof TaskInfo task) {
+                    if (StringUtils.isNotEmpty(task.getScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
+                        context.setPropertyResolved(true);
+                        String caseInstanceId = task.getScopeId();
+                        return CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
+                    }
+                }
+            } else if (PLAN_ITEM_INSTANCE_KEY.equals(property)) {
+                if (variableContainer instanceof CaseInstanceEntity) {
+                    // Special case: using planItemInstance as key, but only a caseInstance available
+                    // (Happens for example for cross boundary plan items)
+                    context.setPropertyResolved(true);
+                    return variableContainer;
+                } else if (variableContainer instanceof TaskInfo task) {
+                    if (StringUtils.isNotEmpty(task.getSubScopeId()) && ScopeTypes.CMMN.equals(task.getScopeType())) {
+                        context.setPropertyResolved(true);
+                        return CommandContextUtil.getPlanItemInstanceEntityManager().findById(task.getSubScopeId());
+                    }
+                }
 
             } else if (PLAN_ITEM_INSTANCES_KEY.equals(property)) {
                 context.setPropertyResolved(true);

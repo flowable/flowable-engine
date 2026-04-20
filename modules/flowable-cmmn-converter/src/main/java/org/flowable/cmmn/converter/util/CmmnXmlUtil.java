@@ -77,11 +77,18 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
                 if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-                    extensionElement.setElementText(xtr.getText().trim());
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
                 }
+                
             } else if (xtr.isStartElement()) {
                 ExtensionElement childExtensionElement = parseExtensionElement(xtr);
                 extensionElement.addChildElement(childExtensionElement);
+                
             } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
                 readyWithExtensionElement = true;
             }
@@ -338,11 +345,17 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION, ioParameter.getSourceExpression());
             }
+            if (StringUtils.isNotEmpty(ioParameter.getSourceType())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getSourceType());
+            }
             if (StringUtils.isNotEmpty(ioParameter.getTarget())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget());
             }
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
                 xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION, ioParameter.getTargetExpression());
+            }
+            if (StringUtils.isNotEmpty(ioParameter.getTargetType())) {
+                xtw.writeAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getTargetType());
             }
 
             xtw.writeEndElement();

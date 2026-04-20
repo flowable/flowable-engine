@@ -31,6 +31,7 @@ public class ExecuteDecisionContext {
     protected String tenantId;
     protected boolean fallbackToDefaultTenant;
     protected boolean forceDMN11;
+    protected boolean disableHistory;
     protected DmnElement dmnElement;
     protected DecisionExecutionAuditContainer decisionExecution;
 
@@ -111,6 +112,12 @@ public class ExecuteDecisionContext {
     }
     public void setForceDMN11(boolean forceDMN11) {
         this.forceDMN11 = forceDMN11;
+    }
+    public boolean isDisableHistory() {
+        return disableHistory;
+    }
+    public void setDisableHistory(boolean disableHistory) {
+        this.disableHistory = disableHistory;
     }
     public DmnElement getDmnElement() {
         return dmnElement;

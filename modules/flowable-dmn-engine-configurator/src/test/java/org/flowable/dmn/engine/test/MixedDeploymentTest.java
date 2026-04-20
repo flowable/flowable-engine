@@ -28,11 +28,12 @@ import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.dmn.engine.FlowableDmnExpressionException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
@@ -98,7 +99,15 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         try {
             assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("oneDecisionTaskProcess"))
                     .isInstanceOf(Exception.class)
-                    .hasMessageContaining("Unknown property used in expression: #{inputVariable1");
+                    .hasMessageContaining("execution failed")
+                    .cause()
+                    .isInstanceOf(FlowableDmnExpressionException.class)
+                    .hasMessage("error while executing input entry")
+                    .cause()
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessageContaining("Unknown property used in expression: #{inputVariable1 == 1}")
+                    .rootCause()
+                    .hasMessageContaining("Cannot resolve identifier 'inputVariable1'");
         } finally {
             deleteAllDmnDeployments();
         }
@@ -504,7 +513,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
 
 
     protected void deleteAllDmnDeployments() {
-        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) flowableRule.getProcessEngine().getProcessEngineConfiguration().getEngineConfigurations()
+        DmnEngineConfiguration dmnEngineConfiguration = (DmnEngineConfiguration) processEngineConfiguration.getEngineConfigurations()
             .get(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
         dmnEngineConfiguration.getDmnRepositoryService().createDeploymentQuery().list().stream()
         .forEach(

@@ -19,8 +19,8 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -49,19 +49,15 @@ import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -70,10 +66,8 @@ import net.javacrumbs.jsonunit.core.Option;
  *
  * @author Frederik Heremans
  */
+@MockitoSettings
 public class TaskResourceTest extends BaseSpringRestTestCase {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -84,13 +78,13 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Mock
     protected FormRepositoryService formRepositoryService;
 
-    @Before
+    @BeforeEach
     public void initializeMocks() {
         Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void resetMocks() {
         processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
@@ -134,8 +128,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + "processInstanceUrl: '" + buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
                         + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
                         + "url: '" + url + "',"
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                        + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                        + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                        + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                         + "}");
 
         // Set tenant on deployment
@@ -145,7 +139,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(responseNode.get("tenantId").asText()).isEqualTo("myTenant");
+        assertThat(responseNode.get("tenantId").asString()).isEqualTo("myTenant");
     }
 
     /**
@@ -194,8 +188,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + "processDefinitionId: null,"
                             + "url: '" + url + "',"
                             + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "',"
-                            + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                            + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                             + "}");
 
         } finally {
@@ -270,8 +264,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            Instant dueDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            String dueDateString = getISODateString(Date.from(dueDate));
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
@@ -294,7 +288,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
@@ -712,6 +706,43 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    public void testUnclaimTask() throws Exception {
+        try {
+            Task task = taskService.newTask();
+            taskService.saveTask(task);
+            String taskId = task.getId();
+
+            // Claim the task first
+            taskService.claim(taskId, "kermit");
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task.getAssignee()).isEqualTo("kermit");
+
+            // Unclaim the task
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            requestNode.put("action", "unclaim");
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getAssignee()).isNull();
+
+        } finally {
+            List<Task> tasks = taskService.createTaskQuery().list();
+            for (Task task : tasks) {
+                taskService.deleteTask(task.getId(), true);
+            }
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
+            for (HistoricTaskInstance task : historicTasks) {
+                historyService.deleteHistoricTaskInstance(task.getId());
+            }
+        }
+    }
+
+    @Test
     @Deployment
     public void testReclaimTask() throws Exception {
 
@@ -735,7 +766,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
 
-        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
+        String taskId = ((ArrayNode) dataNode).get(0).get("id").asString();
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));

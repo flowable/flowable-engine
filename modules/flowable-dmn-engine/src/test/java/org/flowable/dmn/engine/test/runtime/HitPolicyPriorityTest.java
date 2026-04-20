@@ -19,25 +19,18 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyPriorityTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyPriorityTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void priorityHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -50,10 +43,21 @@ public class HitPolicyPriorityTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyPriorityTest.priorityHitPolicy.dmn")
+    public void priorityHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .executeWithSingleResult();
+
+        assertThat(result).isNull();
+    }
+
+    @Test
     @DmnDeployment
     public void priorityHitPolicyCompound() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -71,8 +75,6 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment
     public void priorityHitPolicyCompoundFirstOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -90,8 +92,6 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment
     public void priorityHitPolicyCompoundSecondOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -109,8 +109,6 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment
     public void priorityHitPolicyCompoundNoOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -127,7 +125,6 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment
     public void priorityHitPolicyCompoundNoOutputValuesStrictModeDisabled() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
@@ -156,8 +153,6 @@ public class HitPolicyPriorityTest {
     @Test
     @DmnDeployment
     public void priorityHitPolicyTypeConversion() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()

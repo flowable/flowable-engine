@@ -64,8 +64,7 @@ public class FlowableJobEventBuilder {
     protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
         if (event instanceof FlowableEntityEvent) {
             Object persistedObject = ((FlowableEntityEvent) event).getEntity();
-            if (persistedObject instanceof Job) {
-                Job jobObject = (Job) persistedObject;
+            if (persistedObject instanceof Job jobObject) {
                 if (jobObject.getScopeType() == null) {
                     event.setExecutionId(jobObject.getExecutionId());
                     event.setProcessInstanceId(jobObject.getProcessInstanceId());

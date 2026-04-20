@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricDetailDataResource extends HistoricDetailBaseResource {
 
     @Autowired

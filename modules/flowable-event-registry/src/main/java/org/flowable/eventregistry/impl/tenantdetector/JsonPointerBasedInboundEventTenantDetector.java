@@ -16,8 +16,8 @@ import org.flowable.eventregistry.api.InboundEventTenantDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonPointer;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.core.JsonPointer;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -44,8 +44,8 @@ public class JsonPointerBasedInboundEventTenantDetector implements InboundEventT
             return null;
         }
 
-        if (result.isTextual()) {
-            return result.asText();
+        if (result.isString()) {
+            return result.asString();
         }
 
         return null;

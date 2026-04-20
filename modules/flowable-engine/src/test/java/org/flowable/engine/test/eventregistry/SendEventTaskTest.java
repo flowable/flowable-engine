@@ -16,6 +16,7 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,9 +43,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
@@ -188,6 +189,42 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/engine/test/eventregistry/SendEventTaskTest.testReceiveAndSendEvent.bpmn20.xml",
+            "org/flowable/engine/test/eventregistry/SendEventTaskTest.testSendEventOnSystemChannel.bpmn20.xml" })
+    public void testSendAsyncAndReceiveOnSystemChannelAndSendAsyncAgain() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("sendAndReceiveProcess");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        taskService.complete(task.getId());
+
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+        assertThat(job.getElementId()).isEqualTo("sendEventTask");
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+        managementService.executeJob(job.getId());
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+        // Second send event task should also be handled async
+        job = managementService.createJobQuery().processInstanceId(processInstance2.getId()).singleResult();
+        assertThat(job).isNotNull();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+        assertThat(job.getElementId()).isEqualTo("sendEventTask2");
+
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(2);
+    }
+
+    @Test
     @Deployment
     public void testSendEventSynchronously() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
@@ -287,6 +324,34 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
     
     @Test
     @Deployment
+    public void testSendEventSkipExpression() throws Exception {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
+        variables.put("skipExpression", true);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variables);
+        
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(job).isNull();
+
+        assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Test
+    @Deployment
     public void testTriggerableSendEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
         
@@ -319,7 +384,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   eventProperty: 'test'"
                         + " }");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -349,7 +414,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -387,9 +452,9 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
         JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("eventProperty").asText()).isEqualTo("test");
+        assertThat(jsonNode.get("eventProperty").asString()).isEqualTo("test");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();
@@ -444,7 +509,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + "   eventProperty: 'test'"
                         + " }");
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
 
         InboundChannelModel inboundChannel = (InboundChannelModel) getEventRepositoryService().getChannelModelByKey("test-channel");
         ObjectNode json = objectMapper.createObjectNode();

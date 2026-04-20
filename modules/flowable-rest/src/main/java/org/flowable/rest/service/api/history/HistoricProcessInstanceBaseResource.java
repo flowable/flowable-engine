@@ -94,6 +94,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionKeyLikeIgnoreCase() != null) {
             query.processDefinitionKeyLikeIgnoreCase(queryRequest.getProcessDefinitionKeyLikeIgnoreCase());
         }
+        if (queryRequest.getProcessDefinitionKeys() != null) {
+            query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeys());
+        }
+        if (queryRequest.getExcludeProcessDefinitionKeys() != null) {
+            query.excludeProcessDefinitionKeys(queryRequest.getExcludeProcessDefinitionKeys());
+        }
         if (queryRequest.getProcessDefinitionKeyIn() != null) {
             query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeyIn());
         }
@@ -184,6 +190,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }
+        if (queryRequest.getFinishedBy() != null) {
+            query.finishedBy(queryRequest.getFinishedBy());
+        }
+        if (queryRequest.getState() != null) {
+            query.state(queryRequest.getState());
+        }
         if (queryRequest.getFinished() != null) {
             if (queryRequest.getFinished()) {
                 query.finished();
@@ -196,6 +208,9 @@ public class HistoricProcessInstanceBaseResource {
                 query.includeProcessVariables();
             }
         }
+        if (queryRequest.getIncludeProcessVariablesNames() != null) {
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames());
+        }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
         }
@@ -203,11 +218,20 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getCallbackId() != null) {
             query.processInstanceCallbackId(queryRequest.getCallbackId());
         }
+
+        if (queryRequest.getCallbackIds() != null && !queryRequest.getCallbackIds().isEmpty()) {
+            query.processInstanceCallbackIds(queryRequest.getCallbackIds());
+        }
+
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
         }
         if (Boolean.TRUE.equals(queryRequest.getWithoutCallbackId())) {
             query.withoutProcessInstanceCallbackId();
+        }
+        
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
         }
         
         if (queryRequest.getTenantId() != null) {

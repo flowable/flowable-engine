@@ -14,9 +14,8 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class ParallelMultiInstanceAsyncTest extends PluggableFlowableTestCase {
 
@@ -33,8 +32,7 @@ public class ParallelMultiInstanceAsyncTest extends PluggableFlowableTestCase {
                 .deploy();
 
         Map<String, Object> variables = new HashMap<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = processEngineConfiguration.getObjectMapper().createArrayNode();
         for (int i = 0; i < 10; i++) {
             ObjectNode varNode = arrayNode.addObject();
             varNode.put("value", i + "");

@@ -33,5 +33,5 @@ public interface TreeBuilder extends Serializable {
 	 * @return tree corresponding to the given expression
 	 * @throws ELException on parse error
 	 */
-	public Tree build(String expression) throws TreeBuilderException;
+    Tree build(String expression) throws TreeBuilderException;
 }

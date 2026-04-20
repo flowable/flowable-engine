@@ -30,6 +30,8 @@
             </list>
         </property>
 
+        <property name="databaseSchemaUpdate" value="drop-create" />
+
         <property name="customHitPolicyBehaviors" ref="customHitPolicyBehaviors"/>
     </bean>
 

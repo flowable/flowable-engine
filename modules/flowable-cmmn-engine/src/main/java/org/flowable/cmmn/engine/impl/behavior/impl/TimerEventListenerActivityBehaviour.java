@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
@@ -40,15 +41,16 @@ import org.flowable.common.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.common.engine.impl.runtime.Clock;
+import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN Timer Event Listener.
@@ -74,7 +76,12 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
                 || PlanItemTransition.TERMINATE.equals(transition)
                 || PlanItemTransition.EXIT.equals(transition)) {
             
-            removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+            if (PlanItemInstanceState.SUSPENDED.equals(planItemInstance.getState())) {
+                removeSuspendedJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+                
+            } else {
+                removeTimerJob(commandContext, (PlanItemInstanceEntity) planItemInstance);
+            }
         }
     }
     
@@ -102,12 +109,13 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
             if (timerValue instanceof Date) {
                 timerDueDate = (Date) timerValue;
 
-            } else if (timerValue instanceof DateTime) {
-                DateTime timerDateTime = (DateTime) timerValue;
+            } else if (timerValue instanceof DateTime timerDateTime) {
+                JodaDeprecationLogger.LOGGER.warn(
+                        "Using Joda-Time DateTime has been deprecated and will be removed in a future version. Timer event listener expression {} in {} resolved to a Joda-Time DateTime. ",
+                        timerEventListener.getTimerExpression(), planItemInstance);
                 timerDueDate = timerDateTime.toDate();
 
-            } else if (timerValue instanceof String) {
-                String timerString = (String) timerValue;
+            } else if (timerValue instanceof String timerString) {
 
                 BusinessCalendarManager businessCalendarManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager();
                 if (isDurationString(timerString)) {
@@ -121,7 +129,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
 
                     // Try to parse as ISO8601 first
                     try {
-                        timerDueDate = DateTime.parse(timerString).toDate();
+                        timerDueDate = DateUtil.parseDate(timerString);
                     } catch (Exception e) { }
 
                     // Try to parse as cron expression
@@ -214,9 +222,18 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     protected void removeTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         TimerJobEntityManager timerJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getTimerJobEntityManager();
         List<TimerJobEntity> timerJobsEntities = timerJobEntityManager
-            .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
+                .findJobsByScopeIdAndSubScopeId(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId());
         for (TimerJobEntity timerJobEntity : timerJobsEntities) {
             timerJobEntityManager.delete(timerJobEntity);
+        }
+    }
+    
+    protected void removeSuspendedJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        SuspendedJobEntityManager suspendedJobEntityManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration().getSuspendedJobEntityManager();
+        List<SuspendedJobEntity> suspendedJobsEntities = suspendedJobEntityManager
+                .findJobsBySubScopeId(planItemInstanceEntity.getId());
+        for (SuspendedJobEntity suspendedJobEntity : suspendedJobsEntities) {
+            suspendedJobEntityManager.delete(suspendedJobEntity);
         }
     }
 
@@ -236,8 +253,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     
     public String prepareRepeat(String dueDate, Clock clock) {
         if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
-            DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-            return dueDate.replace("/", "/" + fmt.print(new DateTime(clock.getCurrentTime(),DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
+            return dueDate.replace("/", "/" + clock.getCurrentTime().toInstant().toString() + "/");
         }
         return dueDate;
     }

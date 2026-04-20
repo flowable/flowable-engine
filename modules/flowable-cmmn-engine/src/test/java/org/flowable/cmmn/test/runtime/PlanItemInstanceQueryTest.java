@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -30,10 +31,10 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -42,7 +43,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
     protected String caseDefinitionId;
 
-    @Before
+    @BeforeEach
     public void deployCaseDefinition() {
         String deploymentId = addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceQueryTest.testPlanItemInstanceQuery.cmmn")
@@ -77,6 +78,24 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                     .list()).hasSize(4);
         }
     }
+
+    @Test
+    public void testByCaseInstanceIds() {
+        List<String> caseInstanceIds = startInstances(3);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceIds(Set.of(caseInstanceIds.get(0), caseInstanceIds.get(1), "someId")).list()).extracting(PlanItemInstance::getCaseInstanceId, PlanItemInstance::getElementId).containsExactlyInAnyOrder(
+                tuple(caseInstanceIds.get(0), "planItem1"),
+                tuple(caseInstanceIds.get(0), "planItem2"),
+                tuple(caseInstanceIds.get(0), "planItem3"),
+                tuple(caseInstanceIds.get(0), "planItem7"),
+                tuple(caseInstanceIds.get(1), "planItem1"),
+                tuple(caseInstanceIds.get(1), "planItem2"),
+                tuple(caseInstanceIds.get(1), "planItem3"),
+                tuple(caseInstanceIds.get(1), "planItem7")
+
+        );
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().or().caseDefinitionId("undefinedId").caseInstanceIds(Set.of(caseInstanceIds.get(0), caseInstanceIds.get(1), "someId")).endOr().list()).hasSize(8);
+    }
+
 
     @Test
     public void testByStageInstanceId() {
@@ -756,6 +775,66 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
                 .or().caseInstanceId("undefinedId").planItemInstanceLastStartedBefore(new Date(now.getTime() - 1000)).endOr()
                 .list()).isEmpty();
+
+    }
+
+    @Test
+    public void testByAssignee() {
+        startInstances(2);
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .list();
+        assertThat(planItemInstances).hasSize(4);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+        }
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(2);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceAssignee("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
+
+    }
+
+    @Test
+    public void testByCompletedBy() {
+        startInstances(3);
+
+        List<Task> tasks = cmmnTaskService.createTaskQuery().list();
+        for (Task task : tasks) {
+            cmmnTaskService.setAssignee(task.getId(), "gonzo");
+            cmmnTaskService.complete(task.getId(), "kermit");
+        }
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .includeEnded()
+                .planItemInstanceAssignee("gonzo")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .includeEnded()
+                .planItemInstanceCompletedBy("kermit")
+                .list();
+        assertThat(planItemInstances).hasSize(3);
+
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceCompletedBy("johnDoe")
+                .list();
+        assertThat(planItemInstances).hasSize(0);
 
     }
 
@@ -1547,7 +1626,7 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
     public void testIncludeLocalVariables() {
         CaseInstance caseWithStringValue = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testPlanItemInstanceQuery")
-                .variable("caseVar","caseVarValur")
+                .variable("caseVar", "caseVarValur")
                 .name("With string value")
                 .start();
 

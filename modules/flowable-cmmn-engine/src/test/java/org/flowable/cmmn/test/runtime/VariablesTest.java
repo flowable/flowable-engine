@@ -16,8 +16,12 @@ import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,8 +44,8 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -56,7 +60,7 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -198,6 +202,52 @@ public class VariablesTest extends FlowableCmmnTestCase {
                         entry("stringVar", "Changed value"),
                         entry("doubleVar", 12.6)
                 );
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testBigDecimalVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("testDecimal", new BigDecimal(65.67))
+                .start();
+
+        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertThat(variablesFromGet).containsKey("testDecimal");
+        assertThat(variablesFromGet.get("testDecimal")).isEqualTo(new BigDecimal(65.67));
+
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertThat(variableInstancesFromGet).containsKey("testDecimal");
+        VariableInstance variableInstance = variableInstancesFromGet.get("testDecimal");
+        assertThat(variableInstance.getValue()).isEqualTo(new BigDecimal(65.67));
+        assertThat(variableInstance.getTypeName()).isEqualTo("bigdecimal");
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "testDecimal", new BigDecimal(145.3333));
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "testDecimal")).isEqualTo(new BigDecimal(145.3333));
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testBigIntegerVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("testInteger", new BigInteger("65"))
+                .start();
+
+        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
+        assertThat(variablesFromGet).containsKey("testInteger");
+        assertThat(variablesFromGet.get("testInteger")).isEqualTo(new BigInteger("65"));
+
+        Map<String, VariableInstance> variableInstancesFromGet = cmmnRuntimeService.getVariableInstances(caseInstance.getId());
+        assertThat(variableInstancesFromGet).containsKey("testInteger");
+        VariableInstance variableInstance = variableInstancesFromGet.get("testInteger");
+        assertThat(variableInstance.getValue()).isEqualTo(new BigInteger("65"));
+        assertThat(variableInstance.getTypeName()).isEqualTo("biginteger");
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "testInteger", new BigInteger("145"));
+        
+        assertThat(cmmnRuntimeService.getVariable(caseInstance.getId(), "testInteger")).isEqualTo(new BigInteger("145"));
     }
 
     @Test
@@ -355,6 +405,38 @@ public class VariablesTest extends FlowableCmmnTestCase {
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult()).isNull();
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult()).isNotNull();
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
+    public void testVariableInstanceQueryByCaseInstanceIds() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test2")
+                .start();
+
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test3")
+                .start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            Set<String> ids = new HashSet<>();
+            ids.add(caseInstance1.getId());
+            ids.add(caseInstance3.getId());
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceIds(ids).count()).isEqualTo(2);
+            assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceIds(ids).list())
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("myVar", "test1"),
+                            tuple("myVar", "test3")
+                    );
         }
     }
 
@@ -781,7 +863,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
 
@@ -802,7 +884,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
 

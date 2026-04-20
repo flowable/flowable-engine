@@ -27,7 +27,6 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
@@ -38,11 +37,10 @@ import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -85,10 +83,10 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + timerJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(timerJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(timerJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB, timerJob.getId()));
 
         // Set tenant on deployment
@@ -141,10 +139,10 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + suspendedJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(suspendedJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(suspendedJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_SUSPENDED_JOB, suspendedJob.getId()));
 
         // Set tenant on deployment
@@ -197,10 +195,10 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + deadLetterJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(deadLetterJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(deadLetterJob.getDuedate()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB, deadLetterJob.getId()));
 
         // Set tenant on deployment
@@ -271,12 +269,12 @@ public class JobResourceTest extends BaseSpringRestTestCase {
                         + "elementName: 'Escalation',"
                         + "handlerType: 'trigger-timer',"
                         + "retries: " + lockedJob.getRetries() + ","
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(lockedJob.getDuedate())) + ","
+                        + "dueDate: '" + getISODateString(lockedJob.getDuedate()) + "',"
                         + "lockOwner: 'test',"
-                        + "lockExpirationTime: " + new TextNode(getISODateStringWithTZ(lockedJob.getLockExpirationTime())) + ","
+                        + "lockExpirationTime: '" + getISODateString(lockedJob.getLockExpirationTime()) + "',"
                         + "tenantId: ''"
                         + "}");
-        assertThat(responseNode.path("url").asText(null))
+        assertThat(responseNode.path("url").stringValue(null))
                 .endsWith(RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB, lockedJob.getId()));
     }
 

@@ -72,6 +72,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -150,6 +151,38 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         } finally {
             this.taskService.deleteTask(parentTask.getId(), true);
         }
+    }
+
+    @Test
+    public void testTaskIdentityLinkCountWithDeletionOfSameLink() {
+        task = taskService.createTaskBuilder().
+                name("testName").
+                identityLinks(getDefaultIdentityLinks()).
+                create();
+
+        TaskEntityImpl updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(2);
+
+        processEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    taskService.deleteUserIdentityLink(task.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+                    taskService.deleteUserIdentityLink(task.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(1);
+
+        processEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    taskService.deleteGroupIdentityLink(task.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+                    taskService.deleteGroupIdentityLink(task.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(0);
+
     }
 
     @Test

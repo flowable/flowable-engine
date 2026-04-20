@@ -13,6 +13,7 @@
 package org.flowable.dmn.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.converter.child.OutputValuesParser;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 public class OutputValuesParserTest {
@@ -74,7 +74,8 @@ public class OutputValuesParserTest {
 
     @Test
     void outputValuesParsingRegressionStackOverflow() {
-        Assert.assertThrows(StackOverflowError.class, () -> splitAndFormatInputOutputValues(LONG_LIST_OUTPUT_VALUES));
+        assertThatThrownBy(() -> splitAndFormatInputOutputValues(LONG_LIST_OUTPUT_VALUES))
+                .isInstanceOf(StackOverflowError.class);
     }
 
     @Test

@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Groups" }, authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipResource extends BaseGroupResource {
 
     @ApiOperation(value = "Delete a member from a group", tags = { "Groups" }, code = 204)

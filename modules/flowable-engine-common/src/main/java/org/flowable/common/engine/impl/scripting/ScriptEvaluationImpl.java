@@ -12,24 +12,22 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
-import javax.script.Bindings;
-
 /**
  * @author Filip Hrisafov
  */
 public class ScriptEvaluationImpl implements ScriptEvaluation {
 
-    protected final Bindings bindings;
+    protected final Resolver resolver;
     protected final Object result;
 
-    public ScriptEvaluationImpl(Bindings bindings, Object result) {
-        this.bindings = bindings;
+    public ScriptEvaluationImpl(Resolver resolver, Object result) {
+        this.resolver = resolver;
         this.result = result;
     }
 
     @Override
     public Object getEvaluationAttribute(String key) {
-        return bindings.get(key);
+        return resolver.get(key);
     }
 
     @Override

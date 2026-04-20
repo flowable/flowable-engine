@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instance Variables" }, description = "Manage Case Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceVariableDataResource extends BaseVariableResource {
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Case Instance Variables" }, nickname = "getCaseInstanceVariableData")

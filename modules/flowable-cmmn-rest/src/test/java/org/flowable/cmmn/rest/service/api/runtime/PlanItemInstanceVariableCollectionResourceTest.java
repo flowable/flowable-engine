@@ -34,10 +34,12 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.job.api.Job;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -48,6 +50,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class PlanItemInstanceVariableCollectionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testCreatePlanItemInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -81,6 +84,7 @@ public class PlanItemInstanceVariableCollectionResourceTest extends BaseSpringRe
         assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testPlanItemInstanceNotFound() throws Exception {
 
@@ -96,6 +100,7 @@ public class PlanItemInstanceVariableCollectionResourceTest extends BaseSpringRe
         executeRequest(postRequest, HttpStatus.SC_NOT_FOUND);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testCreateBinaryPlanItemInstanceVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase")
@@ -136,6 +141,39 @@ public class PlanItemInstanceVariableCollectionResourceTest extends BaseSpringRe
         Object variableValue = runtimeService.getLocalVariable(planItem.getId(), "binaryVariable");
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
+    }
+    
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testCreatePlanItemInstanceVariableAsync() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
+
+        List<PlanItemInstance> planItems = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItems).hasSize(1);
+        PlanItemInstance planItem = planItems.get(0);
+
+        String url = buildUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLES_ASYNC, planItem.getId());
+        ArrayNode requestNode = objectMapper.createArrayNode();
+        ObjectNode body = requestNode.addObject();
+
+        body.put("name", "testLocalVar");
+        body.put("value", "newTestValue");
+        body.put("type", "string");
+
+        HttpPost postRequest = new HttpPost(url);
+        postRequest.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(postRequest, HttpStatus.SC_CREATED);
+        closeResponse(response);
+        
+        assertThat(runtimeService.hasLocalVariable(planItem.getId(), "testLocalVar")).isFalse();
+        
+        Job job = managementService.createJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(job).isNotNull();
+        
+        managementService.executeJob(job.getId());
+        
+        // Check resulting instance
+        assertThat(runtimeService.getLocalVariable(planItem.getId(), "testLocalVar")).isEqualTo("newTestValue");
     }
 }
 

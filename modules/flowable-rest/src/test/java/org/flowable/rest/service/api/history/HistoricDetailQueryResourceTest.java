@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -30,11 +29,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic detail query resource.
@@ -99,13 +97,12 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         boolean byteVarFound = false;
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            JsonNode variableNode = it.next().get("variable");
-            String name = variableNode.get("name").textValue();
+        for (JsonNode jsonNode : dataNode) {
+            JsonNode variableNode = jsonNode.get("variable");
+            String name = variableNode.get("name").stringValue();
             if ("byteVar".equals(name)) {
                 byteVarFound = true;
-                String valueUrl = variableNode.get("valueUrl").textValue();
+                String valueUrl = variableNode.get("valueUrl").stringValue();
                 response = executeRequest(new HttpGet(valueUrl), 200);
                 assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
                 byte[] varInput = IOUtils.toByteArray(response.getEntity().getContent());
@@ -117,7 +114,7 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
         assertThat(byteVarFound).isTrue();
     }
 
-    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String variableName, Object variableValue) throws IOException {
 
         // Do the actual call
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
@@ -133,10 +130,9 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode variableNode = it.next().get("variable");
-                String name = variableNode.get("name").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                JsonNode variableNode = jsonNode.get("variable");
+                String name = variableNode.get("name").stringValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -144,7 +140,7 @@ public class HistoricDetailQueryResourceTest extends BaseSpringRestTestCase {
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

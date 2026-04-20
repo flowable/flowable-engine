@@ -13,7 +13,9 @@
 
 package org.flowable.engine.impl;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -31,12 +33,15 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     private static final long serialVersionUID = 1L;
     protected String activityInstanceId;
     protected String processInstanceId;
+    protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String executionId;
     protected String processDefinitionId;
     protected String activityId;
     protected String activityName;
     protected String activityType;
     protected String assignee;
+    protected String completedBy;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -73,6 +78,18 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     }
 
     @Override
+    public ActivityInstanceQuery processInstanceIds(Set<String> processInstanceIds) {
+        if (processInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is null");
+        }
+        if (processInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of process instance ids is empty");
+        }
+        this.processInstanceIds = processInstanceIds;
+        return this;
+    }
+
+    @Override
     public ActivityInstanceQueryImpl executionId(String executionId) {
         this.executionId = executionId;
         return this;
@@ -105,6 +122,12 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
     @Override
     public ActivityInstanceQueryImpl taskAssignee(String assignee) {
         this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public ActivityInstanceQuery taskCompletedBy(String userId) {
+        this.completedBy = userId;
         return this;
     }
 
@@ -276,6 +299,10 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
         return assignee;
     }
 
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
     public boolean isFinished() {
         return finished;
     }
@@ -294,5 +321,17 @@ public class ActivityInstanceQueryImpl extends AbstractQuery<ActivityInstanceQue
 
     public String getDeleteReasonLike() {
         return deleteReasonLike;
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getProcessInstanceIds() {
+        return processInstanceIds;
     }
 }

@@ -23,8 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
  * @author Joram Barrez
  * @author Josh Long
  */
-@ExtendWith(InternalFlowableSpringExtension.class)
 @ExtendWith(SpringExtension.class)
+@ExtendWith(InternalFlowableSpringExtension.class)
 public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase implements ApplicationContextAware {
 
     @Autowired

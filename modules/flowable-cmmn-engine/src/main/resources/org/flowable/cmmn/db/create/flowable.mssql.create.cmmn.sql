@@ -70,6 +70,9 @@ CREATE TABLE ACT_CMMN_RU_CASE_INST
     LAST_REACTIVATION_TIME_    datetime,
     LAST_REACTIVATION_USER_ID_ varchar(255),
     BUSINESS_STATUS_           nvarchar(255),
+    DUE_DATE_                  datetime,
+    CLAIM_TIME_                datetime,
+    CLAIMED_BY_                nvarchar(255),
     TENANT_ID_                 varchar(255) CONSTRAINT DF_ACT_CMMN_RU_CASE_INST_TENANT_ID_ DEFAULT '',
     CONSTRAINT PK_ACT_CMMN_RU_CASE_INST PRIMARY KEY (ID_)
 );
@@ -94,6 +97,8 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     STATE_                  varchar(255),
     CREATE_TIME_            datetime,
     START_USER_ID_          varchar(255),
+    ASSIGNEE_               nvarchar(255),
+    COMPLETED_BY_           nvarchar(255),
     REFERENCE_ID_           varchar(255),
     REFERENCE_TYPE_         varchar(255),
     ITEM_DEFINITION_ID_     varchar(255),
@@ -110,6 +115,7 @@ CREATE TABLE ACT_CMMN_RU_PLAN_ITEM_INST
     COMPLETED_TIME_         datetime,
     OCCURRED_TIME_          datetime,
     TERMINATED_TIME_        datetime,
+    FAILED_TIME_            datetime,
     EXIT_TIME_              datetime,
     ENDED_TIME_             datetime,
     ENTRY_CRITERION_ID_     varchar(255),
@@ -195,7 +201,11 @@ CREATE TABLE ACT_CMMN_HI_CASE_INST
     LAST_REACTIVATION_TIME_    datetime,
     LAST_REACTIVATION_USER_ID_ varchar(255),
     BUSINESS_STATUS_           nvarchar(255),
+    DUE_DATE_                  datetime,
+    CLAIM_TIME_                datetime,
+    CLAIMED_BY_                nvarchar(255),
     TENANT_ID_                 varchar(255) CONSTRAINT DF_ACT_CMMN_HI_CASE_INST_TENANT_ID_ DEFAULT '',
+    END_USER_ID_               varchar(255),
     CONSTRAINT PK_ACT_CMMN_HI_CASE_INST PRIMARY KEY (ID_)
 );
 
@@ -236,10 +246,13 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
     COMPLETED_TIME_        datetime,
     OCCURRED_TIME_         datetime,
     TERMINATED_TIME_       datetime,
+    FAILED_TIME_           datetime,
     EXIT_TIME_             datetime,
     ENDED_TIME_            datetime,
     LAST_UPDATED_TIME_     datetime,
     START_USER_ID_         varchar(255),
+    ASSIGNEE_              nvarchar(255),
+    COMPLETED_BY_          nvarchar(255),
     REFERENCE_ID_          varchar(255),
     REFERENCE_TYPE_        varchar(255),
     ENTRY_CRITERION_ID_    varchar(255),
@@ -255,4 +268,4 @@ CREATE TABLE ACT_CMMN_HI_PLAN_ITEM_INST
 CREATE NONCLUSTERED INDEX ACT_IDX_HI_PLAN_ITEM_INST_CASE ON ACT_CMMN_HI_PLAN_ITEM_INST(CASE_INST_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('cmmn.schema.version', '7.1.0.2', 1);
+values ('cmmn.schema.version', '8.1.0.1', 1);

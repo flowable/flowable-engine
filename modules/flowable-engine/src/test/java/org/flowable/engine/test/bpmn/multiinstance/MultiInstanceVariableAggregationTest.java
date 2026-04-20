@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +52,10 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -1920,8 +1919,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             ArrayNode arrayNode = objectMapper.createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = execution.getVariable(variable.getSource());
-                if (sourceVariable instanceof ArrayNode) {
-                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                if (sourceVariable instanceof ArrayNode sourceArrayNode) {
                     for (int i = 0; i < sourceArrayNode.size(); i++) {
                         JsonNode node = arrayNode.get(i);
                         JsonNode sourceNode = sourceArrayNode.get(i);
@@ -1929,10 +1927,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                             arrayNode.add(sourceNode.deepCopy());
                         } else if (node.isObject()) {
                             ObjectNode objectNode = (ObjectNode) node;
-                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
-                            while (fieldsIterator.hasNext()) {
-                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
-                                objectNode.set(field.getKey(), field.getValue());
+                            for (Map.Entry<String, JsonNode> propertyEntry : sourceNode.properties()) {
+                                String propertyName = propertyEntry.getKey();
+                                JsonNode value = propertyEntry.getValue();
+                                objectNode.set(propertyName, value);
                             }
                         }
                     }

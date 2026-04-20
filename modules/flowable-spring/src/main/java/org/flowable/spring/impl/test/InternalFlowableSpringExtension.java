@@ -31,7 +31,7 @@ public class InternalFlowableSpringExtension extends InternalFlowableExtension {
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(ProcessEngine.class),
+            .computeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(ProcessEngine.class),
                 ProcessEngine.class);
     }
 

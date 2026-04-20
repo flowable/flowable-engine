@@ -38,7 +38,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -53,7 +53,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Variables" }, description = "Manage Tasks variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     @Autowired

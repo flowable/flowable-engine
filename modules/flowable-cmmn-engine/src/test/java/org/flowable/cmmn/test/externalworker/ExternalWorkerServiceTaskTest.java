@@ -35,7 +35,7 @@ import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobAfterCont
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -53,9 +53,9 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityM
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -69,7 +69,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         which will make it impossible to test the lock releasing logic.
      */
 
-    @Before
+    @BeforeEach
     public void disableAsyncExecutorIfNeeded() {
         asyncExecutorActivated = cmmnEngineConfiguration.getAsyncExecutor().isActive();
 
@@ -78,7 +78,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
         }
     }
 
-    @After
+    @AfterEach
     public void enabledAsyncExecutorIfNeeded() {
         if (asyncExecutorActivated) {
             cmmnEngineConfiguration.getAsyncExecutor().start();
@@ -977,7 +977,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(caseInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd(
                 cmmnEngineConfiguration.getAsyncExecutor().getLockOwner(), cmmnEngineConfiguration));
@@ -988,7 +988,7 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(caseInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(caseInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         cmmnEngineConfiguration.getCommandExecutor().execute(new ClearCaseInstanceLockTimesCmd("worker1", cmmnEngineConfiguration));
 
@@ -1025,6 +1025,118 @@ public class ExternalWorkerServiceTaskTest extends FlowableCmmnTestCase {
 
         assertThat(caseInstance.getLockOwner()).isNull();
         assertThat(caseInstance.getLockTime()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleExclusive.cmmn")
+    public void testCaseInstanceIsUnlockedWhenUnacquiringExclusiveJob() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        CaseInstanceEntity caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        cmmnManagementService.unacquireExternalWorkerJob(acquiredJob.getId(), "worker1");
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isNull();
+        assertThat(caseInstance.getLockTime()).isNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleExclusive.cmmn")
+    public void testCaseInstanceIsUnlockedWhenUnacquiringAllExclusiveJobs() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        CaseInstanceEntity caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        cmmnManagementService.unacquireAllExternalWorkerJobsForWorker("worker1");
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isNull();
+        assertThat(caseInstance.getLockTime()).isNull();
+
+        acquiredJobs = cmmnManagementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        caseInstance = (CaseInstanceEntity) cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(acquiredJob.getScopeId())
+                .singleResult();
+
+        assertThat(caseInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(caseInstance.getLockTime()).isNotNull();
     }
 
     @Test

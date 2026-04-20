@@ -33,9 +33,9 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class CmmnLoggingSessionUtil {
     
@@ -182,8 +182,7 @@ public class CmmnLoggingSessionUtil {
         ObjectNode loggingNode = fillEvaluateSentryInstanceEntity(instance, objectMapper);
         
         String label = null;
-        if (instance instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+        if (instance instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             label = planItemInstanceEntity.getPlanItemDefinitionId();
             if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
                 label = planItemInstanceEntity.getPlanItemDefinition().getName();
@@ -252,8 +251,7 @@ public class CmmnLoggingSessionUtil {
     
     protected static String getActivitySubType(PlanItemDefinition planItemDefinition) {
         String activitySubType = null;
-        if (planItemDefinition instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) planItemDefinition;
+        if (planItemDefinition instanceof ServiceTask serviceTask) {
             activitySubType = serviceTask.getImplementation();
         }
         
@@ -290,8 +288,7 @@ public class CmmnLoggingSessionUtil {
     protected static ObjectNode fillEvaluateSentryInstanceEntity(EntityWithSentryPartInstances instance, ObjectMapper objectMapper) {
         ObjectNode loggingNode = null;
         String caseDefinitionId = null;
-        if (instance instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) instance;
+        if (instance instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             String label = planItemInstanceEntity.getPlanItemDefinitionId();
             if (StringUtils.isNotEmpty(planItemInstanceEntity.getPlanItemDefinition().getName())) {
                 label = planItemInstanceEntity.getPlanItemDefinition().getName();

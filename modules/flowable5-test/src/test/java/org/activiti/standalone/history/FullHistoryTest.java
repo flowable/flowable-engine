@@ -888,7 +888,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
             fail("Exception expected when deleting process-instance that is still running");
         } catch (FlowableException ae) {
             // Expected exception
-            assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
+            assertTextPresent("Process instance is still running, cannot delete HistoricProcessInstanceEntity", ae.getMessage());
         }
     }
 

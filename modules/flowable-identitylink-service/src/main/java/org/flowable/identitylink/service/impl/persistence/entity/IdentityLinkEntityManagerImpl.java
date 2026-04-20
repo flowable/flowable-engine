@@ -250,8 +250,10 @@ public class IdentityLinkEntityManagerImpl
 
         List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<>();
         for (IdentityLinkEntity identityLink : identityLinks) {
-            delete(identityLink);
-            removedIdentityLinkEntities.add(identityLink);
+            if (!identityLink.isDeleted()) {
+                delete(identityLink);
+                removedIdentityLinkEntities.add(identityLink);
+            }
         }
 
         if (currentIdentityLinks != null) { // The currentIdentityLinks might contain identity links that are in the cache, but not yet in the db
@@ -261,9 +263,10 @@ public class IdentityLinkEntityManagerImpl
                     if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
                             || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {
 
-                        delete(identityLinkEntity);
-                        removedIdentityLinkEntities.add(identityLinkEntity);
-
+                        if (!identityLinkEntity.isDeleted()) {
+                            delete(identityLinkEntity);
+                            removedIdentityLinkEntities.add(identityLinkEntity);
+                        }
                     }
                 }
             }

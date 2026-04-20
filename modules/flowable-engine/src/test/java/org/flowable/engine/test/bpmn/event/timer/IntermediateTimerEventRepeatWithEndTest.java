@@ -14,6 +14,7 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.OffsetDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -26,9 +27,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -38,28 +36,16 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
 
     @Test
     @Deployment
-    public void testRepeatWithEnd() throws Throwable {
+    public void testRepeatWithEnd() {
 
-        Calendar calendar = Calendar.getInstance();
-        Date baseTime = calendar.getTime();
+        OffsetDateTime now = OffsetDateTime.now();
+        Date baseTime = Date.from(now.toInstant());
 
-        // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.MINUTE, 10);
         // after 10 minutes the end Date will be reached but the intermediate timers will ignore it
         // since the end date is validated only when a new timer is going to be created
 
-        DateTime dt = new DateTime(calendar.getTime());
-        String dateStr1 = fmt.print(dt);
-
-        calendar.setTime(baseTime);
-        calendar.add(Calendar.HOUR, 1);
-        calendar.add(Calendar.MINUTE, 30);
-
-        dt = new DateTime(calendar.getTime());
-        String dateStr2 = fmt.print(dt);
+        String dateStr1 = now.plusMinutes(10).toString();
+        String dateStr2 = now.plusHours(1).plusMinutes(30).toString();
 
         // reset the timer
         Calendar nextTimeCal = Calendar.getInstance();

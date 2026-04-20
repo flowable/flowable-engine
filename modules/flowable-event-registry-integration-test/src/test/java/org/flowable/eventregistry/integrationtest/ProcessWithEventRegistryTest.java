@@ -48,9 +48,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 @BpmnJmsEventTest
 @TestPropertySource(properties = {
@@ -291,7 +290,7 @@ public class ProcessWithEventRegistryTest {
                 });
             
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
@@ -335,7 +334,7 @@ public class ProcessWithEventRegistryTest {
                 });
             
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
@@ -394,7 +393,7 @@ public class ProcessWithEventRegistryTest {
                 });
 
             ObjectNode payloadNode = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "fullPayloadValue");
-            assertThat(payloadNode.get("payload1").asText()).isEqualTo("kermit");
+            assertThat(payloadNode.get("payload1").asString()).isEqualTo("kermit");
             assertThat(payloadNode.get("payload2").asInt()).isEqualTo(123);
 
         } finally {
@@ -639,8 +638,7 @@ public class ProcessWithEventRegistryTest {
             "org/flowable/eventregistry/integrationtest/issueEvent.event"})
     public void testMultiInstanceSendSystemEvent() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ArrayNode issueArray = objectMapper.createArrayNode();
+            ArrayNode issueArray = eventEngineConfiguration.getObjectMapper().createArrayNode();
             addIssue(issueArray, "1", "bug");
             addIssue(issueArray, "2", "task");
             addIssue(issueArray, "3", "question");

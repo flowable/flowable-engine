@@ -13,7 +13,9 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -56,6 +58,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Set<String> caseDefinitionKeys;
+    protected Set<String> excludeCaseDefinitionKeys;
     protected Set<String> caseDefinitionIds;
     protected String caseDefinitionName;
     protected String caseDefinitionNameLike;
@@ -66,6 +69,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String caseInstanceName;
     protected String caseInstanceNameLike;
     protected String caseInstanceNameLikeIgnoreCase;
@@ -88,12 +92,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected String startedBy;
+    protected String finishedBy;
     protected String state;
     protected Date lastReactivatedBefore;
     protected Date lastReactivatedAfter;
     protected String lastReactivatedBy;
     protected String callbackId;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
@@ -102,6 +108,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String tenantIdLikeIgnoreCase;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
+    protected Collection<String> variableNamesToInclude;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -114,6 +121,9 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean inOrStatement;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean withoutSorting;
+    protected boolean returnIdsOnly;
+    protected Set<String> callbackIds;
 
     public HistoricCaseInstanceQueryImpl() {
     }
@@ -466,6 +476,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl excludeCaseDefinitionKeys(Set<String> excludeCaseDefinitionKeys) {
+        if (excludeCaseDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Case definition keys is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
+        } else {
+            this.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
+        }
+        return this;
+    }
 
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceParentId(String parentId) {
@@ -602,6 +625,20 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
         return this;
     }
+
+    @Override
+    public HistoricCaseInstanceQueryImpl finishedBy(String userId) {
+        if (userId == null) {
+            throw new FlowableIllegalArgumentException("user id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.finishedBy = userId;
+        } else {
+            this.finishedBy = userId;
+        }
+
+        return this;
+    }
     
     @Override
     public HistoricCaseInstanceQueryImpl state(String state) {
@@ -670,6 +707,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
+        }
+        return this;
+    }
     
     @Override
     public HistoricCaseInstanceQuery caseInstanceCallbackType(String callbackType) {
@@ -680,6 +730,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId) {
+        if (parentCaseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("parent case instance id is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
+        } else {
+            this.parentCaseInstanceId = parentCaseInstanceId;
         }
         return this;
     }
@@ -824,8 +887,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public List<HistoricCaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        
+        if (withoutSorting) {
+            setIgnoreOrderBy();
+        }
+        
         List<HistoricCaseInstance> results;
-        if (includeCaseVariables) {
+        if (returnIdsOnly) {
+            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findIdsByCriteria(this);
+            
+        } else if (includeCaseVariables) {
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
 
             if (caseInstanceId != null) {
@@ -876,9 +947,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public void enhanceCachedValue(HistoricCaseInstanceEntity caseInstance) {
         if (isIncludeCaseVariables()) {
-            caseInstance.getQueryVariables()
-                    .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
-                            .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            if (variableNamesToInclude == null) {
+                caseInstance.getQueryVariables()
+                        .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            } else {
+                caseInstance.getQueryVariables()
+                        .addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN, variableNamesToInclude));
+            }
         }
     }
 
@@ -917,6 +994,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     @Override
     public HistoricCaseInstanceQuery includeCaseVariables() {
         this.includeCaseVariables = true;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            throw new FlowableIllegalArgumentException("variableNames is null or empty");
+        }
+        includeCaseVariables();
+        this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
         return this;
     }
 
@@ -1175,6 +1262,18 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         this.withLocalizationFallback = true;
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQuery withoutSorting() {
+        this.withoutSorting = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
+        return this;
+    }
 
     public String getCaseDefinitionId() {
         return caseDefinitionId;
@@ -1194,6 +1293,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public Set<String> getCaseDefinitionKeys() {
         return caseDefinitionKeys;
+    }
+    
+    public Set<String> getExcludeCaseDefinitionKeys() {
+        return excludeCaseDefinitionKeys;
     }
 
     public Set<String> getCaseDefinitionIds() {
@@ -1308,6 +1411,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     public String getStartedBy() {
         return startedBy;
     }
+
+    public String getFinishedBy() {
+        return finishedBy;
+    }
     
     public String getState() {
         return state;
@@ -1329,8 +1436,16 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return callbackId;
     }
 
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
     }
 
     public boolean isWithoutCallbackId() {
@@ -1389,6 +1504,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return includeCaseVariables;
     }
 
+    public Collection<String> getVariableNamesToInclude() {
+        return variableNamesToInclude;
+    }
+
     public List<HistoricCaseInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
     }
@@ -1417,6 +1536,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         return hasOrderByForColumn(HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY.getName());
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeCaseInstanceIds) {
+        this.safeCaseInstanceIds = safeCaseInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

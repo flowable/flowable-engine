@@ -34,6 +34,8 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -54,9 +56,15 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     }
 
     public SerializableType() {
+        this(false, NoopVariableLengthVerifier.INSTANCE);
     }
 
     public SerializableType(boolean trackDeserializedObjects) {
+        this(trackDeserializedObjects, NoopVariableLengthVerifier.INSTANCE);
+    }
+
+    public SerializableType(boolean trackDeserializedObjects, VariableLengthVerifier lengthVerifier) {
+        super(lengthVerifier);
         this.trackDeserializedObjects = trackDeserializedObjects;
     }
 

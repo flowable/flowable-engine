@@ -15,6 +15,7 @@ package org.flowable.common.engine.impl.el;
 
 import java.lang.reflect.Method;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.javax.el.FunctionMapper;
 
 /**
@@ -39,7 +40,11 @@ public class FlowableFunctionMapper extends FunctionMapper {
     @Override
     public Method resolveFunction(String prefix, String localName) {
         if (functionResolver != null) {
-            return functionResolver.resolveFunction(prefix, localName);
+            try {
+                return functionResolver.resolveFunction(prefix, localName);
+            } catch (NoSuchMethodException e) {
+                throw new FlowableException("Could not find function method for " + prefix + ":" + localName, e);
+            }
         }
         return null;
     }

@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,7 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private String processDefinitionKeyLike;
     private String processDefinitionKeyLikeIgnoreCase;
     private Set<String> processDefinitionKeys;
+    private Set<String> excludeProcessDefinitionKeys;
     private String processDefinitionName;
     private String processDefinitionNameLike;
     private String processDefinitionNameLikeIgnoreCase;
@@ -68,9 +70,12 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Boolean suspended;
     private Boolean includeProcessVariables;
+    private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
     private String callbackId;
+    private Set<String> callbackIds;
     private String callbackType;
+    private String parentCaseInstanceId;
     private String tenantId;
     private String tenantIdLike;
     private String tenantIdLikeIgnoreCase;
@@ -244,6 +249,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
         this.processDefinitionKeys = processDefinitionKeys;
     }
 
+    public Set<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
+    }
+
+    public void setExcludeProcessDefinitionKeys(Set<String> excludeProcessDefinitionKeys) {
+        this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+    }
+
     public String getProcessDefinitionName() {
         return processDefinitionName;
     }
@@ -380,6 +393,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
         this.includeProcessVariables = includeProcessVariables;
     }
 
+    public Collection<String> getIncludeProcessVariablesNames() {
+        return includeProcessVariablesNames;
+    }
+
+    public void setIncludeProcessVariablesNames(Collection<String> includeProcessVariablesNames) {
+        this.includeProcessVariablesNames = includeProcessVariablesNames;
+    }
+
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
     public List<QueryVariable> getVariables() {
         return variables;
@@ -403,6 +424,14 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
     }
 
     public void setTenantId(String tenantId) {
@@ -451,5 +480,13 @@ public class ProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setParentScopeId(String parentScopeId) {
         this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
+    public void setCallbackIds(Set<String> callbackIds) {
+        this.callbackIds = callbackIds;
     }
 }

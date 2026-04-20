@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -54,6 +55,19 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
 
         Object foo = runtimeService.getVariable(processInstance.getId(), "foo");
         assertThat(foo).as("Could not find the 'foo' variable in variable scope").isEqualTo("FOO");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
+    public void testScriptTaskListenerWithDisabledServicesInScript() {
+        try {
+            processEngineConfiguration.setServicesEnabledInScripting(false);
+            assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess"))
+                    .isInstanceOf(FlowableScriptEvaluationException.class)
+                    .hasMessageContaining("No such property: taskService");
+        } finally {
+            processEngineConfiguration.setServicesEnabledInScripting(true);
+        }
     }
 
     @Test

@@ -34,11 +34,10 @@ public class Flowable5Util {
     public static final String V5_ENGINE_TAG = "v5";
     
     public static boolean isJobHandledByV5Engine(JobInfo jobInfo) {
-        if (!(jobInfo instanceof Job)) { // v5 only knew one type of jobs
+        if (!(jobInfo instanceof Job job)) { // v5 only knew one type of jobs
             return false;
         }
-        
-        final Job job = (Job) jobInfo;
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         boolean isFlowable5ProcessDefinition = Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, job.getProcessDefinitionId());
         if (isFlowable5ProcessDefinition) {

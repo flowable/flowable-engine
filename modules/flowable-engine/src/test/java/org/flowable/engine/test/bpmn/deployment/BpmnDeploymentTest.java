@@ -337,4 +337,17 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
                 .as("Expected deployment exception because v5 compatibility handler is not enabled");
     }
 
+    @Test
+    public void deployingModelWithEmptyCDATAShouldNotFail() {
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testBpmnWithEmptyCDATA.bpmn20.xml")
+                .deploy();
+        deploymentIdsForAutoCleanup.add(deployment.getId());
+
+        ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionKey("myProcess")
+                .singleResult();
+        assertThat(definition).isNotNull();
+    }
+
 }

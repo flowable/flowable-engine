@@ -15,19 +15,16 @@ package org.flowable.spring.test.engine;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.engine.ProcessEngines;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * Spring process engine base test
  *
  * @author Henry Yan
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:org/flowable/spring/test/engine/springProcessEngine-context.xml")
+@SpringJUnitConfig(locations = "classpath:org/flowable/spring/test/engine/springProcessEngine-context.xml")
 @DirtiesContext
 public class SpringProcessEngineTest {
 

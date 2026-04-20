@@ -21,8 +21,8 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -47,12 +47,12 @@ public class DefaultTaskLocalizationManager implements InternalTaskLocalizationM
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        task.setLocalizedName(languageNameNode.asText());
+                        task.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        task.setLocalizedDescription(languageDescriptionNode.asText());
+                        task.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }
@@ -72,12 +72,12 @@ public class DefaultTaskLocalizationManager implements InternalTaskLocalizationM
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        taskEntity.setLocalizedName(languageNameNode.asText());
+                        taskEntity.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        taskEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                        taskEntity.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }

@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -37,6 +38,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
     PlanItemInstanceQuery derivedCaseDefinitionId(String derivedCaseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
+    PlanItemInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
 
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);
 
@@ -74,11 +76,15 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceOccurredAfter(Date occurredAfter);
     PlanItemInstanceQuery planItemInstanceTerminatedBefore(Date terminatedBefore);
     PlanItemInstanceQuery planItemInstanceTerminatedAfter(Date terminatedAfter);
+    PlanItemInstanceQuery planItemInstanceFailedBefore(Date failedBefore);
+    PlanItemInstanceQuery planItemInstanceFailedAfter(Date failedAfter);
     PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore);
     PlanItemInstanceQuery planItemInstanceExitAfter(Date exitAfter);
     PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore);
     PlanItemInstanceQuery planItemInstanceEndedAfter(Date endedAfter);
     PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    PlanItemInstanceQuery planItemInstanceAssignee(String assignee);
+    PlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy);
     PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);

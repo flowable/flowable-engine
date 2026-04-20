@@ -8,9 +8,9 @@
 
 	<parent>
 		<groupId>org.flowable</groupId>
-		<artifactId>flowable-root</artifactId>
-		<relativePath>../..</relativePath>
-		<version>7.1.0</version>
+		<artifactId>flowable-parent</artifactId>
+		<version>8.1.0-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
 	</parent>
 
 	<properties>
@@ -36,7 +36,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
+			<artifactId>slf4j-reload4j</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -120,11 +120,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.uuid</groupId>
 			<artifactId>java-uuid-generator</artifactId>
 			<scope>provided</scope>
@@ -158,5 +153,18 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*TestCase.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 	
 </project>

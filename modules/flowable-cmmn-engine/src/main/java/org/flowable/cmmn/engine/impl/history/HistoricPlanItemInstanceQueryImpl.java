@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
@@ -41,6 +42,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String caseDefinitionId;
     protected String derivedCaseDefinitionId;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String stageInstanceId;
     protected String elementId;
     protected String planItemDefinitionId;
@@ -64,6 +67,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date completedAfter;
     protected Date terminatedBefore;
     protected Date terminatedAfter;
+    protected Date failedBefore;
+    protected Date failedAfter;
     protected Date occurredBefore;
     protected Date occurredAfter;
     protected Date exitBefore;
@@ -71,6 +76,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected Date endedBefore;
     protected Date endedAfter;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean ended;
@@ -135,6 +142,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is null");
+        }
+        if (caseInstanceIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("Set of case instance ids is empty");
+        }
+        this.caseInstanceIds = caseInstanceIds;
+        return this;
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId) {
         this.stageInstanceId = stageInstanceId;
         return this;
@@ -176,6 +195,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
         this.startUserId = startUserId;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
+        this.assignee = assignee;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
         return this;
     }
 
@@ -389,6 +420,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter) {
         this.terminatedAfter = terminatedAfter;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery failedBefore(Date failedBefore) {
+        this.failedBefore = failedBefore;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery failedAfter(Date failedAfter) {
+        this.failedAfter = failedAfter;
         return this;
     }
 
@@ -626,6 +669,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public Date getTerminatedAfter() {
         return terminatedAfter;
     }
+    public Date getFailedBefore() {
+        return failedBefore;
+    }
+    public Date getFailedAfter() {
+        return failedAfter;
+    }
     public Date getOccurredBefore() {
         return occurredBefore;
     }
@@ -646,6 +695,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public String getStartUserId() {
         return startUserId;
+    }
+    public String getAssignee() {
+        return assignee;
+    }
+    public String getCompletedBy() {
+        return completedBy;
     }
     public String getReferenceId() {
         return referenceId;
@@ -699,5 +754,17 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeCaseInstanceIds = safeProcessInstanceIds;
+    }
+
+    public Collection<String> getCaseInstanceIds() {
+        return caseInstanceIds;
     }
 }

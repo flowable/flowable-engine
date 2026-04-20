@@ -53,15 +53,13 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                     MessageEventDefinition messageDefinition = fillMessageRef(bpmnParse, eventDefinition);
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessMessageStartEventActivityBehavior(element, messageDefinition));
 
-                } else if (eventDefinition instanceof SignalEventDefinition) {
-                    SignalEventDefinition signalDefinition = (SignalEventDefinition) eventDefinition;
+                } else if (eventDefinition instanceof SignalEventDefinition signalDefinition) {
                     Signal signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
 
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessSignalStartEventActivityBehavior(
                             element, signalDefinition, signal));
 
-                } else if (eventDefinition instanceof TimerEventDefinition) {
-                    TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                } else if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessTimerStartEventActivityBehavior(
                             element, timerEventDefinition));
 
@@ -71,8 +69,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                 } else if (eventDefinition instanceof EscalationEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEscalationStartEventActivityBehavior(element));
                 
-                } else if (eventDefinition instanceof VariableListenerEventDefinition) {
-                    VariableListenerEventDefinition variableListenerEventDefinition = (VariableListenerEventDefinition) eventDefinition;
+                } else if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessVariableListenerlStartEventActivityBehavior(element, variableListenerEventDefinition));
                 }
                 

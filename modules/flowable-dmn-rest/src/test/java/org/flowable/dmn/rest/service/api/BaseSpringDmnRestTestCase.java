@@ -13,13 +13,13 @@
 package org.flowable.dmn.rest.service.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,133 +28,85 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
-import org.eclipse.jetty.server.Server;
+import org.flowable.common.engine.impl.test.EnsureCleanDb;
+import org.flowable.common.engine.impl.test.LoggingExtension;
 import org.flowable.dmn.api.DmnDecisionService;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.DmnEngines;
-import org.flowable.dmn.engine.impl.test.AbstractDmnTestCase;
-import org.flowable.dmn.engine.test.DmnTestHelper;
+import org.flowable.dmn.engine.test.DmnDeploymentId;
 import org.flowable.dmn.rest.conf.ApplicationConfiguration;
-import org.flowable.dmn.rest.util.TestServerUtil;
-import org.flowable.dmn.rest.util.TestServerUtil.TestServer;
+import org.flowable.dmn.rest.util.TestServer;
+import org.flowable.dmn.spring.impl.test.InternalFlowableDmnSpringExtension;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
-public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
+@SpringJUnitWebConfig(ApplicationConfiguration.class)
+@ExtendWith(InternalFlowableDmnSpringExtension.class)
+@ExtendWith(LoggingExtension.class)
+@EnsureCleanDb(excludeTables = {
+        "ACT_GE_PROPERTY"
+})
+public abstract class BaseSpringDmnRestTestCase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseSpringDmnRestTestCase.class);
 
-    protected static String SERVER_URL_PREFIX;
-    protected static DmnRestUrlBuilder URL_BUILDER;
+    protected String SERVER_URL_PREFIX;
+    protected DmnRestUrlBuilder URL_BUILDER;
 
-    protected static Server server;
-    protected static ApplicationContext appContext;
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
-    protected static DmnEngine dmnEngine;
+    @Autowired
+    protected DmnEngine dmnEngine;
 
     protected String deploymentId;
     protected Throwable exception;
 
-    protected static DmnEngineConfiguration dmnEngineConfiguration;
-    protected static DmnRepositoryService dmnRepositoryService;
-    protected static DmnDecisionService dmnRuleService;
-    protected static DmnHistoryService dmnHistoryService;
+    @Autowired
+    protected DmnEngineConfiguration dmnEngineConfiguration;
+    @Autowired
+    protected DmnRepositoryService dmnRepositoryService;
+    @Autowired
+    protected DmnDecisionService dmnRuleService;
+    @Autowired
+    protected DmnHistoryService dmnHistoryService;
 
-    protected static CloseableHttpClient client;
-    protected static LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
+    @Autowired
+    protected CloseableHttpClient client;
+    protected LinkedList<CloseableHttpResponse> httpResponses = new LinkedList<>();
 
-    static {
+    @Autowired
+    protected TestServer server;
 
-        TestServer testServer = TestServerUtil.createAndStartServer(ApplicationConfiguration.class);
-        server = testServer.getServer();
-        appContext = testServer.getApplicationContext();
-        SERVER_URL_PREFIX = testServer.getServerUrlPrefix();
+    @BeforeEach
+    void init(@DmnDeploymentId String deploymentId) {
+        this.deploymentId = deploymentId;
+
+        SERVER_URL_PREFIX = server.getServerUrlPrefix();
         URL_BUILDER = DmnRestUrlBuilder.usingBaseUrl(SERVER_URL_PREFIX);
-
-        // Lookup services
-        dmnEngine = DmnEngines.getDefaultDmnEngine();
-        dmnEngineConfiguration = appContext.getBean(DmnEngineConfiguration.class);
-        dmnRepositoryService = dmnEngineConfiguration.getDmnRepositoryService();
-        dmnRuleService = dmnEngineConfiguration.getDmnDecisionService();
-        dmnHistoryService = dmnEngineConfiguration.getDmnHistoryService();
-
-        // Create http client for all tests
-        CredentialsProvider provider = new BasicCredentialsProvider();
-        UsernamePasswordCredentials credentials = new UsernamePasswordCredentials("kermit", "kermit");
-        provider.setCredentials(AuthScope.ANY, credentials);
-        client = HttpClientBuilder.create().setDefaultCredentialsProvider(provider).build();
-
-        // Clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-
-            @Override
-            public void run() {
-
-                if (client != null) {
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        LOGGER.error("Could not close http client", e);
-                    }
-                }
-
-                if (server != null && server.isRunning()) {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        LOGGER.error("Error stopping server", e);
-                    }
-                }
-            }
-        });
     }
 
-    @Override
-    public void runBare() throws Throwable {
-        try {
-            deploymentId = DmnTestHelper.annotationDeploymentSetUp(dmnEngine, getClass(), getName());
-
-            super.runBare();
-        } catch (AssertionError e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("ASSERTION FAILED: {}", e, e);
-            exception = e;
-            throw e;
-
-        } catch (Throwable e) {
-            LOGGER.error(EMPTY_LINE);
-            LOGGER.error("EXCEPTION: {}", e, e);
-            exception = e;
-            throw e;
-
-        } finally {
-            DmnTestHelper.annotationDeploymentTearDown(dmnEngine, deploymentId, getClass(), getName());
-            DmnTestHelper.assertAndEnsureCleanDb(dmnEngine);
-            dmnEngineConfiguration.getClock().reset();
-            closeHttpConnections();
-        }
+    @AfterEach
+    void cleanup() {
+        closeHttpConnections();
     }
 
     /**
@@ -230,7 +182,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
     /**
      * Checks if the returned "data" array (child-node of root-json node returned by invoking a GET on the given url) contains entries with the given ID's.
      */
-    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 
         // Do the actual call
@@ -243,9 +195,8 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+        for (JsonNode jsonNode : dataNode) {
+            String id = jsonNode.get("id").stringValue();
             toBeFound.remove(id);
         }
         assertThat(toBeFound)
@@ -253,7 +204,7 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
                 .isEmpty();
     }
 
-    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInPostDataResponseWithStatusCheck(String url, ObjectNode body, int expectedStatusCode, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = 0;
         if (expectedResourceIds != null) {
             numberOfResultsExpected = expectedResourceIds.length;
@@ -273,9 +224,8 @@ public abstract class BaseSpringDmnRestTestCase extends AbstractDmnTestCase {
             // Check presence of ID's
             if (expectedResourceIds != null) {
                 List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-                Iterator<JsonNode> it = dataNode.iterator();
-                while (it.hasNext()) {
-                    String id = it.next().get("id").textValue();
+                for (JsonNode jsonNode : dataNode) {
+                    String id = jsonNode.get("id").stringValue();
                     toBeFound.remove(id);
                 }
                 assertThat(toBeFound)

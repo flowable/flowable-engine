@@ -21,14 +21,14 @@ import java.util.function.Consumer;
 import org.flowable.cmmn.api.event.FlowableCaseStartedEvent;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -37,13 +37,13 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
 
     protected TestEventListener listener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         listener = new TestEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(listener);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (listener != null) {
             cmmnEngineConfiguration.getEventDispatcher().removeEventListener(listener);
@@ -55,8 +55,7 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
     public void testCaseInstanceEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStartedEvent) {
-                FlowableCaseStartedEvent caseStartedEvent = (FlowableCaseStartedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStartedEvent caseStartedEvent) {
                 CaseInstance eventCaseInstance = caseStartedEvent.getEntity();
                 assertThat(eventCaseInstance.getBusinessKey()).isEqualTo("business key");
                 assertThat(eventCaseInstance.getName()).isEqualTo("name");
@@ -95,8 +94,7 @@ public class CaseStartedEventTest extends FlowableCmmnTestCase {
     public void testSubCaseStartedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         listener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStartedEvent) {
-                FlowableCaseStartedEvent caseStartedEvent = (FlowableCaseStartedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStartedEvent caseStartedEvent) {
                 CaseInstance eventCaseInstance = caseStartedEvent.getEntity();
                 assertThat(caseStartedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStartedEvent.getExecutionId()).isNull();

@@ -24,13 +24,13 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Dennis Federico
@@ -59,6 +59,33 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
         Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables).isEmpty();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testInputVariables() {
+        // When input parameters are defined then doNotIncludeVariables is ignored
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("a", 20)
+                .variable("b", 22)
+                .variable("aVar", 100)
+                .variable("bVar", 10)
+                .start();
+        assertThat(caseInstance).isNotNull();
+        assertThat(caseInstance.getCaseVariables().get("sum"))
+                .isInstanceOfSatisfying(Number.class, number -> assertThat(number.intValue()).isEqualTo(120));
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testDoNotIncludeVariables() {
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("scriptCase")
+                .variable("a", 20)
+                .variable("b", 22)
+                .start())
+                .hasMessageContaining("\"a\" is not defined");
     }
 
     @Test

@@ -14,6 +14,7 @@
 package org.flowable.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +38,11 @@ import org.flowable.engine.impl.cmd.AddMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceClaimCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
-import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceStartEventSubscriptionCmd;
+import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
 import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
@@ -72,11 +74,14 @@ import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.RemoveProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.RemoveProcessInstanceOwnerCmd;
+import org.flowable.engine.impl.cmd.SetAsyncExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessStatusCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceDueDateCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
+import org.flowable.engine.impl.cmd.UpdateProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceOwnerCmd;
 import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
@@ -86,6 +91,7 @@ import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceUpdateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionModificationBuilderImpl;
@@ -98,6 +104,7 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
@@ -247,6 +254,21 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public void setProcessInstanceDueDate(String processInstanceId, Date dueDate) {
+        commandExecutor.execute(new SetProcessInstanceDueDateCmd(processInstanceId, dueDate));
+    }
+
+    @Override
+    public void claimProcessInstance(String processInstanceId, String userId) {
+        commandExecutor.execute(new ProcessInstanceClaimCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void unclaimProcessInstance(String processInstanceId) {
+        commandExecutor.execute(new ProcessInstanceClaimCmd(processInstanceId, null));
+    }
+
+    @Override
     public Map<String, Object> getVariables(String executionId) {
         return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
     }
@@ -359,6 +381,36 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void setVariablesLocal(String executionId, Map<String, ?> variables) {
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+    }
+    
+    @Override
+    public void setVariableAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariableLocalAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
+    }
+
+    @Override
+    public void setVariablesAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariablesLocalAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
     }
 
     @Override
@@ -795,6 +847,15 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public ProcessInstanceBuilder createProcessInstanceBuilder() {
         return new ProcessInstanceBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessInstanceUpdateBuilder createProcessInstanceUpdateBuilder(String processInstanceId) {
+        return new ProcessInstanceUpdateBuilderImpl(this, processInstanceId);
+    }
+
+    public void updateProcessInstance(ProcessInstanceUpdateBuilderImpl builder) {
+        commandExecutor.execute(new UpdateProcessInstanceCmd(builder));
     }
 
     @Override

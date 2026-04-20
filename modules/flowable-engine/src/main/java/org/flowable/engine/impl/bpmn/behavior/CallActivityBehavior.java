@@ -58,7 +58,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
@@ -240,17 +240,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     protected ProcessDefinition getProcessDefinition(DelegateExecution execution, CallActivity callActivity, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        ProcessDefinition processDefinition;
-        switch (StringUtils.isNotEmpty(calledElementType) ? calledElementType : CALLED_ELEMENT_TYPE_KEY) {
-            case CALLED_ELEMENT_TYPE_ID:
-                processDefinition = getProcessDefinitionById(execution, processEngineConfiguration);
-                break;
-            case CALLED_ELEMENT_TYPE_KEY:
-                processDefinition = getProcessDefinitionByKey(execution, callActivity.isSameDeployment(), processEngineConfiguration);
-                break;
-            default:
-                throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "] in " + execution);
-        }
+        ProcessDefinition processDefinition = switch (StringUtils.isNotEmpty(calledElementType) ? calledElementType : CALLED_ELEMENT_TYPE_KEY) {
+            case CALLED_ELEMENT_TYPE_ID -> getProcessDefinitionById(execution, processEngineConfiguration);
+            case CALLED_ELEMENT_TYPE_KEY -> getProcessDefinitionByKey(execution, callActivity.isSameDeployment(), processEngineConfiguration);
+            default -> throw new FlowableException("Unrecognized calledElementType [" + calledElementType + "] in " + execution);
+        };
         return processDefinition;
     }
 

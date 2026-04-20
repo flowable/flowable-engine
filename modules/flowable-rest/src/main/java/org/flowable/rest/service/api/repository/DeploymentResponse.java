@@ -5,7 +5,7 @@ import java.util.Date;
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.engine.repository.Deployment;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 

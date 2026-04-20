@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "DMN Rule Service" }, description = "Execute DMN Decision", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "DMN Rule Service" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DmnRuleServiceResource {
 
     @Autowired
@@ -85,6 +85,10 @@ public class DmnRuleServiceResource {
                 decisionBuilder.tenantId(request.getTenantId());
             }
 
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
+            }
+
             DecisionExecutionAuditContainer executionResult = decisionBuilder.executeWithAuditTrail();
 
             if (executionResult instanceof DecisionServiceExecutionAuditContainer) {
@@ -121,6 +125,10 @@ public class DmnRuleServiceResource {
 
             if (StringUtils.isNotEmpty(request.getTenantId())) {
                 decisionBuilder.tenantId(request.getTenantId());
+            }
+
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
             }
 
             Map<String, Object> executionResult = decisionBuilder.executeWithSingleResult();
@@ -160,6 +168,10 @@ public class DmnRuleServiceResource {
                 decisionBuilder.tenantId(request.getTenantId());
             }
 
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
+            }
+
             DecisionExecutionAuditContainer executionResult = decisionBuilder.executeDecisionWithAuditTrail();
 
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
@@ -196,6 +208,10 @@ public class DmnRuleServiceResource {
 
             if (StringUtils.isNotEmpty(request.getTenantId())) {
                 decisionBuilder.tenantId(request.getTenantId());
+            }
+
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
             }
 
             DecisionServiceExecutionAuditContainer executionResult = decisionBuilder.executeDecisionServiceWithAuditTrail();
@@ -237,6 +253,10 @@ public class DmnRuleServiceResource {
                 decisionBuilder.tenantId(request.getTenantId());
             }
 
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
+            }
+
             Map<String, Object> executionResult = decisionBuilder.executeDecisionWithSingleResult();
 
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
@@ -274,6 +294,10 @@ public class DmnRuleServiceResource {
 
             if (StringUtils.isNotEmpty(request.getTenantId())) {
                 decisionBuilder.tenantId(request.getTenantId());
+            }
+
+            if (request.isDisableHistory()) {
+                decisionBuilder.disableHistory();
             }
 
             Map<String, Object> executionResult = decisionBuilder.executeDecisionServiceWithSingleResult();

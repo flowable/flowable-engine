@@ -26,7 +26,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -36,7 +36,7 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers

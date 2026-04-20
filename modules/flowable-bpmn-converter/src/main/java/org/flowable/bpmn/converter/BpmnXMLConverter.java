@@ -152,6 +152,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         addConverter(new ServiceTaskXMLConverter());
         addConverter(new HttpServiceTaskXMLConverter());
         addConverter(new CaseServiceTaskXMLConverter());
+        addConverter(new FormAwareServiceTaskXMLConverter());
         addConverter(new SendEventServiceTaskXMLConverter());
         addConverter(new ExternalWorkerServiceTaskXMLConverter());
         addConverter(new SendTaskXMLConverter());
@@ -275,13 +276,21 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
         if (xif.isPropertySupported(XMLInputFactory.SUPPORT_DTD)) {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
+        
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_DTD)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        }
+        
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        }
 
         if (validateSchema) {
             try (InputStreamReader in = new InputStreamReader(inputStreamProvider.getInputStream(), encoding)) {
                 if (!enableSafeBpmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
-                    validateModel(xif.createXMLStreamReader(in));
+                    validateModel(new FlowableXMLStreamReader(xif.createXMLStreamReader(in)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new XMLException("The bpmn 2.0 xml is not properly encoded", e);
@@ -424,8 +433,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 } else if (ELEMENT_COMPLETION_CONDITION.equals(xtr.getLocalName())) {
                     if (!activeSubProcessList.isEmpty()) {
                         SubProcess subProcess = activeSubProcessList.get(activeSubProcessList.size() - 1);
-                        if (subProcess instanceof AdhocSubProcess) {
-                            AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;
+                        if (subProcess instanceof AdhocSubProcess adhocSubProcess) {
                             adhocSubProcess.setCompletionCondition(xtr.getElementText());
                         }
                     }
@@ -471,8 +479,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
     protected void processFlowElements(Collection<FlowElement> flowElementList, BaseElement parentScope) {
         for (FlowElement flowElement : flowElementList) {
-            if (flowElement instanceof SequenceFlow) {
-                SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+            if (flowElement instanceof SequenceFlow sequenceFlow) {
                 FlowNode sourceNode = getFlowNodeFromScope(sequenceFlow.getSourceRef(), parentScope);
                 if (sourceNode != null) {
                     sourceNode.getOutgoingFlows().add(sequenceFlow);
@@ -485,17 +492,14 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     sequenceFlow.setTargetFlowElement(targetNode);
                 }
 
-            } else if (flowElement instanceof BoundaryEvent) {
-                BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+            } else if (flowElement instanceof BoundaryEvent boundaryEvent) {
                 FlowElement attachedToElement = getFlowNodeFromScope(boundaryEvent.getAttachedToRefId(), parentScope);
-                if (attachedToElement instanceof Activity) {
-                    Activity attachedActivity = (Activity) attachedToElement;
+                if (attachedToElement instanceof Activity attachedActivity) {
                     boundaryEvent.setAttachedToRef(attachedActivity);
                     attachedActivity.getBoundaryEvents().add(boundaryEvent);
                 }
 
-            } else if (flowElement instanceof SubProcess) {
-                SubProcess subProcess = (SubProcess) flowElement;
+            } else if (flowElement instanceof SubProcess subProcess) {
                 Collection<FlowElement> childFlowElements = subProcess.getFlowElements();
                 processFlowElements(childFlowElements, subProcess);
             }
@@ -578,9 +582,8 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
     protected void createXML(FlowElement flowElement, BpmnModel model, XMLStreamWriter xtw) throws Exception {
 
-        if (flowElement instanceof SubProcess) {
+        if (flowElement instanceof SubProcess subProcess) {
 
-            SubProcess subProcess = (SubProcess) flowElement;
             if (flowElement instanceof Transaction) {
                 xtw.writeStartElement(ELEMENT_TRANSACTION);
             } else if (flowElement instanceof AdhocSubProcess) {
@@ -601,8 +604,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             if (subProcess instanceof EventSubProcess) {
                 xtw.writeAttribute(ATTRIBUTE_TRIGGERED_BY, ATTRIBUTE_VALUE_TRUE);
 
-            } else if (subProcess instanceof AdhocSubProcess) {
-                AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;
+            } else if (subProcess instanceof AdhocSubProcess adhocSubProcess) {
                 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_CANCEL_REMAINING_INSTANCES, String.valueOf(adhocSubProcess.isCancelRemainingInstances()), xtw);
                 if (StringUtils.isNotEmpty(adhocSubProcess.getOrdering())) {
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_ORDERING, adhocSubProcess.getOrdering(), xtw);
@@ -647,8 +649,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                 createXML(subElement, model, xtw);
             }
 
-            if (subProcess instanceof AdhocSubProcess) {
-                AdhocSubProcess adhocSubProcess = (AdhocSubProcess) subProcess;
+            if (subProcess instanceof AdhocSubProcess adhocSubProcess) {
                 if (StringUtils.isNotEmpty(adhocSubProcess.getCompletionCondition())) {
                     xtw.writeStartElement(ELEMENT_COMPLETION_CONDITION);
                     xtw.writeCData(adhocSubProcess.getCompletionCondition());

@@ -7,8 +7,8 @@
     <insert id="insertHistoricPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+            START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values (
             #{id, jdbcType=VARCHAR},
             1, #{name, jdbcType=NVARCHAR},
@@ -31,10 +31,13 @@
             #{completedTime, jdbcType=TIMESTAMP},
             #{occurredTime, jdbcType=TIMESTAMP},
             #{terminatedTime, jdbcType=TIMESTAMP},
+            #{failedTime, jdbcType=TIMESTAMP},
             #{exitTime, jdbcType=TIMESTAMP},
             #{endedTime, jdbcType=TIMESTAMP},
             #{lastUpdatedTime, jdbcType=TIMESTAMP},
             #{startUserId, jdbcType=VARCHAR},
+            #{assignee, jdbcType=NVARCHAR},
+            #{completedBy, jdbcType=NVARCHAR},
             #{referenceId, jdbcType=VARCHAR},
             #{referenceType, jdbcType=VARCHAR},
             #{entryCriterionId, jdbcType=VARCHAR},
@@ -48,8 +51,8 @@
     <insert id="bulkInsertHistoricPlanItemInstance" parameterType="java.util.List">
         insert into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
         ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-        START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
+        LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+        START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicPlanItemInstance" index="index" separator=",">
             (
@@ -74,10 +77,13 @@
             #{historicPlanItemInstance.completedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.occurredTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+            #{historicPlanItemInstance.failedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.exitTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
             #{historicPlanItemInstance.startUserId, jdbcType=VARCHAR},
+            #{historicPlanItemInstance.assignee, jdbcType=NVARCHAR},
+            #{historicPlanItemInstance.completedBy, jdbcType=NVARCHAR},
             #{historicPlanItemInstance.referenceId, jdbcType=VARCHAR},
             #{historicPlanItemInstance.referenceType, jdbcType=VARCHAR},
             #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
@@ -94,8 +100,8 @@
         <foreach collection="list" item="historicPlanItemInstance" index="index">
             into ${prefix}ACT_CMMN_HI_PLAN_ITEM_INST (ID_, REV_, NAME_, STATE_, CASE_DEF_ID_, DERIVED_CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_,
             ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, CREATE_TIME_, LAST_AVAILABLE_TIME_, LAST_UNAVAILABLE_TIME_, LAST_ENABLED_TIME_, LAST_DISABLED_TIME_,
-            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
-            START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
+            LAST_STARTED_TIME_, LAST_SUSPENDED_TIME_, COMPLETED_TIME_, OCCURRED_TIME_, TERMINATED_TIME_, FAILED_TIME_, EXIT_TIME_, ENDED_TIME_, LAST_UPDATED_TIME_,
+            START_USER_ID_, ASSIGNEE_, COMPLETED_BY_, REFERENCE_ID_, REFERENCE_TYPE_, ENTRY_CRITERION_ID_, EXIT_CRITERION_ID_, SHOW_IN_OVERVIEW_, EXTRA_VALUE_, TENANT_ID_)
             VALUES (
                 #{historicPlanItemInstance.id, jdbcType=VARCHAR},
                 1, #{historicPlanItemInstance.name, jdbcType=NVARCHAR},
@@ -118,10 +124,13 @@
                 #{historicPlanItemInstance.completedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.occurredTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.terminatedTime, jdbcType=TIMESTAMP},
+                #{historicPlanItemInstance.failedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.exitTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.endedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.lastUpdatedTime, jdbcType=TIMESTAMP},
                 #{historicPlanItemInstance.startUserId, jdbcType=VARCHAR},
+                #{historicPlanItemInstance.assignee, jdbcType=NVARCHAR},
+                #{historicPlanItemInstance.completedBy, jdbcType=NVARCHAR},
                 #{historicPlanItemInstance.referenceId, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.referenceType, jdbcType=VARCHAR},
                 #{historicPlanItemInstance.entryCriterionId, jdbcType=VARCHAR},
@@ -199,6 +208,9 @@
             <if test="originalPersistentState.terminatedTime != terminatedTime">
                 TERMINATED_TIME_ = #{terminatedTime, jdbcType=TIMESTAMP},
             </if>
+            <if test="originalPersistentState.failedTime != failedTime">
+                FAILED_TIME_ = #{failedTime, jdbcType=TIMESTAMP},
+            </if>
             <if test="originalPersistentState.exitTime != exitTime">
                 EXIT_TIME_ = #{exitTime, jdbcType=TIMESTAMP},
             </if>
@@ -210,6 +222,12 @@
             </if>
             <if test="originalPersistentState.startUserId != startUserId">
                 START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.assignee != assignee">
+                ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR},
+            </if>
+            <if test="originalPersistentState.completedBy != completedBy">
+                COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR},
             </if>
             <if test="originalPersistentState.referenceId != referenceId">
                 REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
@@ -296,10 +314,13 @@
         <result property="completedTime" column="COMPLETED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="occurredTime" column="OCCURRED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="terminatedTime" column="TERMINATED_TIME_" jdbcType="TIMESTAMP"/>
+        <result property="failedTime" column="FAILED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="exitTime" column="EXIT_TIME_" jdbcType="TIMESTAMP"/>
         <result property="endedTime" column="ENDED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="lastUpdatedTime" column="LAST_UPDATED_TIME_" jdbcType="TIMESTAMP"/>
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR"/>
+        <result property="assignee" column="ASSIGNEE_" jdbcType="NVARCHAR"/>
+        <result property="completedBy" column="COMPLETED_BY_" jdbcType="NVARCHAR"/>
         <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR"/>
         <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR"/>
         <result property="entryCriterionId" column="ENTRY_CRITERION_ID_" jdbcType="VARCHAR" />
@@ -395,6 +416,19 @@
             <if test="caseInstanceId != null">
                 and RES.CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR}
             </if>
+            <if test="caseInstanceIds != null and !caseInstanceIds.empty">
+                and (
+                <foreach item="caseInstanceIdListItem" index="groupIndex" collection="safeCaseInstanceIds">
+                    <if test="groupIndex &gt; 0">
+                        or
+                    </if>
+                    RES.CASE_INST_ID_ IN
+                    <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                        #{caseInstanceId, jdbcType=VARCHAR}
+                    </foreach>
+                </foreach>
+                )
+            </if>
             <if test="stageInstanceId != null">
                 and RES.STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR}
             </if>
@@ -470,6 +504,12 @@
             <if test="terminatedAfter != null">
                 and RES.TERMINATED_TIME_ &gt;= #{terminatedAfter, jdbcType=TIMESTAMP}
             </if>
+            <if test="failedBefore != null">
+                and RES.FAILED_TIME_ &lt;= #{failedBefore, jdbcType=TIMESTAMP}
+            </if>
+            <if test="failedAfter != null">
+                and RES.FAILED_TIME_ &gt;= #{failedAfter, jdbcType=TIMESTAMP}
+            </if>
             <if test="exitBefore != null">
                 and RES.EXIT_TIME_ &lt;= #{exitBefore, jdbcType=TIMESTAMP}
             </if>
@@ -490,6 +530,12 @@
             </if>
             <if test="startUserId != null">
                 and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
+            </if>
+            <if test="assignee != null">
+                and RES.ASSIGNEE_ = #{assignee, jdbcType=NVARCHAR}
+            </if>
+            <if test="completedBy != null">
+                and RES.COMPLETED_BY_ = #{completedBy, jdbcType=NVARCHAR}
             </if>
             <if test="referenceId != null">
                 and RES.REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR}

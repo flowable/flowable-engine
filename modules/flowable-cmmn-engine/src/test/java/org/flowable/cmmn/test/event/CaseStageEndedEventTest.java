@@ -23,14 +23,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.scope.ScopeTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Micha Kiener
@@ -38,13 +38,13 @@ import org.junit.Test;
 public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     protected CustomEventListener stageListener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         stageListener = new CustomEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(stageListener, FlowableEngineEventType.STAGE_ENDED);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (stageListener != null) {
             cmmnEngineConfiguration.getEventDispatcher().removeEventListener(stageListener);
@@ -56,8 +56,7 @@ public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageCompletedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageEndedEvent) {
-                FlowableCaseStageEndedEvent caseStageEndedEvent = (FlowableCaseStageEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageEndedEvent caseStageEndedEvent) {
                 CaseInstance eventCaseInstance = caseStageEndedEvent.getCaseInstance();
                 assertThat(caseStageEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageEndedEvent.getExecutionId()).isNull();
@@ -102,8 +101,7 @@ public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageForceCompletedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageEndedEvent) {
-                FlowableCaseStageEndedEvent caseStageEndedEvent = (FlowableCaseStageEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageEndedEvent caseStageEndedEvent) {
                 CaseInstance eventCaseInstance = caseStageEndedEvent.getCaseInstance();
                 assertThat(caseStageEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageEndedEvent.getExecutionId()).isNull();
@@ -145,8 +143,7 @@ public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageForceCompletedAfterSubStageCompletedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageEndedEvent) {
-                FlowableCaseStageEndedEvent caseStageEndedEvent = (FlowableCaseStageEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageEndedEvent caseStageEndedEvent) {
                 CaseInstance eventCaseInstance = caseStageEndedEvent.getCaseInstance();
                 assertThat(caseStageEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageEndedEvent.getExecutionId()).isNull();
@@ -191,8 +188,7 @@ public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageForceExitEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageEndedEvent) {
-                FlowableCaseStageEndedEvent caseStageEndedEvent = (FlowableCaseStageEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageEndedEvent caseStageEndedEvent) {
                 CaseInstance eventCaseInstance = caseStageEndedEvent.getCaseInstance();
                 assertThat(caseStageEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageEndedEvent.getExecutionId()).isNull();
@@ -234,8 +230,7 @@ public class CaseStageEndedEventTest extends FlowableCmmnTestCase {
     public void testCaseStageForceExitAfterSubStageCompletedEvents() {
         List<FlowableEvent> events = new ArrayList<>();
         stageListener.eventConsumer = (flowableEvent) -> {
-            if (flowableEvent instanceof FlowableCaseStageEndedEvent) {
-                FlowableCaseStageEndedEvent caseStageEndedEvent = (FlowableCaseStageEndedEvent) flowableEvent;
+            if (flowableEvent instanceof FlowableCaseStageEndedEvent caseStageEndedEvent) {
                 CaseInstance eventCaseInstance = caseStageEndedEvent.getCaseInstance();
                 assertThat(caseStageEndedEvent.getProcessInstanceId()).isNull();
                 assertThat(caseStageEndedEvent.getExecutionId()).isNull();

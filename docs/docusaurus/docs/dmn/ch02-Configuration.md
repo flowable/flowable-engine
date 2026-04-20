@@ -400,7 +400,7 @@ With Maven, for example, add a dependency like this (here using log4j), note tha
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>slf4j-reload4j</artifactId>
     </dependency>
 
 The flowable-rest webapp is configured to use Log4j-binding. Log4j is also used when running the tests for all the flowable-\* modules.

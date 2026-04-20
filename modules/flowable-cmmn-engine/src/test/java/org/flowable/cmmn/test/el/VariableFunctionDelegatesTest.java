@@ -23,12 +23,12 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -211,7 +211,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngine.getCmmnEngineConfiguration().getObjectMapper();
         ArrayNode arrayNode = objectMapper.createArrayNode();
         arrayNode.add(1);
         arrayNode.add(2);
@@ -262,7 +262,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIsNotEmptyFunction")
                 .variable("myVar", objectMapper.createArrayNode())
@@ -306,7 +306,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsFunction")
                 .variable("myVar", objectMapper.createArrayNode())
@@ -373,7 +373,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testVariableContainsAllArrayNode() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsFunction")
                 .variable("myVar", objectMapper.createArrayNode())
@@ -423,7 +423,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsAnyFunction")
                 .variable("myVar", objectMapper.createArrayNode())
@@ -476,7 +476,7 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testVariableContainsAnyArrayNode() {
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsAnyFunction")
                 .variable("myVar", objectMapper.createArrayNode())

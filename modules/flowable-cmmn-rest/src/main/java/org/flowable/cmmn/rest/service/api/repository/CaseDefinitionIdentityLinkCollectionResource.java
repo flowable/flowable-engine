@@ -38,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionIdentityLinkCollectionResource extends BaseCaseDefinitionResource {
 
     @ApiOperation(value = "List candidate starters for a case definition", nickname = "listCaseDefinitionIdentityLinks", tags = { "Case Definitions" })

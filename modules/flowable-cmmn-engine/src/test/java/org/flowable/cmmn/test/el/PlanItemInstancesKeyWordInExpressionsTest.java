@@ -23,11 +23,11 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.Command;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -142,6 +142,18 @@ public class PlanItemInstancesKeyWordInExpressionsTest extends FlowableCmmnTestC
 
         assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid').count()}")).isEqualTo(0);
         assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.name('invalid', 'A').count()}")).isEqualTo(1);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/el/PlanItemInstancesKeyWordInExpressionsTest.testWithName.cmmn")
+    public void testWithFilterUsingLambda() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testPlanItemInstancesKeyWord").start();
+
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.count()}")).isEqualTo(8);
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.filter(inst -> inst.name eq 'A' or inst.name eq 'B').count()}")).isEqualTo(2);
+
+        assertThat(evaluateExpression(caseInstance.getId(), "${planItemInstances.filter(inst -> inst.name eq 'invalid').count()}")).isEqualTo(0);
     }
 
     @Test

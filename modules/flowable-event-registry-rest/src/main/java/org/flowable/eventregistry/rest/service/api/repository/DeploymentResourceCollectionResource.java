@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Registry Deployment" }, description = "Manage Event Registry Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Registry Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentResourceCollectionResource extends BaseDeploymentResource {
 
     @Autowired

@@ -14,7 +14,9 @@
 package org.flowable.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -69,9 +71,12 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected boolean deleted;
     protected boolean notDeleted;
     protected String startedBy;
+    protected String finishedBy;
+    protected String state;
     protected String superProcessInstanceId;
     protected boolean excludeSubprocesses;
     protected List<String> processDefinitionKeyIn;
+    protected List<String> excludeProcessDefinitionKeys;
     protected List<String> processKeyNotIn;
     protected Date startedBefore;
     protected Date startedAfter;
@@ -88,6 +93,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String processDefinitionNameLikeIgnoreCase;
     protected Integer processDefinitionVersion;
     protected Set<String> processInstanceIds;
+    private List<List<String>> safeProcessInstanceIds;
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String involvedUser;
@@ -96,6 +102,7 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     private List<List<String>> safeInvolvedGroups;
     protected IdentityLinkQueryObject involvedGroupIdentityLink;
     protected boolean includeProcessVariables;
+    protected Collection<String> variableNamesToInclude;
     protected boolean withJobException;
     protected String tenantId;
     protected String tenantIdLike;
@@ -107,12 +114,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String rootScopeId;
     protected String parentScopeId;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean withoutSorting;
+    protected boolean returnIdsOnly;
     protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricProcessInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
@@ -183,6 +194,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.processDefinitionKeyIn = processDefinitionKeys;
         } else {
             this.processDefinitionKeyIn = processDefinitionKeys;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery excludeProcessDefinitionKeys(List<String> excludeProcessDefinitionKeys) {
+        if (inOrStatement) {
+            currentOrQueryObject.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
+        } else {
+            this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
         }
         return this;
     }
@@ -428,6 +449,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
+    public HistoricProcessInstanceQuery finishedBy(String finishedBy) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.finishedBy = finishedBy;
+        } else {
+            this.finishedBy = finishedBy;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery state(String state) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys) {
         if (inOrStatement) {
             this.currentOrQueryObject.processKeyNotIn = processDefinitionKeys;
@@ -584,6 +625,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
+    public HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            throw new FlowableIllegalArgumentException("variableNames are null or empty");
+        }
+        includeProcessVariables();
+        this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
+        return this;
+    }
+
+    @Override
     public HistoricProcessInstanceQuery withJobException() {
         if (inOrStatement) {
             this.currentOrQueryObject.withJobException = true;
@@ -681,6 +732,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
         return this;
     }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
+        }
+        return this;
+    }
     
     @Override
     public HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType) {
@@ -688,6 +752,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
+        } else {
+            this.parentCaseInstanceId = parentCaseInstanceId;
         }
         return this;
     }
@@ -990,7 +1064,19 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     @Override
     public HistoricProcessInstanceQuery withLocalizationFallback() {
-        withLocalizationFallback = true;
+        this.withLocalizationFallback = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery withoutSorting() {
+        this.withoutSorting = true;
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
         return this;
     }
 
@@ -1070,13 +1156,21 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public List<HistoricProcessInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
+        
+        if (withoutSorting) {
+            setIgnoreOrderBy();
+        }
+        
         List<HistoricProcessInstance> results = null;
         
         if (processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor() != null) {
             processEngineConfiguration.getHistoricProcessInstanceQueryInterceptor().beforeHistoricProcessInstanceQueryExecute(this);
         }
         
-        if (includeProcessVariables) {
+        if (returnIdsOnly) {
+            results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstanceIdsByQueryCriteria(this);
+            
+        } else if (includeProcessVariables) {
             results = processEngineConfiguration.getHistoricProcessInstanceEntityManager().findHistoricProcessInstancesAndVariablesByQueryCriteria(this);
 
             if (processInstanceId != null) {
@@ -1130,9 +1224,15 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     @Override
     public void enhanceCachedValue(HistoricProcessInstanceEntity processInstance) {
         if (includeProcessVariables) {
-            processInstance.getQueryVariables()
-                    .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
-                            .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
+            if (variableNamesToInclude == null) {
+                processInstance.getQueryVariables()
+                        .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId()));
+            } else {
+                processInstance.getQueryVariables()
+                        .addAll(processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager()
+                                .findHistoricalVariableInstancesByProcessInstanceId(processInstance.getId(), variableNamesToInclude));
+            }
         }
     }
 
@@ -1225,6 +1325,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return processDefinitionKeyIn;
     }
 
+    public List<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
+    }
+
     public String getProcessDefinitionIdLike() {
         return processDefinitionKey + ":%:%";
     }
@@ -1272,6 +1376,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getStartedBy() {
         return startedBy;
+    }
+
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public String getState() {
+        return state;
     }
 
     public String getSuperProcessInstanceId() {
@@ -1358,6 +1470,10 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return includeProcessVariables;
     }
 
+    public Collection<String> getVariableNamesToInclude() {
+        return variableNamesToInclude;
+    }
+
     public boolean isWithException() {
         return withJobException;
     }
@@ -1382,8 +1498,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return callbackId;
     }
 
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
     }
 
     public boolean isWithoutCallbackId() {
@@ -1434,6 +1558,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         }
 
         return hasOrderByForColumn(HistoricProcessInstanceQueryProperty.PROCESS_DEFINITION_KEY.getName());
+    }
+
+    public List<List<String>> getSafeProcessInstanceIds() {
+        return safeProcessInstanceIds;
+    }
+
+    public void setSafeProcessInstanceIds(List<List<String>> safeProcessInstanceIds) {
+        this.safeProcessInstanceIds = safeProcessInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

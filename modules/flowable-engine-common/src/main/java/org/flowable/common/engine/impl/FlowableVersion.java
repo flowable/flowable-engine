@@ -63,10 +63,9 @@ public class FlowableVersion {
     
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof FlowableVersion)) {
+        if (!(obj instanceof FlowableVersion other)) {
             return false;
         }
-        FlowableVersion other = (FlowableVersion) obj;
         boolean mainVersionEqual = mainVersion.equals(other.mainVersion);
         if (!mainVersionEqual) {
             return false;

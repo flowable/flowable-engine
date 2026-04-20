@@ -38,8 +38,8 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.service.impl.QueryVariableValue;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -184,6 +184,7 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "caseDefinitionKeyLike", query.getCaseDefinitionKeyLike());
         putIfNotNull(queryNode, "caseDefinitionKeyLikeIgnoreCase", query.getCaseDefinitionKeyLikeIgnoreCase());
         putIfNotNullOrEmpty(queryNode, "caseDefinitionKeys", query.getCaseDefinitionKeys());
+        putIfNotNullOrEmpty(queryNode, "excludeCaseDefinitionKeys", query.getExcludeCaseDefinitionKeys());
         putIfNotNullOrEmpty(queryNode, "caseDefinitionIds", query.getCaseDefinitionIds());
         putIfNotNull(queryNode, "caseDefinitionName", query.getCaseDefinitionName());
         putIfNotNull(queryNode, "caseDefinitionNameLike", query.getCaseDefinitionNameLike());
@@ -217,10 +218,12 @@ public class DeleteHistoricCaseInstancesUsingBatchesCmd implements Command<Strin
         putIfNotNull(queryNode, "finishedBefore", query.getFinishedBefore());
         putIfNotNull(queryNode, "finishedAfter", query.getFinishedAfter());
         putIfNotNull(queryNode, "startedBy", query.getStartedBy());
+        putIfNotNull(queryNode, "finishedBy", query.getFinishedBy());
         putIfNotNull(queryNode, "lastReactivatedBefore", query.getLastReactivatedBefore());
         putIfNotNull(queryNode, "lastReactivatedAfter", query.getLastReactivatedAfter());
         putIfNotNull(queryNode, "lastReactivatedBy", query.getLastReactivatedBy());
         putIfNotNull(queryNode, "callbackId", query.getCallbackId());
+        putIfNotNullOrEmpty(queryNode, "callbackIds", query.getCallbackIds());
         putIfNotNull(queryNode, "callbackType", query.getCallbackType());
         putIfTrue(queryNode, "withoutCallbackId", query.isWithoutCallbackId());
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());

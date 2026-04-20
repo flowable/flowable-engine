@@ -37,6 +37,8 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
 
     List<HistoricCaseInstance> findWithVariablesByQueryCriteria(HistoricCaseInstanceQuery query);
+    
+    List<HistoricCaseInstance> findIdsByCriteria(HistoricCaseInstanceQuery query);
 
     long countByCriteria(HistoricCaseInstanceQuery query);
     

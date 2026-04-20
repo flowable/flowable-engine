@@ -50,6 +50,8 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
         if (commandContext.isReused() && !agenda.isEmpty()) {
             commandContext.setResult(command.execute(commandContext));
         } else {
+            executeExecutionListenersBeforeAll(commandContext);
+
             agenda.planOperation(new Runnable() {
                 @Override
                 public void run() {
@@ -58,6 +60,8 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
             });
 
             executeOperations(commandContext);
+
+            executeExecutionListenersAfterAll(commandContext);
         }
         
         return (T) commandContext.getResult();
@@ -75,6 +79,22 @@ public class DmnCommandInvoker extends AbstractCommandInterceptor {
                 ExceptionUtil.sneakyThrow(throwable);
             }
             executeExecutionListenersAfterExecute(commandContext, runnable);
+        }
+    }
+
+    protected void executeExecutionListenersBeforeAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterAll(commandContext);
+            }
         }
     }
 

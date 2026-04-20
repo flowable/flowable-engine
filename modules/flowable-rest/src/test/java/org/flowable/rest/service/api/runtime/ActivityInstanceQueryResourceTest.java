@@ -31,11 +31,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the activity instance query resource.
@@ -118,6 +117,10 @@ public class ActivityInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
 
         requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("processInstanceIds").add("someOtherId").add(processInstance.getId());
+        assertResultsPresentInDataResponse(url, requestNode, 5, "theStart", "flow1", "processTask", "flow2", "processTask2");
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processInstance.getProcessDefinitionId());
         assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "processTask", "flow2", "processTask2");
 
@@ -134,7 +137,7 @@ public class ActivityInstanceQueryResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, requestNode, 0);
     }
 
-    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedActivityIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedActivityIds) throws IOException {
 
         // Do the actual call
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
@@ -151,7 +154,7 @@ public class ActivityInstanceQueryResourceTest extends BaseSpringRestTestCase {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
-                String activityId = it.next().get("activityId").textValue();
+                String activityId = it.next().get("activityId").stringValue();
                 toBeFound.remove(activityId);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

@@ -122,14 +122,12 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
                 
                 CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) execution;
                 
-                if (job instanceof TimerJobEntity) {
-                    TimerJobEntity timerJobEntity = (TimerJobEntity) job;
+                if (job instanceof TimerJobEntity timerJobEntity) {
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setTimerJobCount(countingExecutionEntity.getTimerJobCount() + 1);
                     }
                     
-                } else if (job instanceof JobEntity) {
-                    JobEntity jobEntity = (JobEntity) job;
+                } else if (job instanceof JobEntity jobEntity) {
 
                     if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(execution)) {
                         countingExecutionEntity.setJobCount(countingExecutionEntity.getJobCount() + 1);
@@ -287,16 +285,14 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
     protected int getMaxIterations(org.flowable.bpmn.model.Process process, String activityId) {
         FlowElement flowElement = process.getFlowElement(activityId, true);
         if (flowElement != null) {
-            if (flowElement instanceof Event) {
+            if (flowElement instanceof Event event) {
 
-                Event event = (Event) flowElement;
                 List<EventDefinition> eventDefinitions = event.getEventDefinitions();
 
                 if (eventDefinitions != null) {
 
                     for (EventDefinition eventDefinition : eventDefinitions) {
-                        if (eventDefinition instanceof TimerEventDefinition) {
-                            TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
+                        if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
                             if (timerEventDefinition.getTimeCycle() != null) {
                                 return calculateMaxIterationsValue(timerEventDefinition.getTimeCycle());
                             }

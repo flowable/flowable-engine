@@ -14,7 +14,7 @@ package org.flowable.engine.impl.webservice;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -36,10 +36,10 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * An integration test for CXF based web services
@@ -338,9 +338,9 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         final Object currentStructure = histProcInst.getProcessVariables().get("currentStructure");
         assertThat(currentStructure).isInstanceOf(JsonNode.class);
         final JsonNode currentStructureJson = (JsonNode) currentStructure;
-        assertThat(currentStructureJson.findValue("eltString").asText()).isEqualTo(myString);
+        assertThat(currentStructureJson.findValue("eltString").asString()).isEqualTo(myString);
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        final String myDateJson = currentStructureJson.findValue("eltDate").asText();
+        final String myDateJson = currentStructureJson.findValue("eltDate").asString();
         assertThat(sdf.parse(myDateJson)).isEqualTo(myDate);
     }
 
@@ -360,10 +360,12 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
 
         final HistoricProcessInstance histProcInst = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstance.getId()).includeProcessVariables().singleResult();
-        final Map<String, Object> procVariables = histProcInst.getProcessVariables();
-        assertEquals("23", procVariables.get("outParam1"));
-        assertEquals(23, procVariables.get("outParam2"));
-        assertEquals("23-23", procVariables.get("outParam3"));
+        assertThat(histProcInst.getProcessVariables())
+                .contains(
+                        entry("outParam1", "23"),
+                        entry("outParam2", 23),
+                        entry("outParam3", "23-23")
+                );
     }
 
 }

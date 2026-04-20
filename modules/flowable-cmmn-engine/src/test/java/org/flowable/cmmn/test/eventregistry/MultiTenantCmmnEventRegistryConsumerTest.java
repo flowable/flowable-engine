@@ -32,13 +32,12 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -67,14 +66,15 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
 
     private Set<String> cleanupDeploymentIds = new HashSet<>();
 
-    @Before
+    @BeforeEach
     public void setup() {
         getEventRegistryEngineConfiguration().setFallbackToDefaultTenant(true);
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
-        beans.put("inboundChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("sharedInboundChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("tenantAChannelAdapter", new TestInboundChannelAdapter());
-        beans.put("tenantBChannelAdapter", new TestInboundChannelAdapter());
+        ObjectMapper objectMapper = cmmnEngineConfiguration.getObjectMapper();
+        beans.put("inboundChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("sharedInboundChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("tenantAChannelAdapter", new TestInboundChannelAdapter(objectMapper));
+        beans.put("tenantBChannelAdapter", new TestInboundChannelAdapter(objectMapper));
 
         // Shared channel and event in default tenant
         getEventRepositoryService().createInboundChannelModelBuilder()
@@ -152,7 +152,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         eventModelBuilder.deploy();
     }
 
-    @After
+    @AfterEach
     public void cleanup() {
         getEventRepositoryService().createDeploymentQuery().list()
                 .forEach(eventDeployment -> getEventRepositoryService().deleteDeployment(eventDeployment.getId()));
@@ -394,6 +394,11 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -406,8 +411,6 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
         }
 
         public void triggerEventWithoutTenantId(String customerId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "tenantAKey");
             if (customerId != null) {
@@ -416,16 +419,10 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
 
             json.put("payload", "Hello World");
 
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
 
         public void triggerEventForTenantId(String customerId, String tenantId) {
-            ObjectMapper objectMapper = new ObjectMapper();
-
             ObjectNode json = objectMapper.createObjectNode();
             json.put("type", "tenantAKey");
             if (customerId != null) {
@@ -439,11 +436,7 @@ public class MultiTenantCmmnEventRegistryConsumerTest extends FlowableEventRegis
             json.put("payload", "Hello World");
             json.put("tenantId", tenantId);
 
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
 
     }

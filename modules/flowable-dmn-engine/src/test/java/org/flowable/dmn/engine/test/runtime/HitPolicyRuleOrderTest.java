@@ -18,25 +18,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyRuleOrderTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyRuleOrderTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void ruleOrderHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()

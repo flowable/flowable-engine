@@ -38,8 +38,7 @@ public class StandardEventXmlConverter extends CaseElementXmlConverter {
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         try {
             String event = xtr.getElementText();
-            if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-                TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
+            if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener timerEventListener) {
                 timerEventListener.setTimerStartTriggerStandardEvent(event);
             } else {
                 conversionHelper.getCurrentSentryOnPart().setStandardEvent(event);

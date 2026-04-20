@@ -13,7 +13,9 @@
 package org.flowable.cmmn.engine.impl.runtime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +49,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Set<String> caseDefinitionKeys;
+    protected Set<String> excludeCaseDefinitionKeys;
     protected Set<String> caseDefinitionIds;
     protected String caseDefinitionCategory;
     protected String caseDefinitionCategoryLike;
@@ -68,6 +71,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String businessStatusLikeIgnoreCase;
     protected String caseInstanceId;
     protected Set<String> caseInstanceIds;
+    private List<List<String>> safeCaseInstanceIds;
     protected String caseInstanceParentId;
     protected String caseInstanceParentPlanItemInstanceId;
     protected Date startedBefore;
@@ -78,7 +82,9 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected Date lastReactivatedAfter;
     protected String lastReactivatedBy;
     protected String callbackId;
+    protected Set<String> callbackIds;
     protected String callbackType;
+    protected String parentCaseInstanceId;
     protected String referenceId;
     protected String referenceType;
     protected boolean completeable;
@@ -87,6 +93,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String tenantIdLikeIgnoreCase;
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
+    protected Collection<String> variableNamesToInclude;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -471,6 +478,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         }
         return this;
     }
+    
+    @Override
+    public CaseInstanceQueryImpl excludeCaseDefinitionKeys(Set<String> excludeCaseDefinitionKeys) {
+        if (excludeCaseDefinitionKeys == null) {
+            throw new FlowableIllegalArgumentException("Case definition keys is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
+        } else {
+            this.excludeCaseDefinitionKeys = excludeCaseDefinitionKeys;
+        }
+        return this;
+    }
 
     @Override
     public CaseInstanceQueryImpl caseInstanceParentId(String parentId) {
@@ -592,6 +612,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    public CaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds) {
+        if (callbackIds == null || callbackIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("callbackIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackIds = callbackIds;
+        } else {
+            this.callbackIds = callbackIds;
+        }
+        return this;
+    }
+
+    @Override
     public CaseInstanceQuery caseInstanceCallbackType(String callbackType) {
         if (callbackType == null) {
             throw new FlowableIllegalArgumentException("callbackType is null");
@@ -600,6 +633,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.callbackType = callbackType;
         } else {
             this.callbackType = callbackType;
+        }
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId) {
+        if (parentCaseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("parentCaseInstanceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
+        } else {
+            this.parentCaseInstanceId = parentCaseInstanceId;
         }
         return this;
     }
@@ -973,6 +1019,16 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    public CaseInstanceQuery includeCaseVariables(Collection<String> variableNames) {
+        if (variableNames == null || variableNames.isEmpty()) {
+            throw new FlowableIllegalArgumentException("variableNames is null or empty");
+        }
+        includeCaseVariables();
+        this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
+        return this;
+    }
+
+    @Override
     public CaseInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;
@@ -1014,8 +1070,17 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     @Override
     public void enhanceCachedValue(CaseInstanceEntity caseInstance) {
         if (isIncludeCaseVariables()) {
-            caseInstance.getQueryVariables().addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
-                    .findVariableInstanceByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            if (variableNamesToInclude == null) {
+                caseInstance.getQueryVariables().addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                        .findVariableInstanceByScopeIdAndScopeType(caseInstance.getId(), ScopeTypes.CMMN));
+            } else {
+                caseInstance.getQueryVariables().addAll(cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService()
+                        .createInternalVariableInstanceQuery()
+                        .scopeId(caseInstance.getId())
+                        .withoutSubScopeId()
+                        .scopeType(ScopeTypes.CMMN)
+                        .names(variableNamesToInclude).list());
+            }
         }
     }
 
@@ -1124,6 +1189,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return caseDefinitionKeys;
     }
 
+    public Set<String> getExcludeCaseDefinitionKeys() {
+        return excludeCaseDefinitionKeys;
+    }
+
     public String getParentId() {
         return caseInstanceParentId;
     }
@@ -1156,8 +1225,36 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return callbackId;
     }
 
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
     public String getCallbackType() {
         return callbackType;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNameLike() {
+        return nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
     }
 
     public String getReferenceId() {
@@ -1216,6 +1313,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return includeCaseVariables;
     }
 
+    public Collection<String> getVariableNamesToInclude() {
+        return variableNamesToInclude;
+    }
+
     public boolean isNeedsCaseDefinitionOuterJoin() {
         if (isNeedsPaging()) {
             if (AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
@@ -1232,6 +1333,14 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public List<CaseInstanceQueryImpl> getOrQueryObjects() {
         return orQueryObjects;
+    }
+
+    public List<List<String>> getSafeCaseInstanceIds() {
+        return safeCaseInstanceIds;
+    }
+
+    public void setSafeCaseInstanceIds(List<List<String>> safeCaseInstanceIds) {
+        this.safeCaseInstanceIds = safeCaseInstanceIds;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

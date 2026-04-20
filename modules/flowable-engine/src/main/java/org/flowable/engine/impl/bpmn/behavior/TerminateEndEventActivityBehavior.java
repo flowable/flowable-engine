@@ -35,6 +35,7 @@ import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
@@ -80,7 +81,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         String deleteReason = createDeleteReason(execution.getCurrentActivityId());
         deleteExecutionEntities(executionEntityManager, rootExecutionEntity, execution, deleteReason);
         endAllHistoricActivities(rootExecutionEntity.getId(), deleteReason);
-        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(rootExecutionEntity,
+        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(rootExecutionEntity, ProcessInstanceState.COMPLETED,
                 deleteReason, execution.getCurrentActivityId(), CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
     }
 
@@ -99,14 +100,13 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
         if (scopeExecutionEntity.isProcessInstanceType() && scopeExecutionEntity.getSuperExecutionId() == null) {
             endAllHistoricActivities(scopeExecutionEntity.getId(), deleteReason);
             deleteExecutionEntities(executionEntityManager, scopeExecutionEntity, execution, deleteReason);
-            CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceEnd(scopeExecutionEntity, deleteReason, execution.getCurrentActivityId(),
-                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
+            CommandContextUtil.getHistoryManager(commandContext)
+                    .recordProcessInstanceEnd(scopeExecutionEntity, ProcessInstanceState.COMPLETED, deleteReason, execution.getCurrentActivityId(),
+                            CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime());
 
         } else if (scopeExecutionEntity.getCurrentFlowElement() != null
-                && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess) { // SubProcess
+                && scopeExecutionEntity.getCurrentFlowElement() instanceof SubProcess subProcess) { // SubProcess
 
-            SubProcess subProcess = (SubProcess) scopeExecutionEntity.getCurrentFlowElement();
-            
             scopeExecutionEntity.setDeleteReason(deleteReason);
             if (subProcess.hasMultiInstanceLoopCharacteristics()) {
                 CommandContextUtil.getAgenda(commandContext).planDestroyScopeOperation(scopeExecutionEntity);

@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * @author Tijs Rademakers
  */
-public class HumanTask extends Task {
+public class HumanTask extends Task implements HasValidateFormFields {
 
     protected String assignee;
     protected String owner;
@@ -74,10 +74,12 @@ public class HumanTask extends Task {
         this.sameDeployment = sameDeployment;
     }
 
+    @Override
     public String getValidateFormFields() {
         return validateFormFields;
     }
 
+    @Override
     public void setValidateFormFields(String validateFormFields) {
         this.validateFormFields = validateFormFields;
     }

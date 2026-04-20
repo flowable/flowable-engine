@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.query;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -21,10 +22,12 @@ import org.flowable.common.engine.api.query.Query;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 
 /**
  * Abstract superclass for all query types.
@@ -95,6 +98,10 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         if (orderProperty != null) {
             throw new FlowableIllegalArgumentException("Invalid query: call asc() or desc() after using orderByXX()");
         }
+    }
+
+    protected <E> List<List<E>> getSafeList(Collection<E> collection) {
+        return CollectionUtil.partition(collection, AbstractDataManager.MAX_ENTRIES_IN_CLAUSE);
     }
 
     @Override

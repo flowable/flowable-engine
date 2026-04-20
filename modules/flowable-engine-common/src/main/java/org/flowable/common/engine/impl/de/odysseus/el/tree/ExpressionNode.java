@@ -30,18 +30,18 @@ public interface ExpressionNode extends Node {
 	/**
 	 * @return <code>true</code> if this node represents literal text
 	 */
-	public boolean isLiteralText();
+    boolean isLiteralText();
 
 	/**
 	 * @return <code>true</code> if the subtree rooted at this node could be used as an lvalue
 	 *         expression (identifier or property sequence with non-literal prefix).
 	 */
-	public boolean isLeftValue();
+    boolean isLeftValue();
 
 	/**
 	 * @return <code>true</code> if the subtree rooted at this node is a method invocation.
 	 */
-	public boolean isMethodInvocation();
+    boolean isMethodInvocation();
 
 	/**
 	 * Evaluate node.
@@ -54,7 +54,7 @@ public interface ExpressionNode extends Node {
 	 *            result type
 	 * @return evaluated node, coerced to the expected type
 	 */
-	public Object getValue(Bindings bindings, ELContext context, Class<?> expectedType);
+    Object getValue(Bindings bindings, ELContext context, Class<?> expectedType);
 
 	/**
 	 * Get value reference.
@@ -63,7 +63,7 @@ public interface ExpressionNode extends Node {
 	 * @param context
 	 * @return value reference
 	 */
-	public ValueReference getValueReference(Bindings bindings, ELContext context);
+    ValueReference getValueReference(Bindings bindings, ELContext context);
 
 	/**
 	 * Get the value type accepted in {@link #setValue(Bindings, ELContext, Object)}.
@@ -74,7 +74,7 @@ public interface ExpressionNode extends Node {
 	 *            evaluation context
 	 * @return accepted type or <code>null</code> for non-lvalue nodes
 	 */
-	public Class<?> getType(Bindings bindings, ELContext context);
+    Class<?> getType(Bindings bindings, ELContext context);
 
 	/**
 	 * Determine whether {@link #setValue(Bindings, ELContext, Object)} will throw a javax.el.PropertyNotWritableException.
@@ -85,7 +85,7 @@ public interface ExpressionNode extends Node {
 	 *            evaluation context
 	 * @return <code>true</code> if this a read-only expression node
 	 */
-	public boolean isReadOnly(Bindings bindings, ELContext context);
+    boolean isReadOnly(Bindings bindings, ELContext context);
 
 	/**
 	 * Assign value.
@@ -97,7 +97,7 @@ public interface ExpressionNode extends Node {
 	 * @param value
 	 *            value to set
 	 */
-	public void setValue(Bindings bindings, ELContext context, Object value);
+    void setValue(Bindings bindings, ELContext context, Object value);
 
 	/**
 	 * Get method information. If this is a non-lvalue node, answer <code>null</code>.
@@ -112,7 +112,7 @@ public interface ExpressionNode extends Node {
 	 *            expected method argument types
 	 * @return method information or <code>null</code>
 	 */
-	public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes);
+    MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes);
 
 	/**
 	 * Invoke method.
@@ -129,7 +129,7 @@ public interface ExpressionNode extends Node {
 	 *            parameter values
 	 * @return result of the method invocation
 	 */
-	public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues);
+    Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues);
 
 	/**
 	 * Get the canonical expression string for this node. Variable and funtion names will be
@@ -142,5 +142,5 @@ public interface ExpressionNode extends Node {
 	 * <p>
 	 * If the bindings is <code>null</code>, the full canonical subexpression is returned.
 	 */
-	public String getStructuralId(Bindings bindings);
+    String getStructuralId(Bindings bindings);
 }

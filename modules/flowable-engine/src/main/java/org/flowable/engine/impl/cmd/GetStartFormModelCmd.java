@@ -60,8 +60,7 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
         Process process = bpmnModel.getProcessById(processDefinition.getKey());
         FlowElement startElement = process.getInitialFlowElement();
-        if (startElement instanceof StartEvent) {
-            StartEvent startEvent = (StartEvent) startElement;
+        if (startElement instanceof StartEvent startEvent) {
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
                 Deployment deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(processDefinition.getDeploymentId());
                 formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), deployment.getParentDeploymentId(), 

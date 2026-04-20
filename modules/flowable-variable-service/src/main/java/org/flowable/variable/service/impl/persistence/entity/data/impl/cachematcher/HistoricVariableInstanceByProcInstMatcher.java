@@ -12,6 +12,10 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -22,8 +26,15 @@ public class HistoricVariableInstanceByProcInstMatcher extends CachedEntityMatch
 
     @Override
     public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
-        return historicVariableInstanceEntity.getProcessInstanceId() != null
-                && historicVariableInstanceEntity.getProcessInstanceId().equals(parameter);
+        Map<String, Object> parameters = (Map<String, Object>) parameter;
+        if (!Objects.equals(parameters.get("processInstanceId"), historicVariableInstanceEntity.getProcessInstanceId())) {
+            return false;
+        }
+        Collection<String> variableNames = (Collection<String>) parameters.get("variableNames");
+        if (variableNames != null && !variableNames.isEmpty()) {
+            return variableNames.contains(historicVariableInstanceEntity.getName());
+        }
+        return false;
     }
 
 }

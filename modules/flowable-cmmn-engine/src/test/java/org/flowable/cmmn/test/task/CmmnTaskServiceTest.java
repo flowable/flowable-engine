@@ -33,8 +33,8 @@ import org.flowable.cmmn.engine.interceptor.CreateHumanTaskAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -51,7 +51,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Test;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -154,20 +155,6 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
                     .containsExactly("The Task A", "This is a test YES");
             assertThat(historicTaskInstance.getEndTime()).isNotNull();
         }
-    }
-
-    @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void testOneHumanTaskVariableScopeExpressionCase() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-
-        assertThatThrownBy(() -> cmmnTaskService.complete(task.getId(), Collections.singletonMap(
-                "${caseInstance.name}", "newCaseName"
-                )
-        ))
-                .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Error while evaluating expression: ${caseInstance.name}");
     }
 
     @Test
@@ -376,6 +363,39 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
 
     }
 
+    @Test
+    public void testTaskIdentityLinkCountWithDeletionOfSameLink() {
+        Task task = cmmnTaskService.createTaskBuilder().
+                name("testName").
+                identityLinks(getDefaultIdentityLinks()).
+                create();
+
+        TaskEntityImpl updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(2);
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
+                    cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(1);
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
+                    cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(0);
+
+        cmmnTaskService.deleteTask(task.getId(),true);
+
+    }
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
         IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
         identityLinkEntityCandidateUser.setUserId("testUserFromBuilder");

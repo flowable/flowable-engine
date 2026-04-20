@@ -19,24 +19,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres: [11, 12, 13, 14, 15, 16]
+        postgres: [15, 16, 17, 18]
     services:
       postgres:
         image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_PASSWORD: flowable
           POSTGRES_USER: flowable
+          PGDATA: /var/lib/postgresql/data
         ports:
           - 5432:5432
         # needed because the postgres container does not provide a health check
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/postgresql/data:rw
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
           distribution: 'zulu'
           java-version: 17
+      - name: Restore Maven Repository Cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
       - name: Test
+        id: test
         # use postgres for the host here because we have specified a container for the job.
         # If we were running the job on the VM this would be localhost
         # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
@@ -45,7 +53,6 @@ jobs:
           ./mvnw clean install
           ${MAVEN_ARGS}
           -PcleanDb,postgresql,distro
-          -P'!include-spring-boot-samples'
           -Djdbc.url=jdbc:postgresql://localhost:${{ job.services.postgres.ports[5432] }}/flowable
           -Djdbc.username=flowable
           -Djdbc.password=flowable
@@ -54,3 +61,9 @@ jobs:
           -Dspring.datasource.username=flowable
           -Dspring.datasource.password=flowable
           -Dmaven.test.redirectTestOutputToFile=false
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with:
+          name: surefire-test-reports-postgres-${{ matrix.postgres }}
+          path: '**/target/surefire-reports/*'

@@ -31,7 +31,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.ReflectUtil;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.Assignment;
@@ -92,15 +92,13 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         List<DataAssociation> dataInputAssociations = null;
         List<DataAssociation> dataOutputAssociations = null;
 
-        if (flowElement instanceof SendTask) {
-            SendTask sendTask = (SendTask) flowElement;
+        if (flowElement instanceof SendTask sendTask) {
             ioSpecification = sendTask.getIoSpecification();
             operationRef = sendTask.getOperationRef();
             dataInputAssociations = sendTask.getDataInputAssociations();
             dataOutputAssociations = sendTask.getDataOutputAssociations();
 
-        } else if (flowElement instanceof ServiceTask) {
-            ServiceTask serviceTask = (ServiceTask) flowElement;
+        } else if (flowElement instanceof ServiceTask serviceTask) {
             ioSpecification = serviceTask.getIoSpecification();
             operationRef = serviceTask.getOperationRef();
             dataInputAssociations = serviceTask.getDataInputAssociations();
@@ -153,10 +151,10 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         } catch (Exception exc) {
 
             Throwable cause = exc;
-            BpmnError error = null;
+            BusinessError error = null;
             while (cause != null) {
-                if (cause instanceof BpmnError) {
-                    error = (BpmnError) cause;
+                if (cause instanceof BusinessError) {
+                    error = (BusinessError) cause;
                     break;
                 }
                 cause = cause.getCause();

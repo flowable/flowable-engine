@@ -12,7 +12,7 @@
  */
 package org.flowable.test.persistence;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +34,7 @@ import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
+import org.junit.jupiter.params.support.ParameterDeclarations;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -46,7 +47,7 @@ public class EntityHelperUtil {
     static class EntityPackageTestArgumentsProvider implements ArgumentsProvider {
 
         @Override
-        public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
+        public Stream<? extends Arguments> provideArguments(ParameterDeclarations parameters, ExtensionContext context){
             return Stream.of(
 
                     Arguments.of(new EntityMappingPackageInformation("org.flowable",
@@ -99,7 +100,7 @@ public class EntityHelperUtil {
 
             resources.remove("TableData"); // not an entity
 
-            assertFalse(resources.isEmpty());
+            assertThat(resources).isNotEmpty();
 
             return resources;
         } catch (Exception e) {
@@ -139,7 +140,7 @@ public class EntityHelperUtil {
 
             resources.remove("TableData"); // not an entity
 
-            assertFalse(resources.isEmpty());
+            assertThat(resources).isNotEmpty();
 
             return resources;
         } catch (Exception e) {

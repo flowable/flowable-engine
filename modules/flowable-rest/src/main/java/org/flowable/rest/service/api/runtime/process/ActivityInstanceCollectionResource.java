@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime.process;
 import java.util.Map;
 
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +33,7 @@ import io.swagger.annotations.Authorization;
 /**
  * @author Tijs Rademakers
  */
-@Api(tags = { "Activity Instances" }, description = "Manage Activity Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Activity Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 @RestController
 public class ActivityInstanceCollectionResource extends ActivityInstanceBaseResource {
 
@@ -49,10 +50,15 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the activity instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the activity instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIds", dataType = "string", value = "The process instance ids of the activity instances.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query")
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'startTime'.", allowableValues = "activityId,activityName,activityType,duration,endTime,executionId,activityInstanceId,processDefinitionId,processInstanceId,startTime,tenantId,", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @GetMapping(value = "/runtime/activity-instances", produces = "application/json")
     public DataResponse<ActivityInstanceResponse> getActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
@@ -87,8 +93,16 @@ public class ActivityInstanceCollectionResource extends ActivityInstanceBaseReso
             query.setTaskAssignee(allRequestParams.get("taskAssignee"));
         }
 
+        if (allRequestParams.get("taskCompletedBy") != null) {
+            query.setTaskCompletedBy(allRequestParams.get("taskCompletedBy"));
+        }
+
         if (allRequestParams.get("processInstanceId") != null) {
             query.setProcessInstanceId(allRequestParams.get("processInstanceId"));
+        }
+
+        if (allRequestParams.get("processInstanceIds") != null) {
+            query.setProcessInstanceIds(RequestUtil.parseToSet(allRequestParams.get("processInstanceIds")));
         }
 
         if (allRequestParams.get("processDefinitionId") != null) {

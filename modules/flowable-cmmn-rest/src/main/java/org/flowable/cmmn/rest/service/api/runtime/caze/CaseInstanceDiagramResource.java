@@ -42,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
 
     @Autowired

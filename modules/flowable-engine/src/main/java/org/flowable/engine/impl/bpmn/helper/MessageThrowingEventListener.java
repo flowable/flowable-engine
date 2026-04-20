@@ -38,9 +38,7 @@ public class MessageThrowingEventListener extends BaseDelegateEventListener {
 
     @Override
     public void onEvent(FlowableEvent event) {
-        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
-
-            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent engineEvent) {
 
             if (engineEvent.getProcessInstanceId() == null) {
                 throw new FlowableIllegalArgumentException("Cannot throw process-instance scoped message, since the dispatched event is not part of an ongoing process instance");

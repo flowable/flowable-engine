@@ -1,0 +1,89 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20180521/MODEL/" id="definition_47a8ccd5-7efa-11ea-9435-acde48001122" name="decisionService1" namespace="http://www.flowable.org/dmn">
+    <decision id="decision1" name="Decision 1">
+        <informationRequirement id="sid-7C9FC3B2-BC15-40EB-ABD7-32AFC0EBF4F3">
+            <requiredDecision href="#decision3"></requiredDecision>
+        </informationRequirement>
+        <decisionTable id="decisionTable_dffebb42-6761-4777-a09c-6c06c22c4cf0" hitPolicy="RULE ORDER">
+            <input>
+                <inputExpression id="inputExpression_7db43806-e0c5-4c02-9d85-85dcbb5bd98b" typeRef="string">
+                    <text>input1</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_3ef3ef56-ef7a-4833-ac93-13d518904c81" name="output1" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_7db43806-e0c5-4c02-9d85-85dcbb5bd98b_1">
+                    <text><![CDATA[!= ""]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_3ef3ef56-ef7a-4833-ac93-13d518904c81_1">
+                    <text><![CDATA["NOT EMPTY 1"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision2" name="Decision 2">
+        <informationRequirement id="sid-CA264CC0-8AD4-4F6D-9722-4319B418D06A">
+            <requiredDecision href="#decision4"></requiredDecision>
+        </informationRequirement>
+        <decisionTable id="decisionTable_fbb6a971-cef7-4417-9b18-dad40eb8de5c" hitPolicy="RULE ORDER">
+            <input>
+                <inputExpression id="inputExpression_a0f8b798-30e7-47e3-b871-021abd5b3e4e" typeRef="string">
+                    <text>input2</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_4b5be9a6-fb57-4042-92f9-313e88c2755c" name="output2" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_a0f8b798-30e7-47e3-b871-021abd5b3e4e_1">
+                    <text><![CDATA[!= ""]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_4b5be9a6-fb57-4042-92f9-313e88c2755c_1">
+                    <text><![CDATA["NOT EMPTY 1"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision4" name="Decision 4">
+        <decisionTable id="decisionTable_c00ca5b5-6e20-4477-a50c-c7a89ddf9987" hitPolicy="FIRST">
+            <input>
+                <inputExpression id="inputExpression_82ec1f67-9467-40fa-a018-b18b000dc7f7" typeRef="string">
+                    <text>input4</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_44f8805b-6c03-4164-abb1-f68b687eccbe" name="output4" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_82ec1f67-9467-40fa-a018-b18b000dc7f7_1">
+                    <text><![CDATA[!= ""]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_44f8805b-6c03-4164-abb1-f68b687eccbe_1">
+                    <text><![CDATA["NOT EMPTY"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decision id="decision3" name="Decision 3">
+        <informationRequirement id="sid-16CDA0F7-E757-4864-984C-830C3AE589A3">
+            <requiredDecision href="#decision4"></requiredDecision>
+        </informationRequirement>
+        <decisionTable id="decisionTable_0dd76d40-03f1-41b0-a153-e2cb8aee141e" hitPolicy="FIRST">
+            <input>
+                <inputExpression id="inputExpression_9cc0cb74-7321-4c4e-9f73-24370181a5bd" typeRef="string">
+                    <text>input3</text>
+                </inputExpression>
+            </input>
+            <output id="outputExpression_c871efd3-830c-4915-8198-327f9d0368cb" name="output3" typeRef="string"></output>
+            <rule>
+                <inputEntry id="inputEntry_9cc0cb74-7321-4c4e-9f73-24370181a5bd_1">
+                    <text><![CDATA[!= ""]]></text>
+                </inputEntry>
+                <outputEntry id="outputEntry_c871efd3-830c-4915-8198-327f9d0368cb_1">
+                    <text><![CDATA["NOT EMPTY"]]></text>
+                </outputEntry>
+            </rule>
+        </decisionTable>
+    </decision>
+    <decisionService id="expandedDecisionService" name="expandedDecisionService">
+        <outputDecision href="#decision1"></outputDecision>
+        <outputDecision href="#decision2"></outputDecision>
+        <encapsulatedDecision href="#decision4"></encapsulatedDecision>
+        <encapsulatedDecision href="#decision3"></encapsulatedDecision>
+    </decisionService>
+</definitions>

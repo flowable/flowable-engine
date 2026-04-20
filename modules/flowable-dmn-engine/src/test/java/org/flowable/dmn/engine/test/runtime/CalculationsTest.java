@@ -19,19 +19,14 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class CalculationsTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class CalculationsTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/calculations2.dmn")
@@ -42,7 +37,6 @@ public class CalculationsTest {
 
         processVariablesInput.put("sample_input", inputDouble1);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -64,7 +58,6 @@ public class CalculationsTest {
 
         processVariablesInput.put("sample_input", inputFloat1);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -93,7 +86,6 @@ public class CalculationsTest {
         processVariablesInput.put("inputDouble2", inputDouble2);
         processVariablesInput.put("inputFloat1", inputFloat1);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -116,7 +108,6 @@ public class CalculationsTest {
         processVariablesInput.put("input1", "blablatest");
         processVariablesInput.put("referenceVar1", 10D);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()

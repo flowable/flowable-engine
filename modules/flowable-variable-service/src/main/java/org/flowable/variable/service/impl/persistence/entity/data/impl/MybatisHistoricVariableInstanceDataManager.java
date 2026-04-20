@@ -71,7 +71,15 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
 
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(final String processInstanceId) {
-        return getList("selectHistoricVariableInstanceByProcessInstanceId", processInstanceId, historicVariableInstanceByProcInstMatcher, true);
+        return findHistoricVariableInstancesByProcessInstanceId(processInstanceId, null);
+    }
+
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricVariableInstancesByProcessInstanceId(String processInstanceId, Collection<String> variableNames) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("processInstanceId", processInstanceId);
+        params.put("variableNames", variableNames);
+        return getList("selectHistoricVariableInstanceByProcessInstanceId", params, historicVariableInstanceByProcInstMatcher, true);
     }
 
     @Override
@@ -97,9 +105,16 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     
     @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
-        Map<String, String> params = new HashMap<>(2);
+        return findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType, null);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType,
+            Collection<String> variableNames) {
+        Map<String, Object> params = new HashMap<>();
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
+        params.put("variableNames", variableNames);
         return getList("selectHistoricVariableInstanceByScopeIdAndScopeType", params, historicVariableInstanceByScopeIdAndScopeTypeMatcher, true);
     }
     

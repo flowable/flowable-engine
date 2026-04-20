@@ -48,7 +48,7 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mock(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
-        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
+        Map<String, Object> resolveVariableMap = new HashMap<>();
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 
@@ -103,7 +103,7 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mockBpmnJob(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
-        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
+        Map<String, Object> resolveVariableMap = new HashMap<>();
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 
@@ -162,7 +162,7 @@ class ScopeAwareInternalJobManagerTest {
         TimerJobEntity repeatedTimerSchedule = mockCmmnJob(TimerJobEntity.class, "repeatedTimerSchedule");
 
         VariableScope resolveJobScope = mock(VariableScope.class, "resolveJobScope");
-        Map<String, Object> resolveVariableMap = mock(Map.class, "resolveVariableScope");
+        Map<String, Object> resolveVariableMap = new HashMap<>();
         VariableScope timerDeleteJobScope = mock(VariableScope.class, "timerDeleteJobScope");
         VariableScope repeatedTimerScheduleScope = mock(VariableScope.class, "repeatedTimerScheduleScope");
 

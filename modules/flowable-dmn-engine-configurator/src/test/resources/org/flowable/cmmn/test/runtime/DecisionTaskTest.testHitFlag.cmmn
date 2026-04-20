@@ -32,6 +32,6 @@
         </casePlanModel>
     </case>
 
-    <decision id="decisionTableInternal" name="Simple decision table" externalRef="decisionTable"/>
+    <decision id="decisionTableInternal" name="Simple decision table" externalRef="DecisionTable"/>
 
 </definitions>

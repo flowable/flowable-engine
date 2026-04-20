@@ -92,7 +92,8 @@ public class HistoricVariableInstanceBaseResource {
             restApiInterceptor.accessHistoryVariableInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, query, "variableName", allowedSortProperties, restResponseFactory::createHistoricVariableInstanceResponseList);
+        return paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
+                restResponseFactory::createHistoricVariableInstanceResponseList);
     }
 
     protected void addVariables(HistoricVariableInstanceQuery variableInstanceQuery, List<QueryVariable> variables) {

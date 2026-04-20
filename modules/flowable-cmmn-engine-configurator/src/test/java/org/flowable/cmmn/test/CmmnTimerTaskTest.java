@@ -15,14 +15,16 @@ package org.flowable.cmmn.test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -30,24 +32,18 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
 public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
-    public void deployTimerProcess() {
-        if (cmmnRepositoryService.createDeploymentQuery().count() == 0) {
-            cmmnRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/timerInStage.cmmn").deploy();
-        }
-    }
-
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/timerInStage.cmmn")
     public void testCmmnTimerTask() {
-        Date startTime = setCmmnClockFixedToCurrentTime();
+        Instant startTime = Instant.now();
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(startTime));
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerInStage").start();
 
         assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE)
@@ -68,7 +64,7 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
         timerJobs = processEngineManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).executable().list();
         assertThat(timerJobs).isEmpty();
 
-        processEngine.getProcessEngineConfiguration().getClock().setCurrentTime(new Date(startTime.getTime() + (3 * 60 * 60 * 1000 + 1)));
+        processEngine.getProcessEngineConfiguration().getClock().setCurrentTime(Date.from(startTime.plus(3, ChronoUnit.HOURS).plusSeconds(1)));
 
         timerJobs = processEngineManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(ScopeTypes.CMMN).executable().list();
         assertThat(timerJobs).hasSize(1);
@@ -80,7 +76,7 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
                 .hasMessage("time limit of 7000 was exceeded");
 
         // Timer fires after 3 hours, so setting it to 3 hours + 1 second
-        cmmnEngineConfiguration.getClock().setCurrentTime(new Date(startTime.getTime() + (3 * 60 * 60 * 1000 + 1)));
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(startTime.plus(3, ChronoUnit.HOURS).plusSeconds(1)));
 
         timerJobs = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).executable().list();
         assertThat(timerJobs)
@@ -97,10 +93,6 @@ public class CmmnTimerTaskTest extends AbstractProcessEngineIntegrationTest {
 
         cmmnEngineConfiguration.resetClock();
         ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).resetClock();
-
-        for (CmmnDeployment deployment : cmmnRepositoryService.createDeploymentQuery().list()) {
-            cmmnRepositoryService.deleteDeployment(deployment.getId(), true);
-        }
     }
 
 }

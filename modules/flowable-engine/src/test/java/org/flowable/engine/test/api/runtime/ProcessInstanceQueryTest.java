@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +48,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -152,6 +153,40 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
 
         assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processDefinitionKeys(Collections.emptySet()))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+    
+    @Test
+    public void testQueryByExcludeProcessDefinitionKeys() {
+        Set<String> processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY_2);
+
+        ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(0);
+        assertThat(query.list()).hasSize(0);
+        
+        processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY);
+        
+        query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_2_DEPLOY_COUNT);
+        
+        processDefinitionKeySet = new HashSet<>(2);
+        processDefinitionKeySet.add(PROCESS_DEFINITION_KEY_2);
+        
+        query = runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(processDefinitionKeySet);
+        assertThat(query.count()).isEqualTo(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+        assertThat(query.list()).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+    }
+
+    @Test
+    public void testQueryByInvalidExcludeProcessDefinitionKeys() {
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().excludeProcessDefinitionKeys(Collections.emptySet()))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
     }
     
@@ -2327,6 +2362,18 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testQueryByCallbackIds() {
+        String processInstanceId = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("processOneId").start()
+                .getId();
+        String processInstanceId2 = runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcess").callbackId("someOtherCallBack").start()
+                .getId();
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceCallbackIds(Set.of("someId", "processOneId")).list()).extracting(
+                        ProcessInstance::getId)
+                .containsExactly(processInstanceId);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testQueryByInvalidCallbackType() {
         String processInstanceId = runtimeService.startProcessInstanceByKey("oneTaskProcess", "now").getId();
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").list()).isNullOrEmpty();
@@ -2548,7 +2595,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     public void testQueryByParentScopeId() {
         ProcessInstance validationProcessInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
-
+        
         List<ProcessInstance> result = runtimeService.createProcessInstanceQuery().processInstanceParentScopeId(processInstance.getId()).list();
         assertThat(result).isEmpty();
 
@@ -2579,4 +2626,40 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 validationProcessInstance.getId()
         );
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testIncludeDefinedVariables() {
+        ProcessInstance processInstance = runtimeService
+                .createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .businessKey("testBusinessKey")
+                .variable("testVar", "test value")
+                .variable("intVar", 123)
+                .start();
+
+        assertThat(processInstance).isNotNull();
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey").singleResult();
+        assertThat(processInstance.getProcessVariables()).isEmpty();
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey").includeProcessVariables().singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(
+                        entry("testVar", "test value"),
+                        entry("intVar", 123)
+                );
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                .includeProcessVariables(List.of("testVar", "dummy")).singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .containsOnly(
+                        entry("testVar", "test value")
+                );
+
+        processInstance = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey("testBusinessKey")
+                .includeProcessVariables(List.of("unknown", "dummy")).singleResult();
+        assertThat(processInstance.getProcessVariables())
+                .isEmpty();
+    }
+
 }

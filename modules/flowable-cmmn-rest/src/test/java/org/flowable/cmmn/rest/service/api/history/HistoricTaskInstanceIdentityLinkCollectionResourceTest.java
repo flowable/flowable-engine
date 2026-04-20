@@ -25,8 +25,9 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -40,6 +41,7 @@ public class HistoricTaskInstanceIdentityLinkCollectionResourceTest extends Base
     /**
      * Test querying historic task instance. GET cmmn-history/historic-task-instances/{taskId}/identitylinks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetIdentityLinks() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();

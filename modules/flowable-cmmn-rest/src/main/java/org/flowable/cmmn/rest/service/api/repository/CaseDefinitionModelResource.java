@@ -30,7 +30,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionModelResource extends BaseCaseDefinitionResource {
 
     @ApiOperation(value = "Get a case definition CMMN model", tags = { "Case Definitions" }, nickname = "getCmmnModelResource")

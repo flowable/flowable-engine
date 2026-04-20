@@ -994,7 +994,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(processInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(processInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         managementService.executeCommand(new ClearProcessInstanceLockTimesCmd(processEngineConfiguration.getAsyncExecutor().getLockOwner()));
 
@@ -1004,7 +1004,7 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
                 .singleResult();
 
         assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
-        assertThat(processInstance.getLockTime()).isEqualToIgnoringMillis(acquiredJob.getLockExpirationTime());
+        assertThat(processInstance.getLockTime()).isCloseTo(acquiredJob.getLockExpirationTime(), 1000);
 
         managementService.executeCommand(new ClearProcessInstanceLockTimesCmd("worker1"));
 
@@ -1041,6 +1041,119 @@ public class ExternalWorkerServiceTaskTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance.getLockOwner()).isNull();
         assertThat(processInstance.getLockTime()).isNull();
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleExclusive.bpmn20.xml")
+    void testProcessInstanceIsUnlockedWhenUnacquiringExclusiveJob() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isNotNull();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        managementService.unacquireExternalWorkerJob(acquiredJob.getId(), "worker1");
+
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isNull();
+        assertThat(processInstance.getLockTime()).isNull();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isNotNull();
+
+    }
+    
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/externalworker/ExternalWorkerServiceTaskTest.testSimpleExclusive.bpmn20.xml")
+    void testProcessInstanceIsUnlockedWhenUnacquiringAllExclusiveJobs() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("simpleExternalWorker")
+                .variable("name", "kermit")
+                .start();
+
+        List<AcquiredExternalWorkerJob> acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        AcquiredExternalWorkerJob acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        ExecutionEntity processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isNotNull();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        assertThat(acquiredJobs).isEmpty();
+
+        managementService.unacquireAllExternalWorkerJobsForWorker("worker1");
+
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isNull();
+        assertThat(processInstance.getLockTime()).isNull();
+
+        acquiredJobs = managementService.createExternalWorkerJobAcquireBuilder()
+                .topic("simple", Duration.ofHours(1))
+                .acquireAndLock(1, "worker1");
+
+        acquiredJob = acquiredJobs.get(0);
+
+        assertThat(acquiredJob.getLockOwner()).isEqualTo("worker1");
+        assertThat(acquiredJob.getLockExpirationTime()).isNotNull();
+
+        processInstance = (ExecutionEntity) runtimeService.createProcessInstanceQuery()
+                .processInstanceId(acquiredJob.getProcessInstanceId())
+                .singleResult();
+
+        assertThat(processInstance.getLockOwner()).isEqualTo("worker1");
+        assertThat(processInstance.getLockTime()).isNotNull();
     }
 
     @Test

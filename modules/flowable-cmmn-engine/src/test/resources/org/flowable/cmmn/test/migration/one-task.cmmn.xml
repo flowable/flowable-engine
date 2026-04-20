@@ -4,7 +4,7 @@
     <case id="testCase" name="One Task Test Case" flowable:initiatorVariableName="initiator"
           flowable:candidateStarterGroups="flowableUser">
         <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
-          <planItem id="planItem1" name="Task 1" definitionRef="humanTask1"/>
+            <planItem id="planItem1" name="Task 1" definitionRef="humanTask1"/>
             <humanTask id="humanTask1" name="Task 1" flowable:assignee="${initiator}" />
         </casePlanModel>
     </case>

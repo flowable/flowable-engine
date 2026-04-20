@@ -15,8 +15,8 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Parent class for all BPMN 2.0 task types such as ServiceTask, ScriptTask, UserTask, etc.
@@ -34,12 +34,12 @@ public class TaskActivityBehavior extends AbstractBpmnActivityBehavior {
         if (taskElementProperties != null) {
             JsonNode overrideValuesNode = taskElementProperties.get(propertyName);
             if (overrideValuesNode != null) {
-                if (overrideValuesNode.isNull() || !overrideValuesNode.isArray() || overrideValuesNode.size() == 0) {
+                if (overrideValuesNode.isNull() || !overrideValuesNode.isArray() || overrideValuesNode.isEmpty()) {
                     activeValues = null;
                 } else {
                     activeValues = new ArrayList<>();
                     for (JsonNode valueNode : overrideValuesNode) {
-                        activeValues.add(valueNode.asText());
+                        activeValues.add(valueNode.asString());
                     }
                 }
             }

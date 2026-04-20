@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!-- Based on sun_checks.xml from the CheckStyle distribution -->
+
+<module name="Checker">
+    <!--
+        If you set the basedir property below, then all reported file
+        names will be relative to the specified directory. See
+        https://checkstyle.sourceforge.io/config.html
+
+        <property name="basedir" value="${basedir}"/>
+    -->
+
+    <property name="cacheFile" value="${checkstyle.cache.file}"/>
+
+    <module name="SuppressWithPlainTextCommentFilter"/>
+
+    <module name="TreeWalker">
+
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- Checks for imports                              -->
+        <!-- See https://checkstyle.sourceforge.io/checks/imports/index.html -->
+        <module name="AvoidStarImport">
+            <property name="excludes" value="java.awt" />
+        </module>
+        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+        <!--<module name="RedundantImport"/>-->
+        <!--<module name="UnusedImports">-->
+        <!--    <property name="processJavadoc" value="true"/>-->
+        <!--</module>-->
+        <module name="ImportControl">
+            <property name="file" value="/build-config/import-control.xml" />
+        </module>
+
+
+        <!-- Checks for class design                         -->
+        <!-- See https://checkstyle.sourceforge.io/checks/design/index.html -->
+<!--        <module name="VisibilityModifier">-->
+<!--            <property name="packageAllowed" value="true" />-->
+<!--            <property name="protectedAllowed" value="true" />-->
+<!--        </module>-->
+
+        <module name="SuppressionCommentFilter"/>
+    </module>
+
+    <module name="SuppressWarningsFilter"/>
+
+</module>

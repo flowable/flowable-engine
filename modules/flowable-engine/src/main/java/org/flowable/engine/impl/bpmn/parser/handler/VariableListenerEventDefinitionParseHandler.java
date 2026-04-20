@@ -32,12 +32,10 @@ public class VariableListenerEventDefinitionParseHandler extends AbstractBpmnPar
     @Override
     protected void executeParse(BpmnParse bpmnParse, VariableListenerEventDefinition variableListenerEventDefinition) {
 
-        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent intermediateCatchEvent) {
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchVariableListenerEventActivityBehavior(intermediateCatchEvent, variableListenerEventDefinition));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
+        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryVariableListenerEventActivityBehavior(boundaryEvent, variableListenerEventDefinition, boundaryEvent.isCancelActivity()));
         }
     }

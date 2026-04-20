@@ -32,10 +32,10 @@ import org.flowable.variable.api.delegate.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * 
@@ -82,7 +82,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
 
                 CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsSynchronousOperation(executionEntity, evaluateConditions);
 
-            } catch (JsonProcessingException e) {
+            } catch (JacksonException e) {
                 LOGGER.warn("Programmatic error: could not parse job configuration JSON", e);
             }
         }
@@ -103,7 +103,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
         String sequenceFlowId = null;
         JsonNode sequenceFlowIdJsonNode = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_ID);
         if (sequenceFlowIdJsonNode != null && !sequenceFlowIdJsonNode.isNull() && !sequenceFlowIdJsonNode.isMissingNode()) {
-            sequenceFlowId = sequenceFlowIdJsonNode.asText();
+            sequenceFlowId = sequenceFlowIdJsonNode.asString();
         }
 
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(executionEntity.getProcessDefinitionId());
@@ -117,10 +117,10 @@ public class AsyncLeaveJobHandler implements JobHandler {
         }
 
         if (sequenceFlow == null) {
-            String source = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_SOURCE).asText();
-            String target = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_TARGET).asText();
-            int lineNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_NR).asInt();
-            int columnNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_COLUMN_NR).asInt();
+            String source = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_SOURCE).stringValue(null);
+            String target = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_TARGET).stringValue(null);
+            int lineNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_NR).asInt(0);
+            int columnNr = jobConfigurationJson.path(FIELD_SEQUENCE_FLOW_LINE_COLUMN_NR).asInt(0);
 
             List<SequenceFlow> sequenceFlows = bpmnModel.getMainProcess().findFlowElementsOfType(SequenceFlow.class, true);
             Optional<SequenceFlow> sequenceFlowOptional = sequenceFlows.stream()
@@ -148,12 +148,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
         ObjectNode objectNode = objectMapper.createObjectNode();
         objectNode.put(FIELD_EVALUATE_CONDITIONS, evaluateConditions);
-        try {
-            return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Programmatic error: could not create job configuration JSON", e);
-        }
-        return null;
+        return objectMapper.writeValueAsString(objectNode);
     }
 
     public static String createJobConfiguration(ProcessEngineConfiguration processEngineConfiguration, SequenceFlow sequenceFlow) {
@@ -179,12 +174,7 @@ public class AsyncLeaveJobHandler implements JobHandler {
 
         }
 
-        try {
-            return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Programmatic error: could not create job configuration JSON", e);
-        }
-        return null;
+        return objectMapper.writeValueAsString(objectNode);
     }
 
 }

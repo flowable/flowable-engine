@@ -12,12 +12,18 @@
  */
 package org.flowable.engine.impl.delegate;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.VariableAggregationDefinition;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.json.FlowableObjectNode;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.variable.VariableAggregator;
 import org.flowable.engine.delegate.variable.VariableAggregatorContext;
@@ -25,6 +31,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -43,11 +51,6 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * @author Filip Hrisafov
  */
@@ -61,7 +64,8 @@ public class JsonVariableAggregator implements VariableAggregator {
 
     @Override
     public Object aggregateSingleVariable(DelegateExecution execution, VariableAggregatorContext context) {
-        ObjectNode objectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
+        VariableJsonMapper jsonMapper = processEngineConfiguration.getVariableJsonMapper();
+        FlowableObjectNode objectNode = jsonMapper.createObjectNode();
 
         VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
         VariableService variableService = variableServiceConfiguration.getVariableService();
@@ -105,7 +109,7 @@ public class JsonVariableAggregator implements VariableAggregator {
                             objectNode.put(targetVarName, (String) varInstance.getValue());
                             break;
                         case JsonType.TYPE_NAME:
-                            objectNode.set(targetVarName, (JsonNode) varInstance.getValue());
+                            objectNode.set(targetVarName, JsonUtil.asFlowableJsonNode(varInstance.getValue()));
                             break;
                         case BooleanType.TYPE_NAME:
                             objectNode.put(targetVarName, (Boolean) varInstance.getValue());
@@ -121,6 +125,12 @@ public class JsonVariableAggregator implements VariableAggregator {
                             break;
                         case DoubleType.TYPE_NAME:
                             objectNode.put(targetVarName, (Double) varInstance.getValue());
+                            break;
+                        case BigDecimalType.TYPE_NAME:
+                            objectNode.put(targetVarName, (BigDecimal) varInstance.getValue());
+                            break;
+                        case BigIntegerType.TYPE_NAME:
+                            objectNode.put(targetVarName, (BigInteger) varInstance.getValue());
                             break;
                         case DateType.TYPE_NAME:
                             objectNode.put(targetVarName, ((Date) varInstance.getValue()).toInstant().toString());
@@ -144,8 +154,8 @@ public class JsonVariableAggregator implements VariableAggregator {
                             if (VariableAggregatorContext.OVERVIEW.equals(context.getState())) {
                                 // We can only use the aggregated variable if we are in an overview state
                                 Object value = varInstance.getValue();
-                                if (value instanceof JsonNode) {
-                                    objectNode.set(targetVarName, (JsonNode) value);
+                                if (jsonMapper.isJsonNode(value)) {
+                                    objectNode.set(targetVarName, JsonUtil.asFlowableJsonNode(value));
                                 } else {
                                     throw new FlowableException("Cannot aggregate overview variable: " + varInstance);
                                 }
@@ -158,17 +168,17 @@ public class JsonVariableAggregator implements VariableAggregator {
             }
         }
 
-        return objectNode;
+        return objectNode.getImplementationValue();
     }
 
     @Override
     public Object aggregateMultiVariables(DelegateExecution execution, List<? extends VariableInstance> instances, VariableAggregatorContext context) {
-        ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        VariableJsonMapper objectMapper = processEngineConfiguration.getVariableJsonMapper();
+        FlowableArrayNode arrayNode = objectMapper.createArrayNode();
         for (VariableInstance instance : instances) {
-            arrayNode.add((JsonNode) instance.getValue());
+            arrayNode.add(JsonUtil.asFlowableJsonNode(instance.getValue()));
         }
 
-        return arrayNode;
+        return arrayNode.getImplementationValue();
     }
 }

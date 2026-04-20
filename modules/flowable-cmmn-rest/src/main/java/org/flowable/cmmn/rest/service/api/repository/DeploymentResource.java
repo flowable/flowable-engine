@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "CMMN Deployment" }, description = "Manage CMMN Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "CMMN Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentResource extends BaseDeploymentResource {
 
     @Autowired

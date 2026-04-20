@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Dennis Federico
  */
 @RestController
-@Api(tags = {"History PlanItem"}, description = "Manage History Plan Item Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History PlanItem"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricPlanItemInstanceResource extends HistoricPlanItemInstanceBaseResource {
 
     @ApiOperation(value = "Get a historic plan item instance", tags = {"History PlanItem"}, nickname = "getHistoricPlanItemInstance")

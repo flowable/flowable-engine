@@ -22,14 +22,15 @@ import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.delegate.HttpResponseHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public class ParametrizedHttpResponseHandler implements HttpResponseHandler {
 
     protected Expression variableName;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
     @Override
     public void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse) {
@@ -38,7 +39,7 @@ public class ParametrizedHttpResponseHandler implements HttpResponseHandler {
             String variableNameEvaluated = getStringFromField(this.variableName, execution);
             Set<String> fields = getStringSetFromField(variableNameEvaluated);
             for (final String field : fields) {
-              execution.setVariable(field, responseNode.get("name").get(field).asText());
+              execution.setVariable(field, responseNode.get("name").get(field).asString());
             }
             httpResponse.setBodyResponseHandled(true);
 

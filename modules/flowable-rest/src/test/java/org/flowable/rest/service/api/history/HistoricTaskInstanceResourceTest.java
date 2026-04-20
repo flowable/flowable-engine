@@ -40,27 +40,21 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single Historic task instance resource.
  */
+@MockitoSettings
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     protected FormEngineConfigurationApi formEngineConfiguration;
@@ -68,13 +62,13 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Mock
     protected FormService formEngineFormService;
 
-    @Before
+    @BeforeEach
     public void initializeMocks() {
         Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
         engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
     }
 
-    @After
+    @AfterEach
     public void resetMocks() {
         processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
     }
@@ -112,8 +106,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                             + " executionId: '" + task.getExecutionId() + "',"
                             + " description: '" + task.getDescription() + "',"
                             + " name: '" + task.getName() + "',"
-                            + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                            + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                             + " priority: " + task.getPriority() + ","
                             + " endTime: null,"
                             + " parentTaskId: null,"
@@ -165,8 +159,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                                 + " owner: '" + task.getOwner() + "',"
                                 + " description: '" + task.getDescription() + "',"
                                 + " name: '" + task.getName() + "',"
-                                + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                                + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                                + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                                + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                                 + " priority: " + task.getPriority() + ","
                                 + " parentTaskId: '" + task.getParentTaskId() + "',"
                                 + " executionId: null,"

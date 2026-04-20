@@ -93,6 +93,8 @@ import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
@@ -107,6 +109,8 @@ import org.flowable.common.engine.impl.persistence.entity.data.ByteArrayDataMana
 import org.flowable.common.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.scripting.BeansResolverFactory;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEngine;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.common.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
@@ -190,6 +194,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandle
 import org.flowable.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExternalWorkerServiceTaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.FormAwareServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.HttpServiceTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.InclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.IntermediateCatchEventParseHandler;
@@ -236,6 +241,8 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.event.logger.EventLogger;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandler;
+import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandlerImpl;
 import org.flowable.engine.impl.eventregistry.BpmnEventRegistryEventConsumer;
 import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
@@ -272,6 +279,7 @@ import org.flowable.engine.impl.jobexecutor.ParallelMultiInstanceWithNoWaitState
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationJobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessInstanceMigrationStatusJobHandler;
+import org.flowable.engine.impl.jobexecutor.SetAsyncVariablesJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
@@ -344,10 +352,12 @@ import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.impl.variable.ParallelMultiInstanceLoopVariableType;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
+import org.flowable.engine.interceptor.EndProcessInstanceInterceptor;
 import org.flowable.engine.interceptor.ExecutionQueryInterceptor;
 import org.flowable.engine.interceptor.HistoricProcessInstanceQueryInterceptor;
 import org.flowable.engine.interceptor.IdentityLinkInterceptor;
 import org.flowable.engine.interceptor.ProcessInstanceQueryInterceptor;
+import org.flowable.engine.interceptor.ProcessInstanceStateInterceptor;
 import org.flowable.engine.interceptor.StartProcessInstanceInterceptor;
 import org.flowable.engine.interceptor.UserTaskStateInterceptor;
 import org.flowable.engine.migration.ProcessInstanceMigrationCallback;
@@ -380,6 +390,8 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
+import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
 import org.flowable.task.service.InternalTaskAssignmentManager;
@@ -397,6 +409,8 @@ import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -715,6 +729,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected boolean jsonVariableTypeTrackObjects = true;
 
+    protected VariableJsonMapper variableJsonMapper;
+
     /**
      * Whether the Parallel Multi instance should perform the leave operation through an async exclusive job.
      * When this is true then non exclusive parallel multi instances can run in non exclusive asynchronously without an exception being thrown.
@@ -728,11 +744,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected Collection<ELResolver> postDefaultELResolvers;
     // SCRIPTING ///////////////////////////////////////////////////////
     protected List<String> customScriptingEngineClasses;
+    protected FlowableScriptEngine scriptEngine;
     protected ScriptingEngines scriptingEngines;
     protected ScriptBindingsFactory scriptBindingsFactory;
     protected List<ResolverFactory> resolverFactories;
     protected Collection<ResolverFactory> preDefaultResolverFactories;
     protected Collection<ResolverFactory> postDefaultResolverFactories;
+    /**
+     * Flag to indicate whether the services should be enabled in the scripting engine. This is set to true by default.
+     * If set to false, then services like cmmnTaskService, cmmnRuntimeService, etc. will not be available in the scripting engine.
+     */
+    protected boolean servicesEnabledInScripting = true;
     // END SCRIPTING
     protected boolean isExpressionCacheEnabled = true;
     protected int expressionCacheSize = 4096;
@@ -741,6 +763,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected ProcessInstanceStateInterceptor processInstanceStateInterceptor;
+    protected EndProcessInstanceInterceptor endProcessInstanceInterceptor;
+
     protected CreateUserTaskInterceptor createUserTaskInterceptor;
     protected UserTaskStateInterceptor userTaskStateInterceptor;
     protected CreateExternalWorkerJobInterceptor createExternalWorkerJobInterceptor;
@@ -830,6 +855,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected AgendaFutureMaxWaitTimeoutProvider agendaFutureMaxWaitTimeoutProvider;
 
     protected boolean handleProcessEngineExecutorsAfterEngineCreate = true;
+
+    protected BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -947,6 +974,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEventHandlers();
         initFailedJobCommandFactory();
         initEventDispatcher();
+        initVariableValueConversionHandler();
         initProcessValidator();
         initFormFieldHandler();
         initDatabaseEventLogging();
@@ -968,6 +996,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         initHistoryCleaningManager();
         initLocalizationManagers();
+        initEventInstanceOutParameterHandler();
+    }
+
+    public void initEventInstanceOutParameterHandler() {
+        if (bpmnEventInstanceOutParameterHandler == null) {
+            bpmnEventInstanceOutParameterHandler = new BpmnEventInstanceOutParameterHandlerImpl();
+        }
     }
 
     // failedJobCommandFactory
@@ -1189,6 +1224,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initDependentScopeTypes() {
         this.dependentScopeTypes.add(ScopeTypes.BPMN_VARIABLE_AGGREGATION);
         this.dependentScopeTypes.add(ScopeTypes.BPMN_EXTERNAL_WORKER);
+        this.dependentScopeTypes.add(ScopeTypes.BPMN_ASYNC_VARIABLES);
     }
 
     // History manager ///////////////////////////////////////////////////////////
@@ -1299,7 +1335,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER, EntityDependencyOrder.IMMUTABLE_ENTITIES);
 
         // Oracle doesn't support bulk inserting for event log entries and historic task log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
@@ -1323,6 +1359,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setVariableJsonMapper(this.variableJsonMapper);
         this.variableServiceConfiguration.setLoggingSessionEnabled(isLoggingSessionEnabled());
         this.variableServiceConfiguration.setConfigurators(variableServiceConfigurators);
     }
@@ -1828,6 +1865,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new SendTaskParseHandler());
         bpmnParserHandlers.add(new SequenceFlowParseHandler());
         bpmnParserHandlers.add(new ServiceTaskParseHandler());
+        bpmnParserHandlers.add(new FormAwareServiceTaskParseHandler());
         bpmnParserHandlers.add(new HttpServiceTaskParseHandler());
         bpmnParserHandlers.add(new SignalEventDefinitionParseHandler());
         bpmnParserHandlers.add(new StartEventParseHandler());
@@ -1921,6 +1959,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         
         ProcessInstanceMigrationStatusJobHandler processInstanceMigrationStatusJobHandler = new ProcessInstanceMigrationStatusJobHandler();
         jobHandlers.put(processInstanceMigrationStatusJobHandler.getType(), processInstanceMigrationStatusJobHandler);
+        
+        SetAsyncVariablesJobHandler setAsyncVariablesJobHandler = new SetAsyncVariablesJobHandler();
+        jobHandlers.put(setAsyncVariablesJobHandler.getType(), setAsyncVariablesJobHandler);
 
         ExternalWorkerTaskCompleteJobHandler externalWorkerTaskCompleteJobHandler = new ExternalWorkerTaskCompleteJobHandler();
         jobHandlers.put(externalWorkerTaskCompleteJobHandler.getType(), externalWorkerTaskCompleteJobHandler);
@@ -2109,8 +2150,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             idGenerator = dbIdGenerator;
         }
 
-        if (idGenerator instanceof DbIdGenerator) {
-            DbIdGenerator dbIdGenerator = (DbIdGenerator) idGenerator;
+        if (idGenerator instanceof DbIdGenerator dbIdGenerator) {
             if (dbIdGenerator.getIdBlockSize() == 0) {
                 dbIdGenerator.setIdBlockSize(idBlockSize);
             }
@@ -2158,8 +2198,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
             variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new StringType(getMaxLengthString(), variableLengthVerifier));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableLengthVerifier));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -2171,15 +2211,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new BigDecimalType());
+            variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new ParallelMultiInstanceLoopVariableType(this));
             variableTypes.addType(new BpmnAggregatedVariableType(this));
-            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
 
         } else {
             if (customPreVariableTypes != null) {
@@ -2262,9 +2304,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initScriptingEngines() {
+        initScriptEngine();
         if (scriptingEngines == null) {
-            scriptingEngines = new ScriptingEngines(scriptBindingsFactory);
+            scriptingEngines = new ScriptingEngines(scriptEngine, scriptBindingsFactory);
             scriptingEngines.setDefaultTraceEnhancer(new ProcessEngineScriptTraceEnhancer());
+        }
+    }
+
+    protected void initScriptEngine() {
+        if (scriptEngine == null) {
+            scriptEngine = new JSR223FlowableScriptEngine();
+        }
+    }
+
+    @Override
+    public void initObjectMapper() {
+        super.initObjectMapper();
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
         }
     }
 
@@ -2300,17 +2357,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void initMailClients() {
-        if (defaultMailClient == null) {
+        if (mailClientProvider == null) {
+            mailClientProvider = new DefaultMailClientProvider();
+        }
+        if (!(mailClientProvider instanceof DefaultMailClientProvider defaultMailClientProvider)) {
+            return; // custom provider handles resolution at runtime
+        }
+        if (defaultMailClientProvider.getDefaultMailClient() == null) {
             String sessionJndi = getMailSessionJndi();
             if (sessionJndi != null) {
-                defaultMailClient = FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer());
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createSessionClient(sessionJndi, getDefaultMailServer()));
             } else {
                 MailServerInfo mailServer = getDefaultMailServer();
                 String host = mailServer.getMailServerHost();
                 if (host == null) {
                     throw new FlowableException("no SMTP host is configured for the default mail server");
                 }
-                defaultMailClient = FlowableMailClientCreator.createHostClient(host, mailServer);
+                defaultMailClientProvider.setDefaultMailClient(FlowableMailClientCreator.createHostClient(host, mailServer));
             }
         }
 
@@ -2318,6 +2381,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         tenantIds.addAll(mailServers.keySet());
 
         if (!tenantIds.isEmpty()) {
+            Map<String, FlowableMailClient> mailClients = defaultMailClientProvider.getMailClients();
             MailServerInfo defaultMailServer = getDefaultMailServer();
             for (String tenantId : tenantIds) {
                 if (mailClients.containsKey(tenantId)) {
@@ -2953,6 +3017,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     @Override
+    public FlowableScriptEngine getScriptEngine() {
+        return scriptEngine;
+    }
+
+    @Override
+    public ProcessEngineConfigurationImpl setScriptEngine(FlowableScriptEngine scriptEngine) {
+        this.scriptEngine = scriptEngine;
+        return this;
+    }
+
+    @Override
     public ScriptingEngines getScriptingEngines() {
         return scriptingEngines;
     }
@@ -3185,6 +3260,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    @Override
+    public ProcessEngineConfigurationImpl setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
+        return this;
+    }
+
     public boolean isParallelMultiInstanceAsyncLeave() {
         return parallelMultiInstanceAsyncLeave;
     }
@@ -3314,6 +3400,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setStartProcessInstanceInterceptor(StartProcessInstanceInterceptor startProcessInstanceInterceptor) {
         this.startProcessInstanceInterceptor = startProcessInstanceInterceptor;
+        return this;
+    }
+
+    public ProcessInstanceStateInterceptor getProcessInstanceStateInterceptor() {
+        return processInstanceStateInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceStateInterceptor(ProcessInstanceStateInterceptor processInstanceStateInterceptor) {
+        this.processInstanceStateInterceptor = processInstanceStateInterceptor;
+        return this;
+    }
+
+    public EndProcessInstanceInterceptor getEndProcessInstanceInterceptor() {
+        return endProcessInstanceInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setEndProcessInstanceInterceptor(EndProcessInstanceInterceptor endProcessInstanceInterceptor) {
+        this.endProcessInstanceInterceptor = endProcessInstanceInterceptor;
         return this;
     }
     
@@ -3653,6 +3757,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
 
         this.postDefaultResolverFactories.add(resolverFactory);
+        return this;
+    }
+
+    public boolean isServicesEnabledInScripting() {
+        return servicesEnabledInScripting;
+    }
+
+    public ProcessEngineConfigurationImpl setServicesEnabledInScripting(boolean servicesEnabledInScripting) {
+        this.servicesEnabledInScripting = servicesEnabledInScripting;
         return this;
     }
 
@@ -5393,4 +5506,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.batchStatusTimeCycleConfig = batchStatusTimeCycleConfig;
     }
 
+    public BpmnEventInstanceOutParameterHandler getBpmnEventInstanceOutParameterHandler() {
+        return bpmnEventInstanceOutParameterHandler;
+    }
+
+    public void setBpmnEventInstanceOutParameterHandler(BpmnEventInstanceOutParameterHandler bpmnEventInstanceOutParameterHandler) {
+        this.bpmnEventInstanceOutParameterHandler = bpmnEventInstanceOutParameterHandler;
+    }
 }

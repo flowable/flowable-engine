@@ -17,6 +17,7 @@ import org.flowable.common.engine.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
+import org.flowable.job.service.impl.asyncexecutor.JobExecutionObservationProvider;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
@@ -28,15 +29,22 @@ public class TenantAwareExecuteAsyncRunnableFactory implements ExecuteAsyncRunna
 
     protected TenantInfoHolder tenantInfoHolder;
     protected String tenantId;
+    protected JobExecutionObservationProvider jobExecutionObservationProvider;
 
     public TenantAwareExecuteAsyncRunnableFactory(TenantInfoHolder tenantInfoHolder, String tenantId) {
+        this(tenantInfoHolder, tenantId, JobExecutionObservationProvider.NOOP);
+    }
+
+    public TenantAwareExecuteAsyncRunnableFactory(TenantInfoHolder tenantInfoHolder, String tenantId,
+            JobExecutionObservationProvider jobExecutionObservationProvider) {
         this.tenantInfoHolder = tenantInfoHolder;
         this.tenantId = tenantId;
+        this.jobExecutionObservationProvider = jobExecutionObservationProvider;
     }
 
     @Override
     public Runnable createExecuteAsyncRunnable(JobInfo job, JobServiceConfiguration jobServiceConfiguration) {
-        return new TenantAwareExecuteAsyncRunnable(job, jobServiceConfiguration, tenantInfoHolder, tenantId);
+        return new TenantAwareExecuteAsyncRunnable(job, jobServiceConfiguration, tenantInfoHolder, tenantId, jobExecutionObservationProvider);
     }
 
 }

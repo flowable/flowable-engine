@@ -14,40 +14,20 @@ package org.flowable.app.engine.test.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
 import org.flowable.app.api.repository.AppDefinition;
-import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.flowable.app.engine.test.AppDeployment;
+import org.flowable.app.engine.test.AppDeploymentId;
+import org.flowable.app.engine.test.BaseFlowableAppTest;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
  */
-public class AppDefinitionCategoryTest extends FlowableAppTestCase {
-
-    private String deploymentId1;
-
-    @Before
-    public void deployTestDeployments() {
-        this.deploymentId1 = appRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/app/engine/test/test.app")
-                .deploy()
-                .getId();
-    }
-
-    @After
-    public void deleteTestDeployments() {
-        List<AppDeployment> deployments = appRepositoryService.createDeploymentQuery().list();
-        for (AppDeployment appDeployment : deployments) {
-            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
-        }
-    }
+class AppDefinitionCategoryTest extends BaseFlowableAppTest {
 
     @Test
-    public void testUpdateCategory() {
+    @AppDeployment(resources = "org/flowable/app/engine/test/test.app")
+    public void testUpdateCategory(@AppDeploymentId String deploymentId1) {
         AppDefinition appDefinition = appRepositoryService.createAppDefinitionQuery().deploymentId(deploymentId1).singleResult();
         assertThat(appDefinition.getCategory()).isNull();
         

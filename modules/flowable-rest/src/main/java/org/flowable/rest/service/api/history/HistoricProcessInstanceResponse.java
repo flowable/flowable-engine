@@ -20,7 +20,7 @@ import java.util.List;
 import org.flowable.common.rest.util.DateToStringSerializer;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -34,6 +34,11 @@ public class HistoricProcessInstanceResponse {
     protected String name;
     protected String businessKey;
     protected String businessStatus;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date dueDate;
+    @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
+    protected Date claimTime;
+    protected String claimedBy;
     protected String processDefinitionId;
     protected String processDefinitionUrl;
     protected String processDefinitionName;
@@ -44,6 +49,8 @@ public class HistoricProcessInstanceResponse {
     protected Date endTime;
     protected Long durationInMillis;
     protected String startUserId;
+    protected String endUserId;
+    protected String state;
     protected String startActivityId;
     protected String endActivityId;
     protected String deleteReason;
@@ -173,6 +180,24 @@ public class HistoricProcessInstanceResponse {
         this.startUserId = startUserId;
     }
 
+    @ApiModelProperty(example = "kermit")
+    public String getEndUserId() {
+        return endUserId;
+    }
+
+    public void setEndUserId(String endUserId) {
+        this.endUserId = endUserId;
+    }
+
+    @ApiModelProperty(example = "running")
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     @ApiModelProperty(example = "startEvent")
     public String getStartActivityId() {
         return startActivityId;
@@ -273,5 +298,29 @@ public class HistoricProcessInstanceResponse {
 
     public String getTenantId() {
         return tenantId;
+    }
+
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
     }
 }

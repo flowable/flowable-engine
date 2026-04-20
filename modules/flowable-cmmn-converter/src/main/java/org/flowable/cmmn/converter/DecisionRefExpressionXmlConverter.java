@@ -39,8 +39,7 @@ public class DecisionRefExpressionXmlConverter extends CaseElementXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         try {
             String expression = xtr.getElementText();
-            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof DecisionTask) {
-                DecisionTask decisionTask = (DecisionTask) conversionHelper.getCurrentCmmnElement();
+            if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof DecisionTask decisionTask) {
                 decisionTask.setDecisionRefExpression(expression);
             }
         } catch (XMLStreamException e) {

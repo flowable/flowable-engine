@@ -20,12 +20,12 @@ import java.util.Map;
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 public class ProcessVariablesTest extends CdiFlowableTestCase {
 
-    @Ignore
+    @Disabled
     @Test
     @Deployment(resources = "org/flowable/cdi/BusinessProcessBeanTest.test.bpmn20.xml")
     public void testResolveString() {

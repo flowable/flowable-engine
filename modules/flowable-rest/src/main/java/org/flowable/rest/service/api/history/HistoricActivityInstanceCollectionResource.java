@@ -13,8 +13,11 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,7 +35,7 @@ import io.swagger.annotations.Authorization;
 /**
  * @author Tijs Rademakers
  */
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
 @RestController
 public class HistoricActivityInstanceCollectionResource extends HistoricActivityInstanceBaseResource {
 
@@ -49,7 +52,9 @@ public class HistoricActivityInstanceCollectionResource extends HistoricActivity
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic activity instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the historic activity instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic activity instance.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIds", dataType = "string", value = "The process instance ids of the historic activity instances.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "The process definition id of the historic activity instance.", paramType = "query"),
+            @ApiImplicitParam(name = "calledProcessInstanceIds", dataType = "string", value = "The lis of process instance ids that are called by historic activity instances", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query")
@@ -91,8 +96,18 @@ public class HistoricActivityInstanceCollectionResource extends HistoricActivity
             query.setProcessInstanceId(allRequestParams.get("processInstanceId"));
         }
 
+        if (allRequestParams.get("processInstanceIds") != null) {
+            String[] list = StringUtils.split(allRequestParams.get("processInstanceIds"), ",");
+            query.setProcessInstanceIds(new HashSet<>(Arrays.asList(list)));
+        }
+
         if (allRequestParams.get("processDefinitionId") != null) {
             query.setProcessDefinitionId(allRequestParams.get("processDefinitionId"));
+        }
+
+        if (allRequestParams.get("calledProcessInstanceIds") != null) {
+            String[] list = StringUtils.split(allRequestParams.get("calledProcessInstanceIds"), ",");
+            query.setCalledProcessInstanceIds(new HashSet<>(Arrays.asList(list)));
         }
 
         if (allRequestParams.get("tenantId") != null) {

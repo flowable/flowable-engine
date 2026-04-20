@@ -25,24 +25,19 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
     @Test
     @Deployment
-    public void testRepeatWithoutEnd() throws Throwable {
+    public void testRepeatWithoutEnd() {
 
         // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
         Instant baseInstant = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(337);
 
         // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        DateTime dt = new DateTime(new DateTime(baseInstant.plus(20, ChronoUnit.MINUTES).getEpochSecond()));
-        String dateStr = fmt.print(dt);
+        String dateStr = baseInstant.plus(20, ChronoUnit.MINUTES).toString();
 
         // reset the timer
         Instant nextTimeInstant = baseInstant;

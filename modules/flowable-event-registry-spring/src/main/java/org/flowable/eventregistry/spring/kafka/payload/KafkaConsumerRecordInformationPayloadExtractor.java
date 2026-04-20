@@ -35,7 +35,7 @@ import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 public class KafkaConsumerRecordInformationPayloadExtractor<T> implements InboundEventInfoAwarePayloadExtractor<T> {
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, FlowableEventInfo<T> event, String parentDeploymentId, String tenantId) {
         InboundChannelModel inboundChannel = event.getInboundChannel();
         Object rawEvent = event.getRawEvent();
         if (inboundChannel instanceof KafkaInboundChannelModel && rawEvent instanceof ConsumerRecord) {

@@ -360,4 +360,20 @@ public class TimerJobEntity extends AbstractJobEntity {
         }
         return businessCalendarName;
     }
+
+    public String getLockOwner() {
+        return null;
+    }
+
+    public void setLockOwner(String lockOwner) {
+        // Nothing to do
+    }
+
+    public Date getLockExpirationTime() {
+        return null;
+    }
+
+    public void setLockExpirationTime(Date lockExpirationTime) {
+        // Nothing to do
+    }
 }

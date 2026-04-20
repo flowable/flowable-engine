@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.flowable.engine.migration.ActivityMigrationMappingOptions.SingleToActivityOptions;
+
 /**
  * @author Tijs Rademakers
  */
@@ -27,40 +29,36 @@ public class MoveActivityIdContainer {
     protected boolean moveToSubProcessInstance;
     protected String callActivityId;
     protected Integer callActivitySubProcessVersion;
-    protected String newAssigneeId;
-    protected String newOwnerId;
+    protected SingleToActivityOptions<?> activityOptions;
 
     public MoveActivityIdContainer(String singleActivityId, String moveToActivityId) {
-        this(singleActivityId, moveToActivityId, null, null);
+        this(singleActivityId, moveToActivityId, null);
     }
 
-    public MoveActivityIdContainer(String singleActivityId, String moveToActivityId, String newAssigneeId, String newOwnerId) {
+    public MoveActivityIdContainer(String singleActivityId, String moveToActivityId, SingleToActivityOptions<?> activityOptions) {
         this.activityIds = Collections.singletonList(singleActivityId);
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        this.newAssigneeId = newAssigneeId;
-        this.newOwnerId = newOwnerId;
+        this.activityOptions = activityOptions;
     }
 
     public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId) {
-        this(activityIds, moveToActivityId, null, null);
+        this(activityIds, moveToActivityId, null);
     }
 
-    public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId, String newAssigneeId, String newOwnerId) {
+    public MoveActivityIdContainer(List<String> activityIds, String moveToActivityId, SingleToActivityOptions<?> activityOptions) {
         this.activityIds = activityIds;
         this.moveToActivityIds = Collections.singletonList(moveToActivityId);
-        this.newAssigneeId = newAssigneeId;
-        this.newOwnerId = newOwnerId;
+        this.activityOptions = activityOptions;
     }
 
     public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds) {
-        this(singleActivityId, moveToActivityIds, null, null);
+        this(singleActivityId, moveToActivityIds, null);
     }
 
-    public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds, String newAssigneeId, String newOwnerId) {
+    public MoveActivityIdContainer(String singleActivityId, List<String> moveToActivityIds, SingleToActivityOptions<?> activityOptions) {
         this.activityIds = Collections.singletonList(singleActivityId);
         this.moveToActivityIds = moveToActivityIds;
-        this.newAssigneeId = newAssigneeId;
-        this.newOwnerId = newOwnerId;
+        this.activityOptions = activityOptions;
     }
 
     public List<String> getActivityIds() {
@@ -103,11 +101,11 @@ public class MoveActivityIdContainer {
         this.callActivitySubProcessVersion = callActivitySubProcessVersion;
     }
 
-    public Optional<String> getNewAssigneeId() {
-        return Optional.ofNullable(newAssigneeId);
+    public void setActivityOptions(SingleToActivityOptions<?> activityOptions) {
+        this.activityOptions = activityOptions;
     }
 
-    public Optional<String> getNewOwnerId() {
-        return Optional.ofNullable(newOwnerId);
+    public SingleToActivityOptions<?> getActivityOptions() {
+        return activityOptions;
     }
 }

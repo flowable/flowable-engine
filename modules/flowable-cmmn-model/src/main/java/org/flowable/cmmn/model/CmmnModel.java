@@ -141,8 +141,8 @@ public class CmmnModel {
 
         if (foundPlanItem == null) {
             for (Case caseModel : cases) {
-                for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
-                    foundPlanItem = stage.findPlanItemInPlanFragmentOrUpwards(id);
+               for (PlanFragment planFragment : caseModel.getPlanModel().findPlanItemDefinitionsOfType(PlanFragment.class, true)) {
+                    foundPlanItem = planFragment.findPlanItemInPlanFragmentOrUpwards(id);
                     if (foundPlanItem != null) {
                         break;
                     }

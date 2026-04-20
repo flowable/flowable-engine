@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MultiInstanceTaskCompleteEventTest extends CdiFlowableTestCase {
 

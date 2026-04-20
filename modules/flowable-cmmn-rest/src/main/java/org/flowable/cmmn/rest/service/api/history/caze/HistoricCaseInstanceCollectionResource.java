@@ -13,8 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history.caze;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
@@ -40,12 +43,13 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Case" }, description = "Manage History Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Case" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstanceBaseResource {
 
     @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "Only return historic case instances with the given comma-separated ids.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKey", dataType = "string", value = "The case definition key of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLike", dataType = "string", value = "Only return historic case instances like the given case definition key.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionKeyLikeIgnoreCase", dataType = "string", value = "Only return historic case instances like the given case definition key, ignoring case.", paramType = "query"),
@@ -77,6 +81,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "state", dataType = "string", value = "Only return historic case instances with the given state.", paramType = "query"),
             @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return historic case instances which have the given callback id.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return historic case instances which have the given callback type.", paramType = "query"),
+            @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return historic case instances which have the given parent case instance id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return historic case instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return historic case instances which have the given reference type.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return historic case instances last reactived by the given user.", paramType = "query"),
@@ -84,6 +89,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "lastReactivatedAfter", dataType = "string", format = "date-time", value = "Only return historic case instances last reactivated after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "activePlanItemDefinitionId", dataType = "string", value = "Only return historic case instances that have an active plan item instance with the given plan item definition id.", paramType = "query"),
             @ApiImplicitParam(name = "includeCaseVariables", dataType = "boolean", value = "An indication if the historic case instance variables should be returned as well.", paramType = "query"),
+            @ApiImplicitParam(name = "includeCaseVariablesName", dataType = "string", value = "Indication to include case variables with the given names in the result.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances like the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLikeIgnoreCase", dataType = "string", value = "Only return instances like the given tenant id, ignoring case.", paramType = "query"),
@@ -101,6 +107,10 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("caseInstanceId") != null) {
             queryRequest.setCaseInstanceId(allRequestParams.get("caseInstanceId"));
+        }
+
+        if (allRequestParams.get("caseInstanceIds") != null) {
+            queryRequest.setCaseInstanceIds(RequestUtil.parseToSet(allRequestParams.get("caseInstanceIds")));
         }
 
         if (allRequestParams.get("caseDefinitionKey") != null) {
@@ -198,11 +208,19 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         if (allRequestParams.get("callbackId") != null) {
             queryRequest.setCaseInstanceCallbackId(allRequestParams.get("callbackId"));
         }
-        
+
+        if (allRequestParams.containsKey("callbackIds")) {
+            queryRequest.setCaseInstanceCallbackIds(RequestUtil.parseToSet(allRequestParams.get("callbackIds")));
+        }
+
         if (allRequestParams.get("callbackType") != null) {
             queryRequest.setCaseInstanceCallbackType(allRequestParams.get("callbackType"));
         }
         
+        if (allRequestParams.containsKey("parentCaseInstanceId")) {
+            queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
+        }
+
         if (allRequestParams.get("referenceId") != null) {
             queryRequest.setCaseInstanceReferenceId(allRequestParams.get("referenceId"));
         }
@@ -253,6 +271,10 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
 
         if (allRequestParams.get("includeCaseVariables") != null) {
             queryRequest.setIncludeCaseVariables(Boolean.valueOf(allRequestParams.get("includeCaseVariables")));
+        }
+
+        if (allRequestParams.containsKey("includeCaseVariablesNames")) {
+            queryRequest.setIncludeCaseVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeCaseVariablesNames")));
         }
 
         if (allRequestParams.get("tenantId") != null) {

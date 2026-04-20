@@ -52,8 +52,7 @@ public class ParallelMultiInstanceWithNoWaitStatesAsyncLeaveJobHandler implement
             FlowElement currentFlowElement = execution.getCurrentFlowElement();
             if (currentFlowElement instanceof Activity) {
                 Object behavior = ((Activity) currentFlowElement).getBehavior();
-                if (behavior instanceof ParallelMultiInstanceBehavior) {
-                    ParallelMultiInstanceBehavior parallelMultiInstanceBehavior = (ParallelMultiInstanceBehavior) behavior;
+                if (behavior instanceof ParallelMultiInstanceBehavior parallelMultiInstanceBehavior) {
 
                     DelegateExecution multiInstanceRootExecution = ExecutionGraphUtil.getMultiInstanceRootExecution(execution);
                     if (multiInstanceRootExecution != null) {

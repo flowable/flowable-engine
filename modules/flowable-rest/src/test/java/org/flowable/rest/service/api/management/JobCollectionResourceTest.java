@@ -30,11 +30,11 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -63,8 +63,8 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         JsonNode timerJobNode = responseNode.get("data").get(0);
-        assertThat(timerJobNode.get("id").asText()).isEqualTo(timerJob.getId());
-        assertThat(timerJobNode.get("url").asText()).contains("management/timer-jobs/" + timerJob.getId());
+        assertThat(timerJobNode.get("id").asString()).isEqualTo(timerJob.getId());
+        assertThat(timerJobNode.get("url").asString()).contains("management/timer-jobs/" + timerJob.getId());
         
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION);
         assertResultsPresentInDataResponse(url, timerJob.getId());
@@ -193,8 +193,8 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         JsonNode deadletterJobNode = responseNode.get("data").get(0);
-        assertThat(deadletterJobNode.get("id").asText()).isEqualTo(timerJob.getId());
-        assertThat(deadletterJobNode.get("url").asText()).contains("management/deadletter-jobs/" + timerJob.getId());
+        assertThat(deadletterJobNode.get("id").asString()).isEqualTo(timerJob.getId());
+        assertThat(deadletterJobNode.get("url").asString()).contains("management/deadletter-jobs/" + timerJob.getId());
         
         assertResultsPresentInDataResponse(url, timerJob.getId());
 

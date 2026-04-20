@@ -443,7 +443,7 @@ public class CustomEventProcessingPipelineTest extends AbstractFlowableEventTest
         public AtomicInteger payloadCounter = new AtomicInteger(0);
 
         @Override
-        public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, String payload) {
+        public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, String payload, String parentDeploymentId, String tenantId) {
             payloadCounter.incrementAndGet();
             return Collections.emptyList();
         }

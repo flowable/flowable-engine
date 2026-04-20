@@ -26,7 +26,7 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -413,6 +413,10 @@ public class CommandContext {
 
     public void setResult(Object result) {
         resultStack.add(result);
+    }
+
+    public int getResultStackSize() {
+        return resultStack.size();
     }
     
     public long getStartTime() {

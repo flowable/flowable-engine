@@ -34,10 +34,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -71,7 +70,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
     }
 
     protected TestInboundEventChannelAdapter setupTestInboundChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(processEngineConfiguration.getObjectMapper());
         getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
             .put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -287,6 +286,11 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
+        protected final ObjectMapper objectMapper;
+
+        private TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -299,7 +303,6 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
         }
 
         public void testTriggerEvent() {
-            ObjectMapper objectMapper = new ObjectMapper();
 
             ObjectNode json = objectMapper.createObjectNode();
 
@@ -310,11 +313,7 @@ public class EventPayloadTypesConversionTest extends FlowableEventRegistryBpmnTe
             json.put("booleanPayload", true);
             json.set("jsonPayload", objectMapper.createObjectNode().put("hello", "world"));
 
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(json));
         }
 
     }

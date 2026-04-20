@@ -22,7 +22,7 @@ import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -33,10 +33,6 @@ public class VariablesTest extends AbstractProcessEngineIntegrationTest {
     @Deployment
     @CmmnDeployment
     public void testSettingAndRemovingVariableThroughCmmnRuntimeService() {
-        processEngineRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/VariablesTest.testSettingAndRemovingVariableThroughCmmnRuntimeService.bpmn20.xml")
-                .deploy();
-
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("varSyncTestCase")
                 .variable("loopNum", 100)

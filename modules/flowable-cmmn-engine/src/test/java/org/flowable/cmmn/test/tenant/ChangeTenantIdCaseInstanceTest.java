@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnChangeTenantIdEntityTypes;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableChangeTenantIdEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -40,9 +40,9 @@ import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
 
@@ -57,7 +57,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
     protected String deploymentIdWithTenantAForJobs;
     protected TestEventListener eventListener = new TestEventListener();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.deploymentIdWithTenantA = cmmnRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/tenant/caseWithMilestone.cmmn")
                 .tenantId(TEST_TENANT_A).deploy().getId();
@@ -77,7 +77,7 @@ public class ChangeTenantIdCaseInstanceTest extends FlowableCmmnTestCase {
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(eventListener);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         cmmnEngineConfiguration.getEventDispatcher().removeEventListener(eventListener);
     }

@@ -176,7 +176,7 @@ public class FlowableDmnExtension implements ParameterResolver, BeforeEachCallba
 
     protected FlowableDmnTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(),
+            .computeIfAbsent(context.getRequiredTestClass(),
                 key -> new FlowableDmnTestHelper(createDmnEngine(context)), FlowableDmnTestHelper.class);
     }
 

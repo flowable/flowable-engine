@@ -167,10 +167,14 @@
         RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="ids != null and ids">
-        and RES.ID_ in
-        <foreach item="id" index="index" collection="ids" open="(" separator="," close=")">
-          #{id, jdbcType=NVARCHAR}
-        </foreach>
+          and (
+              <foreach item="listItem" collection="safeIds" separator="OR">
+                  RES.ID_ in
+                  <foreach item="id" collection="listItem" open="(" separator="," close=")">
+                      #{id, jdbcType=NVARCHAR}
+                  </foreach>
+              </foreach>
+          )
       </if>
       <if test="category != null">
         and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}

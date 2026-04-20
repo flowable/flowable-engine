@@ -35,9 +35,8 @@ public class ErrorThrowingEventListener extends BaseDelegateEventListener {
 
     @Override
     public void onEvent(FlowableEvent event) {
-        if (isValidEvent(event) && event instanceof FlowableEngineEvent) {
+        if (isValidEvent(event) && event instanceof FlowableEngineEvent engineEvent) {
 
-            FlowableEngineEvent engineEvent = (FlowableEngineEvent) event;
             CommandContext commandContext = Context.getCommandContext();
 
             if (engineEvent.getProcessDefinitionId() != null &&

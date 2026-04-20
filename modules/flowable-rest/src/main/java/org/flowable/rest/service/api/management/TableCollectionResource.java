@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Database tables" }, description = "Manage Database tables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Database tables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TableCollectionResource {
 
     @Autowired

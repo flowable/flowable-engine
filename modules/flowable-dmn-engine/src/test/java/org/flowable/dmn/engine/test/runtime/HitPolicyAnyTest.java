@@ -20,24 +20,18 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyAnyTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyAnyTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void anyHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -58,7 +52,6 @@ public class HitPolicyAnyTest {
     @Test
     @DmnDeployment
     public void anyHitPolicyViolated() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -78,7 +71,6 @@ public class HitPolicyAnyTest {
     @Test
     @DmnDeployment
     public void anyHitPolicyNoValueViolated() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> inputVariables = new HashMap<>();
@@ -104,7 +96,6 @@ public class HitPolicyAnyTest {
     @Test
     @DmnDeployment
     public void anyHitPolicyViolatedStrictModeDisabled() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();

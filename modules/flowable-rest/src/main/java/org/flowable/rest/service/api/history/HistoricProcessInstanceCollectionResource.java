@@ -13,6 +13,9 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -40,7 +43,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCollectionResource extends HistoricProcessInstanceBaseResource {
 
     @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
@@ -80,8 +83,11 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
+        @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
+        @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return instances with the given parent case instance id.", paramType = "query"),
         @ApiImplicitParam(name = "withoutCallbackId", dataType = "boolean", value = "Only return instances that do not have a callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
         @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return instances with a tenant id like the given value.", paramType = "query"),
@@ -235,14 +241,28 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         if (allRequestParams.get("includeProcessVariables") != null) {
             queryRequest.setIncludeProcessVariables(Boolean.valueOf(allRequestParams.get("includeProcessVariables")));
         }
+
+        if (allRequestParams.get("includeProcessVariablesNames") != null) {
+            queryRequest.setIncludeProcessVariablesNames(RequestUtil.parseToList(allRequestParams.get("includeProcessVariablesNames")));
+        }
         
         if (allRequestParams.get("callbackId") != null) {
             queryRequest.setCallbackId(allRequestParams.get("callbackId"));
         }
         
+        if (allRequestParams.get("callbackIds") != null) {
+            String[] callbackIds = allRequestParams.get("callbackIds").split(",");
+            queryRequest.setCallbackIds(new HashSet<>(Arrays.asList(callbackIds)));
+        }
+
         if (allRequestParams.get("callbackType") != null) {
             queryRequest.setCallbackType(allRequestParams.get("callbackType"));
         }
+        
+        if (allRequestParams.get("parentCaseInstanceId") != null) {
+            queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
+        }
+        
         if (allRequestParams.get("withoutCallbackId") != null) {
             queryRequest.setWithoutCallbackId(Boolean.valueOf(allRequestParams.get("withoutCallbackId")));
         }

@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")
@@ -90,6 +90,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic task instance global variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return historic task instances with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return historic task instances with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return historic task instances of the given scopeIds.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns historic task instances without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic task instances with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
@@ -322,6 +323,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("scopeId") != null) {
             queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+
+        if (allRequestParams.get("scopeIds") != null) {
+            queryRequest.setScopeIds(RequestUtil.parseToSet(allRequestParams.get("scopeIds")));
         }
         
         if (allRequestParams.get("withoutScopeId") != null) {

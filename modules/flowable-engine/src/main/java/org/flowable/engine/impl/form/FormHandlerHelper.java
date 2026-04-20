@@ -35,9 +35,7 @@ public class FormHandlerHelper {
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinition.getId());
 
         FlowElement initialFlowElement = process.getInitialFlowElement();
-        if (initialFlowElement instanceof StartEvent) {
-
-            StartEvent startEvent = (StartEvent) initialFlowElement;
+        if (initialFlowElement instanceof StartEvent startEvent) {
 
             List<FormProperty> formProperties = startEvent.getFormProperties();
             String formKey = startEvent.getFormKey();
@@ -54,8 +52,7 @@ public class FormHandlerHelper {
     public TaskFormHandler getTaskFormHandlder(String processDefinitionId, String taskId) {
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         FlowElement flowElement = process.getFlowElement(taskId, true);
-        if (flowElement instanceof UserTask) {
-            UserTask userTask = (UserTask) flowElement;
+        if (flowElement instanceof UserTask userTask) {
 
             ProcessDefinition processDefinitionEntity = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
             DeploymentEntity deploymentEntity = CommandContextUtil.getProcessEngineConfiguration()

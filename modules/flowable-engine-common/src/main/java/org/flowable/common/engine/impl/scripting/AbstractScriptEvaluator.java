@@ -73,7 +73,7 @@ public abstract class AbstractScriptEvaluator {
         }
         ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder();
 
-        return builder.language(language).script(getScript()).variableContainer(variableContainer);
+        return builder.language(language).script(getScript()).scopeContainer(variableContainer);
     }
 
     protected Object evaluateScriptRequest(ScriptEngineRequest.Builder requestBuilder) {
@@ -81,7 +81,7 @@ public abstract class AbstractScriptEvaluator {
         Object result = evaluateScript(getScriptingEngines(), request);
 
         if (resultVariable != null) {
-            VariableContainer variableContainer = request.getVariableContainer();
+            VariableContainer variableContainer = request.getScopeContainer();
             String resultVariable = Objects.toString(this.resultVariable.getValue(variableContainer), null);
             if (variableContainer != null && resultVariable != null) {
                 variableContainer.setVariable(resultVariable, result);

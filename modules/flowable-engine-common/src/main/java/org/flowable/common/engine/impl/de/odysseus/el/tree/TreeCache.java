@@ -26,10 +26,10 @@ public interface TreeCache {
 	/**
 	 * Lookup tree
 	 */
-	public Tree get(String expression);
+    Tree get(String expression);
 
 	/**
 	 * Cache tree
 	 */
-	public void put(String expression, Tree tree);
+    void put(String expression, Tree tree);
 }

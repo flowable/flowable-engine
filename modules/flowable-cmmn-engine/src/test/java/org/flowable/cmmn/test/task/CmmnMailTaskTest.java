@@ -33,58 +33,17 @@ import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.subethamail.wiser.Wiser;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.WiserMessage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
  */
-@Tag("email")
-public class CmmnMailTaskTest extends FlowableCmmnTestCase {
-
-    protected static Wiser wiser;
-
-    @BeforeClass
-    public static void setupWiser() throws Exception {
-        wiser = Wiser.port(5025);
-
-        int counter = 0;
-        boolean serverUpAndRunning = false;
-        while (!serverUpAndRunning && counter++ < 11) {
-
-            wiser = Wiser.port(5025);
-
-            try {
-                wiser.start();
-                serverUpAndRunning = true;
-            } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
-                if (e.getMessage().toLowerCase().contains("bindexception")) {
-                    Thread.sleep(250L);
-                }
-            }
-        }
-    }
-
-    @Before
-    public void resetMessages() {
-        wiser.getMessages().clear();
-    }
-
-    @AfterClass
-    public static void stopWiser() {
-        wiser.stop();
-    }
+public class CmmnMailTaskTest extends CmmnEmailTestCase {
 
     @Test
     @CmmnDeployment
@@ -187,7 +146,7 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
     public void testDynamicRecipientsArrayNode() throws MessagingException {
-        ArrayNode recipients = new ObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
+        ArrayNode recipients = cmmnEngineConfiguration.getObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
         testDynamicRecipientsInternal(recipients);
     }
 

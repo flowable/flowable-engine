@@ -292,8 +292,7 @@ public class DbSqlSession implements Session {
     public Object selectOne(String statement, Object parameter) {
         statement = dbSqlSessionFactory.mapStatement(statement);
         Object result = sqlSession.selectOne(statement, parameter);
-        if (result instanceof Entity) {
-            Entity loadedObject = (Entity) result;
+        if (result instanceof Entity loadedObject) {
             result = cacheLoadOrStore(loadedObject, parameter);
         }
         return result;
@@ -413,7 +412,15 @@ public class DbSqlSession implements Session {
     public void determineUpdatedObjects() {
         updatedObjects = new ArrayList<>();
         Map<Class<?>, Map<String, CachedEntity>> cachedObjects = entityCache.getAllCachedEntities();
+        if (cachedObjects.isEmpty()) {
+            return;
+        }
+
+        Collection<Class<? extends Entity>> immutableEntities = dbSqlSessionFactory.getImmutableEntities();
         for (Class<?> clazz : cachedObjects.keySet()) {
+            if (immutableEntities.contains(clazz)) {
+                continue;
+            }
 
             Map<String, CachedEntity> classCache = cachedObjects.get(clazz);
             for (CachedEntity cachedObject : classCache.values()) {

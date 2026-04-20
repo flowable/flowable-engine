@@ -26,9 +26,10 @@ import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Filip Hrisafov
@@ -48,7 +49,7 @@ public class EventRegistryRabbitConfiguration {
     
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return JsonMapper.shared();
     }
 
     @Bean

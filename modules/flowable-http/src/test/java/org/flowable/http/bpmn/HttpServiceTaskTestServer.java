@@ -23,15 +23,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.servlet.MultipartConfigElement;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -39,17 +34,23 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
+
+import jakarta.servlet.MultipartConfigElement;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 /**
  * Http Server and API to test HTTP Activity
@@ -98,11 +99,12 @@ public class HttpServiceTaskTestServer {
             ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
             contextHandler.setContextPath("/");
             MultipartConfigElement multipartConfig = new MultipartConfigElement((String) null);
-            ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet());
+            ObjectMapper mapper = JsonMapper.shared();
+            ServletHolder httpServiceTaskServletHolder = new ServletHolder(new HttpServiceTaskTestServlet(mapper));
             httpServiceTaskServletHolder.getRegistration().setMultipartConfig(multipartConfig);
             contextHandler.addServlet(httpServiceTaskServletHolder, "/api/*");
-            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet()), "/test");
-            contextHandler.addServlet(new ServletHolder(new HelloServlet()), "/hello");
+            contextHandler.addServlet(new ServletHolder(new SimpleHttpServiceTaskTestServlet(mapper)), "/test");
+            contextHandler.addServlet(new ServletHolder(new HelloServlet(mapper)), "/hello");
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
             contextHandler.addServlet(new ServletHolder(new ClasspathResourceServlet()), "/resource");
@@ -135,9 +137,10 @@ public class HttpServiceTaskTestServer {
         public static Map<String, String> headerMap = new HashMap<>();
 
         private String name = "test servlet";
-        private ObjectMapper mapper = new ObjectMapper();
+        private ObjectMapper mapper;
 
-        public HttpServiceTaskTestServlet() {
+        public HttpServiceTaskTestServlet(ObjectMapper mapper) {
+            this.mapper = mapper;
         }
 
         public HttpServiceTaskTestServlet(String name) {
@@ -170,6 +173,8 @@ public class HttpServiceTaskTestServer {
 
             } else if (code >= 500 && code < 600) {
                 resp.sendError(code, "Server Error");
+            } else {
+                resp.sendError(code, "Custom error");
             }
         }
 
@@ -278,7 +283,11 @@ public class HttpServiceTaskTestServer {
 
         private static final long serialVersionUID = 1L;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
+        private final ObjectMapper objectMapper;
+
+        private SimpleHttpServiceTaskTestServlet(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -298,15 +307,19 @@ public class HttpServiceTaskTestServer {
 
         private static final long serialVersionUID = 1L;
 
-        private ObjectMapper objectMapper = new ObjectMapper();
-        
+        private final ObjectMapper objectMapper;
+
+        private HelloServlet(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
+
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setStatus(200);
             resp.setContentType("application/json");
             
             JsonNode body = objectMapper.readTree(req.getInputStream());
-            String name = body.get("name").asText();
+            String name = body.get("name").asString();
 
             ObjectNode responseNode = objectMapper.createObjectNode();
             responseNode.put("result", "Hello " + name);

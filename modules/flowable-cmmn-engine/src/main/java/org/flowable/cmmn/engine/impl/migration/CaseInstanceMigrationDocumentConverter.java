@@ -12,11 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.migration;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
@@ -28,13 +29,14 @@ import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.common.engine.api.FlowableException;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Valentin Zickner
@@ -42,10 +44,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigrationDocumentConstants {
 
     protected static Predicate<JsonNode> isNotNullNode = jsonNode -> jsonNode != null && !jsonNode.isNull();
-    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isTextual();
+    protected static Predicate<JsonNode> isSingleTextValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isString();
     protected static Predicate<JsonNode> isMultiValue = jsonNode -> isNotNullNode.test(jsonNode) && jsonNode.isArray();
 
-    protected static ObjectMapper objectMapper = new ObjectMapper();
+    protected static ObjectMapper objectMapper = JsonMapper.shared();
 
     public static JsonNode convertToJson(CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         ObjectNode documentNode = objectMapper.createObjectNode();
@@ -64,6 +66,10 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
         if (caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId() != null) {
             documentNode.put(TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY, caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId());
+        }
+        
+        if (caseInstanceMigrationDocument.getEnableAutomaticPlanItemInstanceCreation() != null) {
+            documentNode.put(ENABLE_AUTOMATIC_PLAN_ITEM_INSTANCE_CREATION_JSON_PROPERTY, caseInstanceMigrationDocument.getEnableAutomaticPlanItemInstanceCreation());
         }
 
         ArrayNode activateMappingNodes = convertToJsonActivatePlanItemDefinitionMappings(caseInstanceMigrationDocument.getActivatePlanItemDefinitionMappings());
@@ -127,7 +133,7 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
         try {
             return objectWriter.writeValueAsString(jsonNode);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return jsonNode.toString();
         }
     }
@@ -138,8 +144,52 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         for (ActivatePlanItemDefinitionMapping mapping : planItemDefinitionMappings) {
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
-            mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getNewAssignee());
-            mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
+            
+            if (StringUtils.isNotEmpty(mapping.getNewName())) {
+                mappingNode.put(NEW_NAME_JSON_PROPERTY, mapping.getNewName());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewDueDate())) {
+                mappingNode.put(NEW_DUE_DATE_JSON_PROPERTY, mapping.getNewDueDate());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewPriority())) {
+                mappingNode.put(NEW_PRIORITY_JSON_PROPERTY, mapping.getNewPriority());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewCategory())) {
+                mappingNode.put(NEW_CATEGORY_JSON_PROPERTY, mapping.getNewCategory());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewFormKey())) {
+                mappingNode.put(NEW_FORM_KEY_JSON_PROPERTY, mapping.getNewFormKey());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewAssignee())) {
+                mappingNode.put(NEW_ASSIGNEE_JSON_PROPERTY, mapping.getNewAssignee());
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getNewOwner())) {
+                mappingNode.put(NEW_OWNER_JSON_PROPERTY, mapping.getNewOwner());
+            }
+            
+            if (mapping.getNewCandidateUsers() != null && !mapping.getNewCandidateUsers().isEmpty()) {
+                mappingNode.set(NEW_CANDIDATE_USERS_JSON_PROPERTY, objectMapper.valueToTree(mapping.getNewCandidateUsers()));
+            }
+            
+            if (mapping.getNewCandidateGroups() != null && !mapping.getNewCandidateGroups().isEmpty()) {
+                mappingNode.set(NEW_CANDIDATE_GROUPS_JSON_PROPERTY, objectMapper.valueToTree(mapping.getNewCandidateGroups()));
+            }
+            
+            if (StringUtils.isNotEmpty(mapping.getCondition())) {
+                mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
+            }
+            
+            Map<String, Object> localVariables = mapping.getWithLocalVariables();
+            if (localVariables != null && !localVariables.isEmpty()) {
+                mappingNode.set(LOCAL_VARIABLES_JSON_SECTION, objectMapper.valueToTree(localVariables));
+            }
+
             mappingsArray.add(mappingNode);
         }
 
@@ -166,6 +216,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             ObjectNode mappingNode = objectMapper.createObjectNode();
             mappingNode.put(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mapping.getPlanItemDefinitionId());
             mappingNode.put(CONDITION_JSON_PROPERTY, mapping.getCondition());
+            Map<String, Object> localVariables = mapping.getWithLocalVariables();
+            if (localVariables != null && !localVariables.isEmpty()) {
+                mappingNode.set(LOCAL_VARIABLES_JSON_SECTION, objectMapper.valueToTree(localVariables));
+            }
+
             mappingsArray.add(mappingNode);
         }
 
@@ -251,16 +306,78 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             documentBuilder.setCaseDefinitionToMigrateTo(caseDefinitionKey, caseDefinitionVersion);
 
             documentBuilder.setTenantId(getJsonProperty(TO_CASE_DEFINITION_TENANT_ID_JSON_PROPERTY, rootNode));
+            
+            documentBuilder.setEnableAutomaticPlanItemInstanceCreation(getJsonPropertyAsBoolean(ENABLE_AUTOMATIC_PLAN_ITEM_INSTANCE_CREATION_JSON_PROPERTY, rootNode));
 
             JsonNode activateMappingNodes = rootNode.get(ACTIVATE_PLAN_ITEM_DEFINITIONS_JSON_SECTION);
             if (activateMappingNodes != null) {
                 for (JsonNode mappingNode : activateMappingNodes) {
                     String planItemDefinitionId = getJsonProperty(PLAN_ITEM_DEFINITION_ID_JSON_PROPERTY, mappingNode);
                     ActivatePlanItemDefinitionMapping activateDefinitionMapping = new ActivatePlanItemDefinitionMapping(planItemDefinitionId);
-                    String newAssginee = getJsonProperty(NEW_ASSIGNEE_JSON_PROPERTY, mappingNode);
-                    activateDefinitionMapping.setNewAssignee(newAssginee);
+                    
+                    String newName = getJsonProperty(NEW_NAME_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newName)) {
+                        activateDefinitionMapping.withNewName(newName);
+                    }
+                    
+                    String newDueDate = getJsonProperty(NEW_DUE_DATE_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newDueDate)) {
+                        activateDefinitionMapping.withNewDueDate(newDueDate);
+                    }
+                    
+                    String newPriority = getJsonProperty(NEW_PRIORITY_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newPriority)) {
+                        activateDefinitionMapping.withNewPriority(newPriority);
+                    }
+                    
+                    String newCategory = getJsonProperty(NEW_CATEGORY_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newCategory)) {
+                        activateDefinitionMapping.withNewCategory(newCategory);
+                    }
+                    
+                    String newFormKey = getJsonProperty(NEW_FORM_KEY_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newFormKey)) {
+                        activateDefinitionMapping.withNewFormKey(newFormKey);
+                    }
+                    
+                    String newAssignee = getJsonProperty(NEW_ASSIGNEE_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newAssignee)) {
+                        activateDefinitionMapping.withNewAssignee(newAssignee);
+                    }
+                    
+                    String newOwner = getJsonProperty(NEW_OWNER_JSON_PROPERTY, mappingNode);
+                    if (StringUtils.isNotEmpty(newOwner)) {
+                        activateDefinitionMapping.withNewOwner(newOwner);
+                    }
+                    
+                    if (mappingNode.hasNonNull(NEW_CANDIDATE_USERS_JSON_PROPERTY)) {
+                        JsonNode candidateUserArray = mappingNode.get(NEW_CANDIDATE_USERS_JSON_PROPERTY);
+                        if (candidateUserArray.isArray() && !candidateUserArray.isEmpty()) {
+                            List<String> candidateUsers = new ArrayList<>();
+                            for (JsonNode userNode : candidateUserArray) {
+                                candidateUsers.add(userNode.asString());
+                            }
+                            activateDefinitionMapping.withNewCandidateUsers(candidateUsers);
+                        }
+                    }
+                    
+                    if (mappingNode.hasNonNull(NEW_CANDIDATE_GROUPS_JSON_PROPERTY)) {
+                        JsonNode candidateGroupArray = mappingNode.get(NEW_CANDIDATE_GROUPS_JSON_PROPERTY);
+                        if (candidateGroupArray.isArray() && !candidateGroupArray.isEmpty()) {
+                            List<String> candidateGroups = new ArrayList<>();
+                            for (JsonNode groupNode : candidateGroupArray) {
+                                candidateGroups.add(groupNode.asString());
+                            }
+                            activateDefinitionMapping.withNewCandidateGroups(candidateGroups);
+                        }
+                    }
+                    
                     String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
                     activateDefinitionMapping.setCondition(condition);
+                    Map<String, Object> localVariables = getLocalVariablesFromJson(mappingNode, objectMapper);
+                    if (localVariables != null) {
+                        activateDefinitionMapping.withLocalVariables(localVariables);
+                    }
                     
                     documentBuilder.addActivatePlanItemDefinitionMapping(activateDefinitionMapping);
                 }
@@ -285,6 +402,11 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
                     String condition = getJsonProperty(CONDITION_JSON_PROPERTY, mappingNode);
                     moveToAvailableDefinitionMapping.setCondition(condition);
                     documentBuilder.addMoveToAvailablePlanItemDefinitionMapping(moveToAvailableDefinitionMapping);
+                    Map<String, Object> localVariables = getLocalVariablesFromJson(mappingNode, objectMapper);
+                    if (localVariables != null) {
+                        moveToAvailableDefinitionMapping.setWithLocalVariables(localVariables);
+                    }
+
                 }
             }
             
@@ -355,10 +477,9 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
             return documentBuilder.build();
 
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Error parsing Case Instance Migration Document", e);
         }
-
     }
 
     protected static JsonNode convertToJsonCaseInstanceVariables(CaseInstanceMigrationDocument caseInstanceMigrationDocument, ObjectMapper objectMapper) {
@@ -377,7 +498,15 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
     
     protected static String getJsonProperty(String propertyName, JsonNode jsonNode) {
         if (jsonNode.has(propertyName) && !jsonNode.get(propertyName).isNull()) {
-            return jsonNode.get(propertyName).asText();
+            return jsonNode.get(propertyName).asString();
+        }
+        
+        return null;
+    }
+    
+    protected static Boolean getJsonPropertyAsBoolean(String propertyName, JsonNode jsonNode) {
+        if (jsonNode.has(propertyName) && !jsonNode.get(propertyName).isNull()) {
+            return jsonNode.get(propertyName).asBoolean();
         }
         
         return null;
@@ -388,6 +517,14 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
             return jsonNode.get(propertyName).asInt();
         }
         
+        return null;
+    }
+
+    protected static <V> V getLocalVariablesFromJson(JsonNode jsonNode, ObjectMapper objectMapper) {
+        JsonNode localVariablesNode = jsonNode.get(LOCAL_VARIABLES_JSON_SECTION);
+        if (localVariablesNode != null) {
+            return convertFromJsonNodeToObject(localVariablesNode, objectMapper);
+        }
         return null;
     }
 }

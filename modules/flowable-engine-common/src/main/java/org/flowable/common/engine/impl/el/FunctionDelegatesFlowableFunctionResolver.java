@@ -14,6 +14,7 @@ package org.flowable.common.engine.impl.el;
 
 import java.lang.reflect.Method;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,6 +26,7 @@ import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 public class FunctionDelegatesFlowableFunctionResolver implements FlowableFunctionResolver {
 
     protected final Map<String, FlowableFunctionDelegate> functionDelegateMap;
+    protected final Map<String, Method> functionsCache = new HashMap<>();
 
     public FunctionDelegatesFlowableFunctionResolver(Collection<FlowableFunctionDelegate> functionDelegates) {
         functionDelegateMap = new LinkedHashMap<>();
@@ -40,11 +42,18 @@ public class FunctionDelegatesFlowableFunctionResolver implements FlowableFuncti
     }
 
     @Override
-    public Method resolveFunction(String prefix, String localName) {
-        return resolveFunction(functionDelegateMap.get(prefix + ":" + localName));
+    public Method resolveFunction(String prefix, String localName) throws NoSuchMethodException {
+        String functionName = prefix + ":" + localName;
+        if (functionsCache.containsKey(functionName)) {
+            return functionsCache.get(functionName);
+        }
+        Method functionMethod = resolveFunction(functionDelegateMap.get(functionName), prefix, localName);
+        functionsCache.put(functionName, functionMethod);
+        return functionMethod;
+
     }
 
-    protected Method resolveFunction(FlowableFunctionDelegate functionDelegate) {
-        return functionDelegate != null ? functionDelegate.functionMethod() : null;
+    protected Method resolveFunction(FlowableFunctionDelegate functionDelegate, String prefix, String localName) throws NoSuchMethodException {
+        return functionDelegate != null ? functionDelegate.functionMethod(prefix, localName) : null;
     }
 }

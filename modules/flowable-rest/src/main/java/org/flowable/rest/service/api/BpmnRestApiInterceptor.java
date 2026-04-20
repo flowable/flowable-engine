@@ -150,6 +150,8 @@ public interface BpmnRestApiInterceptor {
 
     void accessExecutionInfoWithQuery(ExecutionQuery executionQuery, ExecutionQueryRequest request);
     
+    void doExecutionActionRequest(Execution execution, ExecutionActionRequest executionActionRequest);
+    
     void doExecutionActionRequest(ExecutionActionRequest executionActionRequest);
     
     void createExecutionVariables(Execution execution, Map<String, Object> variables, RestVariable.RestVariableScope scope);
@@ -186,15 +188,15 @@ public interface BpmnRestApiInterceptor {
     
     void sendSignal(SignalEventReceivedRequest signalEventReceivedRequest);
     
-    void changeActivityState(ExecutionChangeActivityStateRequest changeActivityStateRequest);
+    void changeActivityState(Execution execution, ExecutionChangeActivityStateRequest changeActivityStateRequest);
     
-    void migrateProcessInstance(String processInstanceId, String migrationDocument);
+    void migrateProcessInstance(ProcessInstance processInstance, String migrationDocument);
     
     void migrateInstancesOfProcessDefinition(ProcessDefinition processDefinition, String migrationDocument);
     
     void evaluateProcessInstanceConditionalEvents(ProcessInstance processInstance);
 
-    void injectActivity(InjectActivityRequest injectActivityRequest);
+    void injectActivity(ProcessInstance processInstance, InjectActivityRequest injectActivityRequest);
     
     void accessEventSubscriptionById(EventSubscription eventSubscription);
     

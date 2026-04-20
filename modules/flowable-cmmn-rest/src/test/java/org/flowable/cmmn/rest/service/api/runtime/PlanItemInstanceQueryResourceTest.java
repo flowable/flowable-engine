@@ -29,10 +29,11 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -44,6 +45,7 @@ import net.javacrumbs.jsonunit.core.Option;
  */
 public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PlanItemInstanceQueryResourceTest.testQueryPlanItemInstances.cmmn" })
     public void testQueryPlanItemInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testPlanItemInstanceQuery").start();
@@ -77,11 +79,20 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
                 planItemInstanceList.get(1).getId(),
                 planItemInstanceList.get(2).getId(),
                 planItemInstanceList.get(3).getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceIds").add(caseInstance.getId()).add("someOtherIds");
+        assertResultsPresentInPostDataResponse(url, requestNode,
+                planItemInstanceList.get(0).getId(),
+                planItemInstanceList.get(1).getId(),
+                planItemInstanceList.get(2).getId(),
+                planItemInstanceList.get(3).getId());
     }
 
     /**
      * Test querying plan item instance based on variables. POST query/planitem-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryPlanItemInstancesWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -173,6 +184,7 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying plan item instance and return local variables. POST query/planitem-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryPlanItemInstancesWithLocalVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();

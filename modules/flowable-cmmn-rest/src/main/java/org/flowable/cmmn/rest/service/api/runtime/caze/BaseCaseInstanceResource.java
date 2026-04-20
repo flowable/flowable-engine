@@ -73,6 +73,9 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
+        if (queryRequest.getCaseInstanceIds() != null && !queryRequest.getCaseInstanceIds().isEmpty()) {
+            query.caseInstanceIds(queryRequest.getCaseInstanceIds());
+        }
         if (queryRequest.getCaseDefinitionKey() != null) {
             query.caseDefinitionKey(queryRequest.getCaseDefinitionKey());
         }
@@ -84,6 +87,9 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getCaseDefinitionKeys() != null && !queryRequest.getCaseDefinitionKeys().isEmpty()) {
             query.caseDefinitionKeys(queryRequest.getCaseDefinitionKeys());
+        }
+        if (queryRequest.getExcludeCaseDefinitionKeys() != null && !queryRequest.getExcludeCaseDefinitionKeys().isEmpty()) {
+            query.excludeCaseDefinitionKeys(queryRequest.getExcludeCaseDefinitionKeys());
         }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
@@ -163,8 +169,14 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceCallbackId() != null) {
             query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
         }
+        if (queryRequest.getCaseInstanceCallbackIds() != null && !queryRequest.getCaseInstanceCallbackIds().isEmpty()) {
+            query.caseInstanceCallbackIds(queryRequest.getCaseInstanceCallbackIds());
+        }
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
+        }
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
         }
         if (queryRequest.getCaseInstanceReferenceId() != null) {
             query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
@@ -185,6 +197,9 @@ public class BaseCaseInstanceResource {
             if (queryRequest.getIncludeCaseVariables()) {
                 query.includeCaseVariables();
             }
+        }
+        if (queryRequest.getIncludeCaseVariablesNames() != null) {
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());

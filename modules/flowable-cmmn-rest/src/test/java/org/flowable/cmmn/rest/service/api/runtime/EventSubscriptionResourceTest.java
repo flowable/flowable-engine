@@ -27,14 +27,15 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/signalEventListener.cmmn" })
     public void testQueryEventSubscriptions() throws Exception {
         Calendar hourAgo = Calendar.getInstance();
@@ -89,6 +90,7 @@ public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
         assertResultsPresentInDataResponse(url, eventSubscription.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/signalEventListener.cmmn" })
     public void testGetEventSubscription() throws Exception {
         runtimeService.createCaseInstanceBuilder()
@@ -110,7 +112,7 @@ public class EventSubscriptionResourceTest extends BaseSpringRestTestCase {
                         + "eventName: '" + eventSubscription.getEventName() + "',"
                         + "caseInstanceId: '" + eventSubscription.getScopeId() + "',"
                         + "caseDefinitionId: '" + eventSubscription.getScopeDefinitionId() + "',"
-                        + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
+                        + "created: '" + getISODateString(eventSubscription.getCreated()) + "',"
                         + "tenantId: 'acme'"
                         + "}");
     }

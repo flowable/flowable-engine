@@ -24,14 +24,14 @@ import java.util.stream.Stream;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
@@ -40,7 +40,7 @@ public class HistoricCaseInstanceInvolvementTest extends FlowableCmmnTestCase {
 
     protected String deploymentId;
 
-    @Before
+    @BeforeEach
     public void createCaseInstance() {
         deploymentId = addDeploymentForAutoCleanup(cmmnEngine.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
                 .deploy());

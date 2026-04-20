@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+    <process id="throwBpmnErrorProcess" name="Throw BpmnError After Wait State" isExecutable="true">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="waitTask" />
+        <userTask id="waitTask" name="Wait Task" />
+        <sequenceFlow id="flow2" sourceRef="waitTask" targetRef="serviceTask" />
+        <serviceTask id="serviceTask" name="Throw Error" flowable:class="org.flowable.cmmn.test.delegate.ThrowBpmnErrorJavaDelegate" />
+        <sequenceFlow id="flow3" sourceRef="serviceTask" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+</definitions>

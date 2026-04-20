@@ -1,3 +1,6 @@
+alter table ACT_DMN_DEPLOYMENT_RESOURCE drop constraint ACT_FK_DMN_RSRC_DPL;
+
+drop index ACT_IDX_DMN_RSRC_DPL;
 drop index ACT_IDX_DMN_INSTANCE_ID;
 drop index ACT_IDX_DMN_DEC_UNIQ;
 

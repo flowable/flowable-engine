@@ -44,7 +44,7 @@ import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public class DeploymentTest extends AbstractFlowableEventTest {
 
@@ -79,6 +79,31 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
     })
     public void deployChannelsWithTenantDetection() {
+        InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
+        assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
+                .isInstanceOf(InboundEventStaticTenantDetector.class);
+
+        InboundChannelModel channel2 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel2");
+        DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2
+                .getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPointerBasedInboundEventTenantDetector.class);
+        assertThat(((JsonPointerBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPointerExpression())
+                .isEqualTo("/tenantId");
+
+        InboundChannelModel channel3 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel3");
+        inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(XpathBasedInboundEventTenantDetector.class);
+        assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression())
+                .isEqualTo("/data/tenantId");
+    }
+    
+    @Test
+    @ChannelDeploymentAnnotation(resources = {
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPointerTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithXmlXPathTenant.channel"
+    })
+    public void deployChannelsWithXmlXpathTenantDetection() {
         InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
         assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
                 .isInstanceOf(InboundEventStaticTenantDetector.class);
@@ -780,11 +805,10 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         @Override
         protected void registerChannelModel(InboundChannelModel inboundChannelModel,
-                EventRepositoryService eventRepositoryService,
-                ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+                EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
 
             registeredChannelModels.add(inboundChannelModel);
-            super.registerChannelModel(inboundChannelModel, eventRepositoryService, objectMapper, fallbackToDefaultTenant);
+            super.registerChannelModel(inboundChannelModel, eventRepositoryService, fallbackToDefaultTenant);
         }
 
         @Override

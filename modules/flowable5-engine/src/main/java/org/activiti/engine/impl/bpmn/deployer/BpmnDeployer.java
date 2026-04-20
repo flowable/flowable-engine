@@ -75,9 +75,9 @@ import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -599,7 +599,7 @@ public class BpmnDeployer implements Deployer {
     protected boolean isEqualToCurrentLocalizationValue(String language, String id, String propertyName, String propertyValue, ObjectNode infoNode) {
         boolean isEqual = false;
         JsonNode localizationNode = infoNode.path("localization").path(language).path(id).path(propertyName);
-        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asText().equals(propertyValue)) {
+        if (!localizationNode.isMissingNode() && !localizationNode.isNull() && localizationNode.asString().equals(propertyValue)) {
             isEqual = true;
         }
         return isEqual;

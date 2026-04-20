@@ -16,7 +16,6 @@ package org.flowable.examples.bpmn.executionlistener;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -337,7 +336,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
     public void testJavaDelegateAsExecutionListenerFollowsCorrectFlow() {
         ProcessInstance myFlow = runtimeService.startProcessInstanceByKey("MyFlow");
         String myActions = runtimeService.getVariable(myFlow.getId(), "myActions", String.class);
-        Task task = assertDoesNotThrow(() -> taskService.createTaskQuery().singleResult(), "Only one task 'Production Manager' must be returned.");
+        Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("Production Manager");
         assertThat(myActions).isEqualTo("Start executionListener,ProductionManager taskListener");
     }

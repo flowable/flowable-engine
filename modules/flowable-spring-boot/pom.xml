@@ -5,11 +5,12 @@
 
     <parent>
         <groupId>org.flowable</groupId>
-        <artifactId>flowable-root</artifactId>
-        <relativePath>../..</relativePath>
-        <version>7.1.0</version>
+        <artifactId>flowable-parent</artifactId>
+        <version>8.1.0-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
     </parent>
 
+    <name>Flowable - Spring Boot Parent</name>
     <artifactId>flowable-spring-boot</artifactId>
 
     <packaging>pom</packaging>
@@ -26,17 +27,22 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--
+                Spring Boot 4.0 is using Artemis 2.43.0 which is not compatible with java 25.
+                Therefore, we override it like this.
+                Once we upgrade to a Spring Boot version that uses Artemis that supports Java 25 we can remove this artemis-bom import
+             -->
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring.boot.version}</version>
+                <groupId>org.apache.activemq</groupId>
+                <artifactId>artemis-bom</artifactId>
+                <version>${artemis.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-bom</artifactId>
-                <version>${spring.security.version}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -106,9 +112,6 @@
             <modules>
                 <module>flowable-spring-boot-samples</module>
             </modules>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
     </profiles>
 

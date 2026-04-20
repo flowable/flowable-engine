@@ -10,6 +10,7 @@
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="minimumIdle" value="0" />
         <property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
         <property name="driverClassName" value="${jdbc.driver:org.h2.Driver}" />
         <property name="username" value="${jdbc.username:sa}" />
@@ -38,10 +39,6 @@
     <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService"/>
     <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService"/>
     <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService"/>
-
-    <bean id="flowableRule" class="org.flowable.engine.test.FlowableRule">
-        <property name="processEngine" ref="processEngine"/>
-    </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
 

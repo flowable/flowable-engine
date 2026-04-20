@@ -293,9 +293,23 @@ public abstract class AbstractCmmnDynamicStateManager {
             }
 
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-            if (planItemDefinitionMapping.getNewAssignee() != null && planItem.getPlanItemDefinition() instanceof HumanTask) {
+            if (planItem.getPlanItemDefinition() instanceof HumanTask && 
+                    (planItemDefinitionMapping.getNewName() != null || planItemDefinitionMapping.getNewDueDate() != null || 
+                    planItemDefinitionMapping.getNewPriority() != null || planItemDefinitionMapping.getNewCategory() != null || 
+                    planItemDefinitionMapping.getNewFormKey() != null || planItemDefinitionMapping.getNewAssignee() != null || 
+                    planItemDefinitionMapping.getNewOwner() != null || planItemDefinitionMapping.getNewCandidateUsers() != null ||
+                    planItemDefinitionMapping.getNewCandidateGroups() != null)) {
+                
                 MigrationContext migrationContext = new MigrationContext();
+                migrationContext.setName(planItemDefinitionMapping.getNewName());
+                migrationContext.setDueDate(planItemDefinitionMapping.getNewDueDate());
+                migrationContext.setPriority(planItemDefinitionMapping.getNewPriority());
+                migrationContext.setCategory(planItemDefinitionMapping.getNewCategory());
+                migrationContext.setFormKey(planItemDefinitionMapping.getNewFormKey());
                 migrationContext.setAssignee(planItemDefinitionMapping.getNewAssignee());
+                migrationContext.setOwner(planItemDefinitionMapping.getNewOwner());
+                migrationContext.setCandidateUsers(planItemDefinitionMapping.getNewCandidateUsers());
+                migrationContext.setCandidateGroups(planItemDefinitionMapping.getNewCandidateGroups());
                 agenda.planStartPlanItemInstanceOperation(newPlanItemInstance, null, migrationContext);
                 
             } else if (caseInstanceChangeState.getChildInstanceTaskVariables().containsKey(planItemDefinitionMapping.getPlanItemDefinitionId()) && 
@@ -565,6 +579,10 @@ public abstract class AbstractCmmnDynamicStateManager {
     
     protected void executeVerifySatisfiedSentryParts(CaseInstanceChangeState caseInstanceChangeState, 
             CaseInstanceEntity caseInstance, String originalCaseDefinitionId, CommandContext commandContext) {
+        
+        if (caseInstanceChangeState.getCaseDefinitionToMigrateTo() == null) {
+            return;
+        }
         
         SentryPartInstanceEntityManager sentryPartInstanceEntityManager = cmmnEngineConfiguration.getSentryPartInstanceEntityManager();
         List<SentryPartInstanceEntity> sentryPartInstances = sentryPartInstanceEntityManager.findSentryPartInstancesByCaseInstanceId(caseInstance.getId());
@@ -904,10 +922,8 @@ public abstract class AbstractCmmnDynamicStateManager {
                             task.setScopeDefinitionId(caseDefinition.getId());
                             PlanItemDefinition originalTaskDef = originalCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
                             PlanItemDefinition targetTaskDef = targetCmmnModel.findPlanItemDefinition(task.getTaskDefinitionKey());
-                            if (originalTaskDef != null && targetTaskDef != null && originalTaskDef instanceof HumanTask && targetTaskDef instanceof HumanTask) {
-                                HumanTask originalHumanTask = (HumanTask) originalTaskDef;
-                                HumanTask targetHumanTask = (HumanTask) targetTaskDef;
-                                
+                            if (originalTaskDef != null && targetTaskDef != null && originalTaskDef instanceof HumanTask originalHumanTask && targetTaskDef instanceof HumanTask targetHumanTask) {
+
                                 if (taskPropertyValueIsDifferent(originalHumanTask.getName(), targetHumanTask.getName())) {
                                     task.setName(targetHumanTask.getName());
                                 }

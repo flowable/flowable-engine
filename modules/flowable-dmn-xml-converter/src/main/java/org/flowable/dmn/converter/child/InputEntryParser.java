@@ -37,11 +37,10 @@ public class InputEntryParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof DecisionRule)) {
+        if (!(parentElement instanceof DecisionRule rule)) {
             return;
         }
 
-        DecisionRule rule = (DecisionRule) parentElement;
         UnaryTests inputEntry = new UnaryTests();
 
         inputEntry.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
@@ -104,37 +103,23 @@ public class InputEntryParser extends BaseChildElementParser {
 
         String elementText = extensionElement.getElementText();
         String typeRef = inputClause.getInputExpression().getTypeRef();
-        String newElementText = null;
+        String newElementText;
         if ("collection".equalsIgnoreCase(typeRef)) {
-            switch (elementText) {
-                case "IN":
-                    newElementText = "ALL OF";
-                    break;
-                case "NOT IN":
-                    newElementText = "NONE OF";
-                    break;
-                case "ANY":
-                    newElementText = "ANY OF";
-                    break;
-                case "NOT ANY":
-                    newElementText = "NOT ALL OF";
-                    break;
-            }
+            newElementText = switch (elementText) {
+                case "IN" -> "ALL OF";
+                case "NOT IN" -> "NONE OF";
+                case "ANY" -> "ANY OF";
+                case "NOT ANY" -> "NOT ALL OF";
+                default -> null;
+            };
         } else {
-            switch (elementText) {
-                case "IN":
-                    newElementText = "IS IN";
-                    break;
-                case "NOT IN":
-                    newElementText = "IS NOT IN";
-                    break;
-                case "ANY":
-                    newElementText = "IS IN";
-                    break;
-                case "NOT ANY":
-                    newElementText = "IS NOT IN";
-                    break;
-            }
+            newElementText = switch (elementText) {
+                case "IN" -> "IS IN";
+                case "NOT IN" -> "IS NOT IN";
+                case "ANY" -> "IS IN";
+                case "NOT ANY" -> "IS NOT IN";
+                default -> null;
+            };
         }
 
         if (newElementText != null) {

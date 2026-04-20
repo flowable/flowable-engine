@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -31,10 +30,9 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -243,7 +241,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
     }
 
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
-            throws JsonProcessingException, IOException {
+            throws IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -256,11 +254,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode dataElementNode = it.next();
+            for (JsonNode dataElementNode : dataNode) {
                 JsonNode variableNode = dataElementNode.get("variable");
-                String name = variableNode.get("name").textValue();
+                String name = variableNode.get("name").stringValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -268,7 +264,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

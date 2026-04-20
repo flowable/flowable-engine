@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.util.condition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -25,8 +23,8 @@ import org.flowable.engine.impl.el.UelExpressionCondition;
 import org.flowable.engine.impl.scripting.ScriptCondition;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -71,7 +69,7 @@ public class ConditionUtil {
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

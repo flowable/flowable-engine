@@ -46,7 +46,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
@@ -77,8 +77,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
@@ -146,7 +146,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
             try {
                 nrOfInstances = createInstances(delegateExecution);
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             }
 
@@ -173,7 +173,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             rootExecution = getMultiInstanceRootExecution(execution);
             CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
                     .executeExecutionListeners(activity, rootExecution, ExecutionListener.EVENTNAME_END);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             ErrorPropagation.propagateError(error, rootExecution);
             return;
         }
@@ -389,11 +389,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             
             Object value = expressionManager.createExpression(activeCompletionCondition).getValue(execution);
             
-            if (!(value instanceof Boolean)) {
+            if (!(value instanceof Boolean booleanValue)) {
                 throw new FlowableIllegalArgumentException("completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
             }
 
-            Boolean booleanValue = (Boolean) value;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Completion condition of multi-instance satisfied: {}", booleanValue);
             }
@@ -635,7 +634,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

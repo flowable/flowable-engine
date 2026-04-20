@@ -173,13 +173,12 @@ In addition to using the values listed above for deploymentMode, you may require
 ## Unit testing
 
 When integrating with Spring, business cases can be tested very easily using the standard standard [Flowable testing facilities](cmmn/ch03-API.md#unit-testing).
-The following examples show how a case definition is tested in typical Spring-based JUnit 4 and 5 test:
+The following examples show how a case definition is tested in typical Spring-based JUnit Jupiter test:
 
-**JUnit 5 test.**
+**JUnit Jupiter test.**
 
     @ExtendWith(FlowableCmmnSpringExtension.class)
-    @ExtendWith(SpringExtension.class)
-    @ContextConfiguration(classes = CmmnSpringJunitJupiterTest.TestConfiguration.class)
+    @SpringJUnitConfig(CmmnSpringJunitJupiterTest.TestConfiguration.class)
     class MyBusinessCaseTest {
 
       @Autowired
@@ -200,22 +199,3 @@ The following examples show how a case definition is tested in typical Spring-ba
       }
     }
 
-**JUnit 4 test.**
-
-    public class MyBusinessCaseTest {
-
-      @Rule
-      public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/spring/test/el/SpringBeanTest-context.xml");
-
-      @Test
-      public void simpleCaseTest() {
-        cmmnRule.getCmmnRepositoryService().createDeployment().addClasspathResource("org/flowable/spring/test/el/springExpression.cmmn").deploy();
-        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("myCase")
-                .variable("var1", "John Doe")
-                .start();
-
-        Assert.assertNotNull(caseInstance);
-      }
-    }

@@ -16,13 +16,18 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 
 /**
  * @author Filip Hrisafov
+ * @author Joram Barrez
  */
 public interface AgendaOperationExecutionListener {
+
+    void beforeAll(CommandContext commandContext);
 
     void beforeExecute(CommandContext commandContext, Runnable runnable);
 
     void afterExecute(CommandContext commandContext, Runnable runnable);
 
     void afterExecuteException(CommandContext commandContext, Runnable runnable, Throwable error);
+
+    void afterAll(CommandContext commandContext);
 
 }

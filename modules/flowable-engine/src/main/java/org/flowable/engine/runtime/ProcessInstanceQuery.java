@@ -13,6 +13,7 @@
 package org.flowable.engine.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -124,6 +125,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances which are defined by process definitions with the given keys.
      */
     ProcessInstanceQuery processDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /**
+     * Select the process instances which are defined by process definitions that don't match the given keys.
+     */
+    ProcessInstanceQuery excludeProcessDefinitionKeys(Set<String> processDefinitionKeys);
     
     /**
      * Select process instances whose process definition key is like the given value
@@ -378,11 +384,21 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with the given callback id. 
      */
     ProcessInstanceQuery processInstanceCallbackId(String callbackId);
+
+    /**
+     * Only select process instances with the given callback ids.
+     */
+    ProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
     
     /**
      * Only select process instances with the given callback type.
      */
     ProcessInstanceQuery processInstanceCallbackType(String callbackType);
+    
+    /**
+     * Only select process instances that are a sub process of the provided case instance id. 
+     */
+    ProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
      * Only select process instances with the given reference id.
@@ -408,6 +424,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Include process variables in the process query result
      */
     ProcessInstanceQuery includeProcessVariables();
+
+    /**
+     * Include the process variables with the given names into the query result.
+     */
+    ProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
 
     /**
      * Only select process instances that failed due to an exception happening during a job execution.

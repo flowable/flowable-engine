@@ -39,6 +39,7 @@
 
         <property name="enableEntityLinks" value="true" />
         <property name="enableCaseDefinitionHistoryLevel" value="true" />
+        <property name="enableSafeCmmnXml" value="true" />
 
         <property name="enableHistoricTaskLogging" value="true" />
 

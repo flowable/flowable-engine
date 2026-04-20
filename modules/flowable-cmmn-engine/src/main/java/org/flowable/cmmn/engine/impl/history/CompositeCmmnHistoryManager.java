@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -32,7 +34,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
-    protected final Collection<CmmnHistoryManager> historyManagers;
+    protected final List<CmmnHistoryManager> historyManagers;
 
     public CompositeCmmnHistoryManager(Collection<CmmnHistoryManager> historyManagers) {
         this.historyManagers = new ArrayList<>(historyManagers);
@@ -80,6 +82,20 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
             historyManager.recordUpdateBusinessStatus(caseInstanceEntity, businessStatus);
         }
     }
+    
+    @Override
+    public void recordUpdateDueDate(CaseInstanceEntity caseInstanceEntity, Date dueDate) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordUpdateDueDate(caseInstanceEntity, dueDate);
+        }
+    }
+
+    @Override
+    public void recordUpdateClaimTime(CaseInstanceEntity caseInstanceEntity, Date claimTime, String claimedBy) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordUpdateClaimTime(caseInstanceEntity, claimTime, claimedBy);
+        }
+    }
 
     @Override
     public void recordMilestoneReached(MilestoneInstanceEntity milestoneInstanceEntity) {
@@ -90,15 +106,23 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricCaseInstanceDeleted(String caseInstanceId, String tenantId) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricCaseInstanceDeleted(caseInstanceId, tenantId);
         }
     }
 
     @Override
     public void recordBulkDeleteHistoricCaseInstances(Collection<String> caseInstanceIds) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordBulkDeleteHistoricCaseInstances(caseInstanceIds);
         }
     }
 
@@ -106,6 +130,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     public void recordIdentityLinkCreated(IdentityLinkEntity identityLink) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordIdentityLinkCreated(identityLink);
+        }
+    }
+
+    @Override
+    public void recordIdentityLinkCreated(CaseInstanceEntity caseInstance, IdentityLinkEntity identityLink) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordIdentityLinkCreated(caseInstance, identityLink);
         }
     }
 
@@ -174,8 +205,12 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
 
     @Override
     public void recordHistoricTaskDeleted(HistoricTaskInstance task) {
-        for (CmmnHistoryManager historyManager : historyManagers) {
-            historyManager.recordHistoricTaskDeleted(task);
+        // Reverse order: managers added later may need to read data (e.g. entity links)
+        // that earlier managers delete. Processing deletions in reverse ensures all
+        // managers can access the data they need before it is removed.
+        ListIterator<CmmnHistoryManager> iterator = historyManagers.listIterator(historyManagers.size());
+        while (iterator.hasPrevious()) {
+            iterator.previous().recordHistoricTaskDeleted(task);
         }
     }
 
@@ -260,6 +295,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     public void recordPlanItemInstanceTerminated(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordPlanItemInstanceTerminated(planItemInstanceEntity);
+        }
+    }
+
+    @Override
+    public void recordPlanItemInstanceFailed(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceFailed(planItemInstanceEntity);
         }
     }
 

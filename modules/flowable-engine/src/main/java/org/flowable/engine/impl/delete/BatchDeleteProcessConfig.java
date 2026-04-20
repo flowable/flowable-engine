@@ -14,7 +14,6 @@ package org.flowable.engine.impl.delete;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,7 +25,6 @@ import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
@@ -34,9 +32,8 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.QueryOperator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -94,7 +91,7 @@ public class BatchDeleteProcessConfig {
 
         Batch batch = batchService.getBatch(batchPart.getBatchId());
         JsonNode batchConfiguration = getBatchConfiguration(batch, engineConfiguration);
-        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue();
+        boolean sequentialExecution = batchConfiguration.path("sequential").booleanValue(false);
 
         JsonNode queryNode = batchConfiguration.path("query");
         if (queryNode.isMissingNode()) {
@@ -130,7 +127,7 @@ public class BatchDeleteProcessConfig {
 
         populateQuery(queryNode, query, engineConfiguration);
 
-        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").asBoolean(false)) {
+        if (queryNode.hasNonNull("finishedBefore") || queryNode.hasNonNull("finishedAfter") || queryNode.path("finished").booleanValue(false)) {
             // When the query has finishedBefore, finishedAfter or finished then we need to order by the process instance end time
             // This is done in order to improve the performance when getting pages with large offsets.
             // When the properties are not set we cannot order on the end time
@@ -142,32 +139,30 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static void populateQuery(JsonNode queryNode, HistoricProcessInstanceQuery query, ProcessEngineConfigurationImpl engineConfiguration) {
-        Iterator<Map.Entry<String, JsonNode>> fieldIterator = queryNode.fields();
-        while (fieldIterator.hasNext()) {
-            Map.Entry<String, JsonNode> field = fieldIterator.next();
-            String property = field.getKey();
-            JsonNode value = field.getValue();
+        for (Map.Entry<String, JsonNode> propertyEntry : queryNode.properties()) {
+            String property = propertyEntry.getKey();
+            JsonNode value = propertyEntry.getValue();
             switch (property) {
                 case "processInstanceId":
-                    query.processInstanceId(value.textValue());
+                    query.processInstanceId(value.stringValue());
                     break;
                 case "processDefinitionId":
-                    query.processDefinitionId(value.textValue());
+                    query.processDefinitionId(value.stringValue());
                     break;
                 case "businessKey":
-                    query.processInstanceBusinessKey(value.textValue());
+                    query.processInstanceBusinessKey(value.stringValue());
                     break;
                 case "businessKeyLike":
-                    query.processInstanceBusinessKeyLike(value.textValue());
+                    query.processInstanceBusinessKeyLike(value.stringValue());
                     break;
                 case "businessStatus":
-                    query.processInstanceBusinessStatus(value.textValue());
+                    query.processInstanceBusinessStatus(value.stringValue());
                     break;
                 case "businessStatusLike":
-                    query.processInstanceBusinessStatusLike(value.textValue());
+                    query.processInstanceBusinessStatusLike(value.stringValue());
                     break;
                 case "deploymentId":
-                    query.deploymentId(value.textValue());
+                    query.deploymentId(value.stringValue());
                     break;
                 case "deploymentIds":
                     query.deploymentIdIn(asStringList(value));
@@ -193,10 +188,16 @@ public class BatchDeleteProcessConfig {
                     }
                     break;
                 case "startedBy":
-                    query.startedBy(value.textValue());
+                    query.startedBy(value.stringValue());
+                    break;
+                case "finishedBy":
+                    query.finishedBy(value.stringValue());
+                    break;
+                case "state":
+                    query.state(value.stringValue());
                     break;
                 case "superProcessInstanceId":
-                    query.superProcessInstanceId(value.textValue());
+                    query.superProcessInstanceId(value.stringValue());
                     break;
                 case "excludeSubprocesses":
                     if (value.booleanValue()) {
@@ -206,29 +207,32 @@ public class BatchDeleteProcessConfig {
                 case "processDefinitionKeyIn":
                     query.processDefinitionKeyIn(asStringList(value));
                     break;
+                case "excludeProcessDefinitionKeys":
+                    query.excludeProcessDefinitionKeys(asStringList(value));
+                    break;
                 case "processKeyNotIn":
                     query.processDefinitionKeyNotIn(asStringList(value));
                     break;
                 case "startedBefore":
-                    query.startedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.startedBefore(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "startedAfter":
-                    query.startedAfter(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.startedAfter(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "finishedBefore":
-                    query.finishedBefore(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.finishedBefore(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "finishedAfter":
-                    query.finishedAfter(AsyncHistoryDateUtil.parseDate(value.textValue()));
+                    query.finishedAfter(AsyncHistoryDateUtil.parseDate(value.stringValue()));
                     break;
                 case "processDefinitionKey":
-                    query.processDefinitionKey(value.textValue());
+                    query.processDefinitionKey(value.stringValue());
                     break;
                 case "processDefinitionCategory":
-                    query.processDefinitionCategory(value.textValue());
+                    query.processDefinitionCategory(value.stringValue());
                     break;
                 case "processDefinitionName":
-                    query.processDefinitionName(value.textValue());
+                    query.processDefinitionName(value.stringValue());
                     break;
                 case "processDefinitionVersion":
                     query.processDefinitionVersion(value.intValue());
@@ -237,22 +241,22 @@ public class BatchDeleteProcessConfig {
                     query.processInstanceIds(asStringSet(value));
                     break;
                 case "activeActivityId":
-                    query.activeActivityId(value.textValue());
+                    query.activeActivityId(value.stringValue());
                     break;
                 case "activeActivityIds":
                     query.activeActivityIds(asStringSet(value));
                     break;
                 case "involvedUser":
-                    query.involvedUser(value.textValue());
+                    query.involvedUser(value.stringValue());
                     break;
                 case "involvedUserIdentityLink":
-                    query.involvedUser(value.path("userId").textValue(), value.path("type").textValue());
+                    query.involvedUser(value.path("userId").stringValue(), value.path("type").stringValue());
                     break;
                 case "involvedGroups":
                     query.involvedGroups(asStringSet(value));
                     break;
                 case "involvedGroupIdentityLink":
-                    query.involvedUser(value.path("groupId").textValue(), value.path("type").textValue());
+                    query.involvedUser(value.path("groupId").stringValue(), value.path("type").stringValue());
                     break;
                 case "withJobException":
                     if (value.booleanValue()) {
@@ -260,10 +264,10 @@ public class BatchDeleteProcessConfig {
                     }
                     break;
                 case "tenantId":
-                    query.processInstanceTenantId(value.textValue());
+                    query.processInstanceTenantId(value.stringValue());
                     break;
                 case "tenantIdLike":
-                    query.processInstanceTenantIdLike(value.textValue());
+                    query.processInstanceTenantIdLike(value.stringValue());
                     break;
                 case "withoutTenantId":
                     if (value.booleanValue()) {
@@ -271,19 +275,21 @@ public class BatchDeleteProcessConfig {
                     }
                     break;
                 case "name":
-                    query.processInstanceName(value.textValue());
+                    query.processInstanceName(value.stringValue());
                     break;
                 case "nameLike":
-                    query.processInstanceNameLike(value.textValue());
+                    query.processInstanceNameLike(value.stringValue());
                     break;
                 case "nameLikeIgnoreCase":
-                    query.processInstanceNameLikeIgnoreCase(value.textValue());
+                    query.processInstanceNameLikeIgnoreCase(value.stringValue());
                     break;
                 case "callbackId":
-                    query.processInstanceCallbackId(value.textValue());
+                    query.processInstanceCallbackId(value.stringValue());
+                case "callbackIds":
+                    query.processInstanceCallbackIds(asStringSet(value));
                     break;
                 case "callbackType":
-                    query.processInstanceCallbackType(value.textValue());
+                    query.processInstanceCallbackType(value.stringValue());
                     break;
                 case "withoutCallbackId":
                     if (value.booleanValue()) {
@@ -291,10 +297,10 @@ public class BatchDeleteProcessConfig {
                     }
                     break;
                 case "referenceId":
-                    query.processInstanceReferenceId(value.textValue());
+                    query.processInstanceReferenceId(value.stringValue());
                     break;
                 case "referenceType":
-                    query.processInstanceReferenceType(value.textValue());
+                    query.processInstanceReferenceType(value.stringValue());
                     break;
                 case "queryVariableValues":
                     populateQueryVariableValues(value, query, engineConfiguration);
@@ -303,10 +309,10 @@ public class BatchDeleteProcessConfig {
                     populateOrQueryObjects(value, query, engineConfiguration);
                     break;
                 case "processInstanceRootScopeId":
-                    query.processInstanceRootScopeId(value.textValue());
+                    query.processInstanceRootScopeId(value.stringValue());
                     break;
                 case "processInstanceParentScopeId":
-                    query.processInstanceParentScopeId(value.textValue());
+                    query.processInstanceParentScopeId(value.stringValue());
                     break;
                 default:
                     throw new FlowableIllegalArgumentException("Query property " + property + " is not supported");
@@ -329,13 +335,13 @@ public class BatchDeleteProcessConfig {
             ProcessEngineConfigurationImpl engineConfiguration) {
         if (variableValuesNode.isArray()) {
             for (JsonNode variableValue : variableValuesNode) {
-                String operatorString = variableValue.path("operator").asText(null);
+                String operatorString = variableValue.path("operator").stringValue(null);
                 if (operatorString == null) {
                     throw new FlowableIllegalArgumentException("The variable value does not contain an operator value");
                 }
 
                 QueryOperator operator = QueryOperator.valueOf(operatorString);
-                String variableName = variableValue.path("name").textValue();
+                String variableName = variableValue.path("name").stringValue(null);
                 switch (operator) {
                     case EQUALS:
                         if (variableName != null) {
@@ -388,7 +394,7 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static Object extractVariableValue(JsonNode variableValueNode, ProcessEngineConfigurationImpl engineConfiguration) {
-        String type = variableValueNode.path("type").asText(null);
+        String type = variableValueNode.path("type").stringValue(null);
         if (type == null) {
             throw new FlowableIllegalArgumentException("The variable value does not have a type");
         }
@@ -399,10 +405,10 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static List<String> asStringList(JsonNode node) {
-        if (node != null && node.isArray() && node.size() > 0) {
+        if (node != null && node.isArray() && !node.isEmpty()) {
             List<String> values = new ArrayList<>(node.size());
             for (JsonNode element : node) {
-                values.add(element.textValue());
+                values.add(element.stringValue());
             }
             return values;
         }
@@ -411,10 +417,10 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static Set<String> asStringSet(JsonNode node) {
-        if (node != null && node.isArray() && node.size() > 0) {
+        if (node != null && node.isArray() && !node.isEmpty()) {
             List<String> values = new ArrayList<>(node.size());
             for (JsonNode element : node) {
-                values.add(element.textValue());
+                values.add(element.stringValue());
             }
             return new HashSet<>(values);
         }
@@ -423,13 +429,8 @@ public class BatchDeleteProcessConfig {
     }
 
     protected static JsonNode getBatchConfiguration(Batch batch, ProcessEngineConfigurationImpl engineConfiguration) {
-        try {
-            return engineConfiguration.getObjectMapper()
-                    .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
-        } catch (JsonProcessingException e) {
-            ExceptionUtil.sneakyThrow(e);
-            return null;
-        }
+        return engineConfiguration.getObjectMapper()
+                .readTree(batch.getBatchDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
     }
 
     protected static String prepareFailedResultAsJsonString(String errorMessage, ProcessEngineConfigurationImpl engineConfiguration) {
@@ -457,7 +458,7 @@ public class BatchDeleteProcessConfig {
 
         @Override
         public String getName() {
-            return node.path("name").textValue();
+            return node.path("name").stringValue();
         }
 
         @Override
@@ -492,7 +493,7 @@ public class BatchDeleteProcessConfig {
 
         @Override
         public String getTextValue() {
-            return node.path("textValue").textValue();
+            return node.path("textValue").stringValue(null);
         }
 
         @Override
@@ -502,7 +503,7 @@ public class BatchDeleteProcessConfig {
 
         @Override
         public String getTextValue2() {
-            return node.path("textValues").textValue();
+            return node.path("textValues").stringValue(null);
         }
 
         @Override

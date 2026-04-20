@@ -434,7 +434,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 	}
 
 	@Override
-	public final Object coerceToType(Object obj, Class<?> targetType) {
+	public final <T> T coerceToType(Object obj, Class<T> targetType) {
 		return converter.convert(obj, targetType);
 	}
 

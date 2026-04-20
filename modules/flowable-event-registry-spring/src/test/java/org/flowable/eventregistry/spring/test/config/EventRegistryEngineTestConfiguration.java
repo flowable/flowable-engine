@@ -46,6 +46,7 @@ public class EventRegistryEngineTestConfiguration {
         @Value("${jdbc.password:}") String jdbcPassword
     ) {
         HikariDataSource dataSource = new HikariDataSource();
+        dataSource.setMinimumIdle(0);
         dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriverClass);
         dataSource.setUsername(jdbcUsername);
@@ -70,8 +71,6 @@ public class EventRegistryEngineTestConfiguration {
         engineConfiguration.setDatabaseSchemaUpdate(SpringEventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
 
         channelDefinitionProcessors.stream().forEach(engineConfiguration::addChannelModelProcessor);
-
-        engineConfiguration.setEnableEventRegistryChangeDetection(true);
 
         engineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
 
