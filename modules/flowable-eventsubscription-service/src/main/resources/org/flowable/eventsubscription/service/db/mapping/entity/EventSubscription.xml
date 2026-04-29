@@ -243,9 +243,11 @@
     where EVENT_TYPE_ = 'signal'
       and EVENT_NAME_ = #{parameter.eventName, jdbcType=NVARCHAR}
       and (
-       (EVT.EXECUTION_ID_ is null) 
-       or 
-       (EVT.EXECUTION_ID_ is not null AND EXC.SUSPENSION_STATE_ = 1) 
+      (EVT.EXECUTION_ID_ is null and EVT.PROC_DEF_ID_ is not null and exists (select 1 from ACT_RE_PROCDEF DEF where DEF.ID_ = EVT.PROC_DEF_ID_ and DEF.SUSPENSION_STATE_ = 1))
+      or
+      (EVT.EXECUTION_ID_ is not null AND EXC.SUSPENSION_STATE_ = 1)
+      or
+      (EVT.SCOPE_TYPE_ is not null and EVT.SCOPE_ID_ is not null and EVT.SCOPE_DEFINITION_ID_ is not null and EVT.SUB_SCOPE_ID_ is not null)
       )
     <if test="parameter.tenantId != null">
         and EVT.TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
