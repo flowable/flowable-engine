@@ -544,7 +544,7 @@ class RabbitChannelDefinitionProcessorTest {
     void eventShouldBeSendAfterOutboundChannelDefinitionIsRegisteredWithDefinedExchange() {
         TopicExchange exchange = new TopicExchange("flowable-test");
         rabbitAdmin.declareExchange(exchange);
-        Queue queue = new Queue("outbound-customer", false);
+        Queue queue = new Queue("outbound-customer", true);
         rabbitAdmin.declareQueue(queue);
         Binding binding = BindingBuilder.bind(queue).to(exchange).with("customer");
         rabbitAdmin.declareBinding(binding);
@@ -857,7 +857,7 @@ class RabbitChannelDefinitionProcessorTest {
     void rabbitOutboundChannelShouldResolveExchangeFromExpression() {
         TopicExchange exchange = new TopicExchange("test-expression-customer");
         rabbitAdmin.declareExchange(exchange);
-        Queue queue = new Queue("outbound-customer", false);
+        Queue queue = new Queue("outbound-customer", true);
         rabbitAdmin.declareQueue(queue);
         queuesToDelete.add("outbound-customer");
         Binding binding = BindingBuilder.bind(queue).to(exchange).with("customer");
