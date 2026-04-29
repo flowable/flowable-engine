@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
@@ -322,6 +323,50 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + " }");
     }
     
+    @Test
+    @Deployment
+    public void testSendEventWithAuthenticatedUserExpression() throws Exception {
+        Authentication.setAuthenticatedUserId("alice");
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("process")
+                    .variable("accountNumber", 123)
+                    .start();
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job).isNotNull();
+            assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+            assertThat(job.getElementId()).isEqualTo("sendEventTask");
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+            // Clear the authenticated user before the job runs to prove the captured value is restored
+            // by the AsyncSendEventJobHandler instead of relying on a thread-local that the job worker
+            // does not inherit.
+            Authentication.setAuthenticatedUserId(null);
+
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+            JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+            assertThatJson(jsonNode)
+                    .isEqualTo("{"
+                            + "   nameProperty: 'alice',"
+                            + "   numberProperty: 123"
+                            + " }");
+        } finally {
+            Authentication.setAuthenticatedUserId(null);
+        }
+    }
+
     @Test
     @Deployment
     public void testSendEventSkipExpression() throws Exception {

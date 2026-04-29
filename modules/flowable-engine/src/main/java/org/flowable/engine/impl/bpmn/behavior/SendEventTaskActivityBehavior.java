@@ -30,6 +30,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -92,8 +93,15 @@ public class SendEventTaskActivityBehavior extends AbstractBpmnActivityBehavior 
         boolean sendSynchronously = sendEventServiceTask.isSendSynchronously() || executedAsAsyncJob;
         if (!sendSynchronously) {
             JobService jobService = processEngineConfiguration.getJobServiceConfiguration().getJobService();
-            
+
             JobEntity job = JobUtil.createJob(executionEntity, sendEventServiceTask, AsyncSendEventJobHandler.TYPE, processEngineConfiguration);
+
+            // Capture the currently authenticated user so that ${authenticatedUserId} references in
+            // eventInParameters resolve to the scheduling user when the async job runs in a worker thread.
+            String authenticatedUserId = Authentication.getAuthenticatedUserId();
+            if (StringUtils.isNotEmpty(authenticatedUserId)) {
+                job.setJobHandlerConfiguration(authenticatedUserId);
+            }
 
             jobService.createAsyncJob(job, true);
             jobService.scheduleAsyncJob(job);

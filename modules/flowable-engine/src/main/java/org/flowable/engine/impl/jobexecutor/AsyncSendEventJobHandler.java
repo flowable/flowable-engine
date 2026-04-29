@@ -12,9 +12,11 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -50,11 +52,23 @@ public class AsyncSendEventJobHandler implements JobHandler {
                     "Unexpected activity behavior (" + behavior.getClass() + ") found for " + job + " at " + executionEntity);
         }
 
+        // Restore the authenticated user that scheduled the send so that ${authenticatedUserId}
+        // references in eventInParameters resolve consistently with synchronous sending.
+        boolean restoreAuthentication = false;
+        String previousAuthenticatedUserId = Authentication.getAuthenticatedUserId();
+        if (StringUtils.isNotEmpty(configuration) && previousAuthenticatedUserId == null) {
+            Authentication.setAuthenticatedUserId(configuration);
+            restoreAuthentication = true;
+        }
+
         try {
             commandContext.addAttribute(TYPE, true); // Will be read in the SendEventTaskActivityBehavior
             activityBehavior.execute(executionEntity);
         } finally {
             commandContext.removeAttribute(TYPE);
+            if (restoreAuthentication) {
+                Authentication.setAuthenticatedUserId(previousAuthenticatedUserId);
+            }
         }
     }
 
