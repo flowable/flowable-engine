@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
@@ -328,6 +330,93 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
         }
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void deleteHistoricTaskInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = cmmnEngineConfiguration.getHistoryLevel();
+        try {
+            cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            // The case-task entity link points at the task as the REFERENCE_SCOPE_ID_.
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForTask(task.getId())).isNotEmpty();
+
+            cmmnTaskService.complete(task.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForTask(task.getId())).isEmpty();
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForTask(task.getId())).isEmpty();
+
+            cmmnHistoryService.deleteHistoricCaseInstance(caseInstance.getId());
+        } finally {
+            cmmnEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void deleteHistoricCaseInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = cmmnEngineConfiguration.getHistoryLevel();
+        try {
+            cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            CaseInstance parentCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+
+            // Trigger Task One so the entry sentry on the case task fires and the sub-case starts.
+            PlanItemInstance taskOnePlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(parentCase.getId())
+                    .planItemDefinitionId("task1")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(taskOnePlanItem.getId());
+
+            CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseDefinitionKey("oneTaskCase")
+                    .singleResult();
+            assertThat(subCase).isNotNull();
+
+            PlanItemInstance subTaskPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(subCase.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(subTaskPlanItem.getId());
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            // The sub-case is propagated as the REFERENCE_SCOPE_ID_ in the parent's child entity link.
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForCaseInstance(subCase.getId())).isNotEmpty();
+
+            cmmnHistoryService.deleteHistoricCaseInstance(subCase.getId());
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForCaseInstance(subCase.getId())).isEmpty();
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(subCase.getId())).isEmpty();
+
+            // Trigger Task Two so the parent case completes, then drop it from history.
+            PlanItemInstance taskTwoPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(parentCase.getId())
+                    .planItemDefinitionId("task2")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(taskTwoPlanItem.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            cmmnHistoryService.deleteHistoricCaseInstance(parentCase.getId());
+        } finally {
+            cmmnEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
     protected void validateEmptyHistoricDataForCaseInstance(String caseInstanceId) {
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).list()).hasSize(0);
         assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceId)).hasSize(0);

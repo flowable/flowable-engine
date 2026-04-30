@@ -660,6 +660,11 @@ public class TaskHelper {
                 }
                 processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(taskId);
 
+                if (processEngineConfiguration.isEnableEntityLinks()) {
+                    processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                            .deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(taskId, ScopeTypes.TASK);
+                }
+
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
@@ -711,6 +716,11 @@ public class TaskHelper {
         processEngineConfiguration.getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByTaskIds(taskIds);
         processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
         processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
+
+        if (processEngineConfiguration.isEnableEntityLinks()) {
+            processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(ScopeTypes.TASK, taskIds);
+        }
 
         historicTaskService.bulkDeleteHistoricTaskInstances(taskIds);
         historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);

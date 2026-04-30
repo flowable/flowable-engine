@@ -144,7 +144,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
             
             if (processEngineConfiguration.isEnableEntityLinks()) {
-                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().deleteHistoricEntityLinksByScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN);
+                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                        .deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(processInstanceId, ScopeTypes.BPMN);
             }
             
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
@@ -183,7 +184,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);
             
             if (processEngineConfiguration.isEnableEntityLinks()) {
-                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService().bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.BPMN, processInstanceIds);
+                processEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                        .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(ScopeTypes.BPMN, processInstanceIds);
             }
             
             getCommentEntityManager().bulkDeleteCommentsForProcessInstanceIds(processInstanceIds);

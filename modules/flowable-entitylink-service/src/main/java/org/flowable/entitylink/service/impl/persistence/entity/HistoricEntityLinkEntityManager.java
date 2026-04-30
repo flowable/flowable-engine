@@ -32,9 +32,13 @@ public interface HistoricEntityLinkEntityManager extends EntityManager<HistoricE
 
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
+    void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String id, String scopeType);
+
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
     
     void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
+
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids);
 
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

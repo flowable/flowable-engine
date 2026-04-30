@@ -224,6 +224,11 @@ public class TaskHelper {
 
                 cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().deleteHistoricIdentityLinksByTaskId(taskId);
     
+                if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+                    cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                            .deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(taskId, ScopeTypes.TASK);
+                }
+
                 historicTaskService.deleteHistoricTask(historicTaskInstance);
             }
         }
@@ -283,6 +288,11 @@ public class TaskHelper {
         cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
         cmmnEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForTaskIds(taskIds);
         
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
+                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(ScopeTypes.TASK, taskIds);
+        }
+
         historicTaskService.bulkDeleteHistoricTaskInstances(taskIds);
         
         historicTaskService.bulkDeleteHistoricTaskLogEntriesForTaskIds(taskIds);
