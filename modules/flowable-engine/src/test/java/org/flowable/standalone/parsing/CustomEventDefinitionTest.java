@@ -196,6 +196,29 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
     }
 
     @Test
+    public void testCustomEventDefinitionOnProcessStartEventDeletionRestore() {
+        MyTestProcessStartBehavior.RECORDED_KEYS.clear();
+
+        String firstDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+        deploymentIdsForAutoCleanup.add(firstDeploymentId);
+
+        String secondDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+
+        repositoryService.deleteDeployment(secondDeploymentId, true);
+
+        assertThat(MyTestProcessStartBehavior.RECORDED_KEYS)
+                .containsExactly(
+                        "deploy-proc-start-1@1",
+                        "undeploy-proc-start-1@1",
+                        "deploy-proc-start-1@2",
+                        "deploy-proc-start-1@1[restoring]");
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/standalone/parsing/CustomEventDefinitionTest.boundary.bpmn20.xml")
     public void testCustomEventDefinitionOnBoundaryEvent() {
         MyTestBoundaryBehavior.RECORDED_KEYS.clear();
@@ -415,8 +438,7 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
 
         public static final String OBSOLETE_TYPE = "myTestProcessStartObsoleteType";
 
-        // Records the deploy/undeploy invocations so the test can assert the engine called the new
-        // ProcessLevelStartEventActivityBehavior hook.
+        // Suffix [restoring] marks deploys where ProcessLevelStartEventDeployContext.isRestoringPreviousVersion() is true.
         public static final List<String> RECORDED_KEYS = new CopyOnWriteArrayList<>();
 
         protected final String customKey;
@@ -431,7 +453,8 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
 
         @Override
         public void deploy(ProcessLevelStartEventDeployContext context) {
-            RECORDED_KEYS.add("deploy-" + customKey + "@" + context.getProcessDefinition().getVersion());
+            String suffix = context.isRestoringPreviousVersion() ? "[restoring]" : "";
+            RECORDED_KEYS.add("deploy-" + customKey + "@" + context.getProcessDefinition().getVersion() + suffix);
             context.getEventSubscriptionService().createEventSubscriptionBuilder()
                     .eventType(OBSOLETE_TYPE)
                     .activityId(context.getStartEvent().getId())
@@ -443,6 +466,8 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
         @Override
         public void undeploy(ProcessLevelStartEventUndeployContext context) {
             RECORDED_KEYS.add("undeploy-" + customKey + "@" + context.getPreviousProcessDefinition().getVersion());
+            // Exercises the bulk-flush hook: the deployer iterates registered types and bulk-deletes
+            // matching event subscriptions on the previous process definition.
             context.registerObsoleteEventSubscriptionType(OBSOLETE_TYPE);
         }
     }

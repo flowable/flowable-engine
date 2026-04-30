@@ -32,16 +32,25 @@ public class ProcessLevelStartEventDeployContext {
     protected final StartEvent startEvent;
     protected final ProcessEngineConfigurationImpl processEngineConfiguration;
     protected final CommandContext commandContext;
+    protected final boolean restoringPreviousVersion;
 
     public ProcessLevelStartEventDeployContext(ProcessDefinitionEntity processDefinition,
             Process process, BpmnModel bpmnModel, StartEvent startEvent,
             ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+        this(processDefinition, process, bpmnModel, startEvent, processEngineConfiguration, commandContext, false);
+    }
+
+    public ProcessLevelStartEventDeployContext(ProcessDefinitionEntity processDefinition,
+            Process process, BpmnModel bpmnModel, StartEvent startEvent,
+            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext,
+            boolean restoringPreviousVersion) {
         this.processDefinition = processDefinition;
         this.process = process;
         this.bpmnModel = bpmnModel;
         this.startEvent = startEvent;
         this.processEngineConfiguration = processEngineConfiguration;
         this.commandContext = commandContext;
+        this.restoringPreviousVersion = restoringPreviousVersion;
     }
 
     public ProcessDefinitionEntity getProcessDefinition() {
@@ -72,4 +81,14 @@ public class ProcessLevelStartEventDeployContext {
         return processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
     }
 
+    /**
+     * {@code true} when this deploy is restoring a previous (earlier-version) process definition's start
+     * events because the latest version's deployment was just deleted. Behaviors should skip duplicate-
+     * subscription validation in this mode — the just-deleted process definition's subscriptions are still in the in-
+     * session entity cache (the bulk delete hasn't been flushed yet) so a re-insert would otherwise
+     * trip a false-positive conflict. The fresh-deployment path leaves this {@code false}.
+     */
+    public boolean isRestoringPreviousVersion() {
+        return restoringPreviousVersion;
+    }
 }

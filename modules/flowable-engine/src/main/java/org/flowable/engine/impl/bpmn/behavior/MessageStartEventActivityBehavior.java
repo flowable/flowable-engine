@@ -46,15 +46,22 @@ public class MessageStartEventActivityBehavior extends FlowNodeActivityBehavior 
         ProcessDefinitionEntity processDefinition = context.getProcessDefinition();
 
         String messageName = EventDefinitionExpressionUtil.determineMessageName(commandContext, messageEventDefinition, processDefinition);
-        List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
-                .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
 
-        for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsForSameMessageName) {
-            // throw exception only if there's already a subscription as start event
-            if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) {
-                // the event subscription has no instance-id, so it's a message start event
-                throw new FlowableException("Cannot deploy process definition '" + processDefinition.getResourceName()
-                        + "': there already is a message event subscription for the message with name '" + messageName + "'. For " + eventSubscriptionEntity);
+        // Skip the duplicate check when restoring a previous version's start events after the latest
+        // deployment was deleted: the just-deleted process definition's subscription is still in the in-session entity
+        // cache (the bulk delete in deleteEventSubscriptionsForProcessDefinition is queued, not flushed)
+        // and would trip a false-positive conflict.
+        if (!context.isRestoringPreviousVersion()) {
+            List<EventSubscriptionEntity> subscriptionsForSameMessageName = eventSubscriptionService
+                    .findEventSubscriptionsByName(MessageEventHandler.EVENT_HANDLER_TYPE, messageName, processDefinition.getTenantId());
+
+            for (EventSubscriptionEntity eventSubscriptionEntity : subscriptionsForSameMessageName) {
+                // throw exception only if there's already a subscription as start event
+                if (eventSubscriptionEntity.getProcessInstanceId() == null || eventSubscriptionEntity.getProcessInstanceId().isEmpty()) {
+                    // the event subscription has no instance-id, so it's a message start event
+                    throw new FlowableException("Cannot deploy process definition '" + processDefinition.getResourceName()
+                            + "': there already is a message event subscription for the message with name '" + messageName + "'. For " + eventSubscriptionEntity);
+                }
             }
         }
 
