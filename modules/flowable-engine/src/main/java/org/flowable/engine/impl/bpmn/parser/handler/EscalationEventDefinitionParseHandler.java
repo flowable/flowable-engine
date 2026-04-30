@@ -12,19 +12,25 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.Escalation;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class EscalationEventDefinitionParseHandler extends AbstractBpmnParseHandler<EscalationEventDefinition> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(EscalationEventDefinitionParseHandler.class);
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -47,6 +53,17 @@ public class EscalationEventDefinitionParseHandler extends AbstractBpmnParseHand
             Escalation escalation = bpmnParse.getBpmnModel().getEscalation(eventDefinition.getEscalationCode());
             throwEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
                     .createIntermediateThrowEscalationEventActivityBehavior(throwEvent, eventDefinition, escalation));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof EndEvent endEvent) {
+            Escalation escalation = null;
+            if (bpmnParse.getBpmnModel().containsEscalationRef(eventDefinition.getEscalationCode())) {
+                escalation = bpmnParse.getBpmnModel().getEscalation(eventDefinition.getEscalationCode());
+                if (StringUtils.isEmpty(escalation.getEscalationCode())) {
+                    LOGGER.warn("escalationCode is required for an escalation event {}", endEvent.getId());
+                }
+            }
+            endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEscalationEndEventActivityBehavior(endEvent, eventDefinition, escalation));
 
         } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
                 && startEvent.getSubProcess() instanceof EventSubProcess) {

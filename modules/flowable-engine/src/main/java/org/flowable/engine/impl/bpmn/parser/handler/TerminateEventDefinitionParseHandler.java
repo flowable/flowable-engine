@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,29 +13,21 @@
 package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.BoundaryEvent;
-import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.TerminateEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
-/**
- * @author Joram Barrez
- * @author Tijs Rademakers
- */
-public class CancelEventDefinitionParseHandler extends AbstractBpmnParseHandler<CancelEventDefinition> {
+public class TerminateEventDefinitionParseHandler extends AbstractBpmnParseHandler<TerminateEventDefinition> {
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
-        return CancelEventDefinition.class;
+        return TerminateEventDefinition.class;
     }
 
     @Override
-    protected void executeParse(BpmnParse bpmnParse, CancelEventDefinition cancelEventDefinition) {
-        if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
-            boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryCancelEventActivityBehavior(cancelEventDefinition));
-
-        } else if (bpmnParse.getCurrentFlowElement() instanceof EndEvent endEvent) {
-            endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createCancelEndEventActivityBehavior(endEvent));
+    protected void executeParse(BpmnParse bpmnParse, TerminateEventDefinition eventDefinition) {
+        if (bpmnParse.getCurrentFlowElement() instanceof EndEvent endEvent) {
+            endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createTerminateEndEventActivityBehavior(endEvent));
         }
     }
 }

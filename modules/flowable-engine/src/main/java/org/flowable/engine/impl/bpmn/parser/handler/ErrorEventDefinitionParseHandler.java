@@ -12,18 +12,24 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<ErrorEventDefinition> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ErrorEventDefinitionParseHandler.class);
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -34,6 +40,15 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
     protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
         if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryEventActivityBehavior(boundaryEvent, true));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof EndEvent endEvent) {
+            if (bpmnParse.getBpmnModel().containsErrorRef(eventDefinition.getErrorCode())) {
+                String errorCode = bpmnParse.getBpmnModel().getErrors().get(eventDefinition.getErrorCode());
+                if (StringUtils.isEmpty(errorCode)) {
+                    LOGGER.warn("errorCode is required for an error event {}", endEvent.getId());
+                }
+            }
+            endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createErrorEndEventActivityBehavior(endEvent, eventDefinition));
 
         } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
                 && startEvent.getSubProcess() instanceof EventSubProcess) {
