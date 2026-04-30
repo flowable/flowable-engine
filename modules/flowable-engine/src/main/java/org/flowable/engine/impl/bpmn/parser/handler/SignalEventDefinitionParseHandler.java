@@ -43,10 +43,14 @@ public class SignalEventDefinitionParseHandler extends AbstractBpmnParseHandler<
         } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundarySignalEventActivityBehavior(boundaryEvent, signalDefinition, signal, boundaryEvent.isCancelActivity()));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
-                && startEvent.getSubProcess() instanceof EventSubProcess) {
-            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
-                    .createEventSubProcessSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
+            }
         }
     }
 }

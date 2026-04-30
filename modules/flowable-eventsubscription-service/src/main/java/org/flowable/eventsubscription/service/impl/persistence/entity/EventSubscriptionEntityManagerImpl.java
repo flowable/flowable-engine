@@ -15,6 +15,7 @@ package org.flowable.eventsubscription.service.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -168,8 +169,8 @@ public class EventSubscriptionEntityManagerImpl
     }
 
     @Override
-    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
-        return dataManager.findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId) {
+        return dataManager.findEventSubscriptionsByTypesAndProcessDefinitionId(types, processDefinitionId, tenantId);
     }
     
     @Override

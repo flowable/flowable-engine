@@ -57,10 +57,14 @@ public class MessageEventDefinitionParseHandler extends AbstractBpmnParseHandler
         } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryMessageEventActivityBehavior(boundaryEvent, messageDefinition, boundaryEvent.isCancelActivity()));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
-                && startEvent.getSubProcess() instanceof EventSubProcess) {
-            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
-                    .createEventSubProcessMessageStartEventActivityBehavior(startEvent, messageDefinition));
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessMessageStartEventActivityBehavior(startEvent, messageDefinition));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createMessageStartEventActivityBehavior(startEvent, messageDefinition));
+            }
         }
     }
 

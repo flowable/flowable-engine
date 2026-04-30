@@ -13,6 +13,8 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -257,17 +259,17 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
-        final String query = "selectEventSubscriptionsByTypeAndProcessDefinitionId";
-        Map<String, String> params = new HashMap<>();
-        if (type != null) {
-            params.put("eventType", type);
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId) {
+        if (types == null || types.isEmpty()) {
+            return Collections.emptyList();
         }
+        Map<String, Object> params = new HashMap<>();
+        params.put("eventTypes", types);
         params.put("processDefinitionId", processDefinitionId);
         if (tenantId != null && !tenantId.equals(EventSubscriptionServiceConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
         }
-        return getDbSqlSession().selectList(query, params);
+        return getDbSqlSession().selectList("selectEventSubscriptionsByTypesAndProcessDefinitionId", params);
     }
     
     @Override

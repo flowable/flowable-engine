@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
@@ -65,8 +66,8 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
-    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
-        return getEventSubscriptionEntityManager().findEventSubscriptionsByTypeAndProcessDefinitionId(type, processDefinitionId, tenantId);
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId) {
+        return getEventSubscriptionEntityManager().findEventSubscriptionsByTypesAndProcessDefinitionId(types, processDefinitionId, tenantId);
     }
 
     @Override

@@ -322,13 +322,14 @@
     where (SUB_SCOPE_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
   
-  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByTypesAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>
-      <if test="parameter.eventType != null">
-        (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
-      </if>
+        EVENT_TYPE_ in
+        <foreach item="eventType" index="index" collection="parameter.eventTypes" open="(" separator="," close=")">
+            #{eventType, jdbcType=NVARCHAR}
+        </foreach>
         and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=NVARCHAR}
         and EXECUTION_ID_ is null 
         and PROC_INST_ID_ is null

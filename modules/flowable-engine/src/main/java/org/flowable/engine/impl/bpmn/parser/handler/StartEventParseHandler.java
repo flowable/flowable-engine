@@ -13,12 +13,9 @@
 package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventDefinitionLocation;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.Message;
-import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
@@ -59,8 +56,8 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
             if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.START_EVENT)) {
                 LOGGER.warn("EventDefinition {} is not supported on process-level start event {}",
                         eventDefinition.getClass().getSimpleName(), element.getId());
-            } else if (eventDefinition instanceof MessageEventDefinition) {
-                fillMessageRef(bpmnParse, eventDefinition);
+            } else {
+                bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
             }
         }
 
@@ -69,18 +66,5 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
             
             bpmnParse.getCurrentProcess().setInitialFlowElement(element);
         }
-    }
-    
-    protected MessageEventDefinition fillMessageRef(BpmnParse bpmnParse, EventDefinition eventDefinition) {
-        MessageEventDefinition messageDefinition = (MessageEventDefinition) eventDefinition;
-        BpmnModel bpmnModel = bpmnParse.getBpmnModel();
-        String messageRef = messageDefinition.getMessageRef();
-        if (bpmnModel.containsMessageId(messageRef)) {
-            Message message = bpmnModel.getMessage(messageRef);
-            messageDefinition.setMessageRef(message.getName());
-            messageDefinition.setExtensionElements(message.getExtensionElements());
-        }
-        
-        return messageDefinition;
     }
 }

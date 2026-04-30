@@ -12,11 +12,15 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
@@ -43,12 +47,22 @@ public class EventRegistryEventDefinitionParseHandler extends AbstractBpmnParseH
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
                     .createBoundaryEventRegistryEventActivityBehavior(boundaryEvent, key, boundaryEvent.isCancelActivity()));
 
-        } else if (currentFlowElement instanceof StartEvent startEvent
-                && startEvent.getSubProcess() instanceof EventSubProcess) {
+        } else if (currentFlowElement instanceof StartEvent startEvent) {
             String key = requireEventDefinitionKey(eventDefinition, startEvent.getId());
-            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
-                    .createEventSubProcessEventRegistryStartEventActivityBehavior(startEvent, key));
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessEventRegistryStartEventActivityBehavior(startEvent, key));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventRegistryStartEventActivityBehavior(startEvent, key, isManualCorrelation(startEvent)));
+            }
         }
+    }
+
+    protected static boolean isManualCorrelation(StartEvent startEvent) {
+        List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
+        return correlationConfiguration != null && !correlationConfiguration.isEmpty()
+                && BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText());
     }
 
     private static String requireEventDefinitionKey(EventRegistryEventDefinition eventRegistry, String elementId) {

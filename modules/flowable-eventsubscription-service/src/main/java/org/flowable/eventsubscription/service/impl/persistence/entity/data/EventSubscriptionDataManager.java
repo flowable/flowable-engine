@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     
     List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId);
 
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type);
 

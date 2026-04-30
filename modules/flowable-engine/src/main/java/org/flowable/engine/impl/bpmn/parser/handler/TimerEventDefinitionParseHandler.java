@@ -41,11 +41,14 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryTimerEventActivityBehavior(boundaryEvent, timerEventDefinition, boundaryEvent.isCancelActivity()));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
-                && startEvent.getSubProcess() instanceof EventSubProcess) {
-
-            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
-                    .createEventSubProcessTimerStartEventActivityBehavior(startEvent, timerEventDefinition));
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessTimerStartEventActivityBehavior(startEvent, timerEventDefinition));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createTimerStartEventActivityBehavior(startEvent, timerEventDefinition));
+            }
         }
     }
 }

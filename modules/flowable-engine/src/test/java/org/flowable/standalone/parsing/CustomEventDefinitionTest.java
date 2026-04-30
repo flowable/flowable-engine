@@ -42,13 +42,19 @@ import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.EventSubProcessStartEventInitializerContext;
+import org.flowable.engine.impl.bpmn.behavior.FlowNodeActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventDeployContext;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventUndeployContext;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
@@ -131,6 +137,65 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
     }
 
     @Test
+    public void testCustomEventDefinitionOnProcessStartEvent() {
+        // Validates that a custom EventDefinition on a process-level start event whose ActivityBehavior
+        // implements ProcessLevelStartEventActivityBehavior receives deploy() at deploy time and
+        // undeploy() when superseded by a new version.
+        MyTestProcessStartBehavior.RECORDED_KEYS.clear();
+
+        // First deployment.
+        String firstDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+        deploymentIdsForAutoCleanup.add(firstDeploymentId);
+
+        // After v1 deploy: only deploy@1 is recorded (no previous process definition to undeploy).
+        assertThat(MyTestProcessStartBehavior.RECORDED_KEYS).containsExactly("deploy-proc-start-1@1");
+
+        // Redeploy the same resource — this creates v2; v1 is the previous process definition that should be undeployed.
+        String secondDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+        deploymentIdsForAutoCleanup.add(secondDeploymentId);
+
+        // After v2 deploy: undeploy is called for v1 BEFORE deploy is called for v2.
+        assertThat(MyTestProcessStartBehavior.RECORDED_KEYS)
+                .containsExactly("deploy-proc-start-1@1", "undeploy-proc-start-1@1", "deploy-proc-start-1@2");
+
+    }
+
+    @Test
+    public void testCustomEventDefinitionOnProcessStartEventBulkFlushDeletesObsoleteSubscriptions() {
+        MyTestProcessStartBehavior.RECORDED_KEYS.clear();
+
+        String firstDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+        deploymentIdsForAutoCleanup.add(firstDeploymentId);
+        String v1ProcessDefinitionId = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(firstDeploymentId).singleResult().getId();
+
+        assertThat(findSubscriptions(v1ProcessDefinitionId, MyTestProcessStartBehavior.OBSOLETE_TYPE)).hasSize(1);
+
+        String secondDeploymentId = repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/standalone/parsing/CustomEventDefinitionTest.processStart.bpmn20.xml")
+                .deploy().getId();
+        deploymentIdsForAutoCleanup.add(secondDeploymentId);
+        String v2ProcessDefinitionId = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(secondDeploymentId).singleResult().getId();
+
+        assertThat(findSubscriptions(v1ProcessDefinitionId, MyTestProcessStartBehavior.OBSOLETE_TYPE)).isEmpty();
+        assertThat(findSubscriptions(v2ProcessDefinitionId, MyTestProcessStartBehavior.OBSOLETE_TYPE)).hasSize(1);
+    }
+
+    private List<EventSubscriptionEntity> findSubscriptions(String processDefinitionId, String type) {
+        return managementService.executeCommand(commandContext ->
+                ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration())
+                        .getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
+                        .findEventSubscriptionsByTypesAndProcessDefinitionId(Collections.singleton(type), processDefinitionId, null));
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/standalone/parsing/CustomEventDefinitionTest.boundary.bpmn20.xml")
     public void testCustomEventDefinitionOnBoundaryEvent() {
         MyTestBoundaryBehavior.RECORDED_KEYS.clear();
@@ -158,6 +223,7 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
     public static class MyTestEventDefinition extends EventDefinition implements CustomBpmnEventDefinition {
 
         private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = EnumSet.of(
+                EventDefinitionLocation.START_EVENT,
                 EventDefinitionLocation.INTERMEDIATE_CATCH_EVENT,
                 EventDefinitionLocation.BOUNDARY_EVENT,
                 EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT);
@@ -238,9 +304,12 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
                 intermediateCatchEvent.setBehavior(new MyTestEventCatchBehavior(eventDefinition.getCustomKey()));
             } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
                 boundaryEvent.setBehavior(new MyTestBoundaryBehavior(eventDefinition.getCustomKey(), boundaryEvent.isCancelActivity()));
-            } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
-                    && startEvent.getSubProcess() instanceof EventSubProcess) {
-                startEvent.setBehavior(new MyTestEventSubProcessStartBehavior(eventDefinition.getCustomKey()));
+            } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+                if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                    startEvent.setBehavior(new MyTestEventSubProcessStartBehavior(eventDefinition.getCustomKey()));
+                } else {
+                    startEvent.setBehavior(new MyTestProcessStartBehavior(eventDefinition.getCustomKey()));
+                }
             }
         }
     }
@@ -337,6 +406,44 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
         public void trigger(DelegateExecution execution, String triggerName, Object triggerData) {
             RECORDED_KEYS.add("trigger-" + customKey);
             super.trigger(execution, triggerName, triggerData);
+        }
+    }
+
+    public static class MyTestProcessStartBehavior extends FlowNodeActivityBehavior implements ProcessLevelStartEventActivityBehavior {
+
+        private static final long serialVersionUID = 1L;
+
+        public static final String OBSOLETE_TYPE = "myTestProcessStartObsoleteType";
+
+        // Records the deploy/undeploy invocations so the test can assert the engine called the new
+        // ProcessLevelStartEventActivityBehavior hook.
+        public static final List<String> RECORDED_KEYS = new CopyOnWriteArrayList<>();
+
+        protected final String customKey;
+
+        public MyTestProcessStartBehavior(String customKey) {
+            this.customKey = customKey;
+        }
+
+        public String getCustomKey() {
+            return customKey;
+        }
+
+        @Override
+        public void deploy(ProcessLevelStartEventDeployContext context) {
+            RECORDED_KEYS.add("deploy-" + customKey + "@" + context.getProcessDefinition().getVersion());
+            context.getEventSubscriptionService().createEventSubscriptionBuilder()
+                    .eventType(OBSOLETE_TYPE)
+                    .activityId(context.getStartEvent().getId())
+                    .processDefinitionId(context.getProcessDefinition().getId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .create();
+        }
+
+        @Override
+        public void undeploy(ProcessLevelStartEventUndeployContext context) {
+            RECORDED_KEYS.add("undeploy-" + customKey + "@" + context.getPreviousProcessDefinition().getVersion());
+            context.registerObsoleteEventSubscriptionType(OBSOLETE_TYPE);
         }
     }
 }

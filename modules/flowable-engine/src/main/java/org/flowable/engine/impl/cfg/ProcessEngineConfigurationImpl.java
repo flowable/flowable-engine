@@ -169,10 +169,8 @@ import org.flowable.engine.impl.app.AppResourceConverterImpl;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeploymentHelper;
 import org.flowable.engine.impl.bpmn.deployer.CachingAndArtifactsManager;
-import org.flowable.engine.impl.bpmn.deployer.EventSubscriptionManager;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ProcessDefinitionDiagramHelper;
-import org.flowable.engine.impl.bpmn.deployer.TimerManager;
 import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
@@ -566,8 +564,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected AppDeployer appDeployer;
     protected BpmnParser bpmnParser;
     protected ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory;
-    protected TimerManager timerManager;
-    protected EventSubscriptionManager eventSubscriptionManager;
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
@@ -1743,22 +1739,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             parsedDeploymentBuilderFactory.setBpmnParser(bpmnParser);
         }
 
-        if (timerManager == null) {
-            timerManager = new TimerManager();
-        }
-
-        if (eventSubscriptionManager == null) {
-            eventSubscriptionManager = new EventSubscriptionManager();
-        }
-
         if (bpmnDeploymentHelper == null) {
             bpmnDeploymentHelper = new BpmnDeploymentHelper();
-        }
-        if (bpmnDeploymentHelper.getTimerManager() == null) {
-            bpmnDeploymentHelper.setTimerManager(timerManager);
-        }
-        if (bpmnDeploymentHelper.getEventSubscriptionManager() == null) {
-            bpmnDeploymentHelper.setEventSubscriptionManager(eventSubscriptionManager);
         }
 
         if (cachingAndArtifactsManager == null) {
@@ -2926,22 +2908,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public ProcessEngineConfigurationImpl setParsedDeploymentBuilderFactory(ParsedDeploymentBuilderFactory parsedDeploymentBuilderFactory) {
         this.parsedDeploymentBuilderFactory = parsedDeploymentBuilderFactory;
         return this;
-    }
-
-    public TimerManager getTimerManager() {
-        return timerManager;
-    }
-
-    public void setTimerManager(TimerManager timerManager) {
-        this.timerManager = timerManager;
-    }
-
-    public EventSubscriptionManager getEventSubscriptionManager() {
-        return eventSubscriptionManager;
-    }
-
-    public void setEventSubscriptionManager(EventSubscriptionManager eventSubscriptionManager) {
-        this.eventSubscriptionManager = eventSubscriptionManager;
     }
 
     public BpmnDeploymentHelper getBpmnDeploymentHelper() {

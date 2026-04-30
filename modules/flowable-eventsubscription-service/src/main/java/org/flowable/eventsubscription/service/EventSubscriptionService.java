@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -41,7 +42,7 @@ public interface EventSubscriptionService {
     
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
     
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type);
     
