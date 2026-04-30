@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,10 +13,8 @@
 package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
-import org.flowable.bpmn.model.CompensateEventDefinition;
-import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
-import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.EventDefinitionLocation;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.slf4j.Logger;
@@ -36,27 +34,18 @@ public class IntermediateThrowEventParseHandler extends AbstractActivityBpmnPars
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, ThrowEvent intermediateEvent) {
-
-        EventDefinition eventDefinition = null;
-        if (!intermediateEvent.getEventDefinitions().isEmpty()) {
-            eventDefinition = intermediateEvent.getEventDefinitions().get(0);
-        }
-
-        if (eventDefinition instanceof SignalEventDefinition signalEventDefinition) {
-            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowSignalEventActivityBehavior(intermediateEvent, signalEventDefinition,
-                    bpmnParse.getBpmnModel().getSignal(signalEventDefinition.getSignalRef())));
-            
-        } else if (eventDefinition instanceof EscalationEventDefinition escalationEventDefinition) {
-            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowEscalationEventActivityBehavior(intermediateEvent, escalationEventDefinition,
-                    bpmnParse.getBpmnModel().getEscalation(escalationEventDefinition.getEscalationCode())));
-
-        } else if (eventDefinition instanceof CompensateEventDefinition compensateEventDefinition) {
-            intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowCompensationEventActivityBehavior(intermediateEvent, compensateEventDefinition));
-
-        } else if (eventDefinition == null) {
+        if (intermediateEvent.getEventDefinitions().isEmpty()) {
             intermediateEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateThrowNoneEventActivityBehavior(intermediateEvent));
-        } else {
-            LOGGER.warn("Unsupported intermediate throw event type for throw event {}", intermediateEvent.getId());
+            return;
         }
+
+        EventDefinition eventDefinition = intermediateEvent.getEventDefinitions().get(0);
+        if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.INTERMEDIATE_THROW_EVENT)) {
+            LOGGER.warn("EventDefinition {} is not supported on intermediate throw event {}",
+                    eventDefinition.getClass().getSimpleName(), intermediateEvent.getId());
+            return;
+        }
+
+        bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
     }
 }
