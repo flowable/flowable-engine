@@ -42,6 +42,10 @@ import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.flowable.batch.service.BatchServiceConfiguration;
+import org.flowable.bpmn.converter.CustomEventDefinitionXmlWriter;
+import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.FlowableFunctionDelegate;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
@@ -191,6 +195,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.EndEventParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ErrorEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EscalationEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EventBasedGatewayParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.EventRegistryEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.EventSubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExclusiveGatewayParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ExternalWorkerServiceTaskParseHandler;
@@ -670,6 +675,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<BpmnParseHandler> preBpmnParseHandlers;
     protected List<BpmnParseHandler> postBpmnParseHandlers;
     protected List<BpmnParseHandler> customDefaultBpmnParseHandlers;
+    /**
+     * BPMN child-element XML parsers contributed by integrators (e.g. for custom {@code EventDefinition}
+     * subtypes). Registered with {@link BpmnXMLUtil#addChildElementParser(BaseChildElementParser)} during engine init.
+     */
+    protected List<BaseChildElementParser> customChildElementParsers;
+    /**
+     * BPMN XML writers for {@link org.flowable.bpmn.model.CustomBpmnEventDefinition} subclasses contributed by
+     * integrators. The write-side counterpart to {@link #customChildElementParsers}; registered with
+     * {@link BpmnXMLUtil#addCustomEventDefinitionWriter} during engine init.
+     */
+    protected Map<Class<? extends EventDefinition>, CustomEventDefinitionXmlWriter> customEventDefinitionWriters;
     protected ActivityBehaviorFactory activityBehaviorFactory;
     protected ListenerFactory listenerFactory;
     protected BpmnParseFactory bpmnParseFactory;
@@ -1817,6 +1833,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             bpmnParseFactory = new DefaultBpmnParseFactory();
         }
 
+        if (customChildElementParsers != null) {
+            for (BaseChildElementParser parser : customChildElementParsers) {
+                BpmnXMLUtil.addChildElementParser(parser);
+            }
+        }
+
+        if (customEventDefinitionWriters != null) {
+            for (Map.Entry<Class<? extends EventDefinition>, CustomEventDefinitionXmlWriter> entry : customEventDefinitionWriters.entrySet()) {
+                BpmnXMLUtil.addCustomEventDefinitionWriter(entry.getKey(), entry.getValue());
+            }
+        }
+
         bpmnParser.setBpmnParseFactory(bpmnParseFactory);
         bpmnParser.setActivityBehaviorFactory(activityBehaviorFactory);
         bpmnParser.setListenerFactory(listenerFactory);
@@ -1850,6 +1878,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         bpmnParserHandlers.add(new ErrorEventDefinitionParseHandler());
         bpmnParserHandlers.add(new EscalationEventDefinitionParseHandler());
         bpmnParserHandlers.add(new EventBasedGatewayParseHandler());
+        bpmnParserHandlers.add(new EventRegistryEventDefinitionParseHandler());
         bpmnParserHandlers.add(new ExclusiveGatewayParseHandler());
         bpmnParserHandlers.add(new InclusiveGatewayParseHandler());
         bpmnParserHandlers.add(new IntermediateCatchEventParseHandler());
@@ -3684,6 +3713,40 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setPostBpmnParseHandlers(List<BpmnParseHandler> postBpmnParseHandlers) {
         this.postBpmnParseHandlers = postBpmnParseHandlers;
+        return this;
+    }
+
+    public List<BaseChildElementParser> getCustomChildElementParsers() {
+        return customChildElementParsers;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomChildElementParsers(List<BaseChildElementParser> customChildElementParsers) {
+        this.customChildElementParsers = customChildElementParsers;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addCustomChildElementParser(BaseChildElementParser parser) {
+        if (customChildElementParsers == null) {
+            customChildElementParsers = new ArrayList<>();
+        }
+        customChildElementParsers.add(parser);
+        return this;
+    }
+
+    public Map<Class<? extends EventDefinition>, CustomEventDefinitionXmlWriter> getCustomEventDefinitionWriters() {
+        return customEventDefinitionWriters;
+    }
+
+    public ProcessEngineConfigurationImpl setCustomEventDefinitionWriters(Map<Class<? extends EventDefinition>, CustomEventDefinitionXmlWriter> customEventDefinitionWriters) {
+        this.customEventDefinitionWriters = customEventDefinitionWriters;
+        return this;
+    }
+
+    public ProcessEngineConfigurationImpl addCustomEventDefinitionWriter(Class<? extends EventDefinition> eventDefinitionClass, CustomEventDefinitionXmlWriter writer) {
+        if (customEventDefinitionWriters == null) {
+            customEventDefinitionWriters = new HashMap<>();
+        }
+        customEventDefinitionWriters.put(eventDefinitionClass, writer);
         return this;
     }
 

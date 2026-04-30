@@ -12,17 +12,15 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventDefinitionLocation;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.Signal;
@@ -30,14 +28,19 @@ import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
 public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<StartEvent> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StartEventParseHandler.class);
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -46,9 +49,14 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
 
     @Override
     protected void executeParse(BpmnParse bpmnParse, StartEvent element) {
-        if (element.getSubProcess() != null && element.getSubProcess() instanceof EventSubProcess) {
+        if (element.getSubProcess() instanceof EventSubProcess) {
             if (CollectionUtil.isNotEmpty(element.getEventDefinitions())) {
                 EventDefinition eventDefinition = element.getEventDefinitions().get(0);
+                if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT)) {
+                    LOGGER.warn("EventDefinition {} is not supported on event sub-process start event {}",
+                            eventDefinition.getClass().getSimpleName(), element.getId());
+                    return;
+                }
                 if (eventDefinition instanceof MessageEventDefinition) {
                     MessageEventDefinition messageDefinition = fillMessageRef(bpmnParse, eventDefinition);
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessMessageStartEventActivityBehavior(element, messageDefinition));
@@ -71,27 +79,36 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                 
                 } else if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition) {
                     element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessVariableListenerlStartEventActivityBehavior(element, variableListenerEventDefinition));
-                }
+                } else if (eventDefinition instanceof EventRegistryEventDefinition eventRegistry) {
+                    String key = eventRegistry.getEventDefinitionKey();
+                    if (StringUtils.isEmpty(key)) {
+                        throw new FlowableIllegalArgumentException("EventRegistryEventDefinition on '" + element.getId()
+                                + "' has an empty eventDefinitionKey; the engine cannot register an event-registry subscription without a key.");
+                    }
+                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEventRegistryStartEventActivityBehavior(element, key));
                 
-            } else if (hasEventTypeElement(element)) {
-                List<ExtensionElement> eventTypeElements = element.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                String eventType = eventTypeElements.get(0).getElementText();
-                if (StringUtils.isNotEmpty(eventType)) {
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEventRegistryStartEventActivityBehavior(element, eventType));
+                } else {
+                    // Custom EventDefinition: delegate to the per-EventDefinition parse-handler chain so a
+                    // post-registered handler can install a behavior. Mirrors the dispatch pattern used by
+                    // IntermediateCatchEventParseHandler and BoundaryEventParseHandler.
+                    bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
                 }
             }
 
         } else if (CollectionUtil.isEmpty(element.getEventDefinitions())) {
             element.setBehavior(bpmnParse.getActivityBehaviorFactory().createNoneStartEventActivityBehavior(element));
         
-        } else if (CollectionUtil.isNotEmpty(element.getEventDefinitions())) {
+        } else {
             EventDefinition eventDefinition = element.getEventDefinitions().get(0);
-            if (eventDefinition instanceof MessageEventDefinition) {
+            if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.START_EVENT)) {
+                LOGGER.warn("EventDefinition {} is not supported on process-level start event {}",
+                        eventDefinition.getClass().getSimpleName(), element.getId());
+            } else if (eventDefinition instanceof MessageEventDefinition) {
                 fillMessageRef(bpmnParse, eventDefinition);
             }
         }
 
-        if (element.getSubProcess() == null && (hasNoEventDefinitionOrTypeElement(element) ||
+        if (element.getSubProcess() == null && (CollectionUtil.isEmpty(element.getEventDefinitions()) ||
                 bpmnParse.getCurrentProcess().getInitialFlowElement() == null)) {
             
             bpmnParse.getCurrentProcess().setInitialFlowElement(element);
@@ -109,19 +126,5 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
         }
         
         return messageDefinition;
-    }
-    
-    protected boolean hasNoEventDefinitionOrTypeElement(StartEvent element) {
-        return CollectionUtil.isEmpty(element.getEventDefinitions()) && !hasEventTypeElement(element);
-    }
-
-    protected boolean hasEventTypeElement(StartEvent element) {
-        boolean foundEventTypeElement = false;
-        List<ExtensionElement> eventTypeElements = element.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-        if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
-            foundEventTypeElement = true;
-        }
-        
-        return foundEventTypeElement;
     }
 }

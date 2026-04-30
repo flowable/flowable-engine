@@ -22,9 +22,10 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CustomBpmnEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -374,31 +375,6 @@ public class ProcessInstanceHelper {
         
         StartEvent startEvent = (StartEvent) subElement;
         if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
-            if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
-                String eventType = eventTypeElements.get(0).getElementText();
-                if (StringUtils.isNotEmpty(eventType)) {
-                    ExecutionEntity eventRegistryExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
-                    eventRegistryExecution.setCurrentFlowElement(startEvent);
-                    eventRegistryExecution.setEventScope(true);
-                    eventRegistryExecution.setActive(false);
-
-                    EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
-                            .getEventSubscriptionService().createEventSubscriptionBuilder()
-                                    .eventType(eventType)
-                                    .executionId(eventRegistryExecution.getId())
-                                    .processInstanceId(eventRegistryExecution.getProcessInstanceId())
-                                    .activityId(eventRegistryExecution.getCurrentActivityId())
-                                    .processDefinitionId(eventRegistryExecution.getProcessDefinitionId())
-                                    .scopeType(ScopeTypes.BPMN)
-                                    .tenantId(eventRegistryExecution.getTenantId())
-                                    .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, eventRegistryExecution))
-                                    .create();
-                    
-                    CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
-                }
-            }
-            
             return;
         }
 
@@ -414,7 +390,49 @@ public class ProcessInstanceHelper {
         
         } else if (eventDefinition instanceof VariableListenerEventDefinition) {
             handleVariableListenerEventSubscription(eventDefinition, startEvent, parentExecution, processEngineConfiguration, commandContext);
+
+        } else if (eventDefinition instanceof EventRegistryEventDefinition eventRegistryEventDefinition) {
+            handleEventRegistryEventSubscription(eventRegistryEventDefinition, startEvent, parentExecution, processEngineConfiguration, commandContext);
+
+        } else if (eventDefinition instanceof CustomBpmnEventDefinition) {
+            // Non-built-in subscription-based EventDefinition: create a waiting execution at the start
+            // event so external code can later invoke runtimeService.trigger(executionId) to fire the event
+            // sub-process. Subscription wiring (if any) is the custom integration's responsibility.
+            // ErrorEventDefinition / EscalationEventDefinition deliberately don't fall through here —
+            // they're fired synchronously when an error/escalation is thrown, not via subscription.
+            ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+            execution.setCurrentFlowElement(startEvent);
+            execution.setEventScope(true);
+            execution.setActive(false);
         }
+    }
+
+    protected void handleEventRegistryEventSubscription(EventRegistryEventDefinition eventDefinition, StartEvent startEvent,
+            ExecutionEntity parentExecution, ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+
+        String eventType = eventDefinition.getEventDefinitionKey();
+        if (StringUtils.isEmpty(eventType)) {
+            return;
+        }
+
+        ExecutionEntity eventRegistryExecution = processEngineConfiguration.getExecutionEntityManager().createChildExecution(parentExecution);
+        eventRegistryExecution.setCurrentFlowElement(startEvent);
+        eventRegistryExecution.setEventScope(true);
+        eventRegistryExecution.setActive(false);
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) processEngineConfiguration.getEventSubscriptionServiceConfiguration()
+                .getEventSubscriptionService().createEventSubscriptionBuilder()
+                        .eventType(eventType)
+                        .executionId(eventRegistryExecution.getId())
+                        .processInstanceId(eventRegistryExecution.getProcessInstanceId())
+                        .activityId(eventRegistryExecution.getCurrentActivityId())
+                        .processDefinitionId(eventRegistryExecution.getProcessDefinitionId())
+                        .scopeType(ScopeTypes.BPMN)
+                        .tenantId(eventRegistryExecution.getTenantId())
+                        .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, commandContext, eventRegistryExecution))
+                        .create();
+
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
     }
     
     protected void handleMessageEventSubscription(EventDefinition eventDefinition, StartEvent startEvent, ExecutionEntity parentExecution, 

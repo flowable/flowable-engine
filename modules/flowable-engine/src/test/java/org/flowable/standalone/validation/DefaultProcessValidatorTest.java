@@ -27,7 +27,14 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.TerminateEventDefinition;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.flowable.engine.test.util.TestProcessUtil;
 import org.flowable.validation.ProcessValidationContextImpl;
@@ -360,12 +367,52 @@ public class DefaultProcessValidatorTest {
         assertThat(errors).hasSize(1);
         ValidationError error = errors.get(0);
         assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION);
-        assertThat(error.getDefaultDescription()).isEqualTo("start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
+        assertThat(error.getDefaultDescription()).isEqualTo("Unsupported event subprocess start event definition type");
         assertThat(error.getActivityId()).isEqualTo("cancelStartEventSubProcess");
         assertThat(error.getActivityName()).isEqualTo("Cancel Event Sub Process");
         assertThat(error.isWarning()).isFalse();
         assertThat(error.getXmlLineNumber()).isEqualTo(12);
         assertThat(error.getXmlColumnNumber()).isEqualTo(41);
+    }
+
+    @Test
+    void testBoundaryEventWithUnsupportedDefinition() {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process process = new Process();
+        process.setId("boundaryEventWithUnsupportedDefinition");
+        process.setExecutable(true);
+        bpmnModel.addProcess(process);
+
+        StartEvent start = new StartEvent();
+        start.setId("start");
+        process.addFlowElement(start);
+
+        UserTask userTask = new UserTask();
+        userTask.setId("theTask");
+        userTask.setName("The Task");
+        process.addFlowElement(userTask);
+
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId("invalidBoundaryEvent");
+        boundaryEvent.setName("Invalid Boundary Event");
+        boundaryEvent.setAttachedToRef(userTask);
+        boundaryEvent.setAttachedToRefId(userTask.getId());
+        boundaryEvent.addEventDefinition(new TerminateEventDefinition());
+        process.addFlowElement(boundaryEvent);
+
+        EndEvent end = new EndEvent();
+        end.setId("end");
+        process.addFlowElement(end);
+
+        process.addFlowElement(new SequenceFlow("start", "theTask"));
+        process.addFlowElement(new SequenceFlow("theTask", "end"));
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactly(
+                        tuple(Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, "Invalid or unsupported event definition", "invalidBoundaryEvent", false));
     }
 
     @Test

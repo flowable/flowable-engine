@@ -19,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -32,6 +33,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
+import org.flowable.engine.impl.event.EventRegistryEventDefinitionUtil;
 import org.flowable.engine.impl.event.MessageEventHandler;
 import org.flowable.engine.impl.event.SignalEventHandler;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -90,29 +92,35 @@ public class EventSubscriptionManager {
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, true);
         if (!startEvents.isEmpty()) {
             for (StartEvent startEvent : startEvents) {
-                if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
-                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
-                    if (eventTypeElements != null && !eventTypeElements.isEmpty()) {
-                        String eventType = eventTypeElements.get(0).getElementText();
-                        if (StringUtils.isNotEmpty(eventType)) {
-                            if (result == null) {
-                                result = new ArrayList<>();
-                            }
+                String eventType = readEventRegistryEventType(startEvent);
+                if (StringUtils.isNotEmpty(eventType)) {
+                    if (result == null) {
+                        result = new ArrayList<>();
+                    }
 
-                            // check the starting behavior of the event-registry start event, if it is dynamic with manual subscriptions, add it to the
-                            // result with a true boolean, otherwise with false
-                            List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
-                            if (correlationConfiguration != null && correlationConfiguration.size() > 0 && BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
-                                result.add(new StartEventInfo(eventType, startEvent.getId(), true));
-                            } else {
-                                result.add(new StartEventInfo(eventType, startEvent.getId(), false));
-                            }
-                        }
+                    // check the starting behavior of the event-registry start event, if it is dynamic with manual subscriptions, add it to the
+                    // result with a true boolean, otherwise with false
+                    List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
+                    if (correlationConfiguration != null && correlationConfiguration.size() > 0 && BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
+                        result.add(new StartEventInfo(eventType, startEvent.getId(), true));
+                    } else {
+                        result.add(new StartEventInfo(eventType, startEvent.getId(), false));
                     }
                 }
             }
         }
         return result;
+    }
+
+    /**
+     * Returns the event-registry event type configured on the start event, or {@code null} if the start event
+     * is not an event-registry start event. Reads from the {@link EventRegistryEventDefinition} on the start
+     * event's {@code eventDefinitions} list — synthesized at parse time from {@code <flowable:eventType>} or
+     * supplied programmatically.
+     */
+    protected String readEventRegistryEventType(StartEvent startEvent) {
+        EventRegistryEventDefinition eventDefinition = EventRegistryEventDefinitionUtil.findOn(startEvent);
+        return eventDefinition != null ? eventDefinition.getEventDefinitionKey() : null;
     }
 
     protected record StartEventInfo(String eventType, String activityId, boolean dynamic) {
@@ -143,24 +151,17 @@ public class EventSubscriptionManager {
     protected void addEventSubscriptions(ProcessDefinitionEntity processDefinition, org.flowable.bpmn.model.Process process, BpmnModel bpmnModel) {
         if (CollectionUtil.isNotEmpty(process.getFlowElements())) {
             for (FlowElement element : process.getFlowElements()) {
-                if (element instanceof StartEvent startEvent) {
-                    if (CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
-                        EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
-                        if (eventDefinition instanceof SignalEventDefinition signalEventDefinition) {
-                            insertSignalEvent(signalEventDefinition, startEvent, processDefinition, bpmnModel);
-                        
-                        } else if (eventDefinition instanceof MessageEventDefinition messageEventDefinition) {
-                            insertMessageEvent(messageEventDefinition, startEvent, processDefinition, bpmnModel);
-                        }
-                        
-                    } else {
-                        if (startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE) != null) {
-                            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                            if (!eventTypeElements.isEmpty()) {
-                                String eventDefinitionKey = eventTypeElements.get(0).getElementText();
-                                insertEventRegistryEvent(eventDefinitionKey, startEvent, processDefinition, bpmnModel);
-                            }
-                        }
+                if (element instanceof StartEvent startEvent && CollectionUtil.isNotEmpty(startEvent.getEventDefinitions())) {
+                    EventDefinition eventDefinition = startEvent.getEventDefinitions().get(0);
+                    if (eventDefinition instanceof SignalEventDefinition signalEventDefinition) {
+                        insertSignalEvent(signalEventDefinition, startEvent, processDefinition, bpmnModel);
+
+                    } else if (eventDefinition instanceof MessageEventDefinition messageEventDefinition) {
+                        insertMessageEvent(messageEventDefinition, startEvent, processDefinition, bpmnModel);
+
+                    } else if (eventDefinition instanceof EventRegistryEventDefinition eventRegistryEventDefinition
+                            && StringUtils.isNotEmpty(eventRegistryEventDefinition.getEventDefinitionKey())) {
+                        insertEventRegistryEvent(eventRegistryEventDefinition.getEventDefinitionKey(), startEvent, processDefinition, bpmnModel);
                     }
                 }
             }

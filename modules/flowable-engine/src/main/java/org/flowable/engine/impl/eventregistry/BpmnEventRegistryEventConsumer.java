@@ -22,6 +22,7 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
@@ -30,6 +31,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.event.EventRegistryEventDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
@@ -278,9 +280,8 @@ public class BpmnEventRegistryEventConsumer extends BaseEventRegistryEventConsum
 
             List<StartEvent> startEvents = bpmnModel.getMainProcess().findFlowElementsOfType(StartEvent.class);
             for (StartEvent startEvent : startEvents) {
-                List<ExtensionElement> eventTypes = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                if (eventTypes != null && !eventTypes.isEmpty()
-                        && Objects.equals(eventSubscription.getEventType(), eventTypes.get(0).getElementText())) {
+                EventRegistryEventDefinition eventDefinition = EventRegistryEventDefinitionUtil.findOn(startEvent);
+                if (eventDefinition != null && Objects.equals(eventSubscription.getEventType(), eventDefinition.getEventDefinitionKey())) {
 
                     List<ExtensionElement> correlationCfgExtensions = startEvent.getExtensionElements()
                             .getOrDefault(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());

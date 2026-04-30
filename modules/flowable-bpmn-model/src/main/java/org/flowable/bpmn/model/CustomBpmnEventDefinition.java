@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,20 +12,12 @@
  */
 package org.flowable.bpmn.model;
 
-import java.util.Set;
-
 /**
- * @author Tijs Rademakers
+ * Marker for {@link EventDefinition} subclasses that are not part of the BPMN 2.0 specification and are
+ * therefore serialized inside {@code <extensionElements>} rather than as direct children of the event
+ * element. The Flowable-specific {@code EventRegistryEventDefinition} and {@code VariableListenerEventDefinition}
+ * are built-in implementors; additional {@link EventDefinition} subclasses should also implement this marker
+ * so the BPMN writer routes them through the extension-element path and round-trips correctly.
  */
-public abstract class EventDefinition extends BaseElement {
-
-    @Override
-    public abstract EventDefinition clone();
-
-    /**
-     * Returns the set of {@link EventDefinitionLocation}s where this {@link EventDefinition} is allowed.
-     * Consulted by the BPMN process validators (start / event-subprocess / intermediate-catch / boundary)
-     * to decide whether this event definition is valid in a given event host.
-     */
-    public abstract Set<EventDefinitionLocation> getSupportedLocations();
+public interface CustomBpmnEventDefinition {
 }

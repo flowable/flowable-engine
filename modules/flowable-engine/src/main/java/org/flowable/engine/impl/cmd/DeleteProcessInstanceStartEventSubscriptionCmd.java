@@ -15,12 +15,15 @@ package org.flowable.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.event.EventRegistryEventDefinitionUtil;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilderImpl;
 
 /**
@@ -44,14 +47,14 @@ public class DeleteProcessInstanceStartEventSubscriptionCmd extends AbstractProc
         List<StartEvent> startEvents = process.findFlowElementsOfType(StartEvent.class, false);
         for (StartEvent startEvent : startEvents) {
             // looking for a start event based on an event-registry event subscription
-            List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-            if (eventTypeElements != null && eventTypeElements.size() > 0) {
+            EventRegistryEventDefinition eventDefinition = EventRegistryEventDefinitionUtil.findOn(startEvent);
+            if (eventDefinition != null && StringUtils.isNotEmpty(eventDefinition.getEventDefinitionKey())) {
                 // looking for a dynamic, manually subscribed behavior of the event-registry start event
                 List<ExtensionElement> correlationConfiguration = startEvent.getExtensionElements().get(BpmnXMLConstants.START_EVENT_CORRELATION_CONFIGURATION);
                 if (correlationConfiguration != null && correlationConfiguration.size() > 0 &&
                     BpmnXMLConstants.START_EVENT_CORRELATION_MANUAL.equals(correlationConfiguration.get(0).getElementText())) {
 
-                    String eventDefinitionKey = eventTypeElements.get(0).getElementText();
+                    String eventDefinitionKey = eventDefinition.getEventDefinitionKey();
                     String correlationKey = null;
 
                     if (builder.hasCorrelationParameterValues()) {

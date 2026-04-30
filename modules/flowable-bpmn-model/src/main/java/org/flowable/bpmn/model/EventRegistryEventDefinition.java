@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,12 +16,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-/**
- * @author Tijs Rademakers
- */
-public class ConditionalEventDefinition extends EventDefinition {
+public class EventRegistryEventDefinition extends EventDefinition implements CustomBpmnEventDefinition {
 
     private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(
+            EventDefinitionLocation.START_EVENT,
             EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT,
             EventDefinitionLocation.INTERMEDIATE_CATCH_EVENT,
             EventDefinitionLocation.BOUNDARY_EVENT));
@@ -31,35 +29,32 @@ public class ConditionalEventDefinition extends EventDefinition {
         return SUPPORTED_LOCATIONS;
     }
 
-    protected String conditionExpression;
-    protected String conditionLanguage;
+    protected String eventDefinitionKey;
 
-    public String getConditionExpression() {
-        return conditionExpression;
+    public EventRegistryEventDefinition() {
     }
 
-    public void setConditionExpression(String conditionExpression) {
-        this.conditionExpression = conditionExpression;
+    public EventRegistryEventDefinition(String eventDefinitionKey) {
+        this.eventDefinitionKey = eventDefinitionKey;
     }
 
-    public String getConditionLanguage() {
-        return conditionLanguage;
+    public String getEventDefinitionKey() {
+        return eventDefinitionKey;
     }
 
-    public void setConditionLanguage(String conditionLanguage) {
-        this.conditionLanguage = conditionLanguage;
+    public void setEventDefinitionKey(String eventDefinitionKey) {
+        this.eventDefinitionKey = eventDefinitionKey;
     }
 
     @Override
-    public ConditionalEventDefinition clone() {
-        ConditionalEventDefinition clone = new ConditionalEventDefinition();
+    public EventRegistryEventDefinition clone() {
+        EventRegistryEventDefinition clone = new EventRegistryEventDefinition();
         clone.setValues(this);
         return clone;
     }
 
-    public void setValues(ConditionalEventDefinition otherDefinition) {
+    public void setValues(EventRegistryEventDefinition otherDefinition) {
         super.setValues(otherDefinition);
-        setConditionExpression(otherDefinition.getConditionExpression());
-        setConditionLanguage(otherDefinition.getConditionLanguage());
+        setEventDefinitionKey(otherDefinition.getEventDefinitionKey());
     }
 }

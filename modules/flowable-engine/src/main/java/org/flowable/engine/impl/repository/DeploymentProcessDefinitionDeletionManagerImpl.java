@@ -14,10 +14,11 @@ package org.flowable.engine.impl.repository;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
-import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -131,15 +132,9 @@ public class DeploymentProcessDefinitionDeletionManagerImpl implements Deploymen
                                     restoreSignalStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventDefinition);
                                 } else if (eventDefinition instanceof MessageEventDefinition) {
                                     restoreMessageStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventDefinition);
-                                }
-
-                            } else {
-                                if (startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE) != null) {
-                                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                                    if (!eventTypeElements.isEmpty()) {
-                                        String eventDefinitionKey = eventTypeElements.get(0).getElementText();
-                                        restoreEventRegistryStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventDefinitionKey);
-                                    }
+                                } else if (eventDefinition instanceof EventRegistryEventDefinition eventRegistryEventDefinition
+                                        && StringUtils.isNotEmpty(eventRegistryEventDefinition.getEventDefinitionKey())) {
+                                    restoreEventRegistryStartEvent(previousProcessDefinition, bpmnModel, startEvent, eventRegistryEventDefinition.getEventDefinitionKey());
                                 }
                             }
 
