@@ -16,17 +16,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.EventRegistryEventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EventRegistryEventDefinitionParseHandler extends AbstractBpmnParseHandler<EventRegistryEventDefinition> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventRegistryEventDefinitionParseHandler.class);
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -46,19 +43,11 @@ public class EventRegistryEventDefinitionParseHandler extends AbstractBpmnParseH
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
                     .createBoundaryEventRegistryEventActivityBehavior(boundaryEvent, key, boundaryEvent.isCancelActivity()));
 
-        } else if (currentFlowElement instanceof StartEvent startEvent) {
-            // StartEventParseHandler dispatches EventRegistryEventDefinition inline (event-sub-process branch
-            // creates the typed behavior; process-level branch is driven by the engine's process-start path
-            // via subscription, not by behavior.execute()). Reaching this handler for a StartEvent only
-            // happens if a custom dispatch path explicitly delegates here — warn so the misconfiguration
-            // surfaces.
-            LOGGER.warn("EventRegistryEventDefinition on StartEvent '{}' is dispatched by StartEventParseHandler; reaching this handler is unexpected. Ignoring.",
-                    startEvent.getId());
-        } else {
-            LOGGER.warn("EventRegistryEventDefinition is only supported on IntermediateCatchEvent, BoundaryEvent, and event-sub-process StartEvent. " +
-                    "Found on '{}' (type {}); ignoring",
-                    currentFlowElement != null ? currentFlowElement.getId() : "unknown",
-                    currentFlowElement != null ? currentFlowElement.getClass().getSimpleName() : "null");
+        } else if (currentFlowElement instanceof StartEvent startEvent
+                && startEvent.getSubProcess() instanceof EventSubProcess) {
+            String key = requireEventDefinitionKey(eventDefinition, startEvent.getId());
+            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEventSubProcessEventRegistryStartEventActivityBehavior(startEvent, key));
         }
     }
 

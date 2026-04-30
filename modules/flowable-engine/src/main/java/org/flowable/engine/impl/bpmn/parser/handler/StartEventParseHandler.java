@@ -12,23 +12,14 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ErrorEventDefinition;
-import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventDefinitionLocation;
-import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.MessageEventDefinition;
-import org.flowable.bpmn.model.Signal;
-import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
-import org.flowable.bpmn.model.TimerEventDefinition;
-import org.flowable.bpmn.model.VariableListenerEventDefinition;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.slf4j.Logger;
@@ -57,42 +48,7 @@ public class StartEventParseHandler extends AbstractActivityBpmnParseHandler<Sta
                             eventDefinition.getClass().getSimpleName(), element.getId());
                     return;
                 }
-                if (eventDefinition instanceof MessageEventDefinition) {
-                    MessageEventDefinition messageDefinition = fillMessageRef(bpmnParse, eventDefinition);
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessMessageStartEventActivityBehavior(element, messageDefinition));
-
-                } else if (eventDefinition instanceof SignalEventDefinition signalDefinition) {
-                    Signal signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
-
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessSignalStartEventActivityBehavior(
-                            element, signalDefinition, signal));
-
-                } else if (eventDefinition instanceof TimerEventDefinition timerEventDefinition) {
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessTimerStartEventActivityBehavior(
-                            element, timerEventDefinition));
-
-                } else if (eventDefinition instanceof ErrorEventDefinition) {
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessErrorStartEventActivityBehavior(element));
-                
-                } else if (eventDefinition instanceof EscalationEventDefinition) {
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEscalationStartEventActivityBehavior(element));
-                
-                } else if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition) {
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessVariableListenerlStartEventActivityBehavior(element, variableListenerEventDefinition));
-                } else if (eventDefinition instanceof EventRegistryEventDefinition eventRegistry) {
-                    String key = eventRegistry.getEventDefinitionKey();
-                    if (StringUtils.isEmpty(key)) {
-                        throw new FlowableIllegalArgumentException("EventRegistryEventDefinition on '" + element.getId()
-                                + "' has an empty eventDefinitionKey; the engine cannot register an event-registry subscription without a key.");
-                    }
-                    element.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventSubProcessEventRegistryStartEventActivityBehavior(element, key));
-                
-                } else {
-                    // Custom EventDefinition: delegate to the per-EventDefinition parse-handler chain so a
-                    // post-registered handler can install a behavior. Mirrors the dispatch pattern used by
-                    // IntermediateCatchEventParseHandler and BoundaryEventParseHandler.
-                    bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
-                }
+                bpmnParse.getBpmnParserHandlers().parseElement(bpmnParse, eventDefinition);
             }
 
         } else if (CollectionUtil.isEmpty(element.getEventDefinitions())) {

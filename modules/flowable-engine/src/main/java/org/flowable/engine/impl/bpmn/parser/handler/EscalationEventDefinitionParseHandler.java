@@ -16,6 +16,8 @@ import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.Escalation;
 import org.flowable.bpmn.model.EscalationEventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
@@ -39,6 +41,11 @@ public class EscalationEventDefinitionParseHandler extends AbstractBpmnParseHand
             
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryEscalationEventActivityBehavior(boundaryEvent, 
                                 eventDefinition, escalation, boundaryEvent.isCancelActivity()));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
+                && startEvent.getSubProcess() instanceof EventSubProcess) {
+            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEventSubProcessEscalationStartEventActivityBehavior(startEvent));
         }
     }
 }

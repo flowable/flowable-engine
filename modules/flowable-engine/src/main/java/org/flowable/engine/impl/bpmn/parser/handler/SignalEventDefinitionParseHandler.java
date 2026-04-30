@@ -14,9 +14,11 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
@@ -40,6 +42,11 @@ public class SignalEventDefinitionParseHandler extends AbstractBpmnParseHandler<
 
         } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundarySignalEventActivityBehavior(boundaryEvent, signalDefinition, signal, boundaryEvent.isCancelActivity()));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
+                && startEvent.getSubProcess() instanceof EventSubProcess) {
+            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEventSubProcessSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
         }
     }
 }

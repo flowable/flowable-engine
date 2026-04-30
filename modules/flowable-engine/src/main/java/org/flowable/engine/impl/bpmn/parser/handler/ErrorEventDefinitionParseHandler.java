@@ -15,6 +15,8 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.ErrorEventDefinition;
+import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
@@ -32,6 +34,11 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
     protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
         if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryEventActivityBehavior(boundaryEvent, true));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
+                && startEvent.getSubProcess() instanceof EventSubProcess) {
+            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEventSubProcessErrorStartEventActivityBehavior(startEvent));
         }
     }
 }
