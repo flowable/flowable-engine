@@ -49,7 +49,7 @@ public class CmmnHistoryHelper {
         
         if (cmmnEngineConfiguration.isEnableEntityLinks()) {
             cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
-                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(ScopeTypes.CMMN, caseInstanceIds);
+                    .bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(ScopeTypes.CMMN, caseInstanceIds);
         }
 
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();

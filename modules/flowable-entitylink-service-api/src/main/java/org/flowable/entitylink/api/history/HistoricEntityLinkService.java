@@ -66,9 +66,22 @@ public interface HistoricEntityLinkService {
     
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
+    /**
+     * Delete every historic entity link where the given id appears as either the scope id
+     * (with the given scope type) or the reference scope id (with the given reference scope type).
+     * Used when an entity is removed from history to ensure no orphan rows are left pointing at it
+     * from either direction.
+     */
+    void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String id, String scopeType);
+
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
     
     void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
+
+    /**
+     * Bulk variant of {@link #deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String, String)}.
+     */
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids);
     
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

@@ -102,6 +102,14 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
     }
     
     @Override
+    public void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndType(String id, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("id", id);
+        parameters.put("scopeType", scopeType);
+        getDbSqlSession().delete("deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType", parameters, HistoricEntityLinkEntityImpl.class);
+    }
+
+    @Override
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("scopeDefinitionId", scopeDefinitionId);
@@ -115,6 +123,14 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("scopeIds", createSafeInValuesList(scopeIds));
         getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeType", scopeType);
+        parameters.put("ids", createSafeInValuesList(ids));
+        getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
     }
 
     @Override

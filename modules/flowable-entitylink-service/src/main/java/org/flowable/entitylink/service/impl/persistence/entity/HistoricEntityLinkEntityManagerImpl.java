@@ -62,6 +62,11 @@ public class HistoricEntityLinkEntityManagerImpl
     }
     
     @Override
+    public void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String id, String scopeType) {
+        dataManager.deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndType(id, scopeType);
+    }
+
+    @Override
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType) {
         dataManager.deleteHistoricEntityLinksByScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
     }
@@ -69,6 +74,11 @@ public class HistoricEntityLinkEntityManagerImpl
     @Override
     public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds) {
         dataManager.bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(scopeType, scopeIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids) {
+        dataManager.bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(scopeType, ids);
     }
 
     @Override
