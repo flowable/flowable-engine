@@ -172,6 +172,12 @@ public class EventSubscriptionEntityManagerImpl
     public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId) {
         return dataManager.findEventSubscriptionsByTypesAndProcessDefinitionId(types, processDefinitionId, tenantId);
     }
+
+    @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId,
+            String scopeType, String tenantId) {
+        return dataManager.findEventSubscriptionsByTypesAndScopeDefinitionId(eventTypes, scopeDefinitionId, scopeType, tenantId);
+    }
     
     @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type) {
@@ -246,11 +252,6 @@ public class EventSubscriptionEntityManagerImpl
     @Override
     public void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
         dataManager.deleteEventSubscriptionsForScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
-    }
-
-    @Override
-    public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
-        dataManager.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(scopeDefinitionId, scopeType);
     }
 
     @Override

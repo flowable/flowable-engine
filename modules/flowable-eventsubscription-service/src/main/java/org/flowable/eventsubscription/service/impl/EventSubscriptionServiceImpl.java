@@ -71,6 +71,12 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     }
 
     @Override
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId,
+            String scopeType, String tenantId) {
+        return getEventSubscriptionEntityManager().findEventSubscriptionsByTypesAndScopeDefinitionId(eventTypes, scopeDefinitionId, scopeType, tenantId);
+    }
+
+    @Override
     public List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type) {
         return getEventSubscriptionEntityManager().findEventSubscriptionsByExecutionAndType(executionId, type);
     }
@@ -193,11 +199,6 @@ public class EventSubscriptionServiceImpl extends CommonServiceImpl<EventSubscri
     @Override
     public void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
         getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionIdAndType(scopeDefinitionId, scopeType);
-    }
-
-    @Override
-    public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
-        getEventSubscriptionEntityManager().deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(scopeDefinitionId, scopeType);
     }
 
     @Override
