@@ -20,10 +20,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -34,6 +37,7 @@ import org.flowable.engine.impl.eventregistry.BpmnEventInstanceOutParameterHandl
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CorrelationUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.impl.constant.EventConstants;
@@ -45,7 +49,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessEventRegistryStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessEventRegistryStartEventActivityBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,6 +57,23 @@ public class EventSubProcessEventRegistryStartEventActivityBehavior extends Abst
 
     public EventSubProcessEventRegistryStartEventActivityBehavior(String eventDefinitionKey) {
         this.eventDefinitionKey = eventDefinitionKey;
+    }
+
+    @Override
+    public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+        if (StringUtils.isEmpty(eventDefinitionKey)) {
+            return;
+        }
+
+        ExecutionEntity eventRegistryExecution = context.createEventScopeChildExecution();
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) context.createEventSubscriptionBuilder(eventRegistryExecution)
+                .eventType(eventDefinitionKey)
+                .scopeType(ScopeTypes.BPMN)
+                .configuration(CorrelationUtil.getCorrelationKey(BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, context.getCommandContext(), eventRegistryExecution))
+                .create();
+
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
     }
 
     @Override

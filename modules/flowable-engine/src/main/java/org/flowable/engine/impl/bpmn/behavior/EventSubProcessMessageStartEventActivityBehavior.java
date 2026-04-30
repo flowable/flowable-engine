@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
@@ -35,6 +36,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
@@ -44,7 +46,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEve
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +54,27 @@ public class EventSubProcessMessageStartEventActivityBehavior extends AbstractBp
 
     public EventSubProcessMessageStartEventActivityBehavior(MessageEventDefinition messageEventDefinition) {
         this.messageEventDefinition = messageEventDefinition;
+    }
+
+    @Override
+    public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+        ExecutionEntity parentExecution = context.getParentExecution();
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+        if (bpmnModel.containsMessageId(messageEventDefinition.getMessageRef())) {
+            messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
+        }
+
+        ExecutionEntity messageExecution = context.createEventScopeChildExecution();
+
+        String messageName = EventDefinitionExpressionUtil.determineMessageName(context.getCommandContext(), messageEventDefinition, parentExecution);
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) context.createEventSubscriptionBuilder(messageExecution)
+                .eventType(MessageEventSubscriptionEntity.EVENT_TYPE)
+                .eventName(messageName)
+                .create();
+
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        context.recordWaitingMessageSubscription(eventSubscription);
+        messageExecution.getEventSubscriptions().add(eventSubscription);
     }
 
     @Override

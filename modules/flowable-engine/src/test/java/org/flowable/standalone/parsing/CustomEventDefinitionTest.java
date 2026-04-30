@@ -40,6 +40,8 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventSubProcessStartEventInitializerContext;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.bpmn.parser.handler.AbstractBpmnParseHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -101,9 +103,10 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
         // Start the process; the engine creates a waiting execution at the custom start event with
         // eventScope=true and active=false. behavior.execute() is not invoked at this point — that mirrors
         // the standard pattern shared with built-in subscription-based start events (Message, Signal, etc.):
-        // the behavior is invoked only on trigger.
+        // the behavior is invoked only on trigger. initializeEventSubProcessStart() IS invoked and records
+        // its key so we can assert the engine called the new EventSubProcessStartEventActivityBehavior hook.
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("customEventDefinitionEventSubProcess");
-        assertThat(MyTestEventSubProcessStartBehavior.RECORDED_KEYS).isEmpty();
+        assertThat(MyTestEventSubProcessStartBehavior.RECORDED_KEYS).containsExactly("initialize-esp-7");
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName())
                 .isEqualTo("Main task");
 
@@ -120,7 +123,7 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
         // Trigger the start event — the behavior records and leaves to the event sub-process body, which
         // completes (no further activity) while the main user task remains.
         runtimeService.trigger(startExecution.getId());
-        assertThat(MyTestEventSubProcessStartBehavior.RECORDED_KEYS).containsExactly("trigger-esp-7");
+        assertThat(MyTestEventSubProcessStartBehavior.RECORDED_KEYS).containsExactly("initialize-esp-7", "trigger-esp-7");
 
         // Complete the main user task; the process completes.
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
@@ -267,7 +270,7 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
         }
     }
 
-    public static class MyTestEventSubProcessStartBehavior extends AbstractBpmnActivityBehavior {
+    public static class MyTestEventSubProcessStartBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
         private static final long serialVersionUID = 1L;
 
@@ -281,6 +284,15 @@ public class CustomEventDefinitionTest extends ResourceFlowableTestCase {
 
         public String getCustomKey() {
             return customKey;
+        }
+
+        @Override
+        public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+            RECORDED_KEYS.add("initialize-" + customKey);
+            // Create the standard waiting child execution so external code can later trigger us. A real
+            // integration would also wire up a subscription / callback that resolves the trigger; we keep
+            // it simple here and just make the execution triggerable via runtimeService.trigger(...).
+            context.createEventScopeChildExecution();
         }
 
         @Override
