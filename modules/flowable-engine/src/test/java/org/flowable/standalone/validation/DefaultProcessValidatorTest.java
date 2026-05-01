@@ -34,6 +34,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TerminateEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.flowable.engine.test.util.TestProcessUtil;
@@ -413,6 +414,36 @@ public class DefaultProcessValidatorTest {
                 .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
                 .containsExactly(
                         tuple(Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, "Invalid or unsupported event definition", "invalidBoundaryEvent", false));
+    }
+
+    @Test
+    void testEndEventWithUnsupportedDefinition() {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process process = new Process();
+        process.setId("endEventWithUnsupportedDefinition");
+        process.setExecutable(true);
+        bpmnModel.addProcess(process);
+
+        StartEvent start = new StartEvent();
+        start.setId("start");
+        process.addFlowElement(start);
+
+        EndEvent end = new EndEvent();
+        end.setId("invalidEndEvent");
+        end.setName("Invalid End Event");
+        TimerEventDefinition timerEventDefinition = new TimerEventDefinition();
+        timerEventDefinition.setTimeDuration("PT5M");
+        end.addEventDefinition(timerEventDefinition);
+        process.addFlowElement(end);
+
+        process.addFlowElement(new SequenceFlow("start", "invalidEndEvent"));
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactly(
+                        tuple(Problems.END_EVENT_INVALID_EVENT_DEFINITION, "Invalid or unsupported event definition", "invalidEndEvent", false));
     }
 
     @Test
