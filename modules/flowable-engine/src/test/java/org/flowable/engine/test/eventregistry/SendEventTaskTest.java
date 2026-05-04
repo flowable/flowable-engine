@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.jobexecutor.AsyncSendEventJobHandler;
@@ -322,6 +323,117 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
                         + " }");
     }
     
+    @Test
+    @Deployment
+    public void testSendEventWithAuthenticatedUserExpression() throws Exception {
+        Authentication.setAuthenticatedUserId("alice");
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("process")
+                    .variable("accountNumber", 123)
+                    .start();
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(task).isNotNull();
+
+            taskService.complete(task.getId());
+
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job).isNotNull();
+            assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+            assertThat(job.getElementId()).isEqualTo("sendEventTask");
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+            // Clear the authenticated user before the job runs to prove the captured value is restored
+            // by the AsyncSendEventJobHandler instead of relying on a thread-local that the job worker
+            // does not inherit.
+            Authentication.setAuthenticatedUserId(null);
+
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+
+            JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+            assertThatJson(jsonNode)
+                    .isEqualTo("{"
+                            + "   nameProperty: 'alice',"
+                            + "   numberProperty: 123"
+                            + " }");
+        } finally {
+            Authentication.setAuthenticatedUserId(null);
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testSendEventWithThreadLocalBeanExpression() throws Exception {
+        // Generalises the authenticated-user case: any expression backed by thread-local state
+        // (custom security beans, tenant resolvers, request-scoped helpers, ...) must resolve
+        // against the scheduling thread, not the async worker. We register a custom bean whose
+        // method reads from a ThreadLocal, schedule the send-event, then clear the ThreadLocal
+        // before the worker picks up the job. The captured snapshot must still carry the
+        // scheduling-time value.
+        ThreadLocalContextBean contextBean = new ThreadLocalContextBean();
+        contextBean.set("alice");
+
+        Map<Object, Object> originalBeans = processEngineConfiguration.getExpressionManager().getBeans();
+        Map<Object, Object> beans = new HashMap<>();
+        beans.put("ctxBean", contextBean);
+        processEngineConfiguration.getExpressionManager().setBeans(beans);
+
+        try {
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("process")
+                    .variable("accountNumber", 123)
+                    .start();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+            assertThat(job).isNotNull();
+            assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
+            assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
+
+            // Clear the thread-local before the job worker picks up the job. If the snapshot
+            // was captured at scheduling time the channel receives "alice"; if expressions were
+            // re-evaluated in the worker the value would be null.
+            contextBean.clear();
+
+            JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+
+            assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
+            JsonNode jsonNode = processEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
+            assertThatJson(jsonNode)
+                    .isEqualTo("{"
+                            + "   nameProperty: 'alice',"
+                            + "   numberProperty: 123"
+                            + " }");
+        } finally {
+            contextBean.clear();
+            processEngineConfiguration.getExpressionManager().setBeans(originalBeans);
+        }
+    }
+
+    public static class ThreadLocalContextBean {
+        private final ThreadLocal<String> holder = new ThreadLocal<>();
+
+        public void set(String value) {
+            holder.set(value);
+        }
+
+        public void clear() {
+            holder.remove();
+        }
+
+        public String getValue() {
+            return holder.get();
+        }
+    }
+
     @Test
     @Deployment
     public void testSendEventSkipExpression() throws Exception {
