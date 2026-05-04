@@ -117,8 +117,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
             writeQualifiedAttribute(ATTRIBUTE_SAME_DEPLOYMENT, "false", xtw);
         }
 
-        if ((startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) ||
-                (startEvent.getExtensionElements() != null && startEvent.getExtensionElements().containsKey(ELEMENT_EVENT_TYPE))) {
+        if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
             writeDefaultAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);
         }
     }
@@ -127,7 +126,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         StartEvent startEvent = (StartEvent) element;
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS, startEvent.getInParameters(), didWriteExtensionStartElement, xtw);
-        didWriteExtensionStartElement = writeVariableListenerDefinition(startEvent, didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeCustomEventDefinitionExtensionElements(startEvent, didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeFormProperties(startEvent, didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;
     }

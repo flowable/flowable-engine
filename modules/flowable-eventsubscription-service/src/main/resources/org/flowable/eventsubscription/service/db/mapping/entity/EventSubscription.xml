@@ -322,13 +322,14 @@
     where (SUB_SCOPE_ID_ = #{parameter, jdbcType=NVARCHAR})
   </select>
   
-  <select id="selectEventSubscriptionsByTypeAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+  <select id="selectEventSubscriptionsByTypesAndProcessDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
     <where>
-      <if test="parameter.eventType != null">
-        (EVENT_TYPE_ = #{parameter.eventType, jdbcType=NVARCHAR})
-      </if>
+        EVENT_TYPE_ in
+        <foreach item="eventType" index="index" collection="parameter.eventTypes" open="(" separator="," close=")">
+            #{eventType, jdbcType=NVARCHAR}
+        </foreach>
         and PROC_DEF_ID_ = #{parameter.processDefinitionId, jdbcType=NVARCHAR}
         and EXECUTION_ID_ is null 
         and PROC_INST_ID_ is null
@@ -341,6 +342,26 @@
     </where>   
   </select>
   
+  <select id="selectEventSubscriptionsByTypesAndScopeDefinitionId" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
+    select *
+    from ${prefix}ACT_RU_EVENT_SUBSCR
+    <where>
+        EVENT_TYPE_ in
+        <foreach item="eventType" index="index" collection="parameter.eventTypes" open="(" separator="," close=")">
+            #{eventType, jdbcType=NVARCHAR}
+        </foreach>
+        and SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId, jdbcType=NVARCHAR}
+        and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
+        and SCOPE_ID_ is null
+        <if test="parameter.tenantId != null">
+            and TENANT_ID_ = #{parameter.tenantId, jdbcType=NVARCHAR}
+        </if>
+        <if test="parameter.tenantId == null">
+            and (TENANT_ID_ = '' or TENANT_ID_ is null)
+        </if>
+    </where>
+  </select>
+
   <select id="selectEventSubscriptionsByScopeIdAndType" resultMap="eventSubscriptionResultMap" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject">
     select * 
     from ${prefix}ACT_RU_EVENT_SUBSCR
@@ -1165,13 +1186,6 @@
 
   <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndType" parameterType="map">
      delete from ${prefix}ACT_RU_EVENT_SUBSCR where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
-  </delete>
-
-  <delete id="deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId" parameterType="map">
-     delete from ${prefix}ACT_RU_EVENT_SUBSCR where
-     SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR}
-     and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
-     and SCOPE_ID_ is null
   </delete>
 
  <!-- delete manual subscriptions for process start -->

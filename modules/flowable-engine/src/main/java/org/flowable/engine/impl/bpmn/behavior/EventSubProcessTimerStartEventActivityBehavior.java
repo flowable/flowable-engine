@@ -29,16 +29,20 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
+import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
+import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * Implementation of the BPMN 2.0 event subprocess timer start event.
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,6 +50,18 @@ public class EventSubProcessTimerStartEventActivityBehavior extends AbstractBpmn
 
     public EventSubProcessTimerStartEventActivityBehavior(TimerEventDefinition timerEventDefinition) {
         this.timerEventDefinition = timerEventDefinition;
+    }
+
+    @Override
+    public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+        StartEvent startEvent = context.getStartEvent();
+        ExecutionEntity timerExecution = context.createEventScopeChildExecution();
+
+        TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, startEvent,
+                false, timerExecution, TriggerTimerEventJobHandler.TYPE, TimerEventHandler.createConfiguration(startEvent.getId(),
+                        timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+
+        context.getProcessEngineConfiguration().getJobServiceConfiguration().getTimerJobService().scheduleTimerJob(timerJob);
     }
 
     @Override

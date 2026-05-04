@@ -12,11 +12,22 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class TerminateEventDefinition extends EventDefinition {
+
+    private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(EventDefinitionLocation.END_EVENT));
+
+    @Override
+    public Set<EventDefinitionLocation> getSupportedLocations() {
+        return SUPPORTED_LOCATIONS;
+    }
 
     /**
      * When true, this event will terminate all parent process instances (in the case of using call activity), thus ending the whole process instance.

@@ -35,6 +35,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.ConditionalEventDefinition;
+import org.flowable.bpmn.model.CustomBpmnEventDefinition;
 import org.flowable.bpmn.model.DataAssociation;
 import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
@@ -60,7 +61,6 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
-import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -438,7 +438,13 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
     }
 
     protected void writeEventDefinitions(Event parentEvent, List<EventDefinition> eventDefinitions, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+        // Custom (non-BPMN-spec) event definitions are emitted in writeExtensionChildElements via
+        // BpmnXMLUtil.writeCustomEventDefinitionExtensionElements. Only the BPMN-spec types are written here
+        // as direct children of the event element.
         for (EventDefinition eventDefinition : eventDefinitions) {
+            if (eventDefinition instanceof CustomBpmnEventDefinition) {
+                continue;
+            }
             if (eventDefinition instanceof TimerEventDefinition) {
                 writeTimerDefinition(parentEvent, (TimerEventDefinition) eventDefinition, model, xtw);
                 
@@ -653,32 +659,6 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
         xtw.writeEndElement();
     }
     
-    protected boolean writeVariableListenerDefinition(Event parentEvent, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
-        if (parentEvent.getEventDefinitions().size() == 1) {
-            EventDefinition eventDefinition = parentEvent.getEventDefinitions().iterator().next();
-            if (eventDefinition instanceof VariableListenerEventDefinition variableListenerEventDefinition) {
-                if (!didWriteExtensionStartElement) {
-                    xtw.writeStartElement(ELEMENT_EXTENSIONS);
-                    didWriteExtensionStartElement = true;
-                }
-
-                xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_VARIABLELISTENERDEFINITION, FLOWABLE_EXTENSIONS_NAMESPACE);
-
-                if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableName())) {
-                    writeDefaultAttribute(ATTRIBUTE_VARIABLE_NAME, variableListenerEventDefinition.getVariableName(), xtw);
-                }
-                
-                if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableChangeType())) {
-                    writeDefaultAttribute(ATTRIBUTE_VARIABLE_CHANGE_TYPE, variableListenerEventDefinition.getVariableChangeType(), xtw);
-                }
-
-                xtw.writeEndElement();
-            }
-        }
-        
-        return didWriteExtensionStartElement;
-    }
-
     protected void writeDefaultAttribute(String attributeName, String value, XMLStreamWriter xtw) throws Exception {
         BpmnXMLUtil.writeDefaultAttribute(attributeName, value, xtw);
     }

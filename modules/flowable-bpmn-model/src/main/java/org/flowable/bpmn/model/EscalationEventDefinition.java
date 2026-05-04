@@ -12,10 +12,25 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author Tijs Rademakers
  */
 public class EscalationEventDefinition extends EventDefinition {
+
+    private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(
+            EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT,
+            EventDefinitionLocation.BOUNDARY_EVENT,
+            EventDefinitionLocation.END_EVENT,
+            EventDefinitionLocation.INTERMEDIATE_THROW_EVENT));
+
+    @Override
+    public Set<EventDefinitionLocation> getSupportedLocations() {
+        return SUPPORTED_LOCATIONS;
+    }
 
     protected String escalationCode;
 

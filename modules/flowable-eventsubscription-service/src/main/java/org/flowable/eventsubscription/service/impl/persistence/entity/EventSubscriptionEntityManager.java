@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
@@ -60,8 +61,6 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
-    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
-
     void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
 
     void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration);
@@ -82,7 +81,9 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
 
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
+
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId, String scopeType, String tenantId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(String scopeId, String type);
     

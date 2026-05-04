@@ -21,7 +21,6 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
@@ -32,7 +31,6 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.ExtensionAttribute;
-import org.flowable.bpmn.model.ExtensionElement;
 
 /**
  * @author Tijs Rademakers
@@ -108,15 +106,6 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
             if (!(eventDef instanceof ErrorEventDefinition)) {
                 writeDefaultAttribute(ATTRIBUTE_BOUNDARY_CANCELACTIVITY, String.valueOf(boundaryEvent.isCancelActivity()).toLowerCase(), xtw);
             }
-
-        } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
-            List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-            if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
-                String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
-                if (StringUtils.isNotEmpty(eventTypeValue)) {
-                    writeDefaultAttribute(ATTRIBUTE_BOUNDARY_CANCELACTIVITY, String.valueOf(boundaryEvent.isCancelActivity()).toLowerCase(), xtw);
-                }
-            }
         }
     }
     
@@ -124,7 +113,7 @@ public class BoundaryEventXMLConverter extends BaseBpmnXMLConverter {
     protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         BoundaryEvent boundaryEvent = (BoundaryEvent) element;
         didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS, boundaryEvent.getInParameters(), didWriteExtensionStartElement, xtw);
-        didWriteExtensionStartElement = writeVariableListenerDefinition(boundaryEvent, didWriteExtensionStartElement, xtw);        
+        didWriteExtensionStartElement = BpmnXMLUtil.writeCustomEventDefinitionExtensionElements(boundaryEvent, didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;
     }
 

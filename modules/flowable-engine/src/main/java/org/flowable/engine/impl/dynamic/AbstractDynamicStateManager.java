@@ -29,15 +29,14 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
@@ -523,17 +522,9 @@ public abstract class AbstractDynamicStateManager {
                                             boolean hasEventSubscriptions = false;
                                             if (boundaryEvent.getEventDefinitions() != null && !boundaryEvent.getEventDefinitions().isEmpty()) {
                                                 EventDefinition sourceEventDef = boundaryEvent.getEventDefinitions().get(0);
-                                                if (sourceEventDef instanceof SignalEventDefinition || sourceEventDef instanceof MessageEventDefinition) {
+                                                if (sourceEventDef instanceof SignalEventDefinition || sourceEventDef instanceof MessageEventDefinition
+                                                        || sourceEventDef instanceof EventRegistryEventDefinition) {
                                                     hasEventSubscriptions = true;
-                                                }
-                                                
-                                            } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
-                                                List<ExtensionElement> sourceEventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                                                if (sourceEventTypeExtensionElements != null && !sourceEventTypeExtensionElements.isEmpty()) {
-                                                    String sourceEventTypeValue = sourceEventTypeExtensionElements.get(0).getElementText();
-                                                    if (StringUtils.isNotEmpty(sourceEventTypeValue)) {
-                                                        hasEventSubscriptions = true;
-                                                    }
                                                 }
                                             }
                                             
@@ -1262,17 +1253,9 @@ public abstract class AbstractDynamicStateManager {
                     boolean hasEventSubscriptions = false;
                     if (boundaryEvent.getEventDefinitions() != null && !boundaryEvent.getEventDefinitions().isEmpty()) {
                         EventDefinition sourceEventDef = boundaryEvent.getEventDefinitions().get(0);
-                        if (sourceEventDef instanceof SignalEventDefinition || sourceEventDef instanceof MessageEventDefinition) {
+                        if (sourceEventDef instanceof SignalEventDefinition || sourceEventDef instanceof MessageEventDefinition
+                                || sourceEventDef instanceof EventRegistryEventDefinition) {
                             hasEventSubscriptions = true;
-                        }
-                        
-                    } else if (!boundaryEvent.getExtensionElements().isEmpty()) {
-                        List<ExtensionElement> sourceEventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                        if (sourceEventTypeExtensionElements != null && !sourceEventTypeExtensionElements.isEmpty()) {
-                            String sourceEventTypeValue = sourceEventTypeExtensionElements.get(0).getElementText();
-                            if (StringUtils.isNotEmpty(sourceEventTypeValue)) {
-                                hasEventSubscriptions = true;
-                            }
                         }
                     }
                         
@@ -1412,23 +1395,9 @@ public abstract class AbstractDynamicStateManager {
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
 
             if (CollectionUtil.isEmpty(boundaryEvent.getEventDefinitions())) {
-                
-                boolean hasEventRegistryBoundaryEvent = false;
-                if (!boundaryEvent.getExtensionElements().isEmpty()) {
-                    List<ExtensionElement> eventTypeExtensionElements = boundaryEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-                    if (eventTypeExtensionElements != null && !eventTypeExtensionElements.isEmpty()) {
-                        String eventTypeValue = eventTypeExtensionElements.get(0).getElementText();
-                        if (StringUtils.isNotEmpty(eventTypeValue)) {
-                            hasEventRegistryBoundaryEvent = true;
-                        }
-                    }
-                }
-                
-                if (!hasEventRegistryBoundaryEvent) {
-                    continue;
-                }
-                
-            } else if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+                continue;
+            }
+            if (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
                 continue;
             }
 
@@ -1721,25 +1690,12 @@ public abstract class AbstractDynamicStateManager {
                 if (StringUtils.isNotEmpty(timerSourceDef.getTimeDuration()) && timerSourceDef.getTimeDuration().equals(timerTargetDef.getTimeDuration())) {
                     return true;
                 }
-            } 
-            
-        } else if (!sourceEvent.getExtensionElements().isEmpty() && !targetEvent.getExtensionElements().isEmpty()) {
-            List<ExtensionElement> sourceEventTypeExtensionElements = sourceEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-            List<ExtensionElement> targetEventTypeExtensionElements = targetEvent.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
-            String sourceEventTypeValue = null;
-            if (sourceEventTypeExtensionElements != null && !sourceEventTypeExtensionElements.isEmpty()) {
-                sourceEventTypeValue = sourceEventTypeExtensionElements.get(0).getElementText();
-            }
-            
-            String targetEventTypeValue = null;
-            if (targetEventTypeExtensionElements != null && !targetEventTypeExtensionElements.isEmpty()) {
-                targetEventTypeValue = targetEventTypeExtensionElements.get(0).getElementText();
-            }
-            
-            if (StringUtils.isNotEmpty(sourceEventTypeValue) && StringUtils.isNotEmpty(targetEventTypeValue) && 
-                    sourceEventTypeValue.equals(targetEventTypeValue)) {
-                
-                return true;
+            } else if (sourceEventDef instanceof EventRegistryEventDefinition sourceRegistry) {
+                EventRegistryEventDefinition targetRegistry = (EventRegistryEventDefinition) targetEventDef;
+                if (StringUtils.isNotEmpty(sourceRegistry.getEventDefinitionKey())
+                        && sourceRegistry.getEventDefinitionKey().equals(targetRegistry.getEventDefinitionKey())) {
+                    return true;
+                }
             }
         }
         

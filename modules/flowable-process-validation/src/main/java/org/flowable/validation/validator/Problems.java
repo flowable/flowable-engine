@@ -134,6 +134,7 @@ public interface Problems {
     String DATA_OBJECT_MISSING_NAME = "flowable-data-object-missing-name";
 
     String END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION = "flowable-end-event-cancel-only-inside-transaction";
+    String END_EVENT_INVALID_EVENT_DEFINITION = "flowable-end-event-invalid-event-definition";
 
     String DI_INVALID_REFERENCE = "flowable-di-invalid-reference";
     String DI_DOES_NOT_REFERENCE_FLOWNODE = "flowable-di-does-not-reference-flownode";

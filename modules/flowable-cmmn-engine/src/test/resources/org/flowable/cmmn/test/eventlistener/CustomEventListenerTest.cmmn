@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="customListenerCase" name="Custom listener case">
+        <casePlanModel id="casePlanModel">
+            <planItem id="customListenerPlanItem" definitionRef="customListener"/>
+            <eventListener id="customListener"
+                           flowable:eventType="myTest"
+                           flowable:customKey="widget-42"/>
+        </casePlanModel>
+    </case>
+</definitions>
