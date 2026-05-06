@@ -68,7 +68,7 @@
         <mysql-connector.version>9.5.0</mysql-connector.version>
         <oracle.jdbc.version>23.9.0.25.07</oracle.jdbc.version>
         <oracle.jdbc.artifact>ojdbc17</oracle.jdbc.artifact>
-        <postgresql.version>42.7.8</postgresql.version>
+        <postgresql.version>42.7.11</postgresql.version>
 
         <!-- Test dependencies -->
         <assertj.version>3.27.6</assertj.version>
