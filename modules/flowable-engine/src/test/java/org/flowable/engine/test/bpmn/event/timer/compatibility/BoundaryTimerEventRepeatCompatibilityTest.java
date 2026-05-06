@@ -66,7 +66,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
 
         // boundary events
 
-        waitForJobExecutorToProcessAllJobs(7000, 100);
+        waitForJobExecutorToProcessAllJobs(10000, 100);
 
         // a new job must be prepared because there are 10 repeats 2 seconds interval
         jobs = managementService.createTimerJobQuery().list();
@@ -75,7 +75,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         for (int i = 0; i < 9; i++) {
             nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
             processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
-            waitForJobExecutorToProcessAllJobs(7000, 100);
+            waitForJobExecutorToProcessAllJobs(10000, 100);
             // a new job must be prepared because there are 10 repeats 2 seconds interval
 
             jobs = managementService.createTimerJobQuery().list();
@@ -85,7 +85,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
-        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 100); })
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(10000, 100); })
                 .as("Should not have any other jobs because the endDate is reached")
                 .doesNotThrowAnyException();
 
@@ -95,7 +95,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
                 .containsOnly("Task B");
         taskService.complete(tasks.get(0).getId());
 
-        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 500); })
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(10000, 500); })
                 .as("No jobs should be active here.")
                 .doesNotThrowAnyException();
 

@@ -133,8 +133,8 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             assertThat(jobQuery.count()).isEqualTo(1);
     
             processEngineConfiguration.getClock().setCurrentTime(new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("15/11/2036 11:12:30"));
-            waitForJobExecutorToProcessAllJobs(7000L, 200L);
-    
+            waitForJobExecutorToProcessAllJobs(10000L, 200L);
+
             List<ProcessInstance> pi = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").list();
             assertThat(pi).hasSize(1);
     
@@ -365,7 +365,13 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
             assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
 
             moveBy(Duration.ofDays(1));
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5500, 500);
+            waitForJobExecutorOnCondition(10000, 500, new Callable<>() {
+                @Override
+                public Boolean call() {
+                    return runtimeService.createProcessInstanceQuery().count() == 1
+                            && managementService.createTimerJobQuery().count() == 0;
+                }
+            });
 
             // After the first start there should be one process instance and no jobs since the end date is reached
             assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(1);

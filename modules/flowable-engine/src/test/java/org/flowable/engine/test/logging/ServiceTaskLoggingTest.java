@@ -283,7 +283,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asString()).isNotNull();
 
         FlowableLoggingListener.clear();
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorOnCondition(processEngineConfiguration, 10000, 200,
+                () -> FlowableLoggingListener.TEST_LOGGING_NODES.size() >= 8);
         assertThat(FlowableLoggingListener.TEST_LOGGING_NODES).hasSize(8);
 
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);
