@@ -41,7 +41,6 @@ import org.flowable.bpmn.converter.child.DocumentationParser;
 import org.flowable.bpmn.converter.child.ElementNameParser;
 import org.flowable.bpmn.converter.child.ErrorEventDefinitionParser;
 import org.flowable.bpmn.converter.child.EscalationEventDefinitionParser;
-import org.flowable.bpmn.converter.child.EventRegistryEventTypeParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
 import org.flowable.bpmn.converter.child.FieldExtensionParser;
 import org.flowable.bpmn.converter.child.FlowNodeRefParser;
@@ -112,7 +111,6 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new DocumentationParser());
         addGenericParser(new ErrorEventDefinitionParser());
         addGenericParser(new EscalationEventDefinitionParser());
-        addGenericParser(new EventRegistryEventTypeParser());
         addGenericParser(new ExecutionListenerParser());
         addGenericParser(new FieldExtensionParser());
         addGenericParser(new ScriptInfoParser());
@@ -149,6 +147,14 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         if (StringUtils.isEmpty(eventRegistry.getEventDefinitionKey())) {
             LOGGER.warn("EventRegistryEventDefinition on event '{}' has an empty eventDefinitionKey; skipping serialization. "
                     + "The element will be missing from the written XML and will not round-trip.", parentEvent.getId());
+            return;
+        }
+        // Skip when an <flowable:eventType> extension element is already present on the parent event:
+        // BpmnXMLConverter promotes the legacy XML form into a typed EventRegistryEventDefinition while
+        // leaving the extension element in place, and BaseBpmnXMLConverter's extension-elements writer
+        // already re-emits it. Programmatic models built without the extension element fall through to
+        // the writeStartElement path below.
+        if (parentEvent.getExtensionElements().containsKey(ELEMENT_EVENT_TYPE)) {
             return;
         }
         xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_TYPE, FLOWABLE_EXTENSIONS_NAMESPACE);

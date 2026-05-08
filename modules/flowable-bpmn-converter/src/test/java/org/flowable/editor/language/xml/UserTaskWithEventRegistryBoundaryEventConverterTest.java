@@ -43,7 +43,12 @@ class UserTaskWithEventRegistryBoundaryEventConverterTest {
                             .singleElement()
                             .isInstanceOfSatisfying(EventRegistryEventDefinition.class,
                                     def -> assertThat(def.getEventDefinitionKey()).isEqualTo("myEvent"));
-                    assertThat(boundaryEvent.getExtensionElements()).hasSize(1);
+                    // The legacy <flowable:eventType> extension element is retained alongside the typed
+                    // EventRegistryEventDefinition, so the extension-element map carries both eventType
+                    // and eventCorrelationParameter.
+                    assertThat(boundaryEvent.getExtensionElements()).hasSize(2);
+                    assertThat(boundaryEvent.getExtensionElements().get("eventType")).extracting(ExtensionElement::getElementText)
+                            .containsExactly("myEvent");
                     ExtensionElement extensionElement = boundaryEvent.getExtensionElements().get("eventCorrelationParameter").get(0);
                     assertThat(extensionElement.getAttributeValue(null, "name")).isEqualTo("customerId");
                     assertThat(extensionElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");

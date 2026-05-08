@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_CORRELATION_PARAMETER;
 import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_OUT_PARAMETER;
+import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_TYPE;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventRegistryEventDefinition;
@@ -66,7 +67,10 @@ class StartEventRegistryEventConverterTest {
         assertThat(flowElement).isInstanceOfSatisfying(StartEvent.class, start -> {
             assertThat(start.getId()).isEqualTo("subProcessStart");
             assertThat(start.isInterrupting()).isEqualTo(false);
-            assertThat(start.getExtensionElements()).isEmpty();
+            // The legacy <flowable:eventType> extension element is retained on the event for downstream
+            // code that reads it directly; the typed EventRegistryEventDefinition is added alongside.
+            assertThat(start.getExtensionElements().get(ELEMENT_EVENT_TYPE)).extracting(ExtensionElement::getElementText)
+                    .containsExactly("eventType2");
             assertThat(start.getEventDefinitions())
                     .singleElement()
                     .isInstanceOfSatisfying(EventRegistryEventDefinition.class,

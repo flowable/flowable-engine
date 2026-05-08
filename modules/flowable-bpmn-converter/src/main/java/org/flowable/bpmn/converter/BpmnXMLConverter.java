@@ -80,15 +80,20 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.DateDataObject;
 import org.flowable.bpmn.model.DoubleDataObject;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.IntegerDataObject;
+import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.JsonDataObject;
 import org.flowable.bpmn.model.LongDataObject;
 import org.flowable.bpmn.model.Pool;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.StringDataObject;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.TextAnnotation;
@@ -479,6 +484,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
     protected void processFlowElements(Collection<FlowElement> flowElementList, BaseElement parentScope) {
         for (FlowElement flowElement : flowElementList) {
+
             if (flowElement instanceof SequenceFlow sequenceFlow) {
                 FlowNode sourceNode = getFlowNodeFromScope(sequenceFlow.getSourceRef(), parentScope);
                 if (sourceNode != null) {
@@ -498,12 +504,38 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
                     boundaryEvent.setAttachedToRef(attachedActivity);
                     attachedActivity.getBoundaryEvents().add(boundaryEvent);
                 }
+                promoteEventTypeExtensionToEventRegistryEventDefinition(boundaryEvent);
 
             } else if (flowElement instanceof SubProcess subProcess) {
                 Collection<FlowElement> childFlowElements = subProcess.getFlowElements();
                 processFlowElements(childFlowElements, subProcess);
+            } else if (flowElement instanceof Event event) {
+                promoteEventTypeExtensionToEventRegistryEventDefinition(event);
+
             }
         }
+    }
+
+    /**
+     * Adds a typed {@link EventRegistryEventDefinition} on event hosts that carry a legacy
+     * {@code <flowable:eventType>X</flowable:eventType>} extension element. The extension element is left
+     * in place so external code that reads it via {@code event.getExtensionElements()} continues to work;
+     * the typed definition gives the engine and validators a class to dispatch on. Programmatic models that
+     * already attach the typed definition (or carry no extension element) are skipped.
+     */
+    protected void promoteEventTypeExtensionToEventRegistryEventDefinition(Event event) {
+        if (event.getEventDefinitions().stream().anyMatch(EventRegistryEventDefinition.class::isInstance)) {
+            return;
+        }
+        List<ExtensionElement> eventTypeElements = event.getExtensionElements().get(BpmnXMLConstants.ELEMENT_EVENT_TYPE);
+        if (eventTypeElements == null || eventTypeElements.isEmpty()) {
+            return;
+        }
+        String value = eventTypeElements.get(0).getElementText();
+        if (StringUtils.isEmpty(value)) {
+            return;
+        }
+        event.addEventDefinition(new EventRegistryEventDefinition(value));
     }
 
     protected FlowNode getFlowNodeFromScope(String elementId, BaseElement scope) {
