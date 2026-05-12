@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CancelEventDefinition;
+import org.flowable.bpmn.model.EndEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
@@ -32,7 +33,9 @@ public class CancelEventDefinitionParseHandler extends AbstractBpmnParseHandler<
     protected void executeParse(BpmnParse bpmnParse, CancelEventDefinition cancelEventDefinition) {
         if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryCancelEventActivityBehavior(cancelEventDefinition));
-        }
 
+        } else if (bpmnParse.getCurrentFlowElement() instanceof EndEvent endEvent) {
+            endEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createCancelEndEventActivityBehavior(endEvent));
+        }
     }
 }

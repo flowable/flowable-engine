@@ -13,16 +13,13 @@
 package org.flowable.cmmn.engine.impl.deployer;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseContext;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
@@ -32,11 +29,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
-import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -46,9 +41,12 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -193,39 +191,45 @@ public class CmmnDeployer implements EngineDeployer {
 
     protected void updateEventSubscriptions(CmmnParseResult parseResult, Map<CaseDefinitionEntity, CaseDefinitionEntity> mapOfNewCaseDefinitionToPreviousVersion) {
         EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
-        for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
+        CommandContext commandContext = Context.getCommandContext();
 
+        for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
+            Case newCaseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
             CaseDefinitionEntity previousCaseDefinition = mapOfNewCaseDefinitionToPreviousVersion.get(caseDefinition);
+
             if (previousCaseDefinition != null) {
-                if (isManualCorrelationSubscriptionConfiguration(parseResult, previousCaseDefinition)) {
-                    // for a dynamic event registry start event, we don't remove the manually registered subscriptions, but rather update them to the newest
-                    // case definition, if required
-                    String startEventType = getCaseModel(parseResult, previousCaseDefinition).getPrimaryCase().getStartEventType();
-                    updateOldEventSubscriptions(previousCaseDefinition, caseDefinition, startEventType);
-                } else {
-                    // for a static event registry start event, we delete the old subscription and will later create a new one
-                    eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(previousCaseDefinition.getId(), ScopeTypes.CMMN);
+                Case previousCaseModel = getCaseModel(parseResult, previousCaseDefinition).getPrimaryCase();
+                Set<String> obsoleteEventTypes = new LinkedHashSet<>();
+
+                for (Object handler : previousCaseModel.getStartLifecycleHandlers()) {
+                    if (handler instanceof CaseDefinitionStartLifecycleHandler lifecycleHandler) {
+                        lifecycleHandler.undeploy(new CaseDefinitionStartUndeployContext(
+                                previousCaseDefinition, caseDefinition, previousCaseModel,
+                                cmmnEngineConfiguration, commandContext, obsoleteEventTypes));
+                    }
+                }
+
+                if (!obsoleteEventTypes.isEmpty()) {
+                    deleteObsoleteEventSubscriptions(previousCaseDefinition, obsoleteEventTypes, eventSubscriptionService);
                 }
             }
 
-            // create new subscriptions, but only for static event registry start events
-            Case caseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
-            String startEventType = caseModel.getStartEventType();
-            if (startEventType != null && !isManualCorrelationSubscriptionConfiguration(parseResult, caseDefinition)) {
-                eventSubscriptionService.createEventSubscriptionBuilder()
-                    .eventType(startEventType)
-                    .configuration(getEventCorrelationKey(caseModel))
-                    .scopeDefinitionId(caseDefinition.getId())
-                    .scopeType(ScopeTypes.CMMN)
-                    .tenantId(caseDefinition.getTenantId())
-                    .create();
+            for (Object handler : newCaseModel.getStartLifecycleHandlers()) {
+                if (handler instanceof CaseDefinitionStartLifecycleHandler lifecycleHandler) {
+                    lifecycleHandler.deploy(new CaseDefinitionStartDeployContext(
+                            caseDefinition, newCaseModel, cmmnEngineConfiguration, commandContext));
+                }
             }
         }
     }
 
-    protected void updateOldEventSubscriptions(CaseDefinitionEntity previousCaseDefinition, CaseDefinitionEntity caseDefinition, String eventType) {
-        CommandContextUtil.getCmmnEngineConfiguration().getEventSubscriptionServiceConfiguration().getEventSubscriptionService().updateEventSubscriptionScopeDefinitionId(
-            previousCaseDefinition.getId(), caseDefinition.getId(), eventType, caseDefinition.getKey(), null);
+    protected void deleteObsoleteEventSubscriptions(CaseDefinitionEntity previousCaseDefinition, Collection<String> eventTypes,
+            EventSubscriptionService eventSubscriptionService) {
+        List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService.findEventSubscriptionsByTypesAndScopeDefinitionId(
+                eventTypes, previousCaseDefinition.getId(), ScopeTypes.CMMN, previousCaseDefinition.getTenantId());
+        for (EventSubscriptionEntity subscription : subscriptionsToDelete) {
+            eventSubscriptionService.deleteEventSubscription(subscription);
+        }
     }
 
     protected CmmnModel getCaseModel(CmmnParseResult parseResult, CaseDefinitionEntity caseDefinition) {
@@ -235,20 +239,6 @@ public class CmmnDeployer implements EngineDeployer {
             caseModel = CommandContextUtil.getCmmnEngineConfiguration().getCmmnRepositoryService().getCmmnModel(caseDefinition.getId());
         }
         return caseModel;
-    }
-
-    protected boolean isManualCorrelationSubscriptionConfiguration(CmmnParseResult parseResult, CaseDefinitionEntity caseDefinition) {
-        CmmnModel caseModel = getCaseModel(parseResult, caseDefinition);
-        List<ExtensionElement> correlationCfgExtensions = caseModel.getPrimaryCase().getExtensionElements()
-            .getOrDefault(CmmnXmlConstants.START_EVENT_CORRELATION_CONFIGURATION, Collections.emptyList());
-        if (!correlationCfgExtensions.isEmpty()) {
-            return Objects.equals(correlationCfgExtensions.get(0).getElementText(), CmmnXmlConstants.START_EVENT_CORRELATION_MANUAL);
-        }
-        return false;
-    }
-
-    protected String getEventCorrelationKey(Case caseModel) {
-        return CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel);
     }
 
     protected void makeCaseDefinitionsConsistentWithPersistedVersions(CmmnParseResult parseResult) {

@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
@@ -38,12 +39,14 @@ import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.eventsubscription.service.impl.persistence.entity.GenericEventSubscriptionEntity;
 
+import tools.jackson.databind.node.ObjectNode;
+
 /**
  * Implementation of the event subprocess variable listener start event.
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessVariableListenerlStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessVariableListenerlStartEventActivityBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -51,6 +54,27 @@ public class EventSubProcessVariableListenerlStartEventActivityBehavior extends 
 
     public EventSubProcessVariableListenerlStartEventActivityBehavior(VariableListenerEventDefinition variableListenerEventDefinition) {
         this.variableListenerEventDefinition = variableListenerEventDefinition;
+    }
+
+    @Override
+    public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+        ExecutionEntity variableListenerExecution = context.createEventScopeChildExecution();
+
+        String configuration = null;
+        if (StringUtils.isNotEmpty(variableListenerEventDefinition.getVariableChangeType())) {
+            ObjectNode configurationNode = context.getProcessEngineConfiguration().getObjectMapper().createObjectNode();
+            configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableListenerEventDefinition.getVariableChangeType());
+            configuration = configurationNode.toString();
+        }
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) context.createEventSubscriptionBuilder(variableListenerExecution)
+                .eventType("variable")
+                .eventName(variableListenerEventDefinition.getVariableName())
+                .configuration(configuration)
+                .create();
+
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        variableListenerExecution.getEventSubscriptions().add(eventSubscription);
     }
 
     @Override

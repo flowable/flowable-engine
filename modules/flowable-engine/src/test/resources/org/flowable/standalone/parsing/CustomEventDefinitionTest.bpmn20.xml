@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+  <process id="customEventDefinitionProcess" isExecutable="true">
+
+    <startEvent id="theStart"/>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="customCatch"/>
+
+    <intermediateCatchEvent id="customCatch">
+      <extensionElements>
+        <flowable:myTestEventDefinition customKey="widget-42"/>
+      </extensionElements>
+    </intermediateCatchEvent>
+
+    <sequenceFlow id="flow2" sourceRef="customCatch" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+
+  </process>
+
+</definitions>

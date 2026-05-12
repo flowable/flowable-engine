@@ -20,7 +20,9 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
@@ -28,14 +30,24 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventDeployContext;
+import org.flowable.engine.impl.bpmn.behavior.ProcessLevelStartEventUndeployContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.cmd.CancelJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
@@ -43,9 +55,6 @@ import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
  * deployers to make use of them.
  */
 public class BpmnDeploymentHelper {
-
-    protected TimerManager timerManager;
-    protected EventSubscriptionManager eventSubscriptionManager;
 
     /**
      * Verifies that no two process definitions share the same key, to prevent database unique index violation.
@@ -161,21 +170,95 @@ public class BpmnDeploymentHelper {
     }
 
     /**
-     * Updates all timers and events for the process definition. This removes obsolete message and signal subscriptions and timers, and adds new ones.
+     * Updates all timers and events for the process definition. The undeploy half iterates the previous
+     * process definition's top-level start events; each behavior either does its own per-start-event work
+     * (e.g. the EventRegistry "manual" re-point) or registers an obsolete event subscription / timer job
+     * handler type with the context. After the undeploy iteration the deployer issues one mass-delete per
+     * unique registered type — fewer DB round-trips than per-start-event deletes, and tighter than the
+     * historical fixed Message+Signal+EventRegistry sweep that always ran regardless of which types the
+     * previous process definition used. The deploy half then iterates the new process definition's top-level start events to register the
+     * new artifacts.
      */
     public void updateTimersAndEvents(ProcessDefinitionEntity processDefinition,
             ProcessDefinitionEntity previousProcessDefinition, ParsedDeployment parsedDeployment) {
 
+        CommandContext commandContext = Context.getCommandContext();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+
         Process process = parsedDeployment.getProcessModelForProcessDefinition(processDefinition);
         BpmnModel bpmnModel = parsedDeployment.getBpmnModelForProcessDefinition(processDefinition);
 
-        eventSubscriptionManager.removeObsoleteMessageEventSubscriptions(previousProcessDefinition);
-        eventSubscriptionManager.removeObsoleteSignalEventSubscription(previousProcessDefinition);
-        eventSubscriptionManager.removeOrUpdateObsoleteEventRegistryEventSubscription(previousProcessDefinition, processDefinition);
-        eventSubscriptionManager.addEventSubscriptions(processDefinition, process, bpmnModel);
+        if (previousProcessDefinition != null) {
+            Process previousProcess = ProcessDefinitionUtil.getProcess(previousProcessDefinition.getId());
+            Set<String> obsoleteEventSubscriptionTypes = new LinkedHashSet<>();
+            Set<String> obsoleteTimerJobHandlerTypes = new LinkedHashSet<>();
 
-        timerManager.removeObsoleteTimers(processDefinition);
-        timerManager.scheduleTimers(processDefinition, process);
+            forEachTopLevelStartEventBehavior(previousProcess, (startEvent, behavior) -> behavior.undeploy(
+                    new ProcessLevelStartEventUndeployContext(previousProcessDefinition, processDefinition,
+                            startEvent, processEngineConfiguration, commandContext,
+                            obsoleteEventSubscriptionTypes, obsoleteTimerJobHandlerTypes)));
+
+            if (!obsoleteEventSubscriptionTypes.isEmpty()) {
+                deleteObsoleteEventSubscriptions(previousProcessDefinition, obsoleteEventSubscriptionTypes, processEngineConfiguration);
+            }
+            for (String timerJobHandlerType : obsoleteTimerJobHandlerTypes) {
+                cancelObsoleteTimerJobs(previousProcessDefinition, timerJobHandlerType, processEngineConfiguration, commandContext);
+            }
+        }
+
+        forEachTopLevelStartEventBehavior(process, (startEvent, behavior) -> behavior.deploy(
+                new ProcessLevelStartEventDeployContext(processDefinition,
+                        process, bpmnModel, startEvent, processEngineConfiguration, commandContext)));
+    }
+
+    protected void deleteObsoleteEventSubscriptions(ProcessDefinitionEntity processDefinition, Collection<String> eventHandlerTypes,
+            ProcessEngineConfigurationImpl processEngineConfiguration) {
+
+        EventSubscriptionService eventSubscriptionService = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService
+                .findEventSubscriptionsByTypesAndProcessDefinitionId(eventHandlerTypes, processDefinition.getId(), processDefinition.getTenantId());
+
+        for (EventSubscriptionEntity eventSubscription : subscriptionsToDelete) {
+            eventSubscriptionService.deleteEventSubscription(eventSubscription);
+            CountingEntityUtil.handleDeleteEventSubscriptionEntityCount(eventSubscription);
+        }
+    }
+
+    protected void cancelObsoleteTimerJobs(ProcessDefinitionEntity processDefinition, String timerJobHandlerType,
+            ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
+
+        TimerJobService timerJobService = processEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
+        List<TimerJobEntity> jobsToDelete;
+        if (processDefinition.getTenantId() != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
+            jobsToDelete = timerJobService.findJobsByTypeAndProcessDefinitionKeyAndTenantId(
+                    timerJobHandlerType, processDefinition.getKey(), processDefinition.getTenantId());
+        } else {
+            jobsToDelete = timerJobService.findJobsByTypeAndProcessDefinitionKeyNoTenantId(
+                    timerJobHandlerType, processDefinition.getKey());
+        }
+
+        if (jobsToDelete != null) {
+            for (TimerJobEntity job : jobsToDelete) {
+                new CancelJobsCmd(job.getId(), processEngineConfiguration.getJobServiceConfiguration()).execute(commandContext);
+            }
+        }
+    }
+
+    protected void forEachTopLevelStartEventBehavior(Process process, StartEventBehaviorVisitor visitor) {
+        if (process == null || process.getFlowElements() == null) {
+            return;
+        }
+        for (FlowElement flowElement : process.getFlowElements()) {
+            if (flowElement instanceof StartEvent startEvent
+                    && startEvent.getBehavior() instanceof ProcessLevelStartEventActivityBehavior behavior) {
+                visitor.visit(startEvent, behavior);
+            }
+        }
+    }
+
+    @FunctionalInterface
+    protected interface StartEventBehaviorVisitor {
+        void visit(StartEvent startEvent, ProcessLevelStartEventActivityBehavior behavior);
     }
 
     enum ExpressionType {
@@ -227,19 +310,4 @@ public class BpmnDeploymentHelper {
 
     }
 
-    public TimerManager getTimerManager() {
-        return timerManager;
-    }
-
-    public void setTimerManager(TimerManager timerManager) {
-        this.timerManager = timerManager;
-    }
-
-    public EventSubscriptionManager getEventSubscriptionManager() {
-        return eventSubscriptionManager;
-    }
-
-    public void setEventSubscriptionManager(EventSubscriptionManager eventSubscriptionManager) {
-        this.eventSubscriptionManager = eventSubscriptionManager;
-    }
 }

@@ -52,6 +52,8 @@ import org.flowable.cmmn.api.delegate.PlanItemVariableAggregator;
 import org.flowable.cmmn.api.listener.CaseInstanceLifecycleListener;
 import org.flowable.cmmn.api.listener.PlanItemInstanceLifecycleListener;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationCallback;
+import org.flowable.cmmn.converter.CustomEventListenerXmlFactory;
+import org.flowable.cmmn.converter.GenericEventListenerXmlConverter;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnEnginePostEngineBuildConsumer;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
@@ -123,6 +125,7 @@ import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.engine.impl.parser.DefaultCmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.handler.CasePageTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseParseHandler;
+import org.flowable.cmmn.engine.impl.parser.handler.EventRegistryCaseStartLifecycleParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.CaseTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.DecisionTaskParseHandler;
 import org.flowable.cmmn.engine.impl.parser.handler.ExternalWorkerServiceTaskParseHandler;
@@ -424,6 +427,12 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     protected List<CmmnParseHandler> preCmmnParseHandlers;
     protected List<CmmnParseHandler> postCmmnParseHandlers;
     protected List<CmmnParseHandler> customCmmnParseHandlers;
+    /**
+     * Factories that build custom {@link org.flowable.cmmn.model.EventListener} model objects from XML
+     * {@code <eventListener>} elements with custom {@code flowable:eventListenerType} discriminator values.
+     * Registered with {@link GenericEventListenerXmlConverter#addCustomListenerTypeFactory} during engine init.
+     */
+    protected Map<String, CustomEventListenerXmlFactory> customEventListenerTypeFactories;
 
     protected CmmnListenerFactory listenerFactory;
     protected CmmnListenerNotificationHelper listenerNotificationHelper;
@@ -1165,6 +1174,12 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     }
 
     public void initCmmnParser() {
+        if (customEventListenerTypeFactories != null) {
+            for (Map.Entry<String, CustomEventListenerXmlFactory> entry : customEventListenerTypeFactories.entrySet()) {
+                GenericEventListenerXmlConverter.addCustomListenerTypeFactory(entry.getKey(), entry.getValue());
+            }
+        }
+
         if (cmmnParser == null) {
             CmmnParserImpl cmmnParserImpl = new CmmnParserImpl();
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
@@ -1187,6 +1202,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     public List<CmmnParseHandler> getDefaultCmmnParseHandlers() {
         List<CmmnParseHandler> cmmnParseHandlers = new ArrayList<>();
         cmmnParseHandlers.add(new CaseParseHandler());
+        cmmnParseHandlers.add(new EventRegistryCaseStartLifecycleParseHandler());
         cmmnParseHandlers.add(new CaseTaskParseHandler());
         cmmnParseHandlers.add(new DecisionTaskParseHandler());
         cmmnParseHandlers.add(new HumanTaskParseHandler());
@@ -2402,6 +2418,23 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setCustomCmmnParseHandlers(List<CmmnParseHandler> customCmmnParseHandlers) {
         this.customCmmnParseHandlers = customCmmnParseHandlers;
+        return this;
+    }
+
+    public Map<String, CustomEventListenerXmlFactory> getCustomEventListenerTypeFactories() {
+        return customEventListenerTypeFactories;
+    }
+
+    public CmmnEngineConfiguration setCustomEventListenerTypeFactories(Map<String, CustomEventListenerXmlFactory> customEventListenerTypeFactories) {
+        this.customEventListenerTypeFactories = customEventListenerTypeFactories;
+        return this;
+    }
+
+    public CmmnEngineConfiguration addCustomEventListenerTypeFactory(String listenerType, CustomEventListenerXmlFactory factory) {
+        if (customEventListenerTypeFactories == null) {
+            customEventListenerTypeFactories = new HashMap<>();
+        }
+        customEventListenerTypeFactories.put(listenerType, factory);
         return this;
     }
 

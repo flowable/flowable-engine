@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.eventsubscription.api.EventSubscription;
@@ -41,7 +42,15 @@ public interface EventSubscriptionService {
     
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
     
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
+
+    /**
+     * Returns case-definition-level event subscriptions (i.e. {@code SCOPE_ID_ IS NULL}) for the given
+     * scope definition + scope type whose event type is in the supplied collection. Empty types yields an
+     * empty list. Mirrors {@link #findEventSubscriptionsByTypesAndProcessDefinitionId} for the CMMN side.
+     */
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes,
+            String scopeDefinitionId, String scopeType, String tenantId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByExecutionAndType(String executionId, String type);
     
@@ -92,8 +101,6 @@ public interface EventSubscriptionService {
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
-
-    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
 
     void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
 

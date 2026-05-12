@@ -19,6 +19,7 @@ import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_OUT_PAR
 import static org.flowable.bpmn.constants.BpmnXMLConstants.ELEMENT_EVENT_TYPE;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.StartEvent;
@@ -35,8 +36,10 @@ class StartEventRegistryEventConverterTest {
         assertThat(flowElement).isInstanceOfSatisfying(StartEvent.class, start -> {
             assertThat(start.getId()).isEqualTo("start");
             assertThat(start.isInterrupting()).isEqualTo(true);
-            assertThat(start.getExtensionElements().get(ELEMENT_EVENT_TYPE)).extracting(ExtensionElement::getElementText)
-                    .containsExactly("eventType1");
+            assertThat(start.getEventDefinitions())
+                    .singleElement()
+                    .isInstanceOfSatisfying(EventRegistryEventDefinition.class,
+                            def -> assertThat(def.getEventDefinitionKey()).isEqualTo("eventType1"));
             assertThat(start.getExtensionElements().get("eventName")).extracting(ExtensionElement::getElementText)
                     .containsExactly("eventName1");
             assertThat(start.getExtensionElements().get(ELEMENT_EVENT_OUT_PARAMETER)).extracting(
@@ -64,9 +67,14 @@ class StartEventRegistryEventConverterTest {
         assertThat(flowElement).isInstanceOfSatisfying(StartEvent.class, start -> {
             assertThat(start.getId()).isEqualTo("subProcessStart");
             assertThat(start.isInterrupting()).isEqualTo(false);
-            assertThat(start.getExtensionElements()).containsOnlyKeys(ELEMENT_EVENT_TYPE);
+            // The legacy <flowable:eventType> extension element is retained on the event for downstream
+            // code that reads it directly; the typed EventRegistryEventDefinition is added alongside.
             assertThat(start.getExtensionElements().get(ELEMENT_EVENT_TYPE)).extracting(ExtensionElement::getElementText)
                     .containsExactly("eventType2");
+            assertThat(start.getEventDefinitions())
+                    .singleElement()
+                    .isInstanceOfSatisfying(EventRegistryEventDefinition.class,
+                            def -> assertThat(def.getEventDefinitionKey()).isEqualTo("eventType2"));
         });
     }
 }

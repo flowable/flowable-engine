@@ -15,11 +15,9 @@ package org.flowable.validation.validator.impl;
 import java.util.List;
 
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.CompensateEventDefinition;
-import org.flowable.bpmn.model.EscalationEventDefinition;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventDefinitionLocation;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
@@ -34,14 +32,11 @@ public class IntermediateThrowEventValidator extends ProcessLevelValidator {
     protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<ThrowEvent> throwEvents = process.findFlowElementsOfType(ThrowEvent.class);
         for (ThrowEvent throwEvent : throwEvents) {
-            EventDefinition eventDefinition = null;
-            if (!throwEvent.getEventDefinitions().isEmpty()) {
-                eventDefinition = throwEvent.getEventDefinitions().get(0);
+            if (throwEvent.getEventDefinitions().isEmpty()) {
+                continue;
             }
-
-            if (eventDefinition != null && !(eventDefinition instanceof SignalEventDefinition) &&
-                            !(eventDefinition instanceof EscalationEventDefinition) && !(eventDefinition instanceof CompensateEventDefinition)) {
-
+            EventDefinition eventDefinition = throwEvent.getEventDefinitions().get(0);
+            if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.INTERMEDIATE_THROW_EVENT)) {
                 validationContext.addError(Problems.THROW_EVENT_INVALID_EVENTDEFINITION, process, throwEvent, eventDefinition, "Unsupported intermediate throw event type");
             }
         }
