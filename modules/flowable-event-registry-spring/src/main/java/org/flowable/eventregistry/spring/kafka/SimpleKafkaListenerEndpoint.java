@@ -127,6 +127,11 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint,
     }
 
     @Override
+    public String getAckMode() {
+        return null;
+    }
+
+    @Override
     public Properties getConsumerProperties() {
         return consumerProperties;
     }

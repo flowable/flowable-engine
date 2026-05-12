@@ -35,7 +35,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListenerAnnotationBeanPo
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
-import org.springframework.amqp.rabbit.listener.MessageListenerContainer;
+import org.springframework.amqp.core.MessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpoint;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;

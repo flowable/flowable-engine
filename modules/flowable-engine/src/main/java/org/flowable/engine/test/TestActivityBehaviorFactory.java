@@ -101,7 +101,11 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivity
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventRegistryStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.MessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SignalStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.TimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveEventTaskActivityBehavior;
@@ -160,6 +164,26 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent) {
         return wrappedActivityBehaviorFactory.createNoneStartEventActivityBehavior(startEvent);
+    }
+
+    @Override
+    public MessageStartEventActivityBehavior createMessageStartEventActivityBehavior(StartEvent startEvent, MessageEventDefinition messageEventDefinition) {
+        return wrappedActivityBehaviorFactory.createMessageStartEventActivityBehavior(startEvent, messageEventDefinition);
+    }
+
+    @Override
+    public SignalStartEventActivityBehavior createSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
+        return wrappedActivityBehaviorFactory.createSignalStartEventActivityBehavior(startEvent, signalEventDefinition, signal);
+    }
+
+    @Override
+    public TimerStartEventActivityBehavior createTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition) {
+        return wrappedActivityBehaviorFactory.createTimerStartEventActivityBehavior(startEvent, timerEventDefinition);
+    }
+
+    @Override
+    public EventRegistryStartEventActivityBehavior createEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey, boolean manualCorrelation) {
+        return wrappedActivityBehaviorFactory.createEventRegistryStartEventActivityBehavior(startEvent, eventDefinitionKey, manualCorrelation);
     }
 
     @Override

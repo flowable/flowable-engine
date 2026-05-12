@@ -19,17 +19,18 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
-import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionStartDeployContext;
+import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionStartLifecycleHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.AbstractEngineEntityManager;
 
 /**
@@ -80,31 +81,31 @@ public class CmmnDeploymentEntityManagerImpl
 
     protected void restorePreviousStartEventsIfNeeded(CaseDefinition caseDefinition) {
         CaseDefinitionEntity latestCaseDefinition = findLatestCaseDefinition(caseDefinition);
-        if (latestCaseDefinition != null && caseDefinition.getId().equals(latestCaseDefinition.getId())) {
+        if (latestCaseDefinition == null || !caseDefinition.getId().equals(latestCaseDefinition.getId())) {
+            return;
+        }
 
-            // Try to find a previous version (it could be some versions are missing due to deletions)
-            CaseDefinition previousCaseDefinition = findNewLatestCaseDefinitionAfterRemovalOf(caseDefinition);
-            if (previousCaseDefinition != null) {
-                CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
-                Case caseModel = cmmnModel.getPrimaryCase();
-                String startEventType = caseModel.getStartEventType();
-                if (startEventType != null) {
-                    restoreEventRegistryStartEvent(previousCaseDefinition, caseModel, startEventType);
-                }
+        // Try to find a previous version (it could be some versions are missing due to deletions)
+        CaseDefinition previousCaseDefinition = findNewLatestCaseDefinitionAfterRemovalOf(caseDefinition);
+        if (previousCaseDefinition == null) {
+            return;
+        }
+
+        // The cached parsed model belongs to the deleted case definition; iterate ITS handlers — those
+        // handlers were also installed on the previous version's parsed model when it was deployed, so
+        // we can reuse the deleted case's handler list to drive the restore via the previous case's
+        // own model.
+        CmmnModel previousCmmnModel = CaseDefinitionUtil.getCmmnModel(previousCaseDefinition.getId());
+        Case previousCaseModel = previousCmmnModel.getPrimaryCase();
+
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        for (Object handler : previousCaseModel.getStartLifecycleHandlers()) {
+            if (handler instanceof CaseDefinitionStartLifecycleHandler lifecycleHandler) {
+                lifecycleHandler.deploy(new CaseDefinitionStartDeployContext(
+                        (CaseDefinitionEntity) previousCaseDefinition, previousCaseModel,
+                        engineConfiguration, commandContext, true));
             }
         }
-    }
-
-    protected void restoreEventRegistryStartEvent(CaseDefinition previousCaseDefinition, Case caseModel, String startEventType) {
-        engineConfiguration.getEventSubscriptionServiceConfiguration()
-                .getEventSubscriptionService()
-                .createEventSubscriptionBuilder()
-                .eventType(startEventType)
-                .configuration(CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel))
-                .scopeDefinitionId(previousCaseDefinition.getId())
-                .scopeType(ScopeTypes.CMMN)
-                .tenantId(previousCaseDefinition.getTenantId())
-                .create();
     }
 
     protected CaseDefinitionEntity findLatestCaseDefinition(CaseDefinition caseDefinition) {

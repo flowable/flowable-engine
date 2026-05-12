@@ -87,6 +87,12 @@
     delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
   
+  <delete id="deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK
+    where (SCOPE_ID_     = #{id, jdbcType=NVARCHAR} and SCOPE_TYPE_     = #{scopeType, jdbcType=NVARCHAR})
+       or (REF_SCOPE_ID_ = #{id, jdbcType=NVARCHAR} and REF_SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR})
+  </delete>
+
   <delete id="deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType" parameterType="java.util.Map">
     delete from ${prefix}ACT_HI_ENTITYLINK where SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
@@ -102,6 +108,31 @@
           #{scopeId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>)
+  </delete>
+
+  <delete id="bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds" parameterType="java.util.Map">
+    delete from ${prefix}ACT_HI_ENTITYLINK where
+    (SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR} and
+     (<foreach item="listItem" index="listIndex" collection="ids">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        SCOPE_ID_ in
+        <foreach item="id" index="index" collection="listItem" open="(" separator="," close=")">
+          #{id, jdbcType=NVARCHAR}
+        </foreach>
+     </foreach>))
+    or
+    (REF_SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR} and
+     (<foreach item="listItem" index="listIndex" collection="ids">
+        <if test="listIndex &gt; 0">
+        or
+        </if>
+        REF_SCOPE_ID_ in
+        <foreach item="id" index="index" collection="listItem" open="(" separator="," close=")">
+          #{id, jdbcType=NVARCHAR}
+        </foreach>
+     </foreach>))
   </delete>
   
   <delete id="bulkDeleteHistoricProcessEntityLinks" parameterType="java.util.Map">

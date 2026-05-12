@@ -12,13 +12,28 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author Tijs Rademakers
  */
 public class MessageEventDefinition extends EventDefinition {
 
+    private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(
+            EventDefinitionLocation.START_EVENT,
+            EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT,
+            EventDefinitionLocation.INTERMEDIATE_CATCH_EVENT,
+            EventDefinitionLocation.BOUNDARY_EVENT));
+
     protected String messageRef;
     protected String messageExpression;
+
+    @Override
+    public Set<EventDefinitionLocation> getSupportedLocations() {
+        return SUPPORTED_LOCATIONS;
+    }
 
     public String getMessageRef() {
         return messageRef;

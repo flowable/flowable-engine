@@ -14,7 +14,9 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
@@ -38,6 +40,15 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
         } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
 
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryTimerEventActivityBehavior(boundaryEvent, timerEventDefinition, boundaryEvent.isCancelActivity()));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessTimerStartEventActivityBehavior(startEvent, timerEventDefinition));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createTimerStartEventActivityBehavior(startEvent, timerEventDefinition));
+            }
         }
     }
 }

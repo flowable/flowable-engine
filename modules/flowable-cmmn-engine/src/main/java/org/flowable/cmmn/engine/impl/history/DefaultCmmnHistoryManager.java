@@ -213,7 +213,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
             if (cmmnEngineConfiguration.isEnableEntityLinks()) {
                 cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService()
-                        .deleteHistoricEntityLinksByScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
+                        .deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(historicCaseInstance.getId(), ScopeTypes.CMMN);
             }
 
             HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();

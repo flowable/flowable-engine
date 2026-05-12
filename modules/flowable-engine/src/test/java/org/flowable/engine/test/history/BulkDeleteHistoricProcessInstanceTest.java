@@ -456,6 +456,104 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
         }
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/callActivity.bpmn20.xml",
+            "org/flowable/engine/test/history/subProcess.bpmn20.xml" })
+    public void deleteHistoricTaskInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+        try {
+            processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+
+            Task mainTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(mainTask.getId());
+
+            ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+            Task subTask = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+            String subTaskId = subTask.getId();
+
+            // Complete the sub-task so it has an endTime; deleteHistoricTaskInstance only works on completed tasks.
+            taskService.complete(subTaskId);
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
+
+            // The sub-process task carries a parent link (root scope = parent process instance) before delete.
+            assertThat(historyService.getHistoricEntityLinkParentsForTask(subTaskId)).isNotEmpty();
+
+            historyService.deleteHistoricTaskInstance(subTaskId);
+
+            // After deleting only the historic task, no row in ACT_HI_ENTITYLINK may still reference it.
+            assertThat(historyService.getHistoricEntityLinkParentsForTask(subTaskId)).isEmpty();
+            assertThat(historyService.getHistoricEntityLinkChildrenForTask(subTaskId)).isEmpty();
+
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+        } finally {
+            processEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/callActivity.bpmn20.xml",
+            "org/flowable/engine/test/history/subProcess.bpmn20.xml" })
+    public void deleteHistoricProcessInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+        try {
+            processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+
+            Task mainTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(mainTask.getId());
+
+            ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+            Task subTask = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+            taskService.complete(subTask.getId());
+
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
+
+            // The sub-process is propagated as the REFERENCE_SCOPE_ID_ in the parent's child entity link.
+            assertThat(historyService.getHistoricEntityLinkParentsForProcessInstance(subProcessInstance.getId())).isNotEmpty();
+
+            historyService.deleteHistoricProcessInstance(subProcessInstance.getId());
+
+            assertThat(historyService.getHistoricEntityLinkParentsForProcessInstance(subProcessInstance.getId())).isEmpty();
+            assertThat(historyService.getHistoricEntityLinkChildrenForProcessInstance(subProcessInstance.getId())).isEmpty();
+
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+        } finally {
+            processEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/callActivity.bpmn20.xml",
+            "org/flowable/engine/test/history/subProcess.bpmn20.xml" })
+    public void bulkDeleteHistoricProcessInstancesRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
+        try {
+            processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callActivity");
+
+            Task mainTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(mainTask.getId());
+
+            ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+            Task subTask = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
+            taskService.complete(subTask.getId());
+
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
+
+            assertThat(historyService.getHistoricEntityLinkParentsForProcessInstance(subProcessInstance.getId())).isNotEmpty();
+
+            historyService.bulkDeleteHistoricProcessInstances(Collections.singletonList(subProcessInstance.getId()));
+
+            assertThat(historyService.getHistoricEntityLinkParentsForProcessInstance(subProcessInstance.getId())).isEmpty();
+            assertThat(historyService.getHistoricEntityLinkChildrenForProcessInstance(subProcessInstance.getId())).isEmpty();
+
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+        } finally {
+            processEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
     protected void validateEmptyHistoricDataForProcessInstance(String processInstanceId) {
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).list()).hasSize(0);
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).list()).hasSize(0);
