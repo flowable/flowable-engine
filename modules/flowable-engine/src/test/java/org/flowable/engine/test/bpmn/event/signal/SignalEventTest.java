@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.data.MapEntry.entry;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -43,11 +44,42 @@ import org.flowable.task.api.Task;
 import org.flowable.validation.validator.Problems;
 import org.junit.jupiter.api.Test;
 
+
+
+
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 public class SignalEventTest extends PluggableFlowableTestCase {
+
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/signal/mainProcessV2.bpmn"})
+    public void testSignalScope_WhenSignalIdNotEqualSignalName_GivenMultipleProcessInstances() {
+
+        List<ProcessInstance> processInstances = new ArrayList<>();
+        processInstances.add(runtimeService.startProcessInstanceByKey("mainProcess"));
+        processInstances.add(runtimeService.startProcessInstanceByKey("mainProcess"));
+        processInstances.add(runtimeService.startProcessInstanceByKey("mainProcess"));
+
+        List<EventSubscription> currentSubscriptionList = runtimeService.createEventSubscriptionQuery().list();
+
+        assertThat(currentSubscriptionList).hasSize(processInstances.size());
+        assertThat(currentSubscriptionList).extracting(EventSubscription::getConfiguration).doesNotContainNull();
+    }
+
+    @Test
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/signal/mainProcessV2.bpmn"})
+    public void testSignalScope_WhenSignalIdNotEqualSignalName_GivenSingleProcessInstance() {
+
+        ProcessInstance processInstances = runtimeService.startProcessInstanceByKey("mainProcess");
+
+        List<EventSubscription> currentSubscriptionList = runtimeService.createEventSubscriptionQuery().list();
+
+        assertThat(currentSubscriptionList).hasSize(1);
+        assertThat(currentSubscriptionList).extracting(EventSubscription::getConfiguration).doesNotContainNull();
+    }
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTests.catchAlertSignal.bpmn20.xml",

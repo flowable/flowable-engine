@@ -59,6 +59,41 @@ public class ProcessInstanceMigrationEventSubProcessTest extends AbstractProcess
     }
 
     @Test
+    public void testSignalScope_WhenSignalIdNotEqualSignalName_GivenMultiInstanceMigration(){
+        //create process Definition
+        ProcessDefinition originalProcessDef = deployProcessDefinition("mainProcessDeployment",
+                "org/flowable/engine/test/api/runtime/migration/originalProcess.bpmn");
+
+        ProcessDefinition migrationProcessDef = deployProcessDefinition("mainProcessDeployment",
+                "org/flowable/engine/test/api/runtime/migration/migrationProcess.bpmn");
+
+        //create multi-proc instances
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(originalProcessDef.getKey());
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey(originalProcessDef.getKey());
+
+        //choose a migration state
+        ProcessInstanceMigrationBuilder processInstanceMigrationBuilder = processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(migrationProcessDef.getId())
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("userTask", "userTask"))
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("sendSignalTask", "subProcessTask"));
+
+
+        ProcessInstanceMigrationValidationResult processInstanceMigrationValidationResult = processInstanceMigrationBuilder
+                .validateMigration(processInstance.getId());
+
+        assertThat(processInstanceMigrationValidationResult.isMigrationValid()).isTrue();
+
+        //migration
+        processInstanceMigrationBuilder.migrate(processInstance.getId());
+        processInstanceMigrationBuilder.migrate(processInstance2.getId());
+
+        List<EventSubscription> currentSubscriptionList = runtimeService.createEventSubscriptionQuery().list();
+        assertThat(currentSubscriptionList).extracting(EventSubscription::getConfiguration).doesNotContainNull();
+
+
+    }
+
+    @Test
     public void testMigrateSimpleActivityToActivityInsideSignalEventSubProcessInNewDefinition() {
         ProcessDefinition procDefOneTask = deployProcessDefinition("my deploy",
                 "org/flowable/engine/test/api/runtime/migration/one-task-simple-process.bpmn20.xml");
