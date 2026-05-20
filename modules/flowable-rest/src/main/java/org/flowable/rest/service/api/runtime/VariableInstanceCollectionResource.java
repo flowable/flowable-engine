@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Runtime" }, authorizations = { @Authorization(value = "basicAuth") })
 public class VariableInstanceCollectionResource extends VariableInstanceBaseResource {
 
-    @ApiOperation(value = "List of variable instances", tags = { "History" }, nickname = "listVariableInstances")
+    @ApiOperation(value = "List of variable instances", tags = { "History" }, nickname = "listVariableInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the variable instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "The task id of the variable instance.", paramType = "query"),

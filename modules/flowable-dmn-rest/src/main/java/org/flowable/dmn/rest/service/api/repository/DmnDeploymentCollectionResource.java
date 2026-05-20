@@ -77,7 +77,7 @@ public class DmnDeploymentCollectionResource {
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of decision deployments", tags = { "Deployment" }, nickname = "listDecisionDeployments")
+    @ApiOperation(value = "List of decision deployments", tags = { "Deployment" }, nickname = "listDecisionDeployments", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision deployments with a name like the given name.", paramType = "query"),

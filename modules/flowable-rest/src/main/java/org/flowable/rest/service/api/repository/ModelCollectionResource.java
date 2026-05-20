@@ -60,7 +60,7 @@ public class ModelCollectionResource extends BaseModelResource {
         allowedSortProperties.put("tenantId", ModelQueryProperty.MODEL_TENANT_ID);
     }
 
-    @ApiOperation(value = "List models", nickname= "listModels", tags = { "Models" })
+    @ApiOperation(value = "List models", nickname= "listModels", tags = { "Models" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return models with the given category.", paramType = "query"),

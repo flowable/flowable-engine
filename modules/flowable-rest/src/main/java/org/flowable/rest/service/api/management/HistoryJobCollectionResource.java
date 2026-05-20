@@ -53,7 +53,7 @@ public class HistoryJobCollectionResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List history jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
+    @ApiOperation(value = "List history jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return the job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),

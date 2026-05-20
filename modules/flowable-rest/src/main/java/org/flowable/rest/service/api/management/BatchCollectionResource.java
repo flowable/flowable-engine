@@ -51,7 +51,7 @@ public class BatchCollectionResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "List batches", tags = { "Batches" }, nickname = "listBatches")
+    @ApiOperation(value = "List batches", tags = { "Batches" }, nickname = "listBatches", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return batch with the given id", paramType = "query"),
             @ApiImplicitParam(name = "batchType", dataType = "string", value = "Only return batches for the given type", paramType = "query"),

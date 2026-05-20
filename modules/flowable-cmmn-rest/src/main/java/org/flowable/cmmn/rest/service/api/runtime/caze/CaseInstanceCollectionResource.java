@@ -58,7 +58,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
     @Autowired
     protected CmmnHistoryService historyService;
 
-    @ApiOperation(value = "List case instances", nickname ="listCaseInstances", tags = { "Case Instances" })
+    @ApiOperation(value = "List case instances", nickname ="listCaseInstances", tags = { "Case Instances" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return case instances with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "ids", dataType = "string", value = "Only return case instances with the given comma-separated ids.", paramType = "query"),

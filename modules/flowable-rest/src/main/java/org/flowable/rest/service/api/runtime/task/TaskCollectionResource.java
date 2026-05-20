@@ -54,10 +54,10 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
+    @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return tasks with the given id.", paramType = "query"),
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return tasks with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
@@ -292,6 +292,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("dueAfter")) {
             request.setDueAfter(RequestUtil.getDate(requestParams, "dueAfter"));
+        }
+
+        if (requestParams.containsKey("withoutDueDate") && Boolean.parseBoolean(requestParams.get("withoutDueDate"))) {
+            request.setWithoutDueDate(Boolean.TRUE);
         }
 
         if (requestParams.containsKey("active")) {

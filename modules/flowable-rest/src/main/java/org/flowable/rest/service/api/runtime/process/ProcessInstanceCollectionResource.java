@@ -66,7 +66,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
+    @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "id", dataType = "string", value = "Only return process instances with the given version.", paramType = "query"),
         @ApiImplicitParam(name = "name", dataType = "string", value = "Only return process instances with the given name.", paramType = "query"),
@@ -102,7 +102,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         @ApiImplicitParam(name = "subProcessInstanceId", dataType = "string", value = "Only return process instances which have the given sub process-instance id (for processes started as a call-activity).", paramType = "query"),
         @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only process instances which are not sub processes.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include process variables in the result.", paramType = "query"),
-        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesNames", dataType = "string", value = "Indication to include process variables with the given names (comma-separated) in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return process instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return process instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return process instances with the given callbackType.", paramType = "query"),

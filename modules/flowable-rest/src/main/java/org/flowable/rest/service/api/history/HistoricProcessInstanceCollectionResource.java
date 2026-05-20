@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCollectionResource extends HistoricProcessInstanceBaseResource {
 
-    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
+    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "An id of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "processInstanceName", dataType = "string", value = "A name of the historic process instance.", paramType = "query"),
@@ -83,7 +83,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
-        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesNames", dataType = "string", value = "Indication to include process variables with the given names (comma-separated) in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
