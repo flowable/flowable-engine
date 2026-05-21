@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "History Case" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstanceBaseResource {
 
-    @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances")
+    @ApiOperation(value = "List of historic case instances", tags = { "History Case" }, nickname = "listHistoricCaseInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "An id of the historic case instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "Only return historic case instances with the given comma-separated ids.", paramType = "query"),

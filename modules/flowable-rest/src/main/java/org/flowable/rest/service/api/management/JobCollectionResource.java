@@ -73,7 +73,7 @@ public class JobCollectionResource {
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs")
+    @ApiOperation(value = "List jobs", tags = { "Jobs" }, nickname = "listJobs", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),

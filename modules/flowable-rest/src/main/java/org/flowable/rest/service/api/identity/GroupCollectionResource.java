@@ -70,14 +70,13 @@ public class GroupCollectionResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
+    @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return groups with the given name", paramType = "query"),
             @ApiImplicitParam(name = "type", dataType = "string", value = "Only return groups with the given type", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return groups with a name like the given value. Use % as wildcard-character.", paramType = "query"),
             @ApiImplicitParam(name = "member", dataType = "string", value = "Only return groups which have a member with the given username.", paramType = "query"),
-            @ApiImplicitParam(name = "potentialStarter", dataType = "string", value = "Only return groups which members are potential starters for a process-definition with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,type", paramType = "query"),
             @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
             @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),

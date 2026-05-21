@@ -56,7 +56,7 @@ public class SuspendedJobCollectionResource {
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "List suspended jobs", tags = { "Jobs" }, nickname = "listSuspendedJobs")
+    @ApiOperation(value = "List suspended jobs", tags = { "Jobs" }, nickname = "listSuspendedJobs", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "Only return jobs part of a case with the given id", paramType = "query"),

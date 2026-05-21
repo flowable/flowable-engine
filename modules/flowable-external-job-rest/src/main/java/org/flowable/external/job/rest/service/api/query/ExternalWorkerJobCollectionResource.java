@@ -61,7 +61,7 @@ public class ExternalWorkerJobCollectionResource extends ExternalWorkerJobBaseRe
 
     @ApiOperation(value = "List External Worker Jobs", tags = { "Info and Query" })
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'id'.", allowableValues = "id,dueDate,createTime,executionId,processInstanceId,retries,tenantId", paramType = "body"),
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'id'.", allowableValues = "id,dueDate,createTime,executionId,processInstanceId,retries,tenantId", paramType = "query"),
    })
     @ApiResponses({
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),

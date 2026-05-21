@@ -66,22 +66,24 @@ public class EventDefinitionCollectionResource {
     @Autowired(required=false)
     protected EventRegistryRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of event definitions", tags = { "Event Definitions" }, nickname = "listEventDefinitions")
+    @ApiOperation(value = "List of event definitions", tags = { "Event Definitions" }, nickname = "listEventDefinitions", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return event definitions with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return event definitions with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return event definitions with a name like the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return event definitions with a name like the given name (case-insensitive).", paramType = "query"),
             @ApiImplicitParam(name = "key", dataType = "string", value = "Only return event definitions with the given key.", paramType = "query"),
-            @ApiImplicitParam(name = "keyLike", dataType = "string", value = "Only return event definitions with a name like the given key.", paramType = "query"),
-            @ApiImplicitParam(name = "keyLikeIgnoreCase", dataType = "string", value = "Only return event definitions with a name like the given key (case-insensitive).", paramType = "query"),
+            @ApiImplicitParam(name = "keyLike", dataType = "string", value = "Only return event definitions with a key like the given key.", paramType = "query"),
+            @ApiImplicitParam(name = "keyLikeIgnoreCase", dataType = "string", value = "Only return event definitions with a key like the given key (case-insensitive).", paramType = "query"),
             @ApiImplicitParam(name = "resourceName", dataType = "string", value = "Only return event definitions with the given resource name.", paramType = "query"),
-            @ApiImplicitParam(name = "resourceNameLike", dataType = "string", value = "Only return event definitions with a name like the given resource name.", paramType = "query"),
+            @ApiImplicitParam(name = "resourceNameLike", dataType = "string", value = "Only return event definitions with a resource name like the given resource name.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return event definitions with the given category.", paramType = "query"),
-            @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return event definitions with a category like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return event definitions with a category like the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return event definitions which do not have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return event definitions which are part of a deployment with the given deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "parentDeploymentId", dataType = "string", value = "Only return event definitions which are part of a deployment with the given parent deployment id.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return event definitions with the given tenant id.", paramType = "query"),
+            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return event definitions with a tenant id like the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest event definition versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name,id,key,category,deploymentId,version", paramType = "query"),
             @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),

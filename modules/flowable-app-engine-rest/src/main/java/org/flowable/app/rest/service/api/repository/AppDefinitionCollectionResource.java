@@ -66,7 +66,7 @@ public class AppDefinitionCollectionResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of app definitions",  nickname = "listAppDefinitions", tags = { "App Definitions" })
+    @ApiOperation(value = "List of app definitions",  nickname = "listAppDefinitions", tags = { "App Definitions" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return app definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return app definitions with a category like the given value.", paramType = "query"),
