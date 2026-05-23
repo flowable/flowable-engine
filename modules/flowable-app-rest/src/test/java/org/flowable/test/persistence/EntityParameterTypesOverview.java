@@ -342,7 +342,9 @@ public abstract class EntityParameterTypesOverview {
 
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
 
         // v5
         info.addColumn("CACHED_ENT_STATE_", "cachedEventState", PARAMETER_TYPE_INTEGER);
@@ -520,7 +522,9 @@ public abstract class EntityParameterTypesOverview {
 
         // EntityLink
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
 
     }
 
@@ -941,7 +945,9 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseDefinitionVersion", PARAMETER_TYPE_INTEGER);
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
@@ -1054,7 +1060,9 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("caseInstanceParentId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("caseInstanceName", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("parentScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
+        info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
