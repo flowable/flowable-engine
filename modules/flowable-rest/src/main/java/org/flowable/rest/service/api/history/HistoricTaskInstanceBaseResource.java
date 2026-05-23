@@ -27,6 +27,7 @@ import org.flowable.engine.HistoryService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryProperty;
@@ -342,8 +343,10 @@ public class HistoricTaskInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -412,6 +415,15 @@ public class HistoricTaskInstanceBaseResource {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
                 break;
+
+            case EXISTS:
+                taskInstanceQuery.taskVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskInstanceQuery.taskVariableNotExists(variable.getName());
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
@@ -423,8 +435,10 @@ public class HistoricTaskInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -492,6 +506,15 @@ public class HistoricTaskInstanceBaseResource {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
                 break;
+
+            case EXISTS:
+                taskInstanceQuery.processVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskInstanceQuery.processVariableNotExists(variable.getName());
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }

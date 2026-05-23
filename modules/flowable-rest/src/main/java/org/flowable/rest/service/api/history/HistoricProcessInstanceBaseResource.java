@@ -133,8 +133,14 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getRootScopeId() != null) {
             query.processInstanceRootScopeId(queryRequest.getRootScopeId());
         }
+        if (queryRequest.getRootScopeIds() != null && !queryRequest.getRootScopeIds().isEmpty()) {
+            query.processInstanceRootScopeIds(queryRequest.getRootScopeIds());
+        }
         if (queryRequest.getParentScopeId() != null) {
             query.processInstanceParentScopeId(queryRequest.getParentScopeId());
+        }
+        if (queryRequest.getParentScopeIds() != null && !queryRequest.getParentScopeIds().isEmpty()) {
+            query.processInstanceParentScopeIds(queryRequest.getParentScopeIds());
         }
         if (queryRequest.getDeploymentId() != null) {
             query.deploymentId(queryRequest.getDeploymentId());
@@ -306,8 +312,10 @@ public class HistoricProcessInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -372,6 +380,14 @@ public class HistoricProcessInstanceBaseResource {
 
             case LESS_THAN_OR_EQUALS:
                 processInstanceQuery.variableValueLessThanOrEqual(variable.getName(), actualValue);
+                break;
+
+            case EXISTS:
+                processInstanceQuery.variableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                processInstanceQuery.variableNotExists(variable.getName());
                 break;
 
             default:

@@ -561,6 +561,74 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
     }
 
     @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeIds() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceRootScopeIds(Set.of(processInstance1.getId(), processInstance2.getId())).list();
+        assertThat(result).hasSize(10);
+
+        result = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceRootScopeIds(Set.of(processInstance1.getId())).list();
+        assertThat(result).hasSize(5);
+
+        result = historyService.createHistoricProcessInstanceQuery().or()
+                .processInstanceRootScopeIds(Set.of(processInstance1.getId(), processInstance2.getId())).endOr().list();
+        assertThat(result).hasSize(10);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeIds() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        List<HistoricProcessInstance> result = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceParentScopeIds(Set.of(firstLevelCallActivity1.getCalledProcessInstanceId())).list();
+
+        assertThat(result)
+                .extracting(HistoricProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        secondLevelCallActivity1.getCalledProcessInstanceId(),
+                        secondLevelCallActivity2.getCalledProcessInstanceId()
+                );
+
+        result = historyService.createHistoricProcessInstanceQuery().or()
+                .processInstanceParentScopeIds(Set.of(firstLevelCallActivity1.getCalledProcessInstanceId())).endOr().list();
+        assertThat(result).hasSize(2);
+
+        result = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceParentScopeIds(Set.of(processInstance.getId())).list();
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     public void testIdQueryByDeploymentId() {
         deployOneTaskTestProcess();
         String deploymentId = repositoryService.createDeploymentQuery().singleResult().getId();

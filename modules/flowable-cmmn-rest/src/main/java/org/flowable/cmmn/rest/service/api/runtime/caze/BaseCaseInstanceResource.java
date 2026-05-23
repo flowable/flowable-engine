@@ -127,8 +127,14 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceRootScopeId() != null) {
             query.caseInstanceRootScopeId(queryRequest.getCaseInstanceRootScopeId());
         }
+        if (queryRequest.getCaseInstanceRootScopeIds() != null && !queryRequest.getCaseInstanceRootScopeIds().isEmpty()) {
+            query.caseInstanceRootScopeIds(queryRequest.getCaseInstanceRootScopeIds());
+        }
         if (queryRequest.getCaseInstanceParentScopeId() != null) {
             query.caseInstanceParentScopeId(queryRequest.getCaseInstanceParentScopeId());
+        }
+        if (queryRequest.getCaseInstanceParentScopeIds() != null && !queryRequest.getCaseInstanceParentScopeIds().isEmpty()) {
+            query.caseInstanceParentScopeIds(queryRequest.getCaseInstanceParentScopeIds());
         }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
@@ -294,8 +300,10 @@ public class BaseCaseInstanceResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -367,6 +375,14 @@ public class BaseCaseInstanceResource {
 
             case LESS_THAN_OR_EQUALS:
                 caseInstanceQuery.variableValueLessThanOrEqual(variable.getName(), actualValue);
+                break;
+
+            case EXISTS:
+                caseInstanceQuery.variableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                caseInstanceQuery.variableNotExists(variable.getName());
                 break;
 
             default:

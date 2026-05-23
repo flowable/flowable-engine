@@ -45,7 +45,7 @@ import io.swagger.annotations.Authorization;
 public class ExecutionCollectionResource extends ExecutionBaseResource {
 
     // FIXME naming issue ?
-    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions")
+    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return executions with the given activity id.", paramType = "query"),

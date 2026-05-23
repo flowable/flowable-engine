@@ -46,7 +46,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCollectionResource extends HistoricProcessInstanceBaseResource {
 
-    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
+    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "An id of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "processInstanceName", dataType = "string", value = "A name of the historic process instance.", paramType = "query"),
@@ -65,7 +65,9 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "processDefinitionVersion", dataType = "string", value = "The process definition version of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "The deployment id of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return process instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "rootScopeIds", dataType = "string", value = "Only return process instances which have one of the given root scope ids.", paramType = "query"),
         @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return process instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "parentScopeIds", dataType = "string", value = "Only return process instances which have one of the given parent scope ids.", paramType = "query"),
         @ApiImplicitParam(name = "businessKey", dataType = "string", value = "The business key of the historic process instance.", paramType = "query"),
         @ApiImplicitParam(name = "businessKeyLike", dataType = "string", value = "Only return instances with a business key like this key.", paramType = "query"),
         @ApiImplicitParam(name = "businessKeyLikeIgnoreCase", dataType = "string", value = "Only return instances with a business key like this key ignoring case.", paramType = "query"),
@@ -83,7 +85,7 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
         @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
         @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
         @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
-        @ApiImplicitParam(name = "includeProcessVariablesName", dataType = "string", value = "Indication to include process variables with the given names in the result.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariablesNames", dataType = "string", value = "Indication to include process variables with the given names (comma-separated) in the result.", paramType = "query"),
         @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return instances with the given callbackId.", paramType = "query"),
         @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return instances with the given callbackIds.", paramType = "query"),
         @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return instances with the given callbackType.", paramType = "query"),
@@ -166,8 +168,16 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
         }
 
+        if (allRequestParams.containsKey("rootScopeIds")) {
+            queryRequest.setRootScopeIds(RequestUtil.parseToSet(allRequestParams.get("rootScopeIds")));
+        }
+
         if (allRequestParams.containsKey("parentScopeId")) {
             queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeIds")) {
+            queryRequest.setParentScopeIds(RequestUtil.parseToSet(allRequestParams.get("parentScopeIds")));
         }
 
         if (allRequestParams.get("deploymentId") != null) {

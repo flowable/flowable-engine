@@ -70,7 +70,7 @@ public class GroupCollectionResource {
     @Autowired(required=false)
     protected IdmRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
+    @ApiOperation(value = "List groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return groups with the given name", paramType = "query"),

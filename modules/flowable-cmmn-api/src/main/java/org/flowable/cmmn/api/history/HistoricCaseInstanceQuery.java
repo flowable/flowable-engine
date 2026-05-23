@@ -78,10 +78,20 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseInstanceRootScopeId(String rootScopeId);
 
     /**
+     * Only select historic case instances with one of the given root scope ids.
+     */
+    HistoricCaseInstanceQuery caseInstanceRootScopeIds(Set<String> rootScopeIds);
+
+    /**
      * Only select historic case instances with the given case instance parent scope id.
      */
     HistoricCaseInstanceQuery caseInstanceParentScopeId(String parentScopeId);
-    
+
+    /**
+     * Only select historic case instances with one of the given parent scope ids.
+     */
+    HistoricCaseInstanceQuery caseInstanceParentScopeIds(Set<String> parentScopeIds);
+
     /**
      * Only select historic case instances with the given business status.
      */

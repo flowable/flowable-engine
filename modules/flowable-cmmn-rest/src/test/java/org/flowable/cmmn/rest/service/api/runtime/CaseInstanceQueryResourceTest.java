@@ -25,6 +25,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
@@ -210,6 +211,30 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.removeAll();
         variableNode.put("value", "Azerty2");
         variableNode.put("operation", "equals");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+
+        // Variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseInstance.getId());
+
+        // Variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
         assertResultsPresentInPostDataResponse(url, requestNode);
     }
 
@@ -701,5 +726,75 @@ public class CaseInstanceQueryResourceTest extends BaseSpringRestTestCase {
                         + "  }"
                         + "]");
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryCaseInstancesByRootScopeIds() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceRootScopeIds").add(caseInstance1.getId()).add(caseInstance2.getId());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isArray()
+                .hasSize(8);
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/rest/service/api/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/rest/service/api/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryCaseInstancesByParentScopeIds() throws Exception {
+        CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance caseTask1 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance1.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+        PlanItemInstance humanTask1 = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTask1.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        PlanItemInstance caseTask2 = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance2.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+        PlanItemInstance humanTask2 = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTask2.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("caseInstanceParentScopeIds")
+                .add(humanTask1.getReferenceId())
+                .add(humanTask2.getReferenceId());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_QUERY);
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + url);
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_OK);
+
+        JsonNode rootNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        JsonNode dataNode = rootNode.get("data");
+        assertThatJson(dataNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isArray()
+                .hasSize(2);
     }
 }

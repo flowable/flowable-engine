@@ -108,11 +108,19 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         if (caseInstanceQuery.getCaseInstanceIds() != null) {
             caseInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(caseInstanceQuery.getCaseInstanceIds()));
         }
-        
+
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
         }
-        
+
+        if (caseInstanceQuery.getRootScopeIds() != null) {
+            caseInstanceQuery.setSafeRootScopeIds(createSafeInValuesList(caseInstanceQuery.getRootScopeIds()));
+        }
+
+        if (caseInstanceQuery.getParentScopeIds() != null) {
+            caseInstanceQuery.setSafeParentScopeIds(createSafeInValuesList(caseInstanceQuery.getParentScopeIds()));
+        }
+
         if (caseInstanceQuery.getOrQueryObjects() != null && !caseInstanceQuery.getOrQueryObjects().isEmpty()) {
             for (HistoricCaseInstanceQueryImpl orCaseInstanceQuery : caseInstanceQuery.getOrQueryObjects()) {
                 setSafeInValueLists(orCaseInstanceQuery);

@@ -38,7 +38,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
-    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")
+    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic task instance.", paramType = "query"),
@@ -71,7 +71,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskOwnerLike", dataType = "string", value = "The owner with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskInvolvedUser", dataType = "string", value = "An involved user of the historic task instance", paramType = "query"),
             @ApiImplicitParam(name = "taskCandidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
-            @ApiImplicitParam(name = "taskIgnoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)"),
+            @ApiImplicitParam(name = "ignoreTaskAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)", paramType = "query"),
             @ApiImplicitParam(name = "taskPriority", dataType = "string", value = "The priority of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic task instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "processFinished", dataType = "boolean", value = "Indication if the process instance of the historic task instance is finished.", paramType = "query"),
@@ -263,6 +263,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("dueDateBefore") != null) {
             queryRequest.setDueDateBefore(RequestUtil.getDate(allRequestParams, "dueDateBefore"));
+        }
+
+        if (allRequestParams.containsKey("withoutDueDate") && Boolean.parseBoolean(allRequestParams.get("withoutDueDate"))) {
+            queryRequest.setWithoutDueDate(Boolean.TRUE);
         }
 
         if (allRequestParams.get("taskCreatedOn") != null) {

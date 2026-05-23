@@ -376,12 +376,22 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
 
     /**
+     * Only select process instances with one of the given root scope ids.
+     */
+    ProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds);
+
+    /**
      * Only select process instances with the given parent process instance id.
      */
     ProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
 
     /**
-     * Only select process instances with the given callback id. 
+     * Only select process instances with one of the given parent scope ids.
+     */
+    ProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds);
+
+    /**
+     * Only select process instances with the given callback id.
      */
     ProcessInstanceQuery processInstanceCallbackId(String callbackId);
 

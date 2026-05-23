@@ -74,9 +74,9 @@ public class UserCollectionResource {
     @Autowired(required=false)
     protected IdmRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
+    @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
+            @ApiImplicitParam(name = "id", dataType = "string", value = "Only return user with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
             @ApiImplicitParam(name = "lastName", dataType = "string", value = "Only return users with the given lastname", paramType = "query"),
             @ApiImplicitParam(name = "displayName", dataType = "string", value = "Only return users with the given displayName", paramType = "query"),
@@ -92,7 +92,7 @@ public class UserCollectionResource {
             @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
+            @ApiResponse(code = 200, message = "Indicates the requested users are returned.")
     })
     @GetMapping(value = "/users", produces = "application/json")
     public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {

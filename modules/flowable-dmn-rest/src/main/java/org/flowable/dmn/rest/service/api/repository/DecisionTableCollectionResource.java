@@ -69,7 +69,7 @@ public class DecisionTableCollectionResource {
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" }, nickname = "listDecisionTables")
+    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" }, nickname = "listDecisionTables", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision tables with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return decision tables with a category like the given name.", paramType = "query"),
@@ -82,7 +82,7 @@ public class DecisionTableCollectionResource {
             @ApiImplicitParam(name = "resourceNameLike", dataType = "string", value = "Only return decision tables with a name like the given resource name.", paramType = "query"),
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return decision tables with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "Only return the latest decision tables versions. Can only be used together with key and keyLike parameters, using any other parameter will result in a 400-response.", paramType = "query"),
-            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return decision tables with the given category.", paramType = "query"),
+            @ApiImplicitParam(name = "deploymentId", dataType = "string", value = "Only return decision tables with the given deployment id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return decision tables with the given tenant ID.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "name,id,key,category,deploymentId,version", paramType = "query"),
             @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
@@ -90,7 +90,7 @@ public class DecisionTableCollectionResource {
             @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
+            @ApiResponse(code = 200, message = "Indicates request was successful and the decision tables are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that latest is used with other parameters other than key and keyLike. The status-message contains additional information.")
     })
     @GetMapping(value = "/dmn-repository/decision-tables", produces = "application/json")

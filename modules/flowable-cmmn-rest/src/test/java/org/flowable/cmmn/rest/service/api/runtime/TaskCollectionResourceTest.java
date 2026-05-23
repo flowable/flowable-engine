@@ -465,6 +465,20 @@ public class TaskCollectionResourceTest extends BaseSpringRestTestCase {
             url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?dueBefore=" + getISODateString(inBetweenTaskCreation.getTime());
             assertResultsPresentInDataResponse(url, preparedAdhocTask.getId());
 
+            // Without due date filtering — both prepared tasks have a due date, so no results yet
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutDueDate=true";
+            assertResultsPresentInDataResponse(url);
+
+            // Clear the due date on the case task and verify it now matches
+            Task caseTaskToUpdate = taskService.createTaskQuery().taskId(preparedCaseTask.getId()).singleResult();
+            caseTaskToUpdate.setDueDate(null);
+            taskService.saveTask(caseTaskToUpdate);
+            assertResultsPresentInDataResponse(url, preparedCaseTask.getId());
+
+            // withoutDueDate=false must be ignored (matches the documented behavior)
+            url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_COLLECTION) + "?withoutDueDate=false";
+            assertResultsPresentInDataResponse(url, preparedAdhocTask.getId(), preparedCaseTask.getId());
+
         } finally {
             // Clean adhoc-tasks even if test fails
             List<Task> tasks = taskService.createTaskQuery().list();

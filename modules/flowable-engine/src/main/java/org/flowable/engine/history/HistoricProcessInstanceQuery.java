@@ -133,9 +133,19 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
 
     /**
+     * Only select historic process instances with one of the given root scope ids.
+     */
+    HistoricProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds);
+
+    /**
      * Only select historic process instances with the given parent process instance id.
      */
     HistoricProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
+    /**
+     * Only select historic process instances with one of the given parent scope ids.
+     */
+    HistoricProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds);
 
     /**
      * Only select historic process instances that are defined by a process definition with the given deployment identifier.

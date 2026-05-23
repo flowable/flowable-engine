@@ -137,6 +137,12 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         assertResultsPresentInDataResponse(url + "?dueDateBefore=" + LocalDate.of(2013, Month.MAY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 1, task.getId());
 
+        // Without due date — task has a due date, task1 (completed) and task2 do not
+        assertResultsPresentInDataResponse(url + "?withoutDueDate=true", 2, task1.getId(), task2.getId());
+
+        // withoutDueDate=false must be ignored
+        assertResultsPresentInDataResponse(url + "?withoutDueDate=false", 3, task.getId(), task1.getId(), task2.getId());
+
         assertResultsPresentInDataResponse(url + "?taskCreatedOn=" + created.toInstant().toString(), 1, task1.getId());
 
         created.set(Calendar.YEAR, 2002);
