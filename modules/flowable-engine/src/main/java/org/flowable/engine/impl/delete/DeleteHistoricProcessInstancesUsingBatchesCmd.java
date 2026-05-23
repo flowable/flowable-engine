@@ -234,7 +234,9 @@ public class DeleteHistoricProcessInstancesUsingBatchesCmd implements Command<St
         putIfNotNull(queryNode, "referenceId", query.getReferenceId());
         putIfNotNull(queryNode, "referenceType", query.getReferenceType());
         putIfNotNull(queryNode, "processInstanceRootScopeId", query.getRootScopeId());
+        putIfNotNullOrEmpty(queryNode, "processInstanceRootScopeIds", query.getRootScopeIds());
         putIfNotNull(queryNode, "processInstanceParentScopeId", query.getParentScopeId());
+        putIfNotNullOrEmpty(queryNode, "processInstanceParentScopeIds", query.getParentScopeIds());
         for (QueryVariableValue queryVariableValue : query.getQueryVariableValues()) {
             ArrayNode queryVariablesArrayNode = queryNode.withArray("queryVariableValues");
             populateQueryVariableValue(queryVariablesArrayNode, queryVariableValue);

@@ -347,7 +347,8 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         taskService.setVariablesLocal(caseTask.getId(), variables);
 
         // Additional tasks to confirm it's filtered out
-        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        Task caseTask2 = taskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         ArrayNode variableArray = objectMapper.createArrayNode();
@@ -469,6 +470,30 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("value", "AbCdE%");
         variableNode.put("operation", "likeIgnoreCase");
         assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+        // Task variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+        // Task variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Task variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), caseTask2.getId());
+
+        // Task variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask2.getId());
 
         // Any other operation but equals without value
         variableNode.removeAll();

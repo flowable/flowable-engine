@@ -135,6 +135,30 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("operation", "equals");
         assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), task2.getId());
 
+        // Task variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task.getId(), task2.getId());
+
+        // Task variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        // Task variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        // Task variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 1, finishedTaskCase1.getId());
+
         requestNode = objectMapper.createObjectNode();
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
 

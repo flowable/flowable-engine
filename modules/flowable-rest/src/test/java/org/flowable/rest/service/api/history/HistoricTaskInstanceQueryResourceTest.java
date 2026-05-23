@@ -134,6 +134,30 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("operation", "equals");
         assertResultsPresentInPostDataResponse(url, requestNode, 0);
 
+        // Process variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        // Process variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        // Process variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        // Process variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
         requestNode = objectMapper.createObjectNode();
         variableArray = objectMapper.createArrayNode();
         variableNode = objectMapper.createObjectNode();
@@ -143,6 +167,30 @@ public class HistoricTaskInstanceQueryResourceTest extends BaseSpringRestTestCas
         variableNode.put("value", "test");
         variableNode.put("operation", "equals");
         assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
+
+        // Task variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "local");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 1, task.getId());
+
+        // Task variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 0);
+
+        // Task variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());
+
+        // Task variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "local");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, 2, task2.getId());
 
         requestNode = objectMapper.createObjectNode();
         assertResultsPresentInPostDataResponse(url, requestNode, 3, task.getId(), task2.getId());

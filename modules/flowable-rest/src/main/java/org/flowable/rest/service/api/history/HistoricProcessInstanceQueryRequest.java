@@ -83,7 +83,9 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private String tenantIdLikeIgnoreCase;
     private Boolean withoutTenantId;
     private String rootScopeId;
+    private Set<String> rootScopeIds;
     private String parentScopeId;
+    private Set<String> parentScopeIds;
 
     public String getProcessInstanceId() {
         return processInstanceId;
@@ -510,12 +512,28 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
         this.rootScopeId = rootScopeId;
     }
 
+    public Set<String> getRootScopeIds() {
+        return rootScopeIds;
+    }
+
+    public void setRootScopeIds(Set<String> rootScopeIds) {
+        this.rootScopeIds = rootScopeIds;
+    }
+
     public String getParentScopeId() {
         return parentScopeId;
     }
 
     public void setParentScopeId(String parentScopeId) {
         this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return parentScopeIds;
+    }
+
+    public void setParentScopeIds(Set<String> parentScopeIds) {
+        this.parentScopeIds = parentScopeIds;
     }
 
     public Set<String> getCallbackIds() {

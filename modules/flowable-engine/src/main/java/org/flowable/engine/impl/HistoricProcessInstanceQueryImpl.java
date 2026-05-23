@@ -112,7 +112,11 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String nameLike;
     protected String nameLikeIgnoreCase;
     protected String rootScopeId;
+    protected Set<String> rootScopeIds;
+    private List<List<String>> safeRootScopeIds;
     protected String parentScopeId;
+    protected Set<String> parentScopeIds;
+    private List<List<String>> safeParentScopeIds;
     protected String callbackId;
     protected Set<String> callbackIds;
     protected String callbackType;
@@ -369,11 +373,37 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     }
 
     @Override
+    public HistoricProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds) {
+        if (rootScopeIds == null || rootScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("rootScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeIds = rootScopeIds;
+        } else {
+            this.rootScopeIds = rootScopeIds;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricProcessInstanceQuery processInstanceParentScopeId(String parentId) {
         if (inOrStatement) {
             this.currentOrQueryObject.parentScopeId = parentId;
         } else {
             this.parentScopeId = parentId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds) {
+        if (parentScopeIds == null || parentScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("parentScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeIds = parentScopeIds;
+        } else {
+            this.parentScopeIds = parentScopeIds;
         }
         return this;
     }
@@ -1580,7 +1610,31 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
         return rootScopeId;
     }
 
+    public Set<String> getRootScopeIds() {
+        return rootScopeIds;
+    }
+
     public String getParentScopeId() {
         return parentScopeId;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return parentScopeIds;
+    }
+
+    public List<List<String>> getSafeRootScopeIds() {
+        return safeRootScopeIds;
+    }
+
+    public void setSafeRootScopeIds(List<List<String>> safeRootScopeIds) {
+        this.safeRootScopeIds = safeRootScopeIds;
+    }
+
+    public List<List<String>> getSafeParentScopeIds() {
+        return safeParentScopeIds;
+    }
+
+    public void setSafeParentScopeIds(List<List<String>> safeParentScopeIds) {
+        this.safeParentScopeIds = safeParentScopeIds;
     }
 }

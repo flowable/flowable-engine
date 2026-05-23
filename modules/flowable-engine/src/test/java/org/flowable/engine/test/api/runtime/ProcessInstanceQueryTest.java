@@ -2628,6 +2628,87 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeIds() {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance1.getId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance2.getId())
+                .activityId("callActivity2").singleResult();
+
+        List<ProcessInstance> result = runtimeService.createProcessInstanceQuery()
+                .processInstanceRootScopeIds(Set.of(processInstance1.getId(), processInstance2.getId())).list();
+
+        assertThat(result)
+                .extracting(ProcessInstance::getId)
+                .contains(
+                        firstLevelCallActivity1.getCalledProcessInstanceId(),
+                        firstLevelCallActivity2.getCalledProcessInstanceId()
+                );
+        assertThat(result).hasSize(10);
+
+        result = runtimeService.createProcessInstanceQuery()
+                .processInstanceRootScopeIds(Set.of(processInstance1.getId())).list();
+        assertThat(result).hasSize(5);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeIds() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        List<ProcessInstance> result = runtimeService.createProcessInstanceQuery()
+                .processInstanceParentScopeIds(Set.of(
+                        firstLevelCallActivity1.getCalledProcessInstanceId(),
+                        secondLevelCallActivity1.getCalledProcessInstanceId()
+                )).list();
+
+        assertThat(result)
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(
+                        secondLevelCallActivity1.getCalledProcessInstanceId(),
+                        secondLevelCallActivity2.getCalledProcessInstanceId(),
+                        runtimeService.createActivityInstanceQuery()
+                                .processInstanceId(secondLevelCallActivity1.getCalledProcessInstanceId())
+                                .activityId("callActivity1").singleResult().getCalledProcessInstanceId()
+                );
+
+        result = runtimeService.createProcessInstanceQuery()
+                .processInstanceParentScopeIds(Set.of(processInstance.getId())).list();
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testIncludeDefinedVariables() {
         ProcessInstance processInstance = runtimeService

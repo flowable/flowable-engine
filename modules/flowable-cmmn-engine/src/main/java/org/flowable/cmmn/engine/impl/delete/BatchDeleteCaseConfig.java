@@ -290,8 +290,14 @@ public class BatchDeleteCaseConfig {
                 case "caseInstanceRootScopeId":
                     query.caseInstanceRootScopeId(value.stringValue());
                     break;
+                case "caseInstanceRootScopeIds":
+                    query.caseInstanceRootScopeIds(asStringSet(value));
+                    break;
                 case "caseInstanceParentScopeId":
                     query.caseInstanceParentScopeId(value.stringValue());
+                    break;
+                case "caseInstanceParentScopeIds":
+                    query.caseInstanceParentScopeIds(asStringSet(value));
                     break;
                 default:
                     throw new FlowableIllegalArgumentException("Query property " + property + " is not supported");

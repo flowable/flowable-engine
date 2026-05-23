@@ -1454,7 +1454,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return null;
     }
 
+    public Set<String> getRootScopeIds() {
+        return null;
+    }
+
+    public List<List<String>> getSafeRootScopeIds() {
+        return null;
+    }
+
     public String getParentScopeId() {
+        return null;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return null;
+    }
+
+    public List<List<String>> getSafeParentScopeIds() {
         return null;
     }
 

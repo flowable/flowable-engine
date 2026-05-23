@@ -62,7 +62,11 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String nameLike;
     protected String nameLikeIgnoreCase;
     protected String rootScopeId;
+    protected Set<String> rootScopeIds;
+    private List<List<String>> safeRootScopeIds;
     protected String parentScopeId;
+    protected Set<String> parentScopeIds;
+    private List<List<String>> safeParentScopeIds;
     protected String businessKey;
     protected String businessKeyLike;
     protected String businessKeyLikeIgnoreCase;
@@ -376,6 +380,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    public CaseInstanceQuery caseInstanceRootScopeIds(Set<String> rootScopeIds) {
+        if (rootScopeIds == null || rootScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("rootScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeIds = rootScopeIds;
+        } else {
+            this.rootScopeIds = rootScopeIds;
+        }
+        return this;
+    }
+
+    @Override
     public CaseInstanceQuery caseInstanceParentScopeId(String parentScopeId) {
         if (parentScopeId == null) {
             throw new FlowableIllegalArgumentException("parentScopeId is null");
@@ -384,6 +401,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.parentScopeId = parentScopeId;
         } else {
             this.parentScopeId = parentScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery caseInstanceParentScopeIds(Set<String> parentScopeIds) {
+        if (parentScopeIds == null || parentScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("parentScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeIds = parentScopeIds;
+        } else {
+            this.parentScopeIds = parentScopeIds;
         }
         return this;
     }
@@ -1249,8 +1279,16 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return rootScopeId;
     }
 
+    public Set<String> getRootScopeIds() {
+        return rootScopeIds;
+    }
+
     public String getParentScopeId() {
         return parentScopeId;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return parentScopeIds;
     }
 
     public String getParentCaseInstanceId() {
@@ -1349,5 +1387,21 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public List<List<String>> getSafeRootScopeIds() {
+        return safeRootScopeIds;
+    }
+
+    public void setSafeRootScopeIds(List<List<String>> safeRootScopeIds) {
+        this.safeRootScopeIds = safeRootScopeIds;
+    }
+
+    public List<List<String>> getSafeParentScopeIds() {
+        return safeParentScopeIds;
+    }
+
+    public void setSafeParentScopeIds(List<List<String>> safeParentScopeIds) {
+        this.safeParentScopeIds = safeParentScopeIds;
     }
 }

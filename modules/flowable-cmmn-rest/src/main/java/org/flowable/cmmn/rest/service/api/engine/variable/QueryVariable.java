@@ -46,7 +46,7 @@ public class QueryVariable {
         return QueryVariableOperation.forFriendlyName(operation);
     }
 
-    @ApiModelProperty(allowableValues = "equals, notEquals, equalsIgnoreCase, notEqualsIgnoreCase, like, likeIgnoreCase, greaterThan, greaterThanOrEquals, lessThan, lessThanOrEquals")
+    @ApiModelProperty(allowableValues = "equals, notEquals, equalsIgnoreCase, notEqualsIgnoreCase, like, likeIgnoreCase, greaterThan, greaterThanOrEquals, lessThan, lessThanOrEquals, exists, notExists")
     public void setOperation(String operation) {
         this.operation = operation;
     }
@@ -73,7 +73,7 @@ public class QueryVariable {
 
     public enum QueryVariableOperation {
         EQUALS("equals"), NOT_EQUALS("notEquals"), EQUALS_IGNORE_CASE("equalsIgnoreCase"), NOT_EQUALS_IGNORE_CASE("notEqualsIgnoreCase"), LIKE("like"), LIKE_IGNORE_CASE("likeIgnoreCase"), GREATER_THAN("greaterThan"), GREATER_THAN_OR_EQUALS(
-                "greaterThanOrEquals"), LESS_THAN("lessThan"), LESS_THAN_OR_EQUALS("lessThanOrEquals");
+                "greaterThanOrEquals"), LESS_THAN("lessThan"), LESS_THAN_OR_EQUALS("lessThanOrEquals"), EXISTS("exists"), NOT_EXISTS("notExists");
 
         private final String friendlyName;
 

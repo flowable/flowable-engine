@@ -45,7 +45,9 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceNameLike(String caseInstanceNameLike);
     CaseInstanceQuery caseInstanceNameLikeIgnoreCase(String caseInstanceNameLikeIgnoreCase);
     CaseInstanceQuery caseInstanceRootScopeId(String rootScopeId);
+    CaseInstanceQuery caseInstanceRootScopeIds(Set<String> rootScopeIds);
     CaseInstanceQuery caseInstanceParentScopeId(String parentScopeId);
+    CaseInstanceQuery caseInstanceParentScopeIds(Set<String> parentScopeIds);
     CaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
     CaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
     CaseInstanceQuery caseInstanceBusinessKeyLikeIgnoreCase(String caseInstanceBusinessKeyLikeIgnoreCase);

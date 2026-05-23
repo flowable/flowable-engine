@@ -373,7 +373,8 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         taskService.setVariablesLocal(processTask.getId(), variables);
 
         // Additional tasks to confirm it's filtered out
-        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task processTask2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         ArrayNode variableArray = objectMapper.createArrayNode();
@@ -487,6 +488,30 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("name", "stringVar");
         variableNode.put("value", "Abcde%");
         variableNode.put("operation", "like");
+
+        // Task variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
+        // Task variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Task variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId(), processTask2.getId());
+
+        // Task variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask2.getId());
 
         // Any other operation but equals without value
         variableNode.removeAll();
@@ -622,6 +647,30 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("value", "AzErT%");
         variableNode.put("operation", "likeIgnoreCase");
         assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
+        // Process variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId());
+
+        // Process variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Process variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask.getId(), processTask2.getId());
+
+        // Process variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, processTask2.getId());
     }
 
     @Test

@@ -462,10 +462,43 @@
                     and LINK.HIERARCHY_TYPE_ = 'parent'
                 )
             </if>
+            <if test="parentScopeIds != null">
+                and EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+                    (
+                    <foreach item="parentScopeIdListItem" index="groupIndex" collection="safeParentScopeIds">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        LINK.SCOPE_ID_ in
+                        <foreach item="parentScopeIdItem" index="index" collection="parentScopeIdListItem" open="(" separator="," close=")">
+                            #{parentScopeIdItem, jdbcType=NVARCHAR}
+                        </foreach>
+                    </foreach>
+                    )
+                    and LINK.REF_SCOPE_ID_ = RES.ID_
+                    and LINK.HIERARCHY_TYPE_ = 'parent'
+                )
+            </if>
             <if test="rootScopeId != null">
                 and exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
                     LINK.REF_SCOPE_ID_ = RES.ID_
                     and LINK.ROOT_SCOPE_ID_ = #{rootScopeId, jdbcType=NVARCHAR}
+                )
+            </if>
+            <if test="rootScopeIds != null">
+                and exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+                    LINK.REF_SCOPE_ID_ = RES.ID_
+                    and (
+                    <foreach item="rootScopeIdListItem" index="groupIndex" collection="safeRootScopeIds">
+                        <if test="groupIndex &gt; 0">
+                        or
+                        </if>
+                        LINK.ROOT_SCOPE_ID_ in
+                        <foreach item="rootScopeIdItem" index="index" collection="rootScopeIdListItem" open="(" separator="," close=")">
+                            #{rootScopeIdItem, jdbcType=NVARCHAR}
+                        </foreach>
+                    </foreach>
+                    )
                 )
             </if>
             <if test="businessKey != null">
@@ -882,10 +915,43 @@
                             and LINK.HIERARCHY_TYPE_ = 'parent'
                         )
                     </if>
+                    <if test="orQueryObject.parentScopeIds != null">
+                        or EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+                            (
+                            <foreach item="parentScopeIdListItem" index="groupIndex" collection="orQueryObject.safeParentScopeIds">
+                                <if test="groupIndex &gt; 0">
+                                or
+                                </if>
+                                LINK.SCOPE_ID_ in
+                                <foreach item="parentScopeIdItem" index="index" collection="parentScopeIdListItem" open="(" separator="," close=")">
+                                    #{parentScopeIdItem, jdbcType=NVARCHAR}
+                                </foreach>
+                            </foreach>
+                            )
+                            and LINK.REF_SCOPE_ID_ = RES.ID_
+                            and LINK.HIERARCHY_TYPE_ = 'parent'
+                        )
+                    </if>
                     <if test="orQueryObject.rootScopeId != null">
                         or exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
                             LINK.REF_SCOPE_ID_ = RES.ID_
                             and LINK.ROOT_SCOPE_ID_ = #{orQueryObject.rootScopeId, jdbcType=NVARCHAR}
+                        )
+                    </if>
+                    <if test="orQueryObject.rootScopeIds != null">
+                        or exists(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
+                            LINK.REF_SCOPE_ID_ = RES.ID_
+                            and (
+                            <foreach item="rootScopeIdListItem" index="groupIndex" collection="orQueryObject.safeRootScopeIds">
+                                <if test="groupIndex &gt; 0">
+                                or
+                                </if>
+                                LINK.ROOT_SCOPE_ID_ in
+                                <foreach item="rootScopeIdItem" index="index" collection="rootScopeIdListItem" open="(" separator="," close=")">
+                                    #{rootScopeIdItem, jdbcType=NVARCHAR}
+                                </foreach>
+                            </foreach>
+                            )
                         )
                     </if>
                     <foreach collection="orQueryObject.queryVariableValues" index="index" item="queryVariableValue">

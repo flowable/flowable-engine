@@ -93,7 +93,11 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String nameLike;
     protected String nameLikeIgnoreCase;
     protected String rootScopeId;
+    protected Set<String> rootScopeIds;
+    private List<List<String>> safeRootScopeIds;
     protected String parentScopeId;
+    protected Set<String> parentScopeIds;
+    private List<List<String>> safeParentScopeIds;
     protected String activeActivityId;
     protected Set<String> activeActivityIds;
     protected String callbackId;
@@ -709,11 +713,37 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds) {
+        if (rootScopeIds == null || rootScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("rootScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootScopeIds = rootScopeIds;
+        } else {
+            this.rootScopeIds = rootScopeIds;
+        }
+        return this;
+    }
+
+    @Override
     public ProcessInstanceQuery processInstanceParentScopeId(String parentId) {
         if (inOrStatement) {
             this.currentOrQueryObject.parentScopeId = parentId;
         } else {
             this.parentScopeId = parentId;
+        }
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds) {
+        if (parentScopeIds == null || parentScopeIds.isEmpty()) {
+            throw new FlowableIllegalArgumentException("parentScopeIds is null or empty");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentScopeIds = parentScopeIds;
+        } else {
+            this.parentScopeIds = parentScopeIds;
         }
         return this;
     }
@@ -1122,6 +1152,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         return rootScopeId;
     }
 
+    public Set<String> getRootScopeIds() {
+        return rootScopeIds;
+    }
+
     public String getBusinessKey() {
         return businessKey;
     }
@@ -1172,6 +1206,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getParentScopeId() {
         return parentScopeId;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return parentScopeIds;
     }
 
     public String getProcessDefinitionName() {
@@ -1438,5 +1476,21 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public List<List<String>> getSafeRootScopeIds() {
+        return safeRootScopeIds;
+    }
+
+    public void setSafeRootScopeIds(List<List<String>> safeRootScopeIds) {
+        this.safeRootScopeIds = safeRootScopeIds;
+    }
+
+    public List<List<String>> getSafeParentScopeIds() {
+        return safeParentScopeIds;
+    }
+
+    public void setSafeParentScopeIds(List<List<String>> safeParentScopeIds) {
+        this.safeParentScopeIds = safeParentScopeIds;
     }
 }
