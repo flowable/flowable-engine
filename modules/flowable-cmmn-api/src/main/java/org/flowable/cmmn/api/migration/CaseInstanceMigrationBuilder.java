@@ -14,6 +14,7 @@
 package org.flowable.cmmn.api.migration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 
@@ -30,6 +31,15 @@ public interface CaseInstanceMigrationBuilder {
      * @see CaseInstanceMigrationDocument
      */
     CaseInstanceMigrationBuilder fromCaseInstanceMigrationDocument(CaseInstanceMigrationDocument caseInstanceMigrationDocument);
+
+    /**
+     * Specifies specific case instance ids to migrate. When set, only these case instances will be migrated
+     * instead of all case instances of the source case definition.
+     *
+     * @param caseInstanceIds Set of case instance ids to migrate
+     * @return Returns the builder
+     */
+    CaseInstanceMigrationBuilder withCaseInstanceIdsToMigrate(Set<String> caseInstanceIds);
 
     /**
      * Specifies the case definition to migrate to, using the case definition id

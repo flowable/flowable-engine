@@ -15,8 +15,10 @@ package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
@@ -38,6 +40,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected Integer migrateToCaseDefinitionVersion;
     protected String migrateToCaseDefinitionTenantId;
     protected Boolean enableAutomaticPlanItemInstanceCreation;
+    protected Set<String> caseInstanceIdsToMigrate = new LinkedHashSet<>();
     protected List<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<MoveToAvailablePlanItemDefinitionMapping> moveToAvailablePlanItemDefinitionMappings = new ArrayList<>();
@@ -47,7 +50,7 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
     protected List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings = new ArrayList<>();
     protected String preUpgradeExpression;
-    protected String postUpgradeExpression;
+    protected String postUpgradeExpression;    
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> planItemLocalVariables = new HashMap<>();
 
@@ -68,6 +71,15 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
         this.migrateToCaseDefinitionKey = caseDefinitionKey;
         this.migrateToCaseDefinitionVersion = caseDefinitionVersion;
         this.migrateToCaseDefinitionTenantId = caseDefinitionTenantId;
+    }
+    
+    @Override
+    public Set<String> getCaseInstanceIdsToMigrate() {
+        return caseInstanceIdsToMigrate;
+    }
+
+    public void setCaseInstanceIdsToMigrate(Set<String> caseInstanceIdsToMigrate) {
+        this.caseInstanceIdsToMigrate = caseInstanceIdsToMigrate;
     }
 
     public void setActivatePlanItemDefinitionMappings(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings) {

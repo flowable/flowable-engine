@@ -22,9 +22,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.assertj.core.groups.Tuple;
@@ -6481,7 +6483,12 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         MoveToAvailablePlanItemDefinitionMapping moveToAvailablePlanItemDefinitionMapping = PlanItemDefinitionMappingBuilder.createMoveToAvailablePlanItemDefinitionMappingFor("availableId", "${availableCondition}");
         moveToAvailablePlanItemDefinitionMapping.setWithLocalVariables(localVariables);
 
+        Set<String> caseInstanceIds = new LinkedHashSet<>();
+        caseInstanceIds.add("caseId1");
+        caseInstanceIds.add("caseId2");
+
         String documentAsJson = this.cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .withCaseInstanceIdsToMigrate(caseInstanceIds)
                 .addTerminatePlanItemDefinitionMapping(
                         PlanItemDefinitionMappingBuilder.createTerminatePlanItemDefinitionMappingFor("terminateId", "${terminateCondition}"))
                 .addMoveToAvailablePlanItemDefinitionMapping(moveToAvailablePlanItemDefinitionMapping)
@@ -6580,6 +6587,49 @@ public class CaseInstanceMigrationTest extends AbstractCaseMigrationTest {
         cmmnTaskService.complete(thirdTask.getId());
 
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    @Test
+    void migrateCaseInstancesWithSpecificCaseInstanceIds() {
+        // Arrange
+        deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/one-task.cmmn.xml");
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", "org/flowable/cmmn/test/migration/two-task.cmmn.xml");
+
+        Set<String> caseInstanceIds = new LinkedHashSet<>();
+        caseInstanceIds.add(caseInstance1.getId());
+        caseInstanceIds.add(caseInstance3.getId());
+
+        // Act - only migrate caseInstance1 and caseInstance3
+        cmmnMigrationService.createCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .withCaseInstanceIdsToMigrate(caseInstanceIds)
+                .addActivatePlanItemDefinitionMapping(PlanItemDefinitionMappingBuilder.createActivatePlanItemDefinitionMappingFor("humanTask2"))
+                .migrateCaseInstances(caseInstance1.getCaseDefinitionId());
+
+        // Assert - caseInstance1 and caseInstance3 should be migrated
+        CaseInstance caseInstance1AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance1.getId())
+                .singleResult();
+        assertThat(caseInstance1AfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+
+        CaseInstance caseInstance3AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance3.getId())
+                .singleResult();
+        assertThat(caseInstance3AfterMigration.getCaseDefinitionId()).isEqualTo(destinationDefinition.getId());
+
+        // Assert - caseInstance2 should NOT be migrated
+        CaseInstance caseInstance2AfterMigration = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance2.getId())
+                .singleResult();
+        assertThat(caseInstance2AfterMigration.getCaseDefinitionId()).isNotEqualTo(destinationDefinition.getId());
+
+        // Cleanup
+        cmmnRuntimeService.terminateCaseInstance(caseInstance1.getId());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance2.getId());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance3.getId());
     }
 
     protected class CustomTenantProvider implements DefaultTenantProvider {

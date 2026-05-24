@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
@@ -112,8 +113,12 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
                 CmmnModel newModel = CaseDefinitionUtil.getCmmnModel(caseDefinition.getId());
 
                 CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-                List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(
-                        new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId));
+                CaseInstanceQueryImpl caseInstanceQuery = new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId);
+                Set<String> caseInstanceIdsToMigrate = document.getCaseInstanceIdsToMigrate();
+                if (caseInstanceIdsToMigrate != null && !caseInstanceIdsToMigrate.isEmpty()) {
+                    caseInstanceQuery.caseInstanceIds(caseInstanceIdsToMigrate);
+                }
+                List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(caseInstanceQuery);
 
                 for (CaseInstance caseInstance : caseInstances) {
                     doValidateCaseInstanceMigration(caseInstance.getId(), newModel, document, validationResult, commandContext);
@@ -251,6 +256,10 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
 
         CaseInstanceQueryImpl caseInstanceQueryByCaseDefinitionId = new CaseInstanceQueryImpl(commandContext, cmmnEngineConfiguration).caseDefinitionId(caseDefinitionId);
+        Set<String> caseInstanceIdsToMigrate = document.getCaseInstanceIdsToMigrate();
+        if (caseInstanceIdsToMigrate != null && !caseInstanceIdsToMigrate.isEmpty()) {
+            caseInstanceQueryByCaseDefinitionId.caseInstanceIds(caseInstanceIdsToMigrate);
+        }
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         List<CaseInstance> caseInstances = caseInstanceEntityManager.findByCriteria(caseInstanceQueryByCaseDefinitionId);
 
@@ -534,8 +543,12 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         CaseDefinition caseDefinition = resolveCaseDefinition(document, commandContext);
 
         CmmnEngineConfiguration engineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
-        List<CaseInstanceEntity> caseInstances = engineConfiguration.getCaseInstanceEntityManager()
-                .findCaseInstancesByCaseDefinitionId(caseDefinitionId);
+        CaseInstanceQueryImpl caseInstanceQuery = new CaseInstanceQueryImpl(commandContext, engineConfiguration).caseDefinitionId(caseDefinitionId);
+        Set<String> caseInstanceIdsToMigrate = document.getCaseInstanceIdsToMigrate();
+        if (caseInstanceIdsToMigrate != null && !caseInstanceIdsToMigrate.isEmpty()) {
+            caseInstanceQuery.caseInstanceIds(caseInstanceIdsToMigrate);
+        }
+        List<CaseInstance> caseInstances = engineConfiguration.getCaseInstanceEntityManager().findByCriteria(caseInstanceQuery);
 
         BatchService batchService = engineConfiguration.getBatchServiceConfiguration().getBatchService();
         Batch batch = batchService.createBatchBuilder().batchType(Batch.CASE_MIGRATION_TYPE)

@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Valentin Zickner
@@ -28,6 +29,8 @@ public interface CaseInstanceMigrationDocument {
     Integer getMigrateToCaseDefinitionVersion();
 
     String getMigrateToCaseDefinitionTenantId();
+    
+    Set<String> getCaseInstanceIdsToMigrate();
     
     Boolean getEnableAutomaticPlanItemInstanceCreation();
 

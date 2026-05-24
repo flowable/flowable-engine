@@ -18,6 +18,7 @@ package org.flowable.engine.migration;
  */
 public interface ProcessInstanceMigrationDocumentConstants {
 
+    String PROCESS_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY = "processInstanceIdsToMigrate";
     String TO_PROCESS_DEFINITION_ID_JSON_PROPERTY = "toProcessDefinitionId";
     String TO_PROCESS_DEFINITION_KEY_JSON_PROPERTY = "toProcessDefinitionKey";
     String TO_PROCESS_DEFINITION_VERSION_JSON_PROPERTY = "toProcessDefinitionVersion";

@@ -13,8 +13,10 @@
 package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +53,15 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
 
     public static JsonNode convertToJson(CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
         ObjectNode documentNode = objectMapper.createObjectNode();
+
+        Set<String> caseInstanceIdsToMigrate = caseInstanceMigrationDocument.getCaseInstanceIdsToMigrate();
+        if (caseInstanceIdsToMigrate != null && !caseInstanceIdsToMigrate.isEmpty()) {
+            ArrayNode idsArray = objectMapper.createArrayNode();
+            for (String id : caseInstanceIdsToMigrate) {
+                idsArray.add(id);
+            }
+            documentNode.set(CASE_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY, idsArray);
+        }
 
         if (caseInstanceMigrationDocument.getMigrateToCaseDefinitionId() != null) {
             documentNode.put(TO_CASE_DEFINITION_ID_JSON_PROPERTY, caseInstanceMigrationDocument.getMigrateToCaseDefinitionId());
@@ -298,6 +309,15 @@ public class CaseInstanceMigrationDocumentConverter implements CaseInstanceMigra
         try {
             JsonNode rootNode = objectMapper.readTree(jsonCaseInstanceMigrationDocument);
             CaseInstanceMigrationDocumentBuilderImpl documentBuilder = new CaseInstanceMigrationDocumentBuilderImpl();
+
+            JsonNode caseInstanceIdsNode = rootNode.get(CASE_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY);
+            if (caseInstanceIdsNode != null && caseInstanceIdsNode.isArray()) {
+                Set<String> caseInstanceIds = new LinkedHashSet<>();
+                for (JsonNode idNode : caseInstanceIdsNode) {
+                    caseInstanceIds.add(idNode.asString());
+                }
+                documentBuilder.setCaseInstanceIdsToMigrate(caseInstanceIds);
+            }
 
             documentBuilder.setCaseDefinitionToMigrateTo(getJsonProperty(TO_CASE_DEFINITION_ID_JSON_PROPERTY, rootNode));
             

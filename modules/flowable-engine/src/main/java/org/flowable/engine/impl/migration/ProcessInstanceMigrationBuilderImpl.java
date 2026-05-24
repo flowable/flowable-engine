@@ -14,6 +14,7 @@
 package org.flowable.engine.impl.migration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.api.FlowableException;
@@ -35,7 +36,14 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
+    public ProcessInstanceMigrationBuilder withProcessInstanceIdsToMigrate(Set<String> processInstanceIds) {
+        this.migrationDocumentBuilder.setProcessInstanceIdsToMigrate(processInstanceIds);
+        return this;
+    }
+
+    @Override
     public ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        migrationDocumentBuilder.setProcessInstanceIdsToMigrate(document.getProcessInstanceIdsToMigrate());
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionId());
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion());
         migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());

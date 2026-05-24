@@ -122,9 +122,13 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         
                 ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
                 ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
-                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(
-                        new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinitionId));
-        
+                ProcessInstanceQueryImpl processInstanceQuery = new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinitionId);
+                Set<String> processInstanceIdsToMigrate = document.getProcessInstanceIdsToMigrate();
+                if (processInstanceIdsToMigrate != null && !processInstanceIdsToMigrate.isEmpty()) {
+                    processInstanceQuery.processInstanceIds(processInstanceIdsToMigrate);
+                }
+                List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQuery);
+
                 for (ProcessInstance processInstance : processInstances) {
                     doValidateProcessInstanceMigration(processInstance.getId(), processDefinition.getTenantId(), newModel, document, validationResult, commandContext);
                 }
@@ -329,8 +333,12 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
-        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(
-                new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(sourceProcDefId));
+        ProcessInstanceQueryImpl processInstanceQuery = new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(sourceProcDefId);
+        Set<String> processInstanceIdsToMigrate = document.getProcessInstanceIdsToMigrate();
+        if (processInstanceIdsToMigrate != null && !processInstanceIdsToMigrate.isEmpty()) {
+            processInstanceQuery.processInstanceIds(processInstanceIdsToMigrate);
+        }
+        List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQuery);
 
         BatchService batchService = processEngineConfiguration.getBatchServiceConfiguration().getBatchService();
         BatchBuilder batchBuilder = batchService.createBatchBuilder().batchType(Batch.PROCESS_MIGRATION_TYPE)
@@ -393,6 +401,10 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ProcessInstanceQueryImpl processInstanceQueryByProcessDefinitionId = new ProcessInstanceQueryImpl(commandContext, processEngineConfiguration).processDefinitionId(processDefinitionId);
+        Set<String> processInstanceIdsToMigrate = document.getProcessInstanceIdsToMigrate();
+        if (processInstanceIdsToMigrate != null && !processInstanceIdsToMigrate.isEmpty()) {
+            processInstanceQueryByProcessDefinitionId.processInstanceIds(processInstanceIdsToMigrate);
+        }
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
         List<ProcessInstance> processInstances = executionEntityManager.findProcessInstanceByQueryCriteria(processInstanceQueryByProcessDefinitionId);
 

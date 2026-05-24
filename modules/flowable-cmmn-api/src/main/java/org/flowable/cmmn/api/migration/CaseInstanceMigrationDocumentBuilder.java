@@ -15,11 +15,14 @@ package org.flowable.cmmn.api.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Valentin Zickner
  */
 public interface CaseInstanceMigrationDocumentBuilder {
+
+    CaseInstanceMigrationDocumentBuilder setCaseInstanceIdsToMigrate(Set<String> caseInstanceIds);
 
     CaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionId);
 

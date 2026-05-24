@@ -17,6 +17,7 @@ package org.flowable.cmmn.engine.impl.migration;
  */
 public interface CaseInstanceMigrationDocumentConstants {
 
+    String CASE_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY = "caseInstanceIdsToMigrate";
     String TO_CASE_DEFINITION_ID_JSON_PROPERTY = "toCaseDefinitionId";
     String TO_CASE_DEFINITION_KEY_JSON_PROPERTY = "toCaseDefinitionKey";
     String TO_CASE_DEFINITION_VERSION_JSON_PROPERTY = "toCaseDefinitionVersion";

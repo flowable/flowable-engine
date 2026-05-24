@@ -14,9 +14,11 @@ package org.flowable.engine.migration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -60,6 +62,15 @@ public class ProcessInstanceMigrationDocumentConverter {
     public static JsonNode convertToJson(ProcessInstanceMigrationDocument processInstanceMigrationDocument) {
 
         ObjectNode documentNode = objectMapper.createObjectNode();
+
+        Set<String> processInstanceIdsToMigrate = processInstanceMigrationDocument.getProcessInstanceIdsToMigrate();
+        if (processInstanceIdsToMigrate != null && !processInstanceIdsToMigrate.isEmpty()) {
+            ArrayNode idsArray = objectMapper.createArrayNode();
+            for (String id : processInstanceIdsToMigrate) {
+                idsArray.add(id);
+            }
+            documentNode.set(ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY, idsArray);
+        }
 
         if (processInstanceMigrationDocument.getMigrateToProcessDefinitionId() != null) {
             documentNode.put(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_ID_JSON_PROPERTY, processInstanceMigrationDocument.getMigrateToProcessDefinitionId());
@@ -162,6 +173,15 @@ public class ProcessInstanceMigrationDocumentConverter {
         try {
             JsonNode rootNode = objectMapper.readTree(jsonProcessInstanceMigrationDocument);
             ProcessInstanceMigrationDocumentBuilderImpl documentBuilder = new ProcessInstanceMigrationDocumentBuilderImpl();
+
+            JsonNode processInstanceIdsNode = rootNode.get(ProcessInstanceMigrationDocumentConstants.PROCESS_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY);
+            if (processInstanceIdsNode != null && processInstanceIdsNode.isArray()) {
+                Set<String> processInstanceIds = new LinkedHashSet<>();
+                for (JsonNode idNode : processInstanceIdsNode) {
+                    processInstanceIds.add(idNode.asString());
+                }
+                documentBuilder.setProcessInstanceIdsToMigrate(processInstanceIds);
+            }
 
             String processDefinitionId = rootNode.path(ProcessInstanceMigrationDocumentConstants.TO_PROCESS_DEFINITION_ID_JSON_PROPERTY).stringValue(null);
             documentBuilder.setProcessDefinitionToMigrateTo(processDefinitionId);
