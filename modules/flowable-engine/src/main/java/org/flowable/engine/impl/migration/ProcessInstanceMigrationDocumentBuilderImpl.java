@@ -15,8 +15,10 @@ package org.flowable.engine.impl.migration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
@@ -31,6 +33,7 @@ import org.flowable.engine.migration.Script;
  */
 public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInstanceMigrationDocumentBuilder {
 
+    protected Set<String> processInstanceIdsToMigrate = new LinkedHashSet<>();
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
     protected Integer migrateToProcessDefinitionVersion;
@@ -44,6 +47,12 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
     protected Script postUpgradeScript;
     protected String postUpgradeJavaDelegate;
     protected String postUpgradeJavaDelegateExpression;
+
+    @Override
+    public ProcessInstanceMigrationDocumentBuilder setProcessInstanceIdsToMigrate(Set<String> processInstanceIds) {
+        this.processInstanceIdsToMigrate = processInstanceIds;
+        return this;
+    }
 
     @Override
     public ProcessInstanceMigrationDocumentBuilder setProcessDefinitionToMigrateTo(String processDefinitionId) {
@@ -149,6 +158,7 @@ public class ProcessInstanceMigrationDocumentBuilderImpl implements ProcessInsta
         }
 
         ProcessInstanceMigrationDocumentImpl document = new ProcessInstanceMigrationDocumentImpl();
+        document.setProcessInstanceIdsToMigrate(processInstanceIdsToMigrate);
         document.setMigrateToProcessDefinitionId(migrateToProcessDefinitionId);
         document.setMigrateToProcessDefinition(migrateToProcessDefinitionKey, migrateToProcessDefinitionVersion, migrateToProcessDefinitionTenantId);
         if (preUpgradeScript != null) {

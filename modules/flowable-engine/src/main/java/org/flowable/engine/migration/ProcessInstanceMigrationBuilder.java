@@ -14,6 +14,7 @@
 package org.flowable.engine.migration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 
@@ -27,6 +28,15 @@ public interface ProcessInstanceMigrationBuilder {
      * @see ProcessInstanceMigrationDocument
      */
     ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument processInstanceMigrationDocument);
+
+    /**
+     * Specifies specific process instance ids to migrate. When set, only these process instances will be migrated
+     * instead of all process instances of the source process definition.
+     *
+     * @param processInstanceIds Set of process instance ids to migrate
+     * @return Returns the builder
+     */
+    ProcessInstanceMigrationBuilder withProcessInstanceIdsToMigrate(Set<String> processInstanceIds);
 
     /**
      * Specifies the process definition to migrate to, using the process definition id

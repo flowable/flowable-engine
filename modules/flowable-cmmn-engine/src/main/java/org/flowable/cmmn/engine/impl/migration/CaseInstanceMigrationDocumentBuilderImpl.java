@@ -15,8 +15,10 @@ package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
@@ -34,6 +36,7 @@ import org.flowable.cmmn.api.migration.WaitingForRepetitionPlanItemDefinitionMap
  */
 public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMigrationDocumentBuilder {
 
+    protected Set<String> caseInstanceIdsToMigrate = new LinkedHashSet<>();
     protected String migrateToCaseDefinitionId;
     protected String migrateToCaseDefinitionKey;
     protected Integer migrateToCaseDefinitionVersion;
@@ -50,6 +53,12 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     protected String preUpgradeExpression;
     protected String postUpgradeExpression;
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
+
+    @Override
+    public CaseInstanceMigrationDocumentBuilder setCaseInstanceIdsToMigrate(Set<String> caseInstanceIds) {
+        this.caseInstanceIdsToMigrate = caseInstanceIds;
+        return this;
+    }
 
     @Override
     public CaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionId) {
@@ -200,6 +209,7 @@ public class CaseInstanceMigrationDocumentBuilderImpl implements CaseInstanceMig
     @Override
     public CaseInstanceMigrationDocument build() {
         CaseInstanceMigrationDocumentImpl caseInstanceMigrationDocument = new CaseInstanceMigrationDocumentImpl();
+        caseInstanceMigrationDocument.setCaseInstanceIdsToMigrate(this.caseInstanceIdsToMigrate);
         caseInstanceMigrationDocument.setMigrateToCaseDefinitionId(this.migrateToCaseDefinitionId);
         caseInstanceMigrationDocument.setMigrateToCaseDefinition(this.migrateToCaseDefinitionKey, this.migrateToCaseDefinitionVersion, this.migrateToCaseDefinitionTenantId);
         caseInstanceMigrationDocument.setEnableAutomaticPlanItemInstanceCreation(this.enableAutomaticPlanItemInstanceCreation);

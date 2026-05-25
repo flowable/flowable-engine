@@ -15,12 +15,15 @@ package org.flowable.engine.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Dennis Federico
  * @author martin.grofcik
  */
 public interface ProcessInstanceMigrationDocument {
+
+    Set<String> getProcessInstanceIdsToMigrate();
 
     String getMigrateToProcessDefinitionId();
 

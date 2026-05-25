@@ -14,6 +14,7 @@
 package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.cmmn.api.CmmnMigrationService;
@@ -43,7 +44,14 @@ public class CaseInstanceMigrationBuilderImpl implements CaseInstanceMigrationBu
     }
 
     @Override
+    public CaseInstanceMigrationBuilder withCaseInstanceIdsToMigrate(Set<String> caseInstanceIds) {
+        this.caseInstanceMigrationDocumentDocumentBuilder.setCaseInstanceIdsToMigrate(caseInstanceIds);
+        return this;
+    }
+
+    @Override
     public CaseInstanceMigrationBuilder fromCaseInstanceMigrationDocument(CaseInstanceMigrationDocument caseInstanceMigrationDocument) {
+        this.caseInstanceMigrationDocumentDocumentBuilder.setCaseInstanceIdsToMigrate(caseInstanceMigrationDocument.getCaseInstanceIdsToMigrate());
         this.caseInstanceMigrationDocumentDocumentBuilder.setCaseDefinitionToMigrateTo(caseInstanceMigrationDocument.getMigrateToCaseDefinitionId());
         this.caseInstanceMigrationDocumentDocumentBuilder.setCaseDefinitionToMigrateTo(caseInstanceMigrationDocument.getMigrateToCaseDefinitionKey(), caseInstanceMigrationDocument.getMigrateToCaseDefinitionVersion());
         this.caseInstanceMigrationDocumentDocumentBuilder.setTenantId(caseInstanceMigrationDocument.getMigrateToCaseDefinitionTenantId());

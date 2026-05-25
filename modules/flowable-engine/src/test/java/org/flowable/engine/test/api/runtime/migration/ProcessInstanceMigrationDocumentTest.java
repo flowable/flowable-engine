@@ -19,8 +19,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.IoUtil;
@@ -515,6 +517,27 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
     }
     
+    @Test
+    public void testSerializeDeSerializeProcessInstanceIdsToMigrate() {
+        Set<String> processInstanceIds = new LinkedHashSet<>();
+        processInstanceIds.add("procId1");
+        processInstanceIds.add("procId2");
+        processInstanceIds.add("procId3");
+
+        ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
+                .migrateToProcessDefinition("targetDefId")
+                .withProcessInstanceIdsToMigrate(processInstanceIds)
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("act1", "act2"))
+                .getProcessInstanceMigrationDocument();
+
+        String serializedDocument = document.asJsonString();
+
+        ProcessInstanceMigrationDocument deserialized = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
+
+        assertThat(deserialized.getProcessInstanceIdsToMigrate()).containsExactly("procId1", "procId2", "procId3");
+        assertThat(deserialized.getMigrateToProcessDefinitionId()).isEqualTo("targetDefId");
+    }
+
     protected void assertActivityMappings(ProcessInstanceMigrationDocument migrationDocument, List<ActivityMigrationMapping> activityMigrationMappings) {
         assertThat(migrationDocument.getActivityMigrationMappings()).hasSize(activityMigrationMappings.size());
         for (int i = 0; i < migrationDocument.getActivityMigrationMappings().size(); i++) {

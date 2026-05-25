@@ -24,9 +24,11 @@ import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
@@ -4889,6 +4891,53 @@ public class ProcessInstanceMigrationTest extends AbstractProcessInstanceMigrati
         assertThat(updateList)
                 .extracting(historicDetail -> ((HistoricDetailVariableInstanceUpdateEntity) historicDetail).getVariableType().getTypeName())
                 .containsExactly(values);
+    }
+
+    @Test
+    public void testMigrateProcessInstancesWithSpecificProcessInstanceIds() {
+        //Deploy first version of the process
+        ProcessDefinition version1ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("MP");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("MP");
+        ProcessInstance processInstance3 = runtimeService.startProcessInstanceByKey("MP");
+
+        //Deploy second version of the process
+        ProcessDefinition version2ProcessDef = deployProcessDefinition("my deploy",
+                "org/flowable/engine/test/api/runtime/migration/two-tasks-simple-process.bpmn20.xml");
+
+        Set<String> processInstanceIds = new LinkedHashSet<>();
+        processInstanceIds.add(processInstance1.getId());
+        processInstanceIds.add(processInstance3.getId());
+
+        //Migrate only processInstance1 and processInstance3
+        processMigrationService.createProcessInstanceMigrationBuilder()
+                .migrateToProcessDefinition(version2ProcessDef.getId())
+                .withProcessInstanceIdsToMigrate(processInstanceIds)
+                .migrateProcessInstances(version1ProcessDef.getId());
+
+        // processInstance1 and processInstance3 should be migrated
+        List<Execution> executions1 = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).list();
+        for (Execution execution : executions1) {
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        }
+
+        List<Execution> executions3 = runtimeService.createExecutionQuery().processInstanceId(processInstance3.getId()).list();
+        for (Execution execution : executions3) {
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version2ProcessDef.getId());
+        }
+
+        // processInstance2 should NOT be migrated
+        List<Execution> executions2 = runtimeService.createExecutionQuery().processInstanceId(processInstance2.getId()).list();
+        for (Execution execution : executions2) {
+            assertThat(((ExecutionEntity) execution).getProcessDefinitionId()).isEqualTo(version1ProcessDef.getId());
+        }
+
+        // Cleanup
+        runtimeService.deleteProcessInstance(processInstance1.getId(), "test");
+        runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
+        runtimeService.deleteProcessInstance(processInstance3.getId(), "test");
     }
 
     private void assertThatProcessVariableConverted(ProcessInstance processInstanceToMigrate, Execution execution) {

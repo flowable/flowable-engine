@@ -15,8 +15,10 @@ package org.flowable.engine.impl.migration;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,6 +38,7 @@ import tools.jackson.databind.JsonNode;
  */
 public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigrationDocument {
 
+    protected Set<String> processInstanceIdsToMigrate = new LinkedHashSet<>();
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
     protected Integer migrateToProcessDefinitionVersion;
@@ -53,6 +56,15 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
 
     public static ProcessInstanceMigrationDocument fromJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
+    }
+
+    @Override
+    public Set<String> getProcessInstanceIdsToMigrate() {
+        return processInstanceIdsToMigrate;
+    }
+
+    public void setProcessInstanceIdsToMigrate(Set<String> processInstanceIdsToMigrate) {
+        this.processInstanceIdsToMigrate = processInstanceIdsToMigrate;
     }
 
     public void setMigrateToProcessDefinitionId(String processDefinitionId) {
