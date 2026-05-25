@@ -170,6 +170,9 @@ public class HistoricCaseInstanceBaseResource {
         if (queryRequest.getParentCaseInstanceId() != null) {
             query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
         }
+        if (queryRequest.getParentProcessInstanceId() != null) {
+            query.parentProcessInstanceId(queryRequest.getParentProcessInstanceId());
+        }
         if (queryRequest.getCaseInstanceReferenceId() != null) {
             query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
         }

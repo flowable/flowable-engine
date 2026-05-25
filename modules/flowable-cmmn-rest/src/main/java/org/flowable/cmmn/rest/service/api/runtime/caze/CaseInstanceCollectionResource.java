@@ -94,6 +94,7 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
             @ApiImplicitParam(name = "callbackIds", dataType = "string", value = "Only return case instances which have the given callback ids.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return case instances which have the given callback type.", paramType = "query"),
             @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return case instances which have the given parent case instance id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentProcessInstanceId", dataType = "string", value = "Only return case instances started from the given parent process instance id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return case instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return case instances which have the given reference type.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return case instances last reactivated by the given user.", paramType = "query"),
@@ -251,6 +252,10 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
         
         if (allRequestParams.containsKey("parentCaseInstanceId")) {
             queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("parentProcessInstanceId")) {
+            queryRequest.setParentProcessInstanceId(allRequestParams.get("parentProcessInstanceId"));
         }
 
         if (allRequestParams.containsKey("referenceId")) {

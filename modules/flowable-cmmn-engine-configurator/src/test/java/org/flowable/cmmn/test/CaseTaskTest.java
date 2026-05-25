@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.assertj.core.groups.Tuple;
 import org.flowable.cmmn.api.CallbackTypes;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableException;
@@ -1540,6 +1541,65 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             }
 
             return null;
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/CaseTaskTest.testCaseTask.cmmn")
+    public void testParentProcessInstanceIdQuery() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey("caseTask");
+            List<Task> processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertThat(processTasks).hasSize(1);
+
+            processEngineTaskService.complete(processTasks.get(0).getId());
+
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .parentProcessInstanceId(processInstance.getId())
+                    .singleResult();
+            assertThat(caseInstance).isNotNull();
+            assertThat(caseInstance.getCallbackType()).isEqualTo(CallbackTypes.EXECUTION_CHILD_CASE);
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .parentProcessInstanceId("nonExistingId")
+                    .count()).isZero();
+
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .parentProcessInstanceId(processInstance.getId())
+                    .singleResult();
+            assertThat(historicCaseInstance).isNotNull();
+            assertThat(historicCaseInstance.getId()).isEqualTo(caseInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .parentProcessInstanceId("nonExistingId")
+                    .count()).isZero();
+
+            List<Task> caseTasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(caseTasks).hasSize(1);
+            cmmnTaskService.complete(caseTasks.get(0).getId());
+
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                    .parentProcessInstanceId(processInstance.getId())
+                    .count()).isZero();
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .parentProcessInstanceId(processInstance.getId())
+                    .singleResult()).isNotNull();
+
+            processTasks = processEngineTaskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+            assertThat(processTasks).hasSize(1);
+            processEngineTaskService.complete(processTasks.get(0).getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .parentProcessInstanceId(processInstance.getId())
+                    .singleResult()).isNotNull();
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
 

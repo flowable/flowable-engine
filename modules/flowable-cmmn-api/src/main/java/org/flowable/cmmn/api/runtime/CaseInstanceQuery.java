@@ -66,6 +66,7 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
     CaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
+    CaseInstanceQuery parentProcessInstanceId(String parentProcessInstanceId);
     CaseInstanceQuery caseInstanceReferenceId(String referenceId);
     CaseInstanceQuery caseInstanceReferenceType(String referenceType);
     CaseInstanceQuery caseInstanceIsCompleteable();
