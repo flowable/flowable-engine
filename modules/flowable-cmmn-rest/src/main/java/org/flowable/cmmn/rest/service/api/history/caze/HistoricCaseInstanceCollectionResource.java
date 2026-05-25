@@ -84,6 +84,7 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
             @ApiImplicitParam(name = "callbackId", dataType = "string", value = "Only return historic case instances which have the given callback id.", paramType = "query"),
             @ApiImplicitParam(name = "callbackType", dataType = "string", value = "Only return historic case instances which have the given callback type.", paramType = "query"),
             @ApiImplicitParam(name = "parentCaseInstanceId", dataType = "string", value = "Only return historic case instances which have the given parent case instance id.", paramType = "query"),
+            @ApiImplicitParam(name = "parentProcessInstanceId", dataType = "string", value = "Only return historic case instances started from the given parent process instance id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "Only return historic case instances which have the given reference id.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "Only return historic case instances which have the given reference type.", paramType = "query"),
             @ApiImplicitParam(name = "lastReactivatedBy", dataType = "string", value = "Only return historic case instances last reactived by the given user.", paramType = "query"),
@@ -229,6 +230,10 @@ public class HistoricCaseInstanceCollectionResource extends HistoricCaseInstance
         
         if (allRequestParams.containsKey("parentCaseInstanceId")) {
             queryRequest.setParentCaseInstanceId(allRequestParams.get("parentCaseInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("parentProcessInstanceId")) {
+            queryRequest.setParentProcessInstanceId(allRequestParams.get("parentProcessInstanceId"));
         }
 
         if (allRequestParams.get("referenceId") != null) {

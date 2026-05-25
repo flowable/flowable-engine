@@ -104,6 +104,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String callbackId;
     protected String callbackType;
     protected String parentCaseInstanceId;
+    protected String parentProcessInstanceId;
     protected boolean withoutCallbackId;
     protected String referenceId;
     protected String referenceType;
@@ -772,6 +773,19 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
         } else {
             this.parentCaseInstanceId = parentCaseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery parentProcessInstanceId(String parentProcessInstanceId) {
+        if (parentProcessInstanceId == null) {
+            throw new FlowableIllegalArgumentException("parentProcessInstanceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentProcessInstanceId = parentProcessInstanceId;
+        } else {
+            this.parentProcessInstanceId = parentProcessInstanceId;
         }
         return this;
     }
@@ -1475,6 +1489,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getParentCaseInstanceId() {
         return parentCaseInstanceId;
+    }
+
+    public String getParentProcessInstanceId() {
+        return parentProcessInstanceId;
     }
 
     public boolean isWithoutCallbackId() {

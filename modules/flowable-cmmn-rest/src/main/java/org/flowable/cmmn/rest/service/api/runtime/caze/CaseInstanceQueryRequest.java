@@ -67,6 +67,7 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
     private Set<String> caseInstanceCallbackIds;
     private String caseInstanceCallbackType;
     private String parentCaseInstanceId;
+    private String parentProcessInstanceId;
     private String caseInstanceReferenceId;
     private String caseInstanceReferenceType;
     private String caseInstanceLastReactivatedBy;
@@ -376,6 +377,14 @@ public class CaseInstanceQueryRequest extends PaginateRequest {
 
     public void setParentCaseInstanceId(String parentCaseInstanceId) {
         this.parentCaseInstanceId = parentCaseInstanceId;
+    }
+
+    public String getParentProcessInstanceId() {
+        return parentProcessInstanceId;
+    }
+
+    public void setParentProcessInstanceId(String parentProcessInstanceId) {
+        this.parentProcessInstanceId = parentProcessInstanceId;
     }
 
     public String getCaseInstanceReferenceId() {

@@ -288,6 +288,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
+     * Only select historic case instances that have the given parent process instance id.
+     */
+    HistoricCaseInstanceQuery parentProcessInstanceId(String parentProcessInstanceId);
+
+    /**
      * Only select historic case instances that do not have a callback identifier.
      */
     HistoricCaseInstanceQuery withoutCaseInstanceCallbackId();

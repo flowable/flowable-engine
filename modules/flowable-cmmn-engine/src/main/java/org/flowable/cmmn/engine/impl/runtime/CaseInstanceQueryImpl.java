@@ -89,6 +89,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected Set<String> callbackIds;
     protected String callbackType;
     protected String parentCaseInstanceId;
+    protected String parentProcessInstanceId;
     protected String referenceId;
     protected String referenceType;
     protected boolean completeable;
@@ -676,6 +677,19 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
             this.currentOrQueryObject.parentCaseInstanceId = parentCaseInstanceId;
         } else {
             this.parentCaseInstanceId = parentCaseInstanceId;
+        }
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery parentProcessInstanceId(String parentProcessInstanceId) {
+        if (parentProcessInstanceId == null) {
+            throw new FlowableIllegalArgumentException("parentProcessInstanceId is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentProcessInstanceId = parentProcessInstanceId;
+        } else {
+            this.parentProcessInstanceId = parentProcessInstanceId;
         }
         return this;
     }
@@ -1293,6 +1307,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getParentCaseInstanceId() {
         return parentCaseInstanceId;
+    }
+
+    public String getParentProcessInstanceId() {
+        return parentProcessInstanceId;
     }
 
     public String getReferenceId() {

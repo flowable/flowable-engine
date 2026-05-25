@@ -949,6 +949,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentProcessInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedBy", PARAMETER_TYPE_VARCHAR);
@@ -1064,6 +1065,7 @@ public abstract class EntityParameterTypesOverview {
         info.addQueryParameter("rootScopeId", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("rootScopeIdItem", PARAMETER_TYPE_NVARCHAR);
         info.addQueryParameter("parentCaseInstanceId", PARAMETER_TYPE_VARCHAR);
+        info.addQueryParameter("parentProcessInstanceId", PARAMETER_TYPE_VARCHAR);
         info.addQueryParameter("startedBefore", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("startedAfter", PARAMETER_TYPE_TIMESTAMP);
         info.addQueryParameter("finishedBefore", PARAMETER_TYPE_TIMESTAMP);
