@@ -23,6 +23,7 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartBuilder;
 import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.lock.LockManager;
@@ -445,6 +446,8 @@ public interface ManagementService {
     BatchPartBuilder createBatchPartBuilder(Batch batch);
 
     void deleteBatch(String batchId);
+
+    BatchSummary getBatchSummary(String batchId);
 
     /** get the list of properties. */
     Map<String, String> getProperties();

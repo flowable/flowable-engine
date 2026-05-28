@@ -162,6 +162,23 @@
         inner join ${prefix}FLW_RU_BATCH BATCH_ on RES.BATCH_ID_ = BATCH_.ID_
     </sql>
 
+    <resultMap id="batchSummaryMap" type="org.flowable.batch.api.BatchSummary">
+        <result property="totalBatchParts" column="TOTAL_COUNT_"/>
+        <result property="completedBatchParts" column="COMPLETED_COUNT_"/>
+        <result property="successBatchParts" column="SUCCESS_COUNT_"/>
+        <result property="failedBatchParts" column="FAILED_COUNT_"/>
+    </resultMap>
+
+    <select id="selectBatchPartCountSummaryByBatchId" parameterType="map" resultMap="batchSummaryMap">
+        SELECT
+            COUNT(*) as TOTAL_COUNT_,
+            COALESCE(SUM(CASE WHEN RES.COMPLETE_TIME_ IS NOT NULL THEN 1 ELSE 0 END), 0) as COMPLETED_COUNT_,
+            COALESCE(SUM(CASE WHEN RES.STATUS_ = 'completed' OR RES.STATUS_ = 'success' THEN 1 ELSE 0 END), 0) as SUCCESS_COUNT_,
+            COALESCE(SUM(CASE WHEN RES.STATUS_ = 'failed' OR RES.STATUS_ = 'fail' THEN 1 ELSE 0 END), 0) as FAILED_COUNT_
+        FROM ${prefix}FLW_RU_BATCH_PART RES
+        WHERE RES.BATCH_ID_ = #{batchId, jdbcType=NVARCHAR}
+    </select>
+
     <sql id="commonSelectBatchPartsByQueryCriteriaSql">
         <where>
             <if test="id != null">

@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
@@ -54,6 +55,11 @@ public class BatchPartEntityManagerImpl
     @Override
     public long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery) {
         return dataManager.findBatchPartCountByQueryCriteria((BatchPartQueryImpl) batchPartQuery);
+    }
+
+    @Override
+    public BatchSummary findBatchPartCountSummaryByBatchId(String batchId) {
+        return dataManager.findBatchPartCountSummaryByBatchId(batchId);
     }
 
     @Override

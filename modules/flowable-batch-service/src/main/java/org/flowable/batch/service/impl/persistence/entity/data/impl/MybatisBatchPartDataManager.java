@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.BatchPartEntity;
@@ -80,6 +81,13 @@ public class MybatisBatchPartDataManager extends AbstractDataManager<BatchPartEn
     @Override
     public long findBatchPartCountByQueryCriteria(BatchPartQueryImpl batchPartQuery) {
         return (Long) getDbSqlSession().selectOne("selectBatchPartCountByQueryCriteria", batchPartQuery);
+    }
+
+    @Override
+    public BatchSummary findBatchPartCountSummaryByBatchId(String batchId) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("batchId", batchId);
+        return (BatchSummary) getDbSqlSession().selectOne("selectBatchPartCountSummaryByBatchId", params);
     }
 
     @Override

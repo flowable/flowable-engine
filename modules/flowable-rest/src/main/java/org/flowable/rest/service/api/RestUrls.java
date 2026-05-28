@@ -75,6 +75,7 @@ public final class RestUrls {
     public static final String SEGMENT_JOB_EXCEPTION_STACKTRACE = "exception-stacktrace";
     public static final String SEGMENT_BATCHES = "batches";
     public static final String SEGMENT_BATCH_DOCUMENT = "batch-document";
+    public static final String SEGMENT_BATCH_SUMMARY = "summary";
     public static final String SEGMENT_BATCH_PARTS = "batch-parts";
     public static final String SEGMENT_BATCH_PART_RESULT_DOCUMENT = "result-document";
     public static final String SEGMENT_USERS = "users";
@@ -631,6 +632,11 @@ public final class RestUrls {
      */
     public static final String[] URL_BATCH_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCHES };
     
+    /**
+     * URL template for a batch summary: <i>management/batches/{0:batchId}/summary</i>
+     */
+    public static final String[] URL_BATCH_SUMMARY = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCHES, "{0}", SEGMENT_BATCH_SUMMARY };
+
     /**
      * URL template for a single batch part: <i>management/batches/{0:batchId}</i>
      */
