@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.repository;
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.batch.api.Batch;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
@@ -36,6 +37,7 @@ import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.model.SimpleFormModel;
 import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
 import org.flowable.rest.service.api.FormModelResponse;
+import org.flowable.rest.service.api.management.BatchResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -179,7 +181,7 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @PostMapping(value = "/repository/process-definitions/{processDefinitionId}/batch-migrate", produces = "application/json")
-    public void batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
+    public BatchResponse batchMigrateInstancesOfProcessDefinition(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             @RequestBody String migrationDocumentJson) {
         
         ProcessDefinition processDefinition = getProcessDefinitionFromRequestWithoutAccessCheck(processDefinitionId);
@@ -189,7 +191,8 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
         }
 
         ProcessInstanceMigrationDocument migrationDocument = ProcessInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
-        processMigrationService.batchMigrateProcessInstancesOfProcessDefinition(processDefinitionId, migrationDocument);
+        Batch batch = processMigrationService.batchMigrateProcessInstancesOfProcessDefinition(processDefinitionId, migrationDocument);
+        return restResponseFactory.createBatchResponse(batch);
     }
     
     protected FormInfo getStartForm(FormRepositoryService formRepositoryService, ProcessDefinition processDefinition) {

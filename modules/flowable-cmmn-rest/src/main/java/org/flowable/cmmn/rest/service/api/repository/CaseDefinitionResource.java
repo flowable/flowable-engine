@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.repository;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.batch.api.Batch;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
@@ -179,7 +180,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/batch-migrate", produces = "application/json")
-    public void batchMigrateInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+    public BatchResponse batchMigrateInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             @RequestBody String migrationDocumentJson) {
         
         CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
@@ -189,7 +190,8 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         }
 
         CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
-        cmmnMigrationService.batchMigrateCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+        Batch batch = cmmnMigrationService.batchMigrateCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+        return restResponseFactory.createBatchResponse(batch);
     }
     
     @ApiOperation(value = "Batch migrate all historic instances of case definition", tags = { "Case Definitions" }, notes = "")
@@ -198,7 +200,7 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found.")
     })
     @PostMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/batch-migrate-historic-instances", produces = "application/json")
-    public void batchMigrateHistoricInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
+    public BatchResponse batchMigrateHistoricInstancesOfCaseDefinition(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId,
             @RequestBody String migrationDocumentJson) {
         
         CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
@@ -208,7 +210,8 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         }
 
         HistoricCaseInstanceMigrationDocument migrationDocument = HistoricCaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
-        cmmnMigrationService.batchMigrateHistoricCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+        Batch batch = cmmnMigrationService.batchMigrateHistoricCaseInstancesOfCaseDefinition(caseDefinitionId, migrationDocument);
+        return restResponseFactory.createBatchResponse(batch);
     }
     
     protected FormInfo getStartForm(FormRepositoryService formRepositoryService, CaseDefinition caseDefinition) {

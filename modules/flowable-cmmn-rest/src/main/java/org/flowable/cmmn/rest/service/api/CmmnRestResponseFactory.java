@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.batch.api.Batch;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
@@ -41,6 +42,7 @@ import org.flowable.cmmn.rest.service.api.history.task.HistoricTaskInstanceRespo
 import org.flowable.cmmn.rest.service.api.history.variable.HistoricVariableInstanceResponse;
 import org.flowable.cmmn.rest.service.api.management.HistoryJobResponse;
 import org.flowable.cmmn.rest.service.api.management.JobResponse;
+import org.flowable.cmmn.rest.service.api.repository.BatchResponse;
 import org.flowable.cmmn.rest.service.api.repository.CaseDefinitionResponse;
 import org.flowable.cmmn.rest.service.api.repository.CmmnDeploymentResponse;
 import org.flowable.cmmn.rest.service.api.repository.DecisionResponse;
@@ -631,7 +633,25 @@ public class CmmnRestResponseFactory {
                         urlBuilder));
         return result;
     }
-    
+
+    public BatchResponse createBatchResponse(Batch batch) {
+        return createBatchResponse(batch, createUrlBuilder());
+    }
+
+    public BatchResponse createBatchResponse(Batch batch, RestUrlBuilder urlBuilder) {
+        BatchResponse response = new BatchResponse();
+        response.setId(batch.getId());
+        response.setBatchType(batch.getBatchType());
+        response.setSearchKey(batch.getBatchSearchKey());
+        response.setSearchKey2(batch.getBatchSearchKey2());
+        response.setCreateTime(batch.getCreateTime());
+        response.setCompleteTime(batch.getCompleteTime());
+        response.setStatus(batch.getStatus());
+        response.setTenantId(batch.getTenantId());
+        response.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_BATCH, batch.getId()));
+        return response;
+    }
+
     public List<EventSubscriptionResponse> createEventSubscriptionResponseList(List<EventSubscription> eventSubscriptions) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<EventSubscriptionResponse> responseList = new ArrayList<>(eventSubscriptions.size());
