@@ -65,6 +65,7 @@ public final class CmmnRestUrls {
     public static final String SEGMENT_TIMER_JOBS = "timer-jobs";
     public static final String SEGMENT_SUSPENDED_JOBS = "suspended-jobs";
     public static final String SEGMENT_DEADLETTER_JOBS = "deadletter-jobs";
+    public static final String SEGMENT_BATCHES = "batches";
     public static final String SEGMENT_HISTORY_JOBS = "history-jobs";
     public static final String SEGMENT_JOB_EXCEPTION_STACKTRACE = "exception-stacktrace";
     public static final String SEGMENT_USERS = "users";
@@ -410,6 +411,11 @@ public final class CmmnRestUrls {
      * URL template for the collection of timer jobs: <i>cmmn-management/deadletter-jobs</i>
      */
     public static final String[] URL_DEADLETTER_JOB_COLLECTION = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_DEADLETTER_JOBS };
+
+    /**
+     * URL template for a single batch: <i>cmmn-management/batches/{0:batchId}</i>
+     */
+    public static final String[] URL_BATCH = { SEGMENT_MANAGEMENT_RESOURCES, SEGMENT_BATCHES, "{0}" };
 
     /**
      * URL template for a single event subscription: <i>cmmn-runtime/event-subscriptions/{0:eventSubscriptionId}</i>
