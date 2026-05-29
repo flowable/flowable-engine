@@ -1550,8 +1550,13 @@ public abstract class EntityParameterTypesOverview {
         info.addColumn("BATCH_SEARCH_KEY2_", "batchSearchKey2", PARAMETER_TYPE_NVARCHAR);
 
         info.addQueryParameter("tenantIdLike", PARAMETER_TYPE_NVARCHAR);
+
+        info.addColumn("TOTAL_COUNT_", "totalBatchParts", PARAMETER_TYPE_BIGINT);
+        info.addColumn("COMPLETED_COUNT_", "completedBatchParts", PARAMETER_TYPE_BIGINT);
+        info.addColumn("SUCCESS_COUNT_", "successBatchParts", PARAMETER_TYPE_BIGINT);
+        info.addColumn("FAILED_COUNT_", "failedBatchParts", PARAMETER_TYPE_BIGINT);
     }
-    
+
     protected static void addDeadLetterJobParams() {
         ParameterInfo info = addParameterInfo("deadLetterJob");
         info.addColumn("ID_","id", PARAMETER_TYPE_NVARCHAR);

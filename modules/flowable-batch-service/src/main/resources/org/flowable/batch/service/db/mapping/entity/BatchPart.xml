@@ -163,10 +163,10 @@
     </sql>
 
     <resultMap id="batchSummaryMap" type="org.flowable.batch.api.BatchSummary">
-        <result property="totalBatchParts" column="TOTAL_COUNT_"/>
-        <result property="completedBatchParts" column="COMPLETED_COUNT_"/>
-        <result property="successBatchParts" column="SUCCESS_COUNT_"/>
-        <result property="failedBatchParts" column="FAILED_COUNT_"/>
+        <result property="totalBatchParts" column="TOTAL_COUNT_" jdbcType="BIGINT"/>
+        <result property="completedBatchParts" column="COMPLETED_COUNT_" jdbcType="BIGINT"/>
+        <result property="successBatchParts" column="SUCCESS_COUNT_" jdbcType="BIGINT"/>
+        <result property="failedBatchParts" column="FAILED_COUNT_" jdbcType="BIGINT"/>
     </resultMap>
 
     <select id="selectBatchPartCountSummaryByBatchId" parameterType="map" resultMap="batchSummaryMap">
