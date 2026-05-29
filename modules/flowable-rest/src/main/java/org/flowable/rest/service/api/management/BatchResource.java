@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.management;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.batch.api.Batch;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -55,6 +56,18 @@ public class BatchResource extends BatchBaseResource {
         return restResponseFactory.createBatchResponse(batch);
     }
     
+    @ApiOperation(value = "Get a batch summary", tags = { "Batches" })
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the batch exists and the summary is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested batch does not exist.")
+    })
+    @GetMapping(value = "/management/batches/{batchId}/summary", produces = "application/json")
+    public BatchSummaryResponse getBatchSummary(@ApiParam(name = "batchId") @PathVariable String batchId) {
+        getBatchById(batchId);
+        BatchSummary batchSummary = managementService.getBatchSummary(batchId);
+        return restResponseFactory.createBatchSummaryResponse(batchSummary);
+    }
+
     @ApiOperation(value = "Get the batch document", tags = { "Batches" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the requested batch was found and the batch document has been returned. The response contains the raw batch document and always has a Content-type of application/json."),

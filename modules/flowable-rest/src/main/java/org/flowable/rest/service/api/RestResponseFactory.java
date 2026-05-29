@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -94,6 +95,7 @@ import org.flowable.rest.service.api.identity.UserInfoResponse;
 import org.flowable.rest.service.api.identity.UserResponse;
 import org.flowable.rest.service.api.management.BatchPartResponse;
 import org.flowable.rest.service.api.management.BatchResponse;
+import org.flowable.rest.service.api.management.BatchSummaryResponse;
 import org.flowable.rest.service.api.management.HistoryJobResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
@@ -1259,7 +1261,27 @@ public class RestResponseFactory {
 
         return response;
     }
-    
+
+    public BatchSummaryResponse createBatchSummaryResponse(BatchSummary batchSummary) {
+        return createBatchSummaryResponse(batchSummary, createUrlBuilder());
+    }
+
+    public BatchSummaryResponse createBatchSummaryResponse(BatchSummary batchSummary, RestUrlBuilder urlBuilder) {
+        BatchSummaryResponse response = new BatchSummaryResponse();
+        response.setId(batchSummary.getBatchId());
+        response.setBatchType(batchSummary.getBatchType());
+        response.setCreateTime(batchSummary.getCreateTime());
+        response.setStatus(batchSummary.getStatus());
+        response.setCompleteTime(batchSummary.getCompleteTime());
+        response.setTenantId(batchSummary.getTenantId());
+        response.setTotalBatchParts(batchSummary.getTotalBatchParts());
+        response.setCompletedBatchParts(batchSummary.getCompletedBatchParts());
+        response.setSuccessBatchParts(batchSummary.getSuccessBatchParts());
+        response.setFailedBatchParts(batchSummary.getFailedBatchParts());
+        response.setUrl(urlBuilder.buildUrl(RestUrls.URL_BATCH, batchSummary.getBatchId()));
+        return response;
+    }
+
     public List<BatchPartResponse> createBatchPartResponse(List<BatchPart> batchParts) {
         RestUrlBuilder urlBuilder = createUrlBuilder();
         List<BatchPartResponse> responseList = new ArrayList<>(batchParts.size());

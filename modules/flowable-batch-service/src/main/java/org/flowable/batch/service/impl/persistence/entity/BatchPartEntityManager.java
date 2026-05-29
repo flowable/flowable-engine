@@ -16,22 +16,25 @@ import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
 
 public interface BatchPartEntityManager extends EntityManager<BatchPartEntity> {
-    
+
     List<BatchPart> findBatchPartsByBatchId(String batchId);
-    
+
     List<BatchPart> findBatchPartsByBatchIdAndStatus(String batchId, String status);
-    
+
     List<BatchPart> findBatchPartsByScopeIdAndType(String scopeId, String scopeType);
 
     List<BatchPart> findBatchPartsByQueryCriteria(BatchPartQuery batchPartQuery);
 
     long findBatchPartCountByQueryCriteria(BatchPartQuery batchPartQuery);
 
+    BatchSummary findBatchPartCountSummaryByBatchId(String batchId);
+
     BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType);
-    
+
     BatchPartEntity completeBatchPart(String batchPartId, String status, String resultJson);
 
     void deleteBatchPartEntityAndResources(BatchPartEntity batchPartEntity);

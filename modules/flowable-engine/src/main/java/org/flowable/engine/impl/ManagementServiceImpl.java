@@ -23,6 +23,7 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartBuilder;
 import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchPartBuilderImpl;
 import org.flowable.batch.service.impl.BatchBuilderImpl;
 import org.flowable.batch.service.impl.BatchPartQueryImpl;
@@ -58,6 +59,7 @@ import org.flowable.engine.impl.cmd.GetAllBatchesCmd;
 import org.flowable.engine.impl.cmd.GetBatchDocumentCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartDocumentCmd;
+import org.flowable.engine.impl.cmd.GetBatchSummaryCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
@@ -386,6 +388,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public void deleteBatch(String batchId) {
         commandExecutor.execute(new DeleteBatchCmd(batchId));
+    }
+
+    @Override
+    public BatchSummary getBatchSummary(String batchId) {
+        return commandExecutor.execute(new GetBatchSummaryCmd(batchId));
     }
 
     @Override
