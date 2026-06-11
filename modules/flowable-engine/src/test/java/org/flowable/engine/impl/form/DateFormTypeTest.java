@@ -16,7 +16,9 @@ package org.flowable.engine.impl.form;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.junit.jupiter.api.Test;
@@ -54,6 +56,12 @@ class DateFormTypeTest {
     }
 
     @Test
+    void trailingCharactersThrowException() {
+        assertThatThrownBy(() -> dateFormType.convertFormValueToModelValue("15/06/2024abc"))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
     void wrongFormatThrowsException() {
         assertThatThrownBy(() -> dateFormType.convertFormValueToModelValue("2024-06-15"))
                 .isInstanceOf(FlowableIllegalArgumentException.class);
@@ -78,6 +86,26 @@ class DateFormTypeTest {
         DateFormType isoFormat = new DateFormType("yyyy-MM-dd");
         assertThatThrownBy(() -> isoFormat.convertFormValueToModelValue("15/06/2024"))
                 .isInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    void lenientParsingRollsOverInvalidDate() {
+        DateFormType lenientFormType = new DateFormType("dd/MM/yyyy", true);
+        Object result = lenientFormType.convertFormValueToModelValue("15/13/2024");
+        assertThat(result).isEqualTo(new GregorianCalendar(2025, Calendar.JANUARY, 15).getTime());
+    }
+
+    @Test
+    void lenientParsingAcceptsValidDate() {
+        DateFormType lenientFormType = new DateFormType("dd/MM/yyyy", true);
+        Object result = lenientFormType.convertFormValueToModelValue("15/06/2024");
+        assertThat(result).isInstanceOf(Date.class);
+    }
+
+    @Test
+    void modelValueIsFormatted() {
+        Date date = new GregorianCalendar(2024, Calendar.JUNE, 15).getTime();
+        assertThat(dateFormType.convertModelValueToFormValue(date)).isEqualTo("15/06/2024");
     }
 
 }

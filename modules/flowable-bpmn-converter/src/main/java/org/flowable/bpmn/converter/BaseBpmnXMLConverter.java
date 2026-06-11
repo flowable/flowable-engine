@@ -406,6 +406,10 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
                     writeDefaultAttribute(ATTRIBUTE_FORM_VARIABLE, property.getVariable(), xtw);
                     writeDefaultAttribute(ATTRIBUTE_FORM_DEFAULT, property.getDefaultExpression(), xtw);
                     writeDefaultAttribute(ATTRIBUTE_FORM_DATEPATTERN, property.getDatePattern(), xtw);
+                    if (property.getLenientDateParsing() != null) {
+                        writeDefaultAttribute(ATTRIBUTE_FORM_LENIENT_DATE_PARSING,
+                                property.getLenientDateParsing() ? ATTRIBUTE_VALUE_TRUE : ATTRIBUTE_VALUE_FALSE, xtw);
+                    }
                     if (!property.isReadable()) {
                         writeDefaultAttribute(ATTRIBUTE_FORM_READABLE, ATTRIBUTE_VALUE_FALSE, xtw);
                     }

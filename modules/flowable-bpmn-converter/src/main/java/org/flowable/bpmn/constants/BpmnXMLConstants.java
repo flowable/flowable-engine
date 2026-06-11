@@ -366,6 +366,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_FORM_REQUIRED = "required";
     public static final String ATTRIBUTE_FORM_DEFAULT = "default";
     public static final String ATTRIBUTE_FORM_DATEPATTERN = "datePattern";
+    public static final String ATTRIBUTE_FORM_LENIENT_DATE_PARSING = "lenientDateParsing";
     public static final String ELEMENT_VALUE = "value";
 
     public static final String ELEMENT_FIELD = "field";
