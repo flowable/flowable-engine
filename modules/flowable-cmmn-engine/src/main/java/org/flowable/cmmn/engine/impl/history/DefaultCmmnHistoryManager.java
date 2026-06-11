@@ -409,9 +409,15 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         if (getHistoryConfigurationSettings().isHistoryEnabled(caseDefinition.getId())) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstance.getId());
-            historicCaseInstance.setCaseDefinitionId(caseDefinition.getId());
-            historicCaseInstanceEntityManager.update(historicCaseInstance);
-    
+            if (historicCaseInstance != null) {
+                historicCaseInstance.setCaseDefinitionId(caseDefinition.getId());
+                historicCaseInstanceEntityManager.update(historicCaseInstance);
+            } else {
+                historicCaseInstance = historicCaseInstanceEntityManager.create(caseInstance);
+                historicCaseInstance.setCaseDefinitionId(caseDefinition.getId());
+                historicCaseInstanceEntityManager.insert(historicCaseInstance);
+            }
+
             HistoricTaskService historicTaskService = cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
             taskQuery.caseInstanceId(caseInstance.getId());
