@@ -507,9 +507,15 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void updateProcessDefinitionIdInHistory(ProcessDefinitionEntity processDefinitionEntity, ExecutionEntity processInstance) {
         if (isHistoryEnabled(processDefinitionEntity.getId())) {
             HistoricProcessInstanceEntity historicProcessInstance = getHistoricProcessInstanceEntityManager().findById(processInstance.getId());
-            historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
-            getHistoricProcessInstanceEntityManager().update(historicProcessInstance);
-    
+            if (historicProcessInstance != null) {
+                historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
+                getHistoricProcessInstanceEntityManager().update(historicProcessInstance);
+            } else {
+                historicProcessInstance = getHistoricProcessInstanceEntityManager().create(processInstance);
+                historicProcessInstance.setProcessDefinitionId(processDefinitionEntity.getId());
+                getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
+            }
+
             HistoricTaskService historicTaskService = processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService();
             HistoricTaskInstanceQueryImpl taskQuery = new HistoricTaskInstanceQueryImpl();
             taskQuery.processInstanceId(processInstance.getId());
