@@ -25,19 +25,19 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class CaseInstanceMigrationHistoryLevelTest extends AbstractProcessEngineIntegrationTest {
 
-    @BeforeEach
+	@Before
     public void enableDefinitionHistoryLevel() {
         processEngineConfiguration.setEnableProcessDefinitionHistoryLevel(true);
         cmmnEngineConfiguration.setEnableCaseDefinitionHistoryLevel(true);
     }
 
-    @AfterEach
+	@After
     public void disableDefinitionHistoryLevel() {
         processEngineConfiguration.setEnableProcessDefinitionHistoryLevel(false);
         cmmnEngineConfiguration.setEnableCaseDefinitionHistoryLevel(false);
