@@ -69,7 +69,6 @@ public interface SpringEngineConfiguration extends ApplicationContextAware, Smar
         return PHASE;
     }
 
-    @Override
     default boolean isPauseable() {
         return false;
     }

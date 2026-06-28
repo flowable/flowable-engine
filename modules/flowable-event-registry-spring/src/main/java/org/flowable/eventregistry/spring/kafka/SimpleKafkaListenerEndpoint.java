@@ -126,7 +126,6 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint,
         return null;
     }
 
-    @Override
     public String getAckMode() {
         return null;
     }

@@ -25,3 +25,47 @@
 
 @media only screen and (min-width: 1500px) {
 }
+
+.flowableHome {
+  margin: 0 auto;
+  max-width: 1040px;
+  padding: 48px 24px 72px;
+}
+
+.flowableHome section + section {
+  margin-top: 48px;
+}
+
+.flowableHero {
+  align-items: center;
+  display: grid;
+  gap: 32px;
+  grid-template-columns: 180px 1fr;
+}
+
+.flowableHero img {
+  max-width: 180px;
+  width: 100%;
+}
+
+.flowableHero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+}
+
+.flowableLinkRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 720px) {
+  .flowableHero {
+    grid-template-columns: 1fr;
+  }
+
+  .flowableHero h1 {
+    font-size: 2rem;
+  }
+}

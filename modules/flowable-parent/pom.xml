@@ -17,7 +17,7 @@
     </description>
 
     <properties>
-        <jdk.version>17</jdk.version>
+        <jdk.version>25</jdk.version>
 
         <!-- JVM params for test execution -->
         <argLine>-Duser.language=en -Dfile.encoding=UTF-8 -XX:+UseParallelGC</argLine>

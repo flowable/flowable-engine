@@ -13,16 +13,12 @@
 package org.flowable.spring.boot;
 
 import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Base dispatcher configuration that can be used to configure context for the REST API.
@@ -33,11 +29,4 @@ import tools.jackson.databind.json.JsonMapper;
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    @Autowired
-    protected JsonMapper jsonMapper;
-
-    @Override
-    protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        builder.withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
-    }
 }

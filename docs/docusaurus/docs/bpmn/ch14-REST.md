@@ -472,10 +472,10 @@ It’s possible to support additional variable-types with a custom JSON represen
 <table>
 <caption>URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -584,10 +584,10 @@ It’s possible to support additional variable-types with a custom JSON represen
 <table>
 <caption>Get a deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -694,10 +694,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Delete a deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -748,10 +748,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>List resources in a deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -833,10 +833,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Get a deployment resource - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -913,10 +913,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Get a deployment resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -980,10 +980,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>List of process definitions - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1152,10 +1152,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get a process definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1271,10 +1271,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get a process definition resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1305,10 +1305,10 @@ Exactly the same response codes/boy as GET repository/deployment/{deploymentId}/
 <table>
 <caption>Get a process definition BPMN model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1497,10 +1497,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Get all candidate starters for a process-definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1568,10 +1568,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Add a candidate starter to a process definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1643,10 +1643,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Delete a candidate starter from a process definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1718,10 +1718,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Get a candidate starter from a process definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1795,10 +1795,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Get a list of models - URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1962,10 +1962,10 @@ See suspend process definition [JSON Body parameters](#json-body-parameters).
 <table>
 <caption>Get a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2147,10 +2147,10 @@ All request values are optional. For example, you can only include the 'name' at
 <table>
 <caption>Delete a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2201,10 +2201,10 @@ All request values are optional. For example, you can only include the 'name' at
 <table>
 <caption>Get the editor source for a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2259,10 +2259,10 @@ Response body contains the model’s raw editor source. The response’s content
 <table>
 <caption>Set the editor source for a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2321,10 +2321,10 @@ Response body contains the model’s raw editor source. The response’s content
 <table>
 <caption>Get the extra editor source for a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2379,10 +2379,10 @@ Response body contains the model’s raw extra editor source. The response’s c
 <table>
 <caption>Set the extra editor source for a model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2443,10 +2443,10 @@ Response body contains the model’s raw editor source. The response’s content
 <table>
 <caption>Get a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2509,10 +2509,10 @@ Response body contains the model’s raw editor source. The response’s content
 <table>
 <caption>Delete a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2569,10 +2569,10 @@ Response body contains the model’s raw editor source. The response’s content
 <table>
 <caption>Activate or suspend a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2732,10 +2732,10 @@ Only one of processDefinitionId, processDefinitionKey or message can be used in 
 <table>
 <caption>List of process instances - URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -2958,10 +2958,10 @@ The general [paging and sorting query-parameters](#paging-and-sorting) can be us
 <table>
 <caption>Get diagram for a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3021,10 +3021,10 @@ The general [paging and sorting query-parameters](#paging-and-sorting) can be us
 <table>
 <caption>Get involved people for process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3094,10 +3094,10 @@ Note that the groupId will always be null, as it’s only possible to involve us
 <table>
 <caption>Add an involved user to a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3172,10 +3172,10 @@ Note that the groupId will always be null, as it’s only possible to involve us
 <table>
 <caption>Remove an involved user to from process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3249,10 +3249,10 @@ Note that the groupId will always be null, as it’s only possible to involve us
 <table>
 <caption>List of variables for a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3324,10 +3324,10 @@ Note that only local scoped variables are returned, as there is no global scope 
 <table>
 <caption>Get a variable for a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3403,10 +3403,10 @@ When using POST, all variables that are passed are created. In case one of the v
 <table>
 <caption>Create (or update) variables on a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3493,10 +3493,10 @@ Any number of variables can be passed into the request body array. More informat
 <table>
 <caption>Update a single variable on a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3574,10 +3574,10 @@ In case the variable is a binary variable or serializable, the valueUrl points t
 <table>
 <caption>Create a new binary variable on a process-instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3658,10 +3658,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Update an existing binary variable on a process-instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3739,10 +3739,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3807,10 +3807,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Execute an action on an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3923,10 +3923,10 @@ Returns all activities which are active in the execution and in all child-execut
 <table>
 <caption>Get active activities in an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -3984,10 +3984,10 @@ Returns all activities which are active in the execution and in all child-execut
 <table>
 <caption>List of executions - URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4229,10 +4229,10 @@ The general [paging and sorting query-parameters](#paging-and-sorting) can be us
 <table>
 <caption>List of variables for an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4311,10 +4311,10 @@ In case the variable is a binary variable or serializable, the valueUrl points t
 <table>
 <caption>Get a variable for an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4396,10 +4396,10 @@ When using POST, all variables that are passed are created. In case one of the v
 <table>
 <caption>Create (or update) variables on an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4488,10 +4488,10 @@ When using POST, all variables that are passed are created. In case one of the v
 <table>
 <caption>Update a variable on an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4570,10 +4570,10 @@ In case the variable is a binary variable or serializable, the valueUrl points t
 <table>
 <caption>Create a new binary variable on an execution - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4656,10 +4656,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Update an existing binary variable on a process-instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4745,10 +4745,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -4823,10 +4823,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>List of tasks - URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5370,10 +5370,10 @@ Resolves the task delegation. The task is assigned back to the task owner (if an
 <table>
 <caption>Delete a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5440,10 +5440,10 @@ Resolves the task delegation. The task is assigned back to the task owner (if an
 <table>
 <caption>Get all variables for a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5522,10 +5522,10 @@ The variables are returned as a JSON array. Full response description can be fou
 <table>
 <caption>Get a variable from a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5599,10 +5599,10 @@ Full response body description can be found in the general [REST-variables secti
 <table>
 <caption>Get the binary data for a variable - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5669,10 +5669,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Create new variables on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5771,10 +5771,10 @@ More information about the variable format can be found in [the REST variables s
 <table>
 <caption>Create a new binary variable on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5857,10 +5857,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Update an existing variable on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -5949,10 +5949,10 @@ More information about the variable format can be found in [the REST variables s
 <table>
 <caption>Updating a binary variable on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6037,10 +6037,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Delete a variable on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6103,10 +6103,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Delete all local variables on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6157,10 +6157,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get all identity links for a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6237,10 +6237,10 @@ Returns only identity links targeting either users or groups. Response body and 
 <table>
 <caption>Get all identitylinks for a task for either groups or users - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6318,10 +6318,10 @@ Returns only identity links targeting either users or groups. Response body and 
 <table>
 <caption>Create an identity link on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6395,10 +6395,10 @@ Returns only identity links targeting either users or groups. Response body and 
 <table>
 <caption>Delete an identity link on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6467,10 +6467,10 @@ Returns only identity links targeting either users or groups. Response body and 
 <table>
 <caption>Create a new comment on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6547,10 +6547,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get all comments on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6626,10 +6626,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get a comment on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6699,10 +6699,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Delete a comment on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6759,10 +6759,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get all events for a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6828,10 +6828,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get an event on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6900,10 +6900,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Create a new attachment on a task, containing a link to an external resource - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -6983,10 +6983,10 @@ Only the attachment name is required to create a new attachment.
 <table>
 <caption>Create a new attachment on a task, with an attached file - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7065,10 +7065,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get all attachments on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7146,10 +7146,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get an attachment on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7224,10 +7224,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get the content for an attachment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7288,10 +7288,10 @@ The response body contains the binary content. By default, the content-type of t
 <table>
 <caption>Delete an attachment on a task - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7398,10 +7398,10 @@ The response body contains the binary content. By default, the content-type of t
 <table>
 <caption>List of historic process instances - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7766,10 +7766,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Create a new comment on a historic process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7846,10 +7846,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get all comments on a process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7921,10 +7921,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get a comment on a historic process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -7992,10 +7992,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Delete a comment on a historic process instance - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -8109,10 +8109,10 @@ Parameter saveProcessInstanceId is optional, if true save process instance id of
 <table>
 <caption>Get historic task instances - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -8665,10 +8665,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get historic activity instances - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -8881,10 +8881,10 @@ All supported JSON parameter fields allowed are exactly the same as the paramete
 <table>
 <caption>List of historic variable instances - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9083,10 +9083,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get historic detail - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9305,10 +9305,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get form data - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9514,10 +9514,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get a single table - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9576,10 +9576,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get column info for a single table - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9652,10 +9652,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get row data for a single table - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9678,10 +9678,10 @@ The response body contains the binary value of the variable. When the variable i
 <table>
 <caption>Get row data for a single table - URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -9938,10 +9938,10 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <table>
 <caption>Get a single job - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -10009,10 +10009,10 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <table>
 <caption>Delete a job - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -10335,10 +10335,10 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <table>
 <caption>Get a single dead letter job - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -10406,10 +10406,10 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <table>
 <caption>Delete a dead letter job - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -10737,10 +10737,10 @@ handling the signal will be done immediately and result (200 - OK) will only ret
 <table>
 <caption>Get a single user - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11011,10 +11011,10 @@ All request values are optional. For example, you can only include the 'firstNam
 <table>
 <caption>Delete a user - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11065,10 +11065,10 @@ All request values are optional. For example, you can only include the 'firstNam
 <table>
 <caption>Get a user’s picture - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11123,10 +11123,10 @@ The response body contains the raw picture data, representing the user’s pictu
 <table>
 <caption>Updating a user’s picture - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11183,10 +11183,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>List a user’s info - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11250,10 +11250,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get a user’s info - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11318,10 +11318,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Update a user’s info - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11396,10 +11396,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Create a new user’s info entry - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11473,10 +11473,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Delete a user’s info - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11535,10 +11535,10 @@ The request should be of type multipart/form-data. There should be a single file
 <table>
 <caption>Get a single group - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11774,10 +11774,10 @@ All request values are optional. For example, you can only include the 'name' at
 <table>
 <caption>Delete a group - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11832,10 +11832,10 @@ There is no GET allowed on identity/groups/members. Use the identity/users?membe
 <table>
 <caption>Add a member to a group - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -11908,10 +11908,10 @@ There is no GET allowed on identity/groups/members. Use the identity/users?membe
 <table>
 <caption>Delete a member from a group - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">

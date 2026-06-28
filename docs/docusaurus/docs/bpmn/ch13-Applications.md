@@ -65,10 +65,10 @@ In order to provide custom configuration for the application have a look at the 
 <table>
 <caption>REST App Properties</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -96,10 +96,10 @@ Some of the old properties have been moved to be managed by the Flowable Spring 
 <table>
 <caption>Old properties managed by the Flowable Spring Boot Starter</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -341,10 +341,10 @@ Per default it is -1 (all process definitions).</p></td>
 <table>
 <caption>Old properties managed by Spring Boot</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">

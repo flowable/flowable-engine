@@ -472,10 +472,10 @@ It’s possible to support additional variable-types with a custom JSON represen
 <table>
 <caption>URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -585,10 +585,10 @@ It’s possible to support additional variable-types with a custom JSON represen
 <table>
 <caption>Get a deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -696,10 +696,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Delete a DMN deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -750,10 +750,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Get a deployment resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -816,10 +816,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>List of process definitions - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -967,10 +967,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get a decision table - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1037,10 +1037,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get a decision table resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1071,10 +1071,10 @@ Exactly the same response codes/boy as GET dmn-repository/deployment/{deployment
 <table>
 <caption>Get a decision table DMN model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">

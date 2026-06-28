@@ -61,7 +61,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
-import org.springframework.core.retry.RetryPolicy;
 import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProcessor;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -106,6 +105,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.util.StringValueResolver;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
+import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.backoff.FixedBackOffPolicy;
+import org.springframework.retry.backoff.SleepingBackOffPolicy;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -1074,33 +1076,31 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return resolvedRetryConfiguration;
     }
 
-    protected BackOff createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
+    protected SleepingBackOffPolicy<?> createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
         if (backOff == null) {
-            return new FixedBackOff(DEFAULT_RETRY_DELAY);
+            FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+            backOffPolicy.setBackOffPeriod(DEFAULT_RETRY_DELAY);
+            return backOffPolicy;
         }
-        // This code is the same as the one from Spring Kafka
         Long delay = resolveExpressionAsLong(backOff.getDelay(), "retry.nonBlockingBackOff.delay");
         if (delay == null) {
             delay = DEFAULT_RETRY_DELAY;
         }
-        //TODO support java.time.Duration
         Long max = resolveExpressionAsLong(backOff.getMaxDelay(), "retry.nonBlockingBackOff.maxDelay");
         Double multiplier = resolveExpressionAsDouble(backOff.getMultiplier(), "retry.nonBlockingBackOff.multiplier");
         if (multiplier != null && multiplier > 0) {
-            RetryPolicy.Builder retryPolicyBuilder = RetryPolicy.builder().maxRetries(Long.MAX_VALUE);
-            retryPolicyBuilder.delay(Duration.ofMillis(delay));
-            //TODO add jitter instead of random
-
-            retryPolicyBuilder.multiplier(multiplier);
-
+            ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
+            backOffPolicy.setInitialInterval(delay);
+            backOffPolicy.setMultiplier(multiplier);
             if (max != null && max > delay) {
-                retryPolicyBuilder.maxDelay(Duration.ofMillis(max));
+                backOffPolicy.setMaxInterval(max);
             }
-
-            return retryPolicyBuilder.build().getBackOff();
+            return backOffPolicy;
         }
 
-        return new FixedBackOff(delay);
+        FixedBackOffPolicy backOffPolicy = new FixedBackOffPolicy();
+        backOffPolicy.setBackOffPeriod(delay);
+        return backOffPolicy;
     }
 
     protected static class ResolvedRetryConfiguration {
@@ -1110,7 +1110,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         protected String retryTopicSuffix;
         protected SameIntervalTopicReuseStrategy sameIntervalTopicReuseStrategy;
         protected TopicSuffixingStrategy topicSuffixingStrategy;
-        protected BackOff nonBlockingBackOff;
+        protected SleepingBackOffPolicy<?> nonBlockingBackOff;
         protected boolean autoCreateTopics;
         protected int numPartitions;
         protected short replicationFactor;

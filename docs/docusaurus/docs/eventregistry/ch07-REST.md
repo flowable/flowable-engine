@@ -286,10 +286,10 @@ Paging and order parameters can be added as query-string in the URL (for example
 <table>
 <caption>URL query parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -411,10 +411,10 @@ Paging and order parameters can be added as query-string in the URL (for example
 <table>
 <caption>Get a deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -523,10 +523,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Delete an Event Registry deployment - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -577,10 +577,10 @@ An additional parameter (form-field) can be passed in the request body with name
 <table>
 <caption>Get a deployment resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -643,10 +643,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>List of event definitions - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -794,10 +794,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get an event definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -864,10 +864,10 @@ The response body will contain the binary resource-content for the requested res
 <table>
 <caption>Get an event definition resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -898,10 +898,10 @@ Exactly the same response codes as GET event-registry-repository/deployments/{de
 <table>
 <caption>Get an event definition model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -978,10 +978,10 @@ The response body is a JSON representation of the org.flowable.eventregistry.mod
 <table>
 <caption>List of channel definitions - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1129,10 +1129,10 @@ The response body is a JSON representation of the org.flowable.eventregistry.mod
 <table>
 <caption>Get a channel definition - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1199,10 +1199,10 @@ The response body is a JSON representation of the org.flowable.eventregistry.mod
 <table>
 <caption>Get a channel definition resource content - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1233,10 +1233,10 @@ Exactly the same response codes as GET event-registry-repository/deployments/{de
 <table>
 <caption>Get a channel definition model - URL parameters</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">

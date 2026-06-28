@@ -14,7 +14,7 @@ package org.flowable.spring.boot.environment;
 
 import java.util.List;
 
-import org.springframework.boot.EnvironmentPostProcessor;
+import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.config.ConfigDataEnvironmentPostProcessor;
 import org.springframework.boot.env.PropertySourceLoader;

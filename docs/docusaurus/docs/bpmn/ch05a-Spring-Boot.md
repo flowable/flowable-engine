@@ -11,7 +11,7 @@ The Spring Boot - Flowable integration has been developed together with Spring c
 
 ## Compatibility
 
-Flowable supports Spring Boot 4.x.
+Flowable supports Spring Boot 3.5.x.
 
 ## Getting started
 
@@ -54,7 +54,7 @@ You will see an output like this:
 '  |____| .__|_| |_|_| |_\__, | / / / /
 =========|_|==============|___/=/_/_/_/
 
-:: Spring Boot ::                (v4.0.3)
+:: Spring Boot ::                (v3.5.16)
 
 2026-03-16T22:21:06.576+01:00  INFO 43702 --- [           main] com.example.demo.Application             : Starting Application using Java 25 with PID 43702 (/Users/filiphr/Downloads/demo 31/target/classes started by filiphr in /Users/filiphr/Downloads/demo 31)
 2026-03-16T22:21:06.578+01:00  INFO 43702 --- [           main] com.example.demo.Application             : No active profile set, falling back to 1 default profile: "default"
@@ -697,10 +697,10 @@ Here is a list of configuration properties that the Flowable Spring Boot support
 <table>
 <caption>Deprecated properties</caption>
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
+<col />
+<col />
+<col />
+<col />
 </colgroup>
 <thead>
 <tr class="header">
