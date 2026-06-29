@@ -15,9 +15,7 @@ package org.flowable.cmmn.engine.test.impl;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -30,6 +28,7 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.job.api.HistoryJob;
 import org.slf4j.Logger;
@@ -42,8 +41,8 @@ public abstract class CmmnTestHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnTestHelper.class);
 
-    static Map<String, CmmnEngine> cmmnEngines = new HashMap<>();
-    
+    static final EngineTestCache<CmmnEngine> cmmnEngines = new EngineTestCache<>();
+
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, String methodName) {
@@ -115,14 +114,12 @@ public abstract class CmmnTestHelper {
     }
     
     public static CmmnEngine getCmmnEngine(String configurationResource) {
-        CmmnEngine cmmnEngine = cmmnEngines.get(configurationResource);
-        if (cmmnEngine == null) {
-            LOGGER.debug("==== BUILDING PROCESS ENGINE ========================================================================");
-            cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromResource(configurationResource).buildCmmnEngine();
-            LOGGER.debug("==== PROCESS ENGINE CREATED =========================================================================");
-            cmmnEngines.put(configurationResource, cmmnEngine);
-        }
-        return cmmnEngine;
+        return cmmnEngines.getOrCreate(configurationResource, resource -> {
+            LOGGER.debug("==== BUILDING CMMN ENGINE ========================================================================");
+            CmmnEngine cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromResource(resource).buildCmmnEngine();
+            LOGGER.debug("==== CMMN ENGINE CREATED =========================================================================");
+            return cmmnEngine;
+        });
     }
 
     /**

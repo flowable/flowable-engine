@@ -15,12 +15,11 @@ package org.flowable.dmn.engine.test;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -38,8 +37,8 @@ public abstract class DmnTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, DmnEngine> dmnEngines = new HashMap<>();
-    
+    static final EngineTestCache<DmnEngine> dmnEngines = new EngineTestCache<>();
+
     private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
     
     static {
@@ -140,21 +139,17 @@ public abstract class DmnTestHelper {
     // ///////////////////////////////////////////////////
 
     public static DmnEngine getDmnEngine(String configurationResource) {
-        DmnEngine dmnEngine = dmnEngines.get(configurationResource);
-        if (dmnEngine == null) {
+        return dmnEngines.getOrCreate(configurationResource, resource -> {
             LOGGER.debug("==== BUILDING DMN ENGINE ========================================================================");
-            dmnEngine = DmnEngineConfiguration.createDmnEngineConfigurationFromResource(configurationResource).setDatabaseSchemaUpdate(DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE).buildDmnEngine();
+            DmnEngine dmnEngine = DmnEngineConfiguration.createDmnEngineConfigurationFromResource(resource)
+                    .setDatabaseSchemaUpdate(DmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE).buildDmnEngine();
             LOGGER.debug("==== DMN ENGINE CREATED =========================================================================");
-            dmnEngines.put(configurationResource, dmnEngine);
-        }
-        return dmnEngine;
+            return dmnEngine;
+        });
     }
 
     public static void closeDmnEngines() {
-        for (DmnEngine dmnEngine : dmnEngines.values()) {
-            dmnEngine.close();
-        }
-        dmnEngines.clear();
+        dmnEngines.closeAll();
     }
 
     /**
