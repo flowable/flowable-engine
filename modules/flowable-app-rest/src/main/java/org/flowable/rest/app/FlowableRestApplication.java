@@ -25,6 +25,8 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import tools.jackson.databind.json.JsonMapper;
+
 /**
  * @author Filip Hrisafov
  */
@@ -53,6 +55,11 @@ public class FlowableRestApplication {
                 registry.addViewController("/docs/").setViewName("forward:/docs/index.html");
             }
         };
+    }
+
+    @Bean
+    public JsonMapper jsonMapper() {
+        return JsonMapper.shared();
     }
 
     @Bean
