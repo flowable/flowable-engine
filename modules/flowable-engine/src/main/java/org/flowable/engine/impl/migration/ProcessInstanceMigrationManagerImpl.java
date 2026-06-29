@@ -449,6 +449,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         		procDefToMigrateTo, document, commandContext);
 
         LOGGER.debug("Updating Process definition reference of process root execution with id:'{}' to '{}'", processInstance.getId(), procDefToMigrateTo.getId());
+        String originalProcessDefinitionId = processInstanceEntity.getProcessDefinitionId();
         processInstanceEntity.setProcessDefinitionId(procDefToMigrateTo.getId());
 
         LOGGER.debug("Resolve activity executions to migrate");
@@ -500,8 +501,9 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         
         List<ProcessInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
+            ProcessDefinition sourceProcessDefinition = ProcessDefinitionUtil.getProcessDefinition(originalProcessDefinitionId);
             for (ProcessInstanceMigrationCallback processInstanceMigrationCallback : migrationCallbacks) {
-                processInstanceMigrationCallback.processInstanceMigrated(processInstance, procDefToMigrateTo, document, commandContext);
+                processInstanceMigrationCallback.processInstanceMigrated(processInstance, sourceProcessDefinition, procDefToMigrateTo, document, commandContext);
             }
         }
 

@@ -20,5 +20,10 @@ public interface ProcessInstanceMigrationCallback {
     
     void processInstanceMigrated(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, 
             ProcessInstanceMigrationDocument document, CommandContext commandContext);
-    
+
+    default void processInstanceMigrated(ProcessInstance processInstance, ProcessDefinition sourceProcessDefinition,
+            ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
+        processInstanceMigrated(processInstance, procDefToMigrateTo, document, commandContext);
+    }
+
 }

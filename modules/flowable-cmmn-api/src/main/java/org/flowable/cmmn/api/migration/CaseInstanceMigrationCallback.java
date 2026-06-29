@@ -19,7 +19,17 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 public interface CaseInstanceMigrationCallback {
     
     void caseInstanceMigrated(CaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, CaseInstanceMigrationDocument document);
-    
+
+    default void caseInstanceMigrated(CaseInstance caseInstance, CaseDefinition sourceCaseDefinition, CaseDefinition caseDefToMigrateTo,
+            CaseInstanceMigrationDocument document) {
+        caseInstanceMigrated(caseInstance, caseDefToMigrateTo, document);
+    }
+
     void historicCaseInstanceMigrated(HistoricCaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, HistoricCaseInstanceMigrationDocument document);
-    
+
+    default void historicCaseInstanceMigrated(HistoricCaseInstance caseInstance, CaseDefinition sourceCaseDefinition, CaseDefinition caseDefToMigrateTo,
+            HistoricCaseInstanceMigrationDocument document) {
+        historicCaseInstanceMigrated(caseInstance, caseDefToMigrateTo, document);
+    }
+
 }
