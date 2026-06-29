@@ -39,4 +39,13 @@ public class InternalFlowableSpringExtension extends InternalFlowableExtension {
     protected ExtensionContext.Store getStore(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE);
     }
+
+    @Override
+    public void afterAll(ExtensionContext context) throws Exception {
+        try {
+            super.afterAll(context);
+        } finally {
+            getStore(context).remove(context.getRequiredTestClass());
+        }
+    }
 }

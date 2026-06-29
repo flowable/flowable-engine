@@ -24,6 +24,7 @@ import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -84,7 +85,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Filip Hrisafov
  */
-public class FlowableDmnExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+public class FlowableDmnExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.dmn.cfg.xml";
 
@@ -137,6 +138,11 @@ public class FlowableDmnExtension implements ParameterResolver, BeforeEachCallba
         }
 
         dmnEngine.getDmnEngineConfiguration().getClock().reset();
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
     }
 
     @Override
