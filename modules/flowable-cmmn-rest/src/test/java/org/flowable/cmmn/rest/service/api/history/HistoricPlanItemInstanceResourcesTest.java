@@ -503,6 +503,39 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
      * Test querying plan item instance and return local variables. POST query/planitem-instances
      */
     @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/HistoricPlanItemInstanceResourcesTest.testByStarted.cmmn" })
+    public void testGetHistoricPlanItemInstancesByStarted() throws Exception {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        // Complete A so it is started + ended, then terminate the case so B ends without ever being started
+        Task taskA = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.complete(taskA.getId());
+        runtimeService.terminateCaseInstance(caseInstance.getId());
+
+        String startedPlanItemId = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceName("A").singleResult().getId();
+        String notStartedPlanItemId = historyService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseInstanceId(caseInstance.getId()).planItemInstanceName("B").singleResult().getId();
+
+        final String baseUrl = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_PLANITEM_INSTANCES);
+
+        HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance.getId() + "&started=true");
+        CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode.get("data")).hasSize(1);
+        assertThat(responseNode.get("data").get(0).get("id").asString()).isEqualTo(startedPlanItemId);
+
+        httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance.getId() + "&notStarted=true");
+        response = executeRequest(httpGet, HttpStatus.SC_OK);
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode.get("data")).hasSize(1);
+        assertThat(responseNode.get("data").get(0).get("id").asString()).isEqualTo(notStartedPlanItemId);
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryHistoricPlanItemInstancesWithLocalVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();

@@ -60,6 +60,8 @@ public class HistoricPlanItemInstanceQueryRequest extends PaginateRequest {
     private String referenceType;
     private String tenantId;
     private Boolean withoutTenantId;
+    private Boolean started;
+    private Boolean notStarted;
     private Boolean includeLocalVariables;
 
     public String getPlanItemInstanceId() {
@@ -348,6 +350,22 @@ public class HistoricPlanItemInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Boolean getStarted() {
+        return started;
+    }
+
+    public void setStarted(Boolean started) {
+        this.started = started;
+    }
+
+    public Boolean getNotStarted() {
+        return notStarted;
+    }
+
+    public void setNotStarted(Boolean notStarted) {
+        this.notStarted = notStarted;
     }
 
     public Boolean getIncludeLocalVariables() {

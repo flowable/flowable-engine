@@ -114,6 +114,24 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
     }
 
     @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PlanItemInstanceQueryResourceTest.testByStarted.cmmn" })
+    public void testGetStartedPlanItemInstances() throws Exception {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        String startedPlanItemId = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("A").singleResult().getId();
+        String notStartedPlanItemId = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("B").singleResult().getId();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?started=true";
+        assertResultsPresentInDataResponse(url, startedPlanItemId);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?notStarted=true";
+        assertResultsPresentInDataResponse(url, notStartedPlanItemId);
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItemInstancesWithLocalVariables() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();

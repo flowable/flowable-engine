@@ -122,6 +122,18 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      * @return The query will include both runtime and ended (completed/terminated/occurred/exited) plan item instances.
      */
     PlanItemInstanceQuery includeEnded();
+
+    /**
+     * Only select plan item instances that have been started (last started time is set).
+     * Independent of the default non-ended filter: this does not implicitly include ended instances.
+     */
+    PlanItemInstanceQuery started();
+
+    /**
+     * Only select plan item instances that have not been started (last started time is null).
+     * Independent of the default non-ended filter: this does not implicitly include ended instances.
+     */
+    PlanItemInstanceQuery notStarted();
     
     /**
      * Only select plan item instances which have a local variable with the given value. The type of variable is determined based on the value. 

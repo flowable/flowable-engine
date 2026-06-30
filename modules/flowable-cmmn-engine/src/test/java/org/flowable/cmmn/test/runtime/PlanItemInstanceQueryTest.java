@@ -1649,6 +1649,43 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         );
     }
 
+    @Test
+    @CmmnDeployment
+    public void testByStarted() {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        List<PlanItemInstance> all = cmmnRuntimeService.createPlanItemInstanceQuery().orderByName().asc().list();
+        assertThat(all).extracting(PlanItemInstance::getName).containsExactly("A", "B");
+
+        List<PlanItemInstance> started = cmmnRuntimeService.createPlanItemInstanceQuery().started().list();
+        assertThat(started)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+        assertThat(started).allSatisfy(pi -> assertThat(pi.getLastStartedTime()).isNotNull());
+
+        List<PlanItemInstance> notStarted = cmmnRuntimeService.createPlanItemInstanceQuery().notStarted().list();
+        assertThat(notStarted)
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("B");
+        assertThat(notStarted).allSatisfy(pi -> assertThat(pi.getLastStartedTime()).isNull());
+
+        // started and notStarted partition the full result set
+        assertThat(started.size() + notStarted.size()).isEqualTo(all.size());
+
+        // filters compose inside an or() ... endOr() block
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").started().endOr()
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("A");
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").notStarted().endOr()
+                .list())
+                .extracting(PlanItemInstance::getName)
+                .containsExactly("B");
+    }
+
     private List<String> startInstances(int numberOfInstances) {
         List<String> caseInstanceIds = new ArrayList<>();
         for (int i = 0; i < numberOfInstances; i++) {

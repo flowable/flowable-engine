@@ -112,6 +112,12 @@ public class PlanItemInstanceBaseResource {
         if (queryRequest.getIncludeEnded() != null && queryRequest.getIncludeEnded()) {
             query.includeEnded();
         }
+        if (queryRequest.getStarted() != null && queryRequest.getStarted()) {
+            query.started();
+        }
+        if (queryRequest.getNotStarted() != null && queryRequest.getNotStarted()) {
+            query.notStarted();
+        }
         if (queryRequest.getIncludeLocalVariables() != null && queryRequest.getIncludeLocalVariables()) {
             query.includeLocalVariables();
         }
