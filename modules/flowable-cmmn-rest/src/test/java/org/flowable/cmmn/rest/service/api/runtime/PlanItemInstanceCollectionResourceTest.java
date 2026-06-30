@@ -127,7 +127,7 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
         String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?started=true";
         assertResultsPresentInDataResponse(url, startedPlanItemId);
 
-        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?notStarted=true";
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?started=false";
         assertResultsPresentInDataResponse(url, notStartedPlanItemId);
     }
 

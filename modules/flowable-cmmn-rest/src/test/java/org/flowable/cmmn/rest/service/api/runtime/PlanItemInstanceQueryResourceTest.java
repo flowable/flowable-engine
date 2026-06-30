@@ -114,7 +114,7 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
 
         requestNode = objectMapper.createObjectNode();
         requestNode.put("caseInstanceId", caseInstance.getId());
-        requestNode.put("notStarted", true);
+        requestNode.put("started", false);
         assertResultsPresentInPostDataResponse(url, requestNode, notStartedPlanItem.getId());
     }
 

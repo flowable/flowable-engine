@@ -46,7 +46,6 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
     private String referenceType;
     private Boolean includeEnded;
     private Boolean started;
-    private Boolean notStarted;
     private Boolean includeLocalVariables;
     private List<QueryVariable> variables;
     private List<QueryVariable> caseInstanceVariables;
@@ -205,14 +204,6 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
 
     public void setStarted(Boolean started) {
         this.started = started;
-    }
-
-    public Boolean getNotStarted() {
-        return notStarted;
-    }
-
-    public void setNotStarted(Boolean notStarted) {
-        this.notStarted = notStarted;
     }
 
     public Boolean getIncludeLocalVariables() {

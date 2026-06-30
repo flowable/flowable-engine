@@ -100,11 +100,7 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getStarted()).ifPresent(started -> {
                     if (started) {
                         query.started();
-                    }
-                }
-        );
-        Optional.ofNullable(queryRequest.getNotStarted()).ifPresent(notStarted -> {
-                    if (notStarted) {
+                    } else {
                         query.notStarted();
                     }
                 }

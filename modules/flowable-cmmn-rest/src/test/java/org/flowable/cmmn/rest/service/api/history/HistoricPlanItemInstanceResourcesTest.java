@@ -527,7 +527,7 @@ public class HistoricPlanItemInstanceResourcesTest extends BaseSpringRestTestCas
         assertThat(responseNode.get("data")).hasSize(1);
         assertThat(responseNode.get("data").get(0).get("id").asString()).isEqualTo(startedPlanItemId);
 
-        httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance.getId() + "&notStarted=true");
+        httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance.getId() + "&started=false");
         response = executeRequest(httpGet, HttpStatus.SC_OK);
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
