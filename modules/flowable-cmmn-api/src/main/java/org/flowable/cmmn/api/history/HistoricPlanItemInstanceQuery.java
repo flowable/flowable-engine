@@ -81,6 +81,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery endedAfter(Date endedAfter);
     HistoricPlanItemInstanceQuery ended();
     HistoricPlanItemInstanceQuery notEnded();
+    HistoricPlanItemInstanceQuery started();
+    HistoricPlanItemInstanceQuery notStarted();
 
     /**
      * Localize plan item name to specified locale.

@@ -528,6 +528,12 @@
             <if test="notEnded">
                 and RES.ENDED_TIME_ is null
             </if>
+            <if test="started">
+                and RES.LAST_STARTED_TIME_ is not null
+            </if>
+            <if test="notStarted">
+                and RES.LAST_STARTED_TIME_ is null
+            </if>
             <if test="startUserId != null">
                 and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
             </if>

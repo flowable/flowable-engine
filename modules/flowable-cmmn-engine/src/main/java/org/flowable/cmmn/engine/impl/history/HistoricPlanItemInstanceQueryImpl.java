@@ -82,6 +82,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String referenceType;
     protected boolean ended;
     protected boolean notEnded;
+    protected boolean started;
+    protected boolean notStarted;
     protected String entryCriterionId;
     protected String exitCriterionId;
     protected String formKey;
@@ -472,6 +474,18 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
 
     @Override
+    public HistoricPlanItemInstanceQuery started() {
+        this.started = true;
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery notStarted() {
+        this.notStarted = true;
+        return this;
+    }
+
+    @Override
     public HistoricPlanItemInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;
@@ -713,6 +727,12 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public boolean isNotEnded() {
         return notEnded;
+    }
+    public boolean isStarted() {
+        return started;
+    }
+    public boolean isNotStarted() {
+        return notStarted;
     }
     public String getEntryCriterionId() {
         return entryCriterionId;

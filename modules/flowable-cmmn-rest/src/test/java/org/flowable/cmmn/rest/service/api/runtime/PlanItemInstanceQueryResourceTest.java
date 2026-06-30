@@ -90,6 +90,35 @@ public class PlanItemInstanceQueryResourceTest extends BaseSpringRestTestCase {
     }
 
     /**
+     * Test querying plan item instances by started / notStarted presence filters. POST query/planitem-instances
+     */
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PlanItemInstanceQueryResourceTest.testByStarted.cmmn" })
+    public void testQueryPlanItemInstancesByStarted() throws Exception {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        PlanItemInstance startedPlanItem = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("A").singleResult();
+        PlanItemInstance notStartedPlanItem = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("B").singleResult();
+        assertThat(startedPlanItem.getLastStartedTime()).isNotNull();
+        assertThat(notStartedPlanItem.getLastStartedTime()).isNull();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_QUERY);
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        requestNode.put("started", true);
+        assertResultsPresentInPostDataResponse(url, requestNode, startedPlanItem.getId());
+
+        requestNode = objectMapper.createObjectNode();
+        requestNode.put("caseInstanceId", caseInstance.getId());
+        requestNode.put("started", false);
+        assertResultsPresentInPostDataResponse(url, requestNode, notStartedPlanItem.getId());
+    }
+
+    /**
      * Test querying plan item instance based on variables. POST query/planitem-instances
      */
     @Test
