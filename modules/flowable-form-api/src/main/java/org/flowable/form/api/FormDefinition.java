@@ -12,6 +12,8 @@
  */
 package org.flowable.form.api;
 
+import org.flowable.common.engine.api.repository.FlowableDefinition;
+
 /**
  * An object structure representing a form
  * 
@@ -20,37 +22,14 @@ package org.flowable.form.api;
  * @author Tijs Rademakers
  * @author Joram Barez
  */
-public interface FormDefinition {
-
-    /** unique identifier */
-    String getId();
+public interface FormDefinition extends FlowableDefinition {
 
     /**
      * category name of the form
      */
     String getCategory();
 
-    /** label used for display purposes */
-    String getName();
-
-    /** unique name for all versions this form */
-    String getKey();
-
     /** description of this form **/
     String getDescription();
-
-    /** version of this form */
-    int getVersion();
-
-    /**
-     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this form definition.
-     */
-    String getResourceName();
-
-    /** The deployment in which this form is contained. */
-    String getDeploymentId();
-
-    /** The tenant identifier of this form */
-    String getTenantId();
 
 }

@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
@@ -169,8 +172,13 @@ public class DeploymentManager {
         // Delete data
         deploymentEntityManager.deleteDeployment(deploymentId);
 
+        FlowableEventDispatcher eventDispatcher = engineConfig.getEventDispatcher();
         for (DmnDecision definition : definitions) {
             decisionCache.remove(definition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(definition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        engineConfig.getEngineCfgKey());
+            }
         }
     }
 

@@ -15,7 +15,11 @@ package org.flowable.eventregistry.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.persistence.deploy.Deployer;
 import org.flowable.eventregistry.impl.persistence.entity.ChannelDefinitionEntity;
@@ -162,9 +166,14 @@ public class EventDefinitionDeployer implements Deployer {
     protected void persistEventDefinitions(ParsedDeployment parsedDeployment) {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
         EventDefinitionEntityManager eventDefinitionEntityManager = eventRegistryEngineConfiguration.getEventDefinitionEntityManager();
+        FlowableEventDispatcher eventDispatcher = eventRegistryEngineConfiguration.getEventDispatcher();
 
         for (EventDefinitionEntity eventDefinition : parsedDeployment.getAllEventDefinitions()) {
             eventDefinitionEntityManager.insert(eventDefinition);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(eventDefinition, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                        EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+            }
         }
     }
     
@@ -174,9 +183,14 @@ public class EventDefinitionDeployer implements Deployer {
     protected void persistChannelDefinitions(ParsedDeployment parsedDeployment) {
         EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryConfiguration();
         ChannelDefinitionEntityManager channelDefinitionEntityManager = eventRegistryEngineConfiguration.getChannelDefinitionEntityManager();
+        FlowableEventDispatcher eventDispatcher = eventRegistryEngineConfiguration.getEventDispatcher();
 
         for (ChannelDefinitionEntity channelDefinition : parsedDeployment.getAllChannelDefinitions()) {
             channelDefinitionEntityManager.insert(channelDefinition);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(channelDefinition, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                        EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+            }
         }
     }
 

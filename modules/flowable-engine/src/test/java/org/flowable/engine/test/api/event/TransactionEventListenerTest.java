@@ -42,6 +42,10 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
 
         onCommitListener = new TestTransactionEventListener(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(onCommitListener);
+
+        // Definition deploy/undeploy events from a sibling test's deployment cleanup can land in the
+        // shared static map; start every test from a clean slate.
+        TestTransactionEventListener.eventsReceived.clear();
     }
 
     @AfterEach

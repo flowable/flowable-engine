@@ -284,6 +284,7 @@ public class DmnEngineConfiguration extends AbstractBuildableEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
+        initEventDispatcher();
         initHitPolicyBehaviors();
         initRuleEngineExecutor();
         initDecisionRequirementsDiagramGenerator();

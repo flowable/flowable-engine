@@ -45,7 +45,7 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
         assertThat(processDefinition).isNotNull();
 
         // Check create-event
-        assertThat(listener.getEventsReceived()).hasSize(2);
+        assertThat(listener.getEventsReceived()).hasSize(3);
         assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEntityEvent.class);
 
         FlowableEntityEvent event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
@@ -53,6 +53,10 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
         assertThat(((ProcessDefinition) event.getEntity()).getId()).isEqualTo(processDefinition.getId());
 
         event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.DEFINITION_DEPLOYED);
+        assertThat(((ProcessDefinition) event.getEntity()).getId()).isEqualTo(processDefinition.getId());
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(2);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_INITIALIZED);
         assertThat(((ProcessDefinition) event.getEntity()).getId()).isEqualTo(processDefinition.getId());
         listener.clearEventsReceived();
@@ -84,11 +88,15 @@ public class ProcessDefinitionEventsTest extends PluggableFlowableTestCase {
         // Check delete event when category is updated
         repositoryService.deleteDeployment(processDefinition.getDeploymentId(), true);
 
-        assertThat(listener.getEventsReceived()).hasSize(1);
+        assertThat(listener.getEventsReceived()).hasSize(2);
         assertThat(listener.getEventsReceived().get(0)).isInstanceOf(FlowableEntityEvent.class);
 
         event = (FlowableEntityEvent) listener.getEventsReceived().get(0);
         assertThat(event.getType()).isEqualTo(FlowableEngineEventType.ENTITY_DELETED);
+        assertThat(((ProcessDefinition) event.getEntity()).getId()).isEqualTo(processDefinition.getId());
+
+        event = (FlowableEntityEvent) listener.getEventsReceived().get(1);
+        assertThat(event.getType()).isEqualTo(FlowableEngineEventType.DEFINITION_UNDEPLOYED);
         assertThat(((ProcessDefinition) event.getEntity()).getId()).isEqualTo(processDefinition.getId());
         listener.clearEventsReceived();
     }

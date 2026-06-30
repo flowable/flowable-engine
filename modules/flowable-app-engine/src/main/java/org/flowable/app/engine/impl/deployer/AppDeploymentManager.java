@@ -29,8 +29,11 @@ import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class AppDeploymentManager {
@@ -134,8 +137,13 @@ public class AppDeploymentManager {
             deployer.undeploy(deployment, cascade);
         }
 
+        FlowableEventDispatcher eventDispatcher = appEngineConfiguration.getEventDispatcher();
         for (AppDefinition appDefinition : new AppDefinitionQueryImpl().deploymentId(deploymentId).list()) {
             appDefinitionCache.remove(appDefinition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(appDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        appEngineConfiguration.getEngineCfgKey());
+            }
         }
 
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);

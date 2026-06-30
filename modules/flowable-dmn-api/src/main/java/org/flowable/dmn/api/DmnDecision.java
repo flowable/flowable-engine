@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.api;
 
+import org.flowable.common.engine.api.repository.FlowableDefinition;
+
 /**
  * An object structure representing an executable DMN decision
  * 
@@ -19,32 +21,15 @@ package org.flowable.dmn.api;
  * @author Joram Barez
  * @author Yvo Swillens
  */
-public interface DmnDecision {
-
-    /** unique identifier */
-    String getId();
+public interface DmnDecision extends FlowableDefinition {
 
     /**
      * category name of this definition
      */
     String getCategory();
 
-    /** label used for display purposes */
-    String getName();
-
-    /** unique name for all versions this definition */
-    String getKey();
-
     /** description of this definition **/
     String getDescription();
-
-    /** version of this definition */
-    int getVersion();
-
-    /**
-     * name of {@link DmnRepositoryService#getResourceAsStream(String, String) the resource} of this definition.
-     */
-    String getResourceName();
 
     /**
      * Does this decision have a graphical notation defined (such that a diagram can be generated)?
@@ -53,12 +38,6 @@ public interface DmnDecision {
 
     /** The resource name in the deployment of the diagram image (if any). */
     String getDiagramResourceName();
-
-    /** The deployment in which this definition is contained. */
-    String getDeploymentId();
-
-    /** The tenant identifier of this definition */
-    String getTenantId();
 
     /** The decision type of this definition */
     String getDecisionType();
