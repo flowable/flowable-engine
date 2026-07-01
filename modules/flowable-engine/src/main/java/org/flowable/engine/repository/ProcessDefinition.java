@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.repository;
 
+import org.flowable.common.engine.api.repository.FlowableDefinition;
 import org.flowable.engine.FormService;
-import org.flowable.engine.RepositoryService;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**
@@ -29,35 +29,15 @@ import org.flowable.engine.runtime.ProcessInstance;
  * @author Joram Barez
  * @author Daniel Meyer
  */
-public interface ProcessDefinition {
-
-    /** unique identifier */
-    String getId();
+public interface ProcessDefinition extends FlowableDefinition {
 
     /**
      * category name which is derived from the targetNamespace attribute in the definitions element
      */
     String getCategory();
 
-    /** label used for display purposes */
-    String getName();
-
-    /** unique name for all versions this process definitions */
-    String getKey();
-
     /** description of this process **/
     String getDescription();
-
-    /** version of this process definition */
-    int getVersion();
-
-    /**
-     * name of {@link RepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
-     */
-    String getResourceName();
-
-    /** The deployment in which this process definition is contained. */
-    String getDeploymentId();
 
     /** The resource name in the deployment of the diagram image (if any). */
     String getDiagramResourceName();
@@ -75,9 +55,6 @@ public interface ProcessDefinition {
     /** Returns true if the process definition is in suspended state. */
     boolean isSuspended();
 
-    /** The tenant identifier of this process definition */
-    String getTenantId();
-    
     /** The derived from process definition value when this is a dynamic process definition */
     String getDerivedFrom();
 

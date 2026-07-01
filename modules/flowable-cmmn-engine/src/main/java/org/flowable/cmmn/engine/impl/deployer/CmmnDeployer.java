@@ -35,6 +35,8 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -43,7 +45,9 @@ import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -183,9 +187,14 @@ public class CmmnDeployer implements EngineDeployer {
 
     protected void persistCaseDefinitions(CmmnParseResult parseResult) {
         CaseDefinitionEntityManager caseDefinitionManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
             caseDefinitionManager.insert(caseDefinition, false);
             addAuthorizationsForNewCaseDefinition(parseResult.getCmmnCaseForCaseDefinition(caseDefinition), caseDefinition);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(caseDefinition, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                        EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
     }
 

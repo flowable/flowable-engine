@@ -14,13 +14,14 @@ package org.flowable.dmn.spring.impl.test;
 
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.test.InternalFlowableDmnExtension;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * @author Filip Hrisafov
  */
-public class InternalFlowableDmnSpringExtension extends InternalFlowableDmnExtension {
+public class InternalFlowableDmnSpringExtension extends InternalFlowableDmnExtension implements AfterAllCallback {
 
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(InternalFlowableDmnSpringExtension.class);
 
@@ -34,5 +35,10 @@ public class InternalFlowableDmnSpringExtension extends InternalFlowableDmnExten
     @Override
     protected ExtensionContext.Store getStore(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE);
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
     }
 }

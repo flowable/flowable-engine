@@ -569,6 +569,12 @@
         <if test="!includeEnded &amp;&amp; !ended">
             and RES.ENDED_TIME_ is null
         </if>
+        <if test="started">
+            and RES.LAST_STARTED_TIME_ is not null
+        </if>
+        <if test="notStarted">
+            and RES.LAST_STARTED_TIME_ is null
+        </if>
         <if test="startUserId != null">
             and RES.START_USER_ID_ = #{startUserId, jdbcType=VARCHAR}
         </if>
@@ -869,6 +875,12 @@
                 </if>
                 <if test="orQueryObject.ended">
                     or RES.ENDED_TIME_ is not null
+                </if>
+                <if test="orQueryObject.started">
+                    or RES.LAST_STARTED_TIME_ is not null
+                </if>
+                <if test="orQueryObject.notStarted">
+                    or RES.LAST_STARTED_TIME_ is null
                 </if>
                 <if test="orQueryObject.startUserId != null">
                     or RES.START_USER_ID_ = #{orQueryObject.startUserId, jdbcType=VARCHAR}

@@ -22,9 +22,12 @@ import org.flowable.app.engine.impl.persistence.entity.AppDefinitionEntityManage
 import org.flowable.app.engine.impl.persistence.entity.AppDeploymentEntity;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.app.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +79,11 @@ public class AppDeployer implements EngineDeployer {
                     newAppDefinition.setDeploymentId(deployment.getId());
                     newAppDefinition.setResourceName(resourceName);
                     appDefinitionEntityManager.insert(newAppDefinition, false);
+                    FlowableEventDispatcher eventDispatcher = appEngineConfiguration.getEventDispatcher();
+                    if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                        eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(newAppDefinition, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                                appEngineConfiguration.getEngineCfgKey());
+                    }
                     updateCachingAndArtifacts(newAppDefinition, appResourceModel, deploymentEntity);
                     
                 } else {

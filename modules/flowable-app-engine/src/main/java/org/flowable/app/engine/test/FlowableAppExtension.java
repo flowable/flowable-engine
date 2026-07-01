@@ -20,6 +20,7 @@ import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.test.impl.AppTestHelper;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -69,7 +70,7 @@ import org.junit.platform.commons.support.AnnotationSupport;
  *
  * @author Filip Hrisafov
  */
-public class FlowableAppExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+public class FlowableAppExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.app.cfg.xml";
 
@@ -104,6 +105,11 @@ public class FlowableAppExtension implements ParameterResolver, BeforeEachCallba
         }
         testHelper.getAppEngine().getAppEngineConfiguration().getClock().reset();
 
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
     }
 
     @Override

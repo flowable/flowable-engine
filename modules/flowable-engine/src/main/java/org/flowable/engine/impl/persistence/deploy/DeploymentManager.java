@@ -204,6 +204,8 @@ public class DeploymentManager {
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition),
                         processEngineConfiguration.getEngineCfgKey());
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.DEFINITION_UNDEPLOYED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
 

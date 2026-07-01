@@ -97,6 +97,14 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getExitAfter()).ifPresent(query::exitAfter);
         Optional.ofNullable(queryRequest.getEndedBefore()).ifPresent(query::endedBefore);
         Optional.ofNullable(queryRequest.getEndedAfter()).ifPresent(query::endedAfter);
+        Optional.ofNullable(queryRequest.getStarted()).ifPresent(started -> {
+                    if (started) {
+                        query.started();
+                    } else {
+                        query.notStarted();
+                    }
+                }
+        );
         Optional.ofNullable(queryRequest.getIncludeLocalVariables()).ifPresent(includeLocalVariables -> {
                     if (includeLocalVariables) {
                         query.includeLocalVariables();

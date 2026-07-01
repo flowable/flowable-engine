@@ -374,7 +374,21 @@ public enum FlowableEngineEventType implements FlowableEventType {
     /**
      * The business status was updated
      */
-    BUSINESS_STATUS_UPDATED
+    BUSINESS_STATUS_UPDATED,
+
+    /**
+     * A definition (process, case, decision, app, form, event or channel definition) has been deployed.
+     * A separate event is dispatched for each newly created definition version. The event entity is the
+     * {@link org.flowable.common.engine.api.repository.FlowableDefinition} that was deployed.
+     */
+    DEFINITION_DEPLOYED,
+
+    /**
+     * A definition (process, case, decision, app, form, event or channel definition) has been undeployed
+     * because its deployment was deleted. A separate event is dispatched for each removed definition. The event
+     * entity is the {@link org.flowable.common.engine.api.repository.FlowableDefinition} that was undeployed.
+     */
+    DEFINITION_UNDEPLOYED
     ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};

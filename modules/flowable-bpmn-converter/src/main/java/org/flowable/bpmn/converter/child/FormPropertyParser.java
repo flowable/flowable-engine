@@ -54,6 +54,9 @@ public class FormPropertyParser extends BaseChildElementParser {
         property.setExpression(xtr.getAttributeValue(null, ATTRIBUTE_FORM_EXPRESSION));
         property.setDefaultExpression(xtr.getAttributeValue(null, ATTRIBUTE_FORM_DEFAULT));
         property.setDatePattern(xtr.getAttributeValue(null, ATTRIBUTE_FORM_DATEPATTERN));
+        if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_FORM_LENIENT_DATE_PARSING))) {
+            property.setLenientDateParsing(Boolean.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_FORM_LENIENT_DATE_PARSING)));
+        }
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_FORM_REQUIRED))) {
             property.setRequired(Boolean.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_FORM_REQUIRED)));
         }

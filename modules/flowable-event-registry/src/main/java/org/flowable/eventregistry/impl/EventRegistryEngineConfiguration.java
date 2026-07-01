@@ -264,6 +264,7 @@ public class EventRegistryEngineConfiguration extends AbstractBuildableEngineCon
         initInboundEventPayloadExtractorProvider();
         initChannelDefinitionProcessors();
         initDeployers();
+        initEventDispatcher();
         initInboundChannelModelCacheManager();
         initChangeDetectionManager();
         initChangeDetectionExecutor();

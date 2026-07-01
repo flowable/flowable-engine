@@ -85,6 +85,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
         mapping.put("referenceType", HistoricPlanItemInstanceQueryRequest::setReferenceType);
         mapping.put("tenantId", HistoricPlanItemInstanceQueryRequest::setTenantId);
         mapping.put("withoutTenantId", (h, s) -> h.setWithoutTenantId(Boolean.valueOf(s)));
+        mapping.put("started", (h, s) -> h.setStarted(Boolean.valueOf(s)));
     }
 
     @ApiOperation(value = "List of historic plan item instances", tags = {"History PlanItem"}, nickname = "listHistoricPlanItemInstances")
@@ -121,6 +122,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiImplicitParam(name = "exitAfter", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that exit after this date.", paramType = "query"),
             @ApiImplicitParam(name = "endedBefore", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that ended before this date.", paramType = "query"),
             @ApiImplicitParam(name = "endedAfter", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that ended after this date.", paramType = "query"),
+            @ApiImplicitParam(name = "started", dataType = "boolean", value = "If true, only returns historic planItem instances that have been started (last started time is set). If false, only returns historic planItem instances that have not been started (last started time is null).", paramType = "query"),
             @ApiImplicitParam(name = "startUserId", dataType = "string", format = "date-time", value = "Return only historic planItem instances that were started by this user.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "The id of process that was referenced by this historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "The type of reference to the process referenced by this historic planItem instance.", paramType = "query"),

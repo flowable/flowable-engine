@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -343,6 +345,47 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).containsOnly(
                 entry("localVar", "someValue")
         );
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testByStarted() {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        // Complete A so it is started + ended, then terminate the case so B ends without ever being started
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(taskA.getId());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricPlanItemInstance> all = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId())
+                    .orderByName().asc()
+                    .list();
+            assertThat(all).extracting(HistoricPlanItemInstance::getName).containsExactly("A", "B");
+
+            List<HistoricPlanItemInstance> started = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId())
+                    .started()
+                    .list();
+            assertThat(started)
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactly("A");
+            assertThat(started).allSatisfy(pi -> assertThat(pi.getLastStartedTime()).isNotNull());
+
+            List<HistoricPlanItemInstance> notStarted = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId())
+                    .notStarted()
+                    .list();
+            assertThat(notStarted)
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactly("B");
+            assertThat(notStarted).allSatisfy(pi -> assertThat(pi.getLastStartedTime()).isNull());
+
+            // started and notStarted partition the full result set
+            assertThat(started.size() + notStarted.size()).isEqualTo(all.size());
+        }
     }
 
     private List<String> startInstances(int numberOfInstances) {

@@ -240,6 +240,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
         initDataManagers();
         initEntityManagers();
         initDeployers();
+        initEventDispatcher();
         initAppDefinitionCache();
         initAppResourceConverter();
         initDeploymentManager();

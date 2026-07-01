@@ -229,6 +229,8 @@ public class BpmnDeployer implements EngineDeployer {
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition),
                         processEngineConfiguration.getEngineCfgKey());
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.DEFINITION_DEPLOYED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
             }
         }
     }

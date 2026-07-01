@@ -699,6 +699,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<AbstractFormType> customFormTypes;
     protected FormTypes formTypes;
+    protected boolean lenientDateParsing;
 
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
@@ -2286,9 +2287,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initFormTypes() {
         if (formTypes == null) {
             formTypes = new FormTypes();
+            formTypes.setLenientDateParsing(lenientDateParsing);
             formTypes.addFormType(new StringFormType());
             formTypes.addFormType(new LongFormType());
-            formTypes.addFormType(new DateFormType("dd/MM/yyyy"));
+            formTypes.addFormType(new DateFormType("dd/MM/yyyy", lenientDateParsing));
             formTypes.addFormType(new BooleanFormType());
             formTypes.addFormType(new DoubleFormType());
         }
@@ -3010,6 +3012,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setFormTypes(FormTypes formTypes) {
         this.formTypes = formTypes;
+        return this;
+    }
+
+    public boolean isLenientDateParsing() {
+        return lenientDateParsing;
+    }
+
+    public ProcessEngineConfigurationImpl setLenientDateParsing(boolean lenientDateParsing) {
+        this.lenientDateParsing = lenientDateParsing;
         return this;
     }
 

@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -236,6 +238,23 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         address = (Address) variables.remove("address");
         assertThat(address.getStreet()).isEqualTo("rubensstraat");
         assertThat(variables).isEqualTo(expectedVariables);
+    }
+
+    @Test
+    @Deployment
+    public void testDateFormPropertyLenientParsing() {
+        String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+        Map<String, String> invalidStrictDate = new HashMap<>();
+        invalidStrictDate.put("strictDate", "15/13/2024");
+        assertThatThrownBy(() -> formService.submitStartFormData(procDefId, invalidStrictDate))
+                .isInstanceOf(FlowableIllegalArgumentException.class);
+
+        Map<String, String> invalidLenientDate = new HashMap<>();
+        invalidLenientDate.put("lenientDate", "15/13/2024");
+        String processInstanceId = formService.submitStartFormData(procDefId, invalidLenientDate).getId();
+        assertThat(runtimeService.getVariable(processInstanceId, "lenientDate"))
+                .isEqualTo(new GregorianCalendar(2025, Calendar.JANUARY, 15).getTime());
     }
 
     @Test

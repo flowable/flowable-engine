@@ -78,6 +78,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected Date endedAfter;
     protected boolean ended;
     protected boolean includeEnded;
+    protected boolean started;
+    protected boolean notStarted;
     protected String startUserId;
     protected String assignee;
     protected String completedBy;
@@ -684,6 +686,26 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
             throw new FlowableIllegalArgumentException("includeEnded is not allowed within an or query");
         } else {
             this.includeEnded = true;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery started() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.started = true;
+        } else {
+            this.started = true;
+        }
+        return this;
+    }
+
+    @Override
+    public PlanItemInstanceQuery notStarted() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.notStarted = true;
+        } else {
+            this.notStarted = true;
         }
         return this;
     }
@@ -1337,6 +1359,12 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     public boolean isIncludeEnded() {
         return includeEnded;
+    }
+    public boolean isStarted() {
+        return started;
+    }
+    public boolean isNotStarted() {
+        return notStarted;
     }
     public String getStartUserId() {
         return startUserId;

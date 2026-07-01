@@ -29,8 +29,12 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class CmmnDeploymentManager {
@@ -134,10 +138,17 @@ public class CmmnDeploymentManager {
             deployer.undeploy(deployment, cascade);
         }
 
+        List<CaseDefinition> caseDefinitions = new CaseDefinitionQueryImpl().deploymentId(deploymentId).list();
+
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
-        
-        for (CaseDefinition caseDefinition : new CaseDefinitionQueryImpl().deploymentId(deploymentId).list()) {
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        for (CaseDefinition caseDefinition : caseDefinitions) {
             caseDefinitionCache.remove(caseDefinition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(caseDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
     }
 

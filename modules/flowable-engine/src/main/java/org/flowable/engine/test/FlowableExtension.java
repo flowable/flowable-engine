@@ -31,6 +31,7 @@ import org.flowable.engine.impl.test.TestHelper;
 import org.flowable.engine.test.mock.FlowableMockSupport;
 import org.flowable.engine.test.mock.MockServiceTask;
 import org.flowable.engine.test.mock.NoOpServiceTasks;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -89,7 +90,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Filip Hrisafov
  */
-public class FlowableExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+public class FlowableExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.cfg.xml";
 
@@ -150,6 +151,11 @@ public class FlowableExtension implements ParameterResolver, BeforeEachCallback,
         if (mockSupport != null) {
             TestHelper.annotationMockSupportTeardown(mockSupport);
         }
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
     }
 
     @Override
