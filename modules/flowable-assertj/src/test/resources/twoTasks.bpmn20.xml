@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="test">
+
+  <process id="twoTasksProcess">
+    <startEvent id="theStart" />
+    <sequenceFlow id="theStart-theTask" sourceRef="theStart" targetRef="theTask1" />
+    <userTask id="theTask1"/>
+    <sequenceFlow id="theTask1-theTask2" sourceRef="theTask1" targetRef="theTask2" />
+    <userTask id="theTask2"/>
+    <sequenceFlow id="theTask-theEnd" sourceRef="theTask2" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>
