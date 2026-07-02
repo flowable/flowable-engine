@@ -33,6 +33,26 @@ public class SubProcess extends Activity implements FlowElementsContainer {
     protected List<Artifact> artifactList = new ArrayList<>();
     protected List<ValuedDataObject> dataObjects = new ArrayList<>();
 
+
+    //Custom PROTOOLS:
+    @Override
+    public FlowElement getFlowElement(String flowElementId, boolean searchRecursive) {
+        if (searchRecursive) {
+            return flowElementMap.get(flowElementId);
+        } else {
+            return findFlowElementInList(flowElementId);
+        }
+    }
+    protected FlowElement findFlowElementInList(String flowElementId) {
+        for (FlowElement f : flowElementList) {
+            if (f.getId() != null && f.getId().equals(flowElementId)) {
+                return f;
+            }
+        }
+        return null;
+    }
+    //END CUSTOM
+
     @Override
     public FlowElement getFlowElement(String id) {
         FlowElement foundElement = null;

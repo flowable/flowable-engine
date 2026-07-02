@@ -20,6 +20,10 @@ import java.util.Map;
  */
 public interface FlowElementsContainer {
 
+
+    //Custom PROTOOLS:
+    FlowElement getFlowElement(String flowElementId, boolean searchRecursive);
+
     FlowElement getFlowElement(String id);
 
     Collection<FlowElement> getFlowElements();
