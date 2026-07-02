@@ -260,6 +260,15 @@ public class EndExecutionOperation extends AbstractOperation {
             for (ExecutionEntity childExecutionEntity : childExecutions) {
                 if (!isInEventSubProcess(childExecutionEntity) && childExecutionEntity.isActive() && !childExecutionEntity.isEnded()) {
                     activeSiblings = true;
+                    break;
+                }
+                if (childExecutionEntity.isMultiInstanceRoot()){
+                    for (ExecutionEntity childMultiExecutionEntity : childExecutionEntity.getExecutions()){
+                        if (!isInEventSubProcess(childMultiExecutionEntity) && childMultiExecutionEntity.isActive() && !childMultiExecutionEntity.isEnded()) {
+                            activeSiblings = true;
+                            break;
+                        }
+                    }
                 }
             }
             
