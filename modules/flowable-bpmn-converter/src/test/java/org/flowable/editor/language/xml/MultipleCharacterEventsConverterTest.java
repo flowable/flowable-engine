@@ -26,6 +26,17 @@ public class MultipleCharacterEventsConverterTest {
         assertThat(model.getFlowElement("end").getExtensionElements().get("data").get(0).getElementText()).isEqualTo("a&b&c&d&e&f&g");
         
         assertThat(model.getFlowElement("flow2").getExtensionElements().get("data").get(0).getElementText()).isEqualTo("a&b&c&d&e&f&g");
+
+        assertThat(model.getFlowElement("flow2").getExtensionElements().get("data2").get(0).getElementText()).isEqualTo("a& b& c& d& e& f& g");
+
+        assertThat(model.getFlowElement("flow2").getExtensionElements().get("data3").get(0).getElementText()).isNull();
+
+        assertThat(model.getFlowElement("flow2").getExtensionElements().get("data4").get(0).getElementText()).isNull();
+
+        assertThat(model.getFlowElement("flow2").getExtensionElements().get("data5").get(0).getElementText()).isEqualTo("""
+                this is
+                        multiple lines
+                        data""");
     }
 
 }
