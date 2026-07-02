@@ -809,6 +809,33 @@ public abstract class AbstractEngineConfiguration {
         if (sqlSessionFactory == null) {
             InputStream inputStream = null;
             try {
+                // [KINGBASE] —— 确保已初始化 databaseType
+                if (databaseType == null) {
+                    initDatabaseType(); // 这一步会把 KingbaseES 映射成 "kingbase"
+                }
+
+                // [KINGBASE] —— 在加载 properties 之前细化为 kingbase-<mode>
+                if ("kingbase".equalsIgnoreCase(databaseType)) {
+                    try (java.sql.Connection c = this.getDataSource().getConnection();
+                         java.sql.Statement st = c.createStatement();
+                         java.sql.ResultSet rs = st.executeQuery("show database_mode")) {
+
+                        if (rs.next()) {
+                            String mode = rs.getString(1); // mysql / oracle / sqlserver
+                            switch (mode.toLowerCase()) {
+                                case "mysql" -> databaseType = "kingbase-mysql";
+                                case "oracle" -> databaseType = "kingbase-oracle";
+                                case "sqlserver" -> databaseType = "kingbase-sqlserver";
+                                case "pg" -> databaseType = "postgres";
+                                default -> throw new FlowableException("Unknown Kingbase database_mode: " + mode);
+                            }
+                        } else {
+                            throw new FlowableException("SHOW DATABASE_MODE returned no rows");
+                        }
+                    } catch (java.sql.SQLException e) {
+                        throw new FlowableException("Detect Kingbase database_mode failed", e);
+                    }
+                }
                 inputStream = getMyBatisXmlConfigurationStream();
 
                 Environment environment = new Environment("default", transactionFactory, dataSource);
