@@ -10,7 +10,7 @@ env:
 jobs:
   test_jdk:
     name: Linux (JDK ${{ matrix.java }})
-    runs-on: warp-ubuntu-latest-x64-2x
+    runs-on: blacksmith-2vcpu-ubuntu-2404
     strategy:
       fail-fast: false
       matrix:
