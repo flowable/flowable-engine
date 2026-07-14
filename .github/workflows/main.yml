@@ -10,7 +10,7 @@ env:
 jobs:
   test_jdk:
     name: Linux (JDK ${{ matrix.java }})
-    runs-on: ubicloud-standard-2
+    runs-on: ubicloud-standard-4
     strategy:
       fail-fast: false
       matrix:
