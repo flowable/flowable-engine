@@ -43,7 +43,9 @@ class FlowableDependsOnDatabaseInitializationDetectorTest {
     @Test
     void processEngineDependsOnDatabaseInitialization() {
         contextRunner
-                .withPropertyValues("spring.sql.init.mode=always")
+                .withPropertyValues(
+                        "spring.sql.init.mode=always",
+                        "flowable.check-process-definitions=false")
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     String[] dependsOn = context.getBeanFactory()
@@ -51,7 +53,6 @@ class FlowableDependsOnDatabaseInitializationDetectorTest {
                             .getDependsOn();
                     assertThat(dependsOn)
                             .as("processEngine must wait for the SQL init database initializer")
-                            .isNotNull()
                             .contains("dataSourceScriptDatabaseInitializer");
                 });
     }
@@ -61,16 +62,16 @@ class FlowableDependsOnDatabaseInitializationDetectorTest {
         contextRunner
                 .withPropertyValues(
                         "spring.sql.init.mode=always",
+                        "flowable.check-process-definitions=false",
                         "flowable.depends-on-database-initialization-detection=false")
                 .run(context -> {
                     assertThat(context).hasNotFailed();
                     String[] dependsOn = context.getBeanFactory()
                             .getBeanDefinition("processEngine")
                             .getDependsOn();
-                    assertThat(dependsOn == null || !java.util.Arrays.asList(dependsOn)
-                            .contains("dataSourceScriptDatabaseInitializer"))
+                    assertThat(dependsOn)
                             .as("opt-out must remove the database initializer dependency")
-                            .isTrue();
+                            .isNullOrEmpty();
                 });
     }
 }
