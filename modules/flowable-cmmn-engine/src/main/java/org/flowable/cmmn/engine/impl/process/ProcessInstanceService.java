@@ -97,4 +97,14 @@ public interface ProcessInstanceService {
      */
     boolean isHistoryEnabledForProcessInstance(String processInstanceId);
 
+    /**
+     * Returns the id of the root process instance of the call hierarchy the given process instance belongs to.
+     * For a top-level process instance this is the process instance id itself; for a process instance started
+     * through one or more BPMN call activities it is the outermost process instance. Used to resolve the owning
+     * case of a variable that belongs to a process nested under a case.
+     */
+    default String getRootProcessInstanceId(String processInstanceId) {
+        return processInstanceId;
+    }
+
 }

@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -25,6 +27,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
@@ -218,10 +221,39 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     public boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity) {
         String caseDefinitionId = null;
         if (isEnableCaseDefinitionHistoryLevel() && variableInstanceEntity.getScopeId() != null) {
-            CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
-            caseDefinitionId = caseInstance.getCaseDefinitionId();
+            caseDefinitionId = getCaseDefinitionId(variableInstanceEntity);
         }
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+    }
+
+    protected String getCaseDefinitionId(VariableInstanceEntity variableInstanceEntity) {
+        String scopeId = variableInstanceEntity.getScopeId();
+
+        // A case (or case sub-scope) variable stores the case instance id as its scopeId.
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(scopeId);
+        if (caseInstance != null) {
+            return caseInstance.getCaseDefinitionId();
+        }
+
+        // The scopeId is not a case instance id. This happens for a variable that belongs to a process running
+        // under a case, e.g. a BPMN multi-instance variable-aggregation variable whose scopeId is the process
+        // instance id (see BpmnAggregation). The process may itself be nested under the case through one or more
+        // BPMN call activities, so resolve the root process instance of the call hierarchy - that is the process
+        // a CMMN process task started directly - and use the plan item instance that started it (its referenceId
+        // is that root process instance id) to determine the owning case definition.
+        ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+        if (processInstanceService != null) {
+            String rootProcessInstanceId = processInstanceService.getRootProcessInstanceId(scopeId);
+            List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByReferenceId(rootProcessInstanceId);
+            for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+                if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+                    return planItemInstance.getCaseDefinitionId();
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
