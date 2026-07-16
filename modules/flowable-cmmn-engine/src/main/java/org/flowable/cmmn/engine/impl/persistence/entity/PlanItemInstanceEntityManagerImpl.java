@@ -422,6 +422,11 @@ public class PlanItemInstanceEntityManagerImpl
     }
 
     @Override
+    public List<PlanItemInstanceEntity> findByReferenceId(String referenceId) {
+        return dataManager.findByReferenceId(referenceId);
+    }
+
+    @Override
     public List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId) {
         return dataManager.findByStageInstanceIdAndPlanItemId(stageInstanceId, planItemId);
     }

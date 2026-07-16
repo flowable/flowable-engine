@@ -29,7 +29,9 @@ public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanc
     List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceEntity);
 
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planitemId);
-    
+
+    List<PlanItemInstanceEntity> findByReferenceId(String referenceId);
+
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
 
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndTypeAndState(String caseInstanceId, List<String> planItemDefinitionTypes,
