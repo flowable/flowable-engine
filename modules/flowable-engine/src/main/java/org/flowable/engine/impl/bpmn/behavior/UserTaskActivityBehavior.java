@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
@@ -138,7 +139,12 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior implements Ac
             activeTaskIdVariableName = userTask.getTaskIdVariableName();
         }
         
-        if (execution.getCurrentActivityName() != null) {
+        // The current activity name may already hold a resolved name expression (set in ActivityInstanceEntityManagerImpl).
+        // Reuse it as the task name to avoid resolving the same expression twice, but only when no dynamic or migration
+        // override replaced the name (an override makes activeTaskName differ from the raw model name and must take precedence).
+        if (execution.getCurrentActivityName() != null
+                && userTask.getName() != null
+                && Objects.equals(activeTaskName, userTask.getName())) {
             activeTaskName = execution.getCurrentActivityName();
         }
         
