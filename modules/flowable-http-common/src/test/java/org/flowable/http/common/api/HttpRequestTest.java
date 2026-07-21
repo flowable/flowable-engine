@@ -84,6 +84,66 @@ class HttpRequestTest {
     }
 
     @Test
+    void setBodyBytesShouldNotBePossibleWhenBodyIsSet() {
+        HttpRequest request = new HttpRequest();
+        request.setBody("test");
+        assertThatThrownBy(() -> request.setBodyBytes(new byte[] { 1, 2, 3 }))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body and body bytes");
+        assertThat(request.getBodyBytes()).isNull();
+    }
+
+    @Test
+    void setBodyBytesShouldNotBePossibleWhenMultiValuePartsAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        assertThatThrownBy(() -> request.setBodyBytes(new byte[] { 1, 2, 3 }))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body bytes and multi value parts");
+        assertThat(request.getBodyBytes()).isNull();
+    }
+
+    @Test
+    void setBodyBytesShouldNotBePossibleWhenFormParametersAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.addFormParameter("name", "kermit");
+        assertThatThrownBy(() -> request.setBodyBytes(new byte[] { 1, 2, 3 }))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body bytes and form parameters");
+        assertThat(request.getBodyBytes()).isNull();
+    }
+
+    @Test
+    void setBodyShouldNotBePossibleWhenBodyBytesAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.setBodyBytes(new byte[] { 1, 2, 3 });
+        assertThatThrownBy(() -> request.setBody("test"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body and body bytes");
+        assertThat(request.getBody()).isNull();
+    }
+
+    @Test
+    void addMultiValuePartShouldNotBePossibleWhenBodyBytesAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.setBodyBytes(new byte[] { 1, 2, 3 });
+        assertThatThrownBy(() -> request.addMultiValuePart(MultiValuePart.fromText("name", "kermit")))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body bytes and multi value parts");
+        assertThat(request.getMultiValueParts()).isNull();
+    }
+
+    @Test
+    void addFormParameterShouldNotBePossibleWhenBodyBytesAreSet() {
+        HttpRequest request = new HttpRequest();
+        request.setBodyBytes(new byte[] { 1, 2, 3 });
+        assertThatThrownBy(() -> request.addFormParameter("name", "kermit"))
+                .isInstanceOf(FlowableIllegalStateException.class)
+                .hasMessage("Cannot set both body bytes and form parameters");
+        assertThat(request.getFormParameters()).isNull();
+    }
+
+    @Test
     void getHttpHeadersAsString() {
         HttpRequest request = new HttpRequest();
         assertThat(request.getHttpHeadersAsString()).isNull();

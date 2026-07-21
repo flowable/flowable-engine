@@ -35,6 +35,12 @@ public class HttpRequest {
     protected String body;
     protected String bodyEncoding;
     /**
+     * Raw binary body to be sent in the request. Mutually exclusive with {@link #body}, {@link #multiValueParts}
+     * and {@link #formParameters}. Use this for a raw binary payload that must not go through the textual
+     * {@link #body}, which would corrupt it.
+     */
+    protected byte[] bodyBytes;
+    /**
      * Multi-value parts to be sent in the request.
      * This is used for multipart/form-data requests and will be encoded as such.
      */
@@ -93,7 +99,9 @@ public class HttpRequest {
     }
 
     public void setBody(String body) {
-        if (multiValueParts != null && !multiValueParts.isEmpty()) {
+        if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and body bytes");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
             throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
         } else if (formParameters != null && !formParameters.isEmpty()) {
             throw new FlowableIllegalStateException("Cannot set both body and form parameters");
@@ -109,6 +117,21 @@ public class HttpRequest {
         this.bodyEncoding = bodyEncoding;
     }
 
+    public byte[] getBodyBytes() {
+        return bodyBytes;
+    }
+
+    public void setBodyBytes(byte[] bodyBytes) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and body bytes");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and multi value parts");
+        } else if (formParameters != null && !formParameters.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and form parameters");
+        }
+        this.bodyBytes = bodyBytes;
+    }
+
     public Collection<MultiValuePart> getMultiValueParts() {
         return multiValueParts;
     }
@@ -116,6 +139,8 @@ public class HttpRequest {
     public void addMultiValuePart(MultiValuePart part) {
         if (body != null) {
             throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        } else if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and multi value parts");
         } else if (formParameters != null && !formParameters.isEmpty()) {
             throw new FlowableIllegalStateException("Cannot set both form parameters and multi value parts");
         }
@@ -132,6 +157,8 @@ public class HttpRequest {
     public void addFormParameter(String key, String value) {
         if (body != null) {
             throw new FlowableIllegalStateException("Cannot set both body and form parameters");
+        } else if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and form parameters");
         } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
             throw new FlowableIllegalStateException("Cannot set both multi value parts and form parameters");
         }
