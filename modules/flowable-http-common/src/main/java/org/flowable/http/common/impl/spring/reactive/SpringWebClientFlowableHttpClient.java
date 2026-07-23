@@ -190,6 +190,10 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
 
             requestBodySpec.bodyValue(requestInfo.getBody());
+        } else if (requestInfo.getBodyBytes() != null) {
+            // A caller-supplied Content-Type header (added afterwards) takes precedence over this default.
+            requestBodySpec.contentType(MediaType.APPLICATION_OCTET_STREAM);
+            requestBodySpec.bodyValue(requestInfo.getBodyBytes());
         } else if (requestInfo.getMultiValueParts() != null) {
             MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
             for (MultiValuePart part : requestInfo.getMultiValueParts()) {

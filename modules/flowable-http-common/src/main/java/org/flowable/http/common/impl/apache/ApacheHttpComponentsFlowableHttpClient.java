@@ -48,6 +48,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
@@ -247,6 +248,9 @@ public class ApacheHttpComponentsFlowableHttpClient implements FlowableHttpClien
             } else {
                 requestBase.setEntity(new StringEntity(requestInfo.getBody()));
             }
+        } else if (requestInfo.getBodyBytes() != null) {
+            // A caller-supplied Content-Type header (added afterwards) takes precedence over this default.
+            requestBase.setEntity(new ByteArrayEntity(requestInfo.getBodyBytes(), ContentType.APPLICATION_OCTET_STREAM));
         } else if (requestInfo.getMultiValueParts() != null) {
             if (MULTIPART_ENTITY_BUILDER_PRESENT) {
                 MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();

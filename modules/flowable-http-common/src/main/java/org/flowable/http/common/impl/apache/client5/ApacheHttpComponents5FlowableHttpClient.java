@@ -234,6 +234,9 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             } else {
                 requestBase.setEntity(AsyncEntityProducers.create(requestInfo.getBody()));
             }
+        } else if (requestInfo.getBodyBytes() != null) {
+            // A caller-supplied Content-Type header (added afterwards) takes precedence over this default.
+            requestBase.setEntity(requestInfo.getBodyBytes(), ContentType.APPLICATION_OCTET_STREAM);
         } else if (requestInfo.getMultiValueParts() != null) {
             MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
             entityBuilder.setMode(multipartMode);
