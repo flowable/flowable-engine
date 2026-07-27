@@ -491,7 +491,7 @@ public class CrossEngineBusinessErrorTest extends AbstractProcessEngineIntegrati
      * │  BPMN: start → [Wait Task] → [Throw Error] → end          │
      * │                 (user task)    throws BpmnError("BPMN_ERROR")│
      * └────────────────────────────────────────────────────────────┘
-     * Transaction 2 (complete Wait Task → BpmnError → onError callback):
+     * This time: complete Wait Task → BpmnError → onError callback:
      *  - matching sentry fires → B activates
      *  - B's activation triggers a re-evaluation cycle in which the still-pending
      *    non-matching sentry's ifPart is evaluated again — but the lifecycle event of
@@ -499,9 +499,9 @@ public class CrossEngineBusinessErrorTest extends AbstractProcessEngineIntegrati
      *    unresolvable. This must NOT throw "Unknown property used in expression".
      */
     @Test
-    public void testProcessTaskBpmnErrorFaultCodeIfPart() {
+    public void testProcessTaskBpmnErrorFaultCodeMultipleSentriesWithIfPart() {
         CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/test/CrossEngineBusinessErrorTest.testProcessTaskBpmnErrorFaultCodeIfPart.cmmn")
+                .addClasspathResource("org/flowable/cmmn/test/CrossEngineBusinessErrorTest.testProcessTaskBpmnErrorFaultCodeMultipleSentriesWithIfPart.cmmn")
                 .deploy();
         Deployment bpmnDeployment = processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/CrossEngineBusinessErrorTest.testProcessTaskBpmnErrorAfterWaitState.bpmn20.xml")
