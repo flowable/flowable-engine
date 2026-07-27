@@ -482,6 +482,64 @@ public class CrossEngineBusinessErrorTest extends AbstractProcessEngineIntegrati
         }
     }
 
+    /**
+     * CMMN Case
+     * ┌────────────────────────────────────────────────────────────┐
+     * │  [Process Task]──fault sentry (faultCode=='BPMN_ERROR')──▶[B]      │
+     * │       │       └─fault sentry (faultCode=='SOME_OTHER_ERROR')──▶[C] │
+     * │       ▼ starts                                              │
+     * │  BPMN: start → [Wait Task] → [Throw Error] → end          │
+     * │                 (user task)    throws BpmnError("BPMN_ERROR")│
+     * └────────────────────────────────────────────────────────────┘
+     * Transaction 2 (complete Wait Task → BpmnError → onError callback):
+     *  - matching sentry fires → B activates
+     *  - B's activation triggers a re-evaluation cycle in which the still-pending
+     *    non-matching sentry's ifPart is evaluated again — but the lifecycle event of
+     *    that later operation no longer carries the businessError, so faultCode is
+     *    unresolvable. This must NOT throw "Unknown property used in expression".
+     */
+    @Test
+    public void testProcessTaskBpmnErrorFaultCodeIfPart() {
+        CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CrossEngineBusinessErrorTest.testProcessTaskBpmnErrorFaultCodeIfPart.cmmn")
+                .deploy();
+        Deployment bpmnDeployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/CrossEngineBusinessErrorTest.testProcessTaskBpmnErrorAfterWaitState.bpmn20.xml")
+                .deploy();
+
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testProcessTaskFaultIfPart")
+                    .start();
+
+            List<Task> bpmnTasks = processEngineTaskService.createTaskQuery().list();
+            assertThat(bpmnTasks).extracting(Task::getName).containsExactly("Wait Task");
+
+            // Complete the user task → next service task throws BpmnError("BPMN_ERROR") in a new transaction,
+            // propagating via the onError callback into the CMMN engine.
+            processEngineTaskService.complete(bpmnTasks.get(0).getId());
+
+            // ProcessTask should be FAILED (BpmnError propagated as fault via callback)
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.FAILED)
+                    .includeEnded()
+                    .list())
+                    .extracting(PlanItemInstance::getName)
+                    .containsExactly("Process Task");
+
+            // Only the matching sentry should have fired → B active, C not created/activated
+            List<Task> cmmnTasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+            assertThat(cmmnTasks).extracting(Task::getName).containsExactly("B");
+
+            cmmnTaskService.complete(cmmnTasks.get(0).getId());
+            assertCaseInstanceEnded(caseInstance);
+
+        } finally {
+            deleteDeployments(cmmnDeployment, bpmnDeployment);
+        }
+    }
+
     private void deleteDeployments(CmmnDeployment cmmnDeployment, Deployment bpmnDeployment) {
         // Clean up CMMN first (ends case instances), then BPMN.
         cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true);
