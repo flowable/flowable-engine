@@ -224,7 +224,12 @@ public class TimerJobEntityManagerImpl
     }
 
     protected void setNewRepeat(JobEntity timerEntity, int newRepeatValue) {
-        List<String> expression = Arrays.asList(timerEntity.getRepeat().split("/"));
+        String repeat = timerEntity.getRepeat();
+        if (repeat == null) {
+            timerEntity.setRepeat("R" + newRepeatValue);
+            return;
+        }
+        List<String> expression = Arrays.asList(repeat.split("/"));
         expression = expression.subList(1, expression.size());
         StringBuilder repeatBuilder = new StringBuilder("R");
         repeatBuilder.append(newRepeatValue);
