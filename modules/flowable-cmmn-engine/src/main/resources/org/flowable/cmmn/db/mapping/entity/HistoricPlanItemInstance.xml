@@ -601,6 +601,204 @@
                 and (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
             </if>
 
+            <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
+                and
+                <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <if test="orQueryObject.planItemInstanceId != null">
+                        or RES.ID_ = #{orQueryObject.planItemInstanceId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.planItemInstanceName != null">
+                        or RES.NAME_ = #{orQueryObject.planItemInstanceName, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.state != null">
+                        or RES.STATE_ = #{orQueryObject.state, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.caseDefinitionId != null">
+                        or RES.CASE_DEF_ID_ = #{orQueryObject.caseDefinitionId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.derivedCaseDefinitionId != null">
+                        or RES.DERIVED_CASE_DEF_ID_ = #{orQueryObject.derivedCaseDefinitionId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.caseInstanceId != null">
+                        or RES.CASE_INST_ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.caseInstanceIds != null and !orQueryObject.caseInstanceIds.empty">
+                        or RES.CASE_INST_ID_ in <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds" open="(" separator="," close=")">#{caseInstanceId, jdbcType=VARCHAR}</foreach>
+                    </if>
+                    <if test="orQueryObject.stageInstanceId != null">
+                        or RES.STAGE_INST_ID_ = #{orQueryObject.stageInstanceId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.elementId != null">
+                        or RES.ELEMENT_ID_ = #{orQueryObject.elementId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.planItemDefinitionId != null">
+                        or RES.ITEM_DEFINITION_ID_ = #{orQueryObject.planItemDefinitionId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.planItemDefinitionType != null">
+                        or RES.ITEM_DEFINITION_TYPE_ = #{orQueryObject.planItemDefinitionType, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.planItemDefinitionTypes != null and !orQueryObject.planItemDefinitionTypes.empty">
+                        or RES.ITEM_DEFINITION_TYPE_ in <foreach item="planItemDefinitionType" index="index" collection="orQueryObject.planItemDefinitionTypes" open="(" separator="," close=")">#{planItemDefinitionType, jdbcType=VARCHAR}</foreach>
+                    </if>
+                    <if test="orQueryObject.createdBefore != null">
+                        or RES.CREATE_TIME_ &lt;= #{orQueryObject.createdBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.createdAfter != null">
+                        or RES.CREATE_TIME_ &gt;= #{orQueryObject.createdAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastAvailableBefore != null">
+                        or RES.LAST_AVAILABLE_TIME_ &lt;= #{orQueryObject.lastAvailableBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastAvailableAfter != null">
+                        or RES.LAST_AVAILABLE_TIME_ &gt;= #{orQueryObject.lastAvailableAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastUnavailableBefore != null">
+                        or RES.LAST_UNAVAILABLE_TIME_ &lt;= #{orQueryObject.lastUnavailableBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastUnavailableAfter != null">
+                        or RES.LAST_UNAVAILABLE_TIME_ &gt;= #{orQueryObject.lastUnavailableAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastEnabledBefore != null">
+                        or RES.LAST_ENABLED_TIME_ &lt;= #{orQueryObject.lastEnabledBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastEnabledAfter != null">
+                        or RES.LAST_ENABLED_TIME_ &gt;= #{orQueryObject.lastEnabledAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastDisabledBefore != null">
+                        or RES.LAST_DISABLED_TIME_ &lt;= #{orQueryObject.lastDisabledBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastDisabledAfter != null">
+                        or RES.LAST_DISABLED_TIME_ &gt;= #{orQueryObject.lastDisabledAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastStartedBefore != null">
+                        or RES.LAST_STARTED_TIME_ &lt;= #{orQueryObject.lastStartedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastStartedAfter != null">
+                        or RES.LAST_STARTED_TIME_ &gt;= #{orQueryObject.lastStartedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastSuspendedBefore != null">
+                        or RES.LAST_SUSPENDED_TIME_ &lt;= #{orQueryObject.lastSuspendedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.lastSuspendedAfter != null">
+                        or RES.LAST_SUSPENDED_TIME_ &gt;= #{orQueryObject.lastSuspendedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.completedBefore != null">
+                        or RES.COMPLETED_TIME_ &lt;= #{orQueryObject.completedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.completedAfter != null">
+                        or RES.COMPLETED_TIME_ &gt;= #{orQueryObject.completedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.occurredBefore != null">
+                        or RES.OCCURRED_TIME_ &lt;= #{orQueryObject.occurredBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.occurredAfter != null">
+                        or RES.OCCURRED_TIME_ &gt;= #{orQueryObject.occurredAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.terminatedBefore != null">
+                        or RES.TERMINATED_TIME_ &lt;= #{orQueryObject.terminatedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.terminatedAfter != null">
+                        or RES.TERMINATED_TIME_ &gt;= #{orQueryObject.terminatedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.failedBefore != null">
+                        or RES.FAILED_TIME_ &lt;= #{orQueryObject.failedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.failedAfter != null">
+                        or RES.FAILED_TIME_ &gt;= #{orQueryObject.failedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.exitBefore != null">
+                        or RES.EXIT_TIME_ &lt;= #{orQueryObject.exitBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.exitAfter != null">
+                        or RES.EXIT_TIME_ &gt;= #{orQueryObject.exitAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.endedBefore != null">
+                        or RES.ENDED_TIME_ &lt;= #{orQueryObject.endedBefore, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.endedAfter != null">
+                        or RES.ENDED_TIME_ &gt;= #{orQueryObject.endedAfter, jdbcType=TIMESTAMP}
+                    </if>
+                    <if test="orQueryObject.ended">
+                        or RES.ENDED_TIME_ is not null
+                    </if>
+                    <if test="orQueryObject.notEnded">
+                        or RES.ENDED_TIME_ is null
+                    </if>
+                    <if test="orQueryObject.started">
+                        or RES.LAST_STARTED_TIME_ is not null
+                    </if>
+                    <if test="orQueryObject.notStarted">
+                        or RES.LAST_STARTED_TIME_ is null
+                    </if>
+                    <if test="orQueryObject.startUserId != null">
+                        or RES.START_USER_ID_ = #{orQueryObject.startUserId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.assignee != null">
+                        or RES.ASSIGNEE_ = #{orQueryObject.assignee, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.completedBy != null">
+                        or RES.COMPLETED_BY_ = #{orQueryObject.completedBy, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.referenceId != null">
+                        or RES.REFERENCE_ID_ = #{orQueryObject.referenceId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.referenceType != null">
+                        or RES.REFERENCE_TYPE_ = #{orQueryObject.referenceType, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.entryCriterionId != null">
+                        or RES.ENTRY_CRITERION_ID_ = #{orQueryObject.entryCriterionId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.exitCriterionId != null">
+                        or RES.EXIT_CRITERION_ID_ = #{orQueryObject.exitCriterionId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.formKey != null">
+                        or RES.EXTRA_VALUE_ = #{orQueryObject.formKey, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.extraValue != null">
+                        or RES.EXTRA_VALUE_ = #{orQueryObject.extraValue, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.onlyStages">
+                        or RES.IS_STAGE_ = #{orQueryObject.onlyStages, jdbcType=BOOLEAN}
+                    </if>
+                    <if test="orQueryObject.involvedUser != null || orQueryObject.involvedGroups != null">
+                        or exists(select I.ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SUB_SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'planItem'
+                        and
+                        (
+                          <if test="orQueryObject.involvedUser != null">
+                            I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+                          </if>
+                          <if test="orQueryObject.involvedUser != null &amp;&amp; orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                            or
+                          </if>
+                          <if test="orQueryObject.involvedGroups != null &amp;&amp; !orQueryObject.involvedGroups.empty">
+                            (
+                            <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                                <if test="groupIndex &gt; 0">
+                                or
+                                </if>
+                                I.GROUP_ID_ IN
+                                <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
+                                      open="(" separator="," close=")">
+                                  #{involvedGroup, jdbcType=NVARCHAR}
+                                </foreach>
+                            </foreach>
+                            )
+                          </if>
+                        )
+                        )
+                    </if>
+                    <if test="orQueryObject.tenantId != null">
+                        or RES.TENANT_ID_ = #{orQueryObject.tenantId, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.tenantIdLike != null">
+                        or RES.TENANT_ID_ like #{orQueryObject.tenantIdLike, jdbcType=VARCHAR}
+                    </if>
+                    <if test="orQueryObject.withoutTenantId">
+                        or (RES.TENANT_ID_ is null or RES.TENANT_ID_ = '')
+                    </if>
+                </trim>
+            </foreach>
+
         </where>
     </sql>
 
