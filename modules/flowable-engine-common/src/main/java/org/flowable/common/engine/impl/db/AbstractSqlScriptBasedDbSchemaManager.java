@@ -188,10 +188,10 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             tableName = prependDatabaseTablePrefix(tableName);
         }
         try (PreparedStatement statement = databaseConfiguration.getConnection()
-                .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?")) {
+                .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?");
+             ResultSet resultSet = statement.executeQuery()) {
 
             statement.setString(1, propertyName);
-            ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 return resultSet.getString(1);
             } else {
