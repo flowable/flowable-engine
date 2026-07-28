@@ -281,7 +281,9 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
                     try {
                         caseDefinitionHistoryLevel = HistoryLevel.getHistoryLevelForKey(historyLevelValue);
 
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        LOGGER.warn("Could not parse history level value '{}' for case definition {}", historyLevelValue, caseDefinition.getId());
+                    }
                 }
             }
 
@@ -289,7 +291,9 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
                 caseDefinitionHistoryLevel = this.cmmnEngineConfiguration.getHistoryLevel();
             }
 
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            LOGGER.warn("Could not resolve history level for case definition {}", caseDefinitionId, e);
+        }
 
         return caseDefinitionHistoryLevel;
     }
