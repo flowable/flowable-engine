@@ -107,5 +107,8 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
             planItemInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(planItemInstanceQuery.getCaseInstanceIds()));
         }
 
+        for (HistoricPlanItemInstanceQueryImpl orQueryObject : planItemInstanceQuery.getOrQueryObjects()) {
+            setSafeInValueLists(orQueryObject);
+        }
     }
 }
