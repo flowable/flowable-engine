@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.function.UnaryOperator;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
@@ -203,6 +204,16 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .list();
         assertThat(planItemInstances).hasSize(0);
 
+        // or(): assignee "gonzo" OR bogus case definition id => the same 2 assigned human tasks
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or()
+                    .planItemInstanceAssignee("gonzo")
+                    .planItemInstanceCaseDefinitionId("undefinedId")
+                .endOr()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(HistoricPlanItemInstance::getAssignee)
+                .containsExactlyInAnyOrder("gonzo", "gonzo");
     }
 
     @Test
@@ -233,6 +244,16 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .list();
         assertThat(planItemInstances).hasSize(0);
 
+        // or(): completedBy "kermit" OR bogus case definition id => the same 3 completed human tasks
+        planItemInstances = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or()
+                    .planItemInstanceCompletedBy("kermit")
+                    .planItemInstanceCaseDefinitionId("undefinedId")
+                .endOr()
+                .list();
+        assertThat(planItemInstances)
+                .extracting(HistoricPlanItemInstance::getCompletedBy)
+                .containsExactlyInAnyOrder("kermit", "kermit", "kermit");
     }
 
     @Test
@@ -389,6 +410,28 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
 
             // started and notStarted partition the full result set
             assertThat(started.size() + notStarted.size()).isEqualTo(all.size());
+
+            // or(): started OR bogus case definition id => only A
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId())
+                    .or()
+                        .started()
+                        .planItemInstanceCaseDefinitionId("undefinedId")
+                    .endOr()
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactly("A");
+
+            // or(): notStarted OR bogus case definition id => only B
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceCaseInstanceId(caseInstance.getId())
+                    .or()
+                        .notStarted()
+                        .planItemInstanceCaseDefinitionId("undefinedId")
+                    .endOr()
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactly("B");
         }
     }
 
@@ -403,7 +446,9 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                         .planItemInstanceCaseDefinitionId("undefinedId")
                         .planItemInstanceCaseInstanceId(caseInstanceIds.get(0))
                     .endOr()
-                    .list()).hasSize(4);
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Stage one", "Stage two", "A", "B");
 
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                     .or()
@@ -419,13 +464,17 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         List<String> caseInstanceIds = startInstances(2);
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            // (all 4 plan items of case 0) OR (the 2 stages of every case) => 4 (case 0) + 2 (stages of case 1) = 6, overlap deduped
+            // (all 4 plan items of case 0) OR (the 2 stages of every case) => 4 (case 0) + 2 (stages of case 1) = 6.
+            // A single WHERE with OR yields each row once by construction (no DISTINCT), so case 0's 2 stages
+            // are not double-counted despite matching both legs.
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                     .or()
                         .planItemInstanceCaseInstanceId(caseInstanceIds.get(0))
                         .planItemInstanceDefinitionType(PlanItemDefinitionType.STAGE)
                     .endOr()
-                    .list()).hasSize(6);
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Stage one", "Stage two", "A", "B", "Stage one", "Stage two");
         }
     }
 
@@ -440,7 +489,9 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                         .planItemInstanceCaseInstanceIds(Set.of(caseInstanceIds.get(0), caseInstanceIds.get(1)))
                         .planItemInstanceCaseDefinitionId("undefinedId")
                     .endOr()
-                    .list()).hasSize(8);
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Stage one", "Stage two", "A", "B", "Stage one", "Stage two", "A", "B");
         }
     }
 
@@ -449,24 +500,25 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         startInstances(2);
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            // type == HUMAN_TASK AND (bogus OR real case definition id) => the 2 human tasks per case = 4
+            // type == HUMAN_TASK AND (name "A" OR elementId "planItem3" i.e. "Stage one").
+            // "Stage one" is a STAGE, so the outer AND must strip it, leaving only the 2 "A" human tasks.
+            // This fails both if the OR block is deleted (would return only "A" from the name leg = still 2,
+            // but the elementId leg proves the OR participates) and if OR is mutated to AND.
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                     .planItemInstanceDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
                     .or()
-                        .planItemInstanceCaseInstanceId("undefinedId")
-                        .planItemInstanceCaseDefinitionId(caseDefinitionId)
+                        .planItemInstanceName("A")
+                        .planItemInstanceElementId("planItem3")
                     .endOr()
-                    .list()).hasSize(4);
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("A", "A");
         }
     }
 
     @Test
     public void testOrQueryCoversManyParameters() {
         List<String> caseInstanceIds = startInstances(2);
-
-        if (!CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            return;
-        }
 
         String firstCaseInstanceId = caseInstanceIds.get(0);
 
@@ -519,7 +571,9 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                         .planItemInstanceName("A")
                         .planItemInstanceElementId("planItem3")
                     .endOr()
-                    .list()).hasSize(4);
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("A", "Stage one", "A", "Stage one");
         }
     }
 
@@ -527,7 +581,10 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
      * Runs {@code or(filter OR bogusCaseDefinitionId).endOr()} and asserts both list() and count() return expectedSize.
      * Pairing the real filter with a non-matching one isolates the real filter's OR branch.
      */
-    private void assertOr(int expectedSize, java.util.function.UnaryOperator<HistoricPlanItemInstanceQuery> filter) {
+    private void assertOr(int expectedSize, UnaryOperator<HistoricPlanItemInstanceQuery> filter) {
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceCaseDefinitionId("undefinedId").list()).isEmpty();
+
         HistoricPlanItemInstanceQuery listQuery = cmmnHistoryService.createHistoricPlanItemInstanceQuery().or();
         filter.apply(listQuery).planItemInstanceCaseDefinitionId("undefinedId").endOr();
         assertThat(listQuery.list()).hasSize(expectedSize);
@@ -549,6 +606,48 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThatThrownBy(() -> cmmnHistoryService.createHistoricPlanItemInstanceQuery().endOr())
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasMessage("endOr() can only be called after calling or()");
+    }
+
+    @Test
+    public void testByTenantId() {
+        // Deploy the same case with a tenant and start a single instance in it. The @BeforeEach deployment has no tenant,
+        // so the only tenant-scoped plan items are the 4 belonging to this case instance.
+        addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/history/HistoricPlanItemInstanceQueryTest.testQuery.cmmn")
+                .tenantId("flowable")
+                .deploy());
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testQuery").tenantId("flowable").start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceTenantId("flowable").list()).hasSize(4);
+
+            // or(): exact tenant id OR bogus case definition id => the 4 tenant plan items
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .or()
+                        .planItemInstanceTenantId("flowable")
+                        .planItemInstanceCaseDefinitionId("undefinedId")
+                    .endOr()
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Stage one", "Stage two", "A", "B");
+
+            // or(): tenant id like OR bogus case definition id => the same 4 tenant plan items
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .or()
+                        .planItemInstanceTenantIdLike("flow%")
+                        .planItemInstanceCaseDefinitionId("undefinedId")
+                    .endOr()
+                    .list())
+                    .extracting(HistoricPlanItemInstance::getName)
+                    .containsExactlyInAnyOrder("Stage one", "Stage two", "A", "B");
+
+            // a non-matching tenant id alone matches nothing, so the OR branches above are genuinely discriminating
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceTenantId("nonexisting").list()).isEmpty();
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                    .planItemInstanceTenantIdLike("nonexisting%").list()).isEmpty();
+        }
     }
 
     private List<String> startInstances(int numberOfInstances) {
