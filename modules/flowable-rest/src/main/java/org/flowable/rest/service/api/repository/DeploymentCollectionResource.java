@@ -205,7 +205,11 @@ public class DeploymentCollectionResource {
             }
 
             if (!decodedQueryStrings.containsKey("deploymentName") || StringUtils.isEmpty(decodedQueryStrings.get("deploymentName"))) {
-                String fileNameWithoutExtension = fileName.split("\\.")[0];
+                String fileNameWithoutExtension = fileName;
+                int dotIndex = fileName.lastIndexOf('.');
+                if (dotIndex > 0) {
+                    fileNameWithoutExtension = fileName.substring(0, dotIndex);
+                }
 
                 if (StringUtils.isNotEmpty(fileNameWithoutExtension)) {
                     fileName = fileNameWithoutExtension;
