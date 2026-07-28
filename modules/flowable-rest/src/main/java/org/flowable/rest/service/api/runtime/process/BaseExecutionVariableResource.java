@@ -82,12 +82,12 @@ public class BaseExecutionVariableResource implements InitializingBean {
                 response.setContentType("application/octet-stream");
 
             } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
-                outputStream.writeObject(variable.getValue());
-                outputStream.close();
-                result = buffer.toByteArray();
-                response.setContentType("application/x-java-serialized-object");
+                try (ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                     ObjectOutputStream outputStream = new ObjectOutputStream(buffer)) {
+                    outputStream.writeObject(variable.getValue());
+                    result = buffer.toByteArray();
+                    response.setContentType("application/x-java-serialized-object");
+                }
 
             } else {
                 throw new FlowableObjectNotFoundException("The variable does not have a binary data stream.", null);
