@@ -98,7 +98,8 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
 
     /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
-     * Only one OR statement is allowed, for the second call to this method an exception will be thrown.
+     * OR statements cannot be nested: calling or() again before endOr() throws an exception. Sequential
+     * OR statements (or() ... endOr() ... or() ... endOr()) are allowed and are AND-ed together.
      */
     HistoricPlanItemInstanceQuery or();
 

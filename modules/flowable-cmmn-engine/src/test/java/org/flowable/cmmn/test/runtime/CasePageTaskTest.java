@@ -217,6 +217,20 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(nonMatchingGroups).singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
+        HistoricPlanItemInstance historicByUser = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedUser("janedoe").endOr()
+                .singleResult();
+        assertThat(historicByUser.getName()).isEqualTo("Case Page Task One");
+
+        HistoricPlanItemInstance historicByGroup = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedGroups(groups).endOr()
+                .singleResult();
+        assertThat(historicByGroup.getName()).isEqualTo("Case Page Task One");
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedUser("nonexisting").endOr()
+                .list()).isEmpty();
+
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)

@@ -402,7 +402,7 @@
                 RES.ID_ = #{planItemInstanceId, jdbcType=VARCHAR}
             </if>
             <if test="planItemInstanceName != null">
-                RES.NAME_ = #{planItemInstanceName, jdbcType=NVARCHAR}
+                and RES.NAME_ = #{planItemInstanceName, jdbcType=NVARCHAR}
             </if>
             <if test="state != null">
                 and RES.STATE_ = #{state, jdbcType=VARCHAR}
@@ -441,7 +441,7 @@
             <if test="planItemDefinitionType != null">
                 and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR}
             </if>
-            <if test="planItemDefinitionTypes != null">
+            <if test="planItemDefinitionTypes != null and !planItemDefinitionTypes.empty">
                 and RES.ITEM_DEFINITION_TYPE_ in <foreach item="planItemDefinitionType" index="index" collection="planItemDefinitionTypes" open="(" separator="," close=")">#{planItemDefinitionType, jdbcType=VARCHAR}</foreach>
             </if>
             <if test="createdBefore != null">
@@ -623,7 +623,17 @@
                         or RES.CASE_INST_ID_ = #{orQueryObject.caseInstanceId, jdbcType=VARCHAR}
                     </if>
                     <if test="orQueryObject.caseInstanceIds != null and !orQueryObject.caseInstanceIds.empty">
-                        or RES.CASE_INST_ID_ in <foreach item="caseInstanceId" index="index" collection="orQueryObject.caseInstanceIds" open="(" separator="," close=")">#{caseInstanceId, jdbcType=VARCHAR}</foreach>
+                        or (
+                        <foreach item="caseInstanceIdListItem" index="groupIndex" collection="orQueryObject.safeCaseInstanceIds">
+                            <if test="groupIndex &gt; 0">
+                                or
+                            </if>
+                            RES.CASE_INST_ID_ IN
+                            <foreach item="caseInstanceId" index="index" collection="caseInstanceIdListItem" open="(" separator="," close=")">
+                                #{caseInstanceId, jdbcType=VARCHAR}
+                            </foreach>
+                        </foreach>
+                        )
                     </if>
                     <if test="orQueryObject.stageInstanceId != null">
                         or RES.STAGE_INST_ID_ = #{orQueryObject.stageInstanceId, jdbcType=VARCHAR}
