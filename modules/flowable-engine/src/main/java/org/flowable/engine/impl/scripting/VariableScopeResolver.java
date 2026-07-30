@@ -44,7 +44,7 @@ public class VariableScopeResolver implements Resolver {
             "managementService", ProcessEngineConfiguration::getManagementService,
             "historyService", ProcessEngineConfiguration::getHistoryService,
             "formService", ProcessEngineConfiguration::getFormService,
-            "identityServiceKey", ProcessEngineConfiguration::getIdentityService
+            "identityService", ProcessEngineConfiguration::getIdentityService
     );
 
     public VariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableContainer scopeContainer,
