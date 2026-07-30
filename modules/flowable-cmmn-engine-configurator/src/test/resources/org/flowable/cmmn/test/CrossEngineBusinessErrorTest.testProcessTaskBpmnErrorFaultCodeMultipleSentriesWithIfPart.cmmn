@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testProcessTaskFaultIfPart" name="Test ProcessTask Fault faultCode ifPart">
+        <casePlanModel id="casePlanModel" name="Case plan model" autoComplete="true">
+            <planItem id="planItemProcess" name="Process Task" definitionRef="processTask" />
+            <planItem id="planItemB" name="B" definitionRef="humanTaskB">
+                <entryCriterion id="entryB" sentryRef="sentryMatching" />
+            </planItem>
+            <planItem id="planItemC" name="C" definitionRef="humanTaskC">
+                <entryCriterion id="entryC" sentryRef="sentryNonMatching" />
+            </planItem>
+
+            <!-- Matches the thrown BpmnError code -> B activates -->
+            <sentry id="sentryMatching" flowable:triggerMode="onEvent">
+                <planItemOnPart id="onPartProcessForB" sourceRef="planItemProcess">
+                    <standardEvent>fault</standardEvent>
+                </planItemOnPart>
+                <ifPart>
+                    <condition><![CDATA[${faultCode == 'BPMN_ERROR'}]]></condition>
+                </ifPart>
+            </sentry>
+
+            <!-- Does NOT match -> stays pending (onPart satisfied, ifPart unsatisfied).
+                 When B activates it triggers a re-evaluation cycle in which this ifPart
+                 is evaluated again, but with no businessError on the lifecycle event. -->
+            <sentry id="sentryNonMatching" flowable:triggerMode="onEvent">
+                <planItemOnPart id="onPartProcessForC" sourceRef="planItemProcess">
+                    <standardEvent>fault</standardEvent>
+                </planItemOnPart>
+                <ifPart>
+                    <condition><![CDATA[${faultCode == 'SOME_OTHER_ERROR'}]]></condition>
+                </ifPart>
+            </sentry>
+
+            <processTask id="processTask" name="Process Task" processRef="throwErrorProcess" isBlocking="true" />
+            <humanTask id="humanTaskB" name="B" />
+            <humanTask id="humanTaskC" name="C" />
+        </casePlanModel>
+    </case>
+    <process id="throwErrorProcess" externalRef="throwBpmnErrorProcess" />
+</definitions>

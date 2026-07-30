@@ -45,9 +45,35 @@ import org.flowable.cmmn.model.SentryOnPart;
  */
 public class FaultPropagation {
 
+    /**
+     * Transaction-scoped holder for the {@link BusinessError} currently being propagated.
+     * The error is primarily carried on the {@link org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent}
+     * of the fault operation, but a fault sentry's if-part can be (re-)evaluated in a later agenda operation
+     * whose lifecycle event no longer carries the error (e.g. when another matching sentry activates and triggers
+     * a fresh evaluation cycle in which a still-pending fault sentry is re-checked). Keeping the error on the
+     * command context lets those re-evaluations still resolve {@code faultCode}/{@code faultMessage}/{@code error}
+     * instead of failing with a PropertyNotFoundException. It is transient — discarded when the command completes.
+     */
+    protected static final String CURRENT_BUSINESS_ERROR_ATTRIBUTE = "cmmnCurrentBusinessError";
+
+    public static void storeCurrentBusinessError(CommandContext commandContext, BusinessError error) {
+        if (error != null) {
+            commandContext.addAttribute(CURRENT_BUSINESS_ERROR_ATTRIBUTE, error);
+        }
+    }
+
+    public static BusinessError getCurrentBusinessError(CommandContext commandContext) {
+        Object value = commandContext.getAttribute(CURRENT_BUSINESS_ERROR_ATTRIBUTE);
+        return value instanceof BusinessError ? (BusinessError) value : null;
+    }
+
     public static void propagateFault(BusinessError fault, CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         // The BusinessError is carried on the PlanItemLifeCycleEvent and resolved via
         // CmmnFaultVariableContainer during sentry if-part evaluation — similar to BPMN's BpmnErrorVariableContainer.
+
+        // Also keep it on the command context so fault sentry if-parts that are re-evaluated in a later
+        // agenda operation (with a different lifecycle event) can still resolve the fault variables.
+        storeCurrentBusinessError(commandContext, fault);
 
         // Check if any plan item in the case has a fault sentry on this plan item.
         // Uses the parser-built dependency graph (entryDependentPlanItems) to avoid
