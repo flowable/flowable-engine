@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnFaultVariableContainer;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
@@ -54,7 +55,9 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -718,12 +721,21 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
 
-        // When the lifecycle event carries fault data, wrap the variable container with CmmnFaultVariableContainer
+        // When a fault is being propagated, wrap the variable container with CmmnFaultVariableContainer
         // so that fault-specific variables (faultCode, faultMessage, error) are available for if-part expression
         // resolution without polluting the actual variable scope. This is analogous to BPMN's BpmnErrorVariableContainer.
+        // The error is normally carried on the current lifecycle event, but a fault sentry's if-part can be
+        // re-evaluated in a later agenda operation whose event no longer carries it (e.g. another matching sentry
+        // activated and triggered a new evaluation cycle while this fault sentry was still pending). For sentries
+        // with a fault on-part we therefore fall back to the command-context-scoped error so the re-evaluation
+        // resolves consistently instead of throwing a PropertyNotFoundException.
         VariableContainer resolveContainer = variableContainer;
-        if (planItemLifeCycleEvent != null && planItemLifeCycleEvent.getBusinessError() != null) {
-            resolveContainer = new CmmnFaultVariableContainer(planItemLifeCycleEvent.getBusinessError(), variableContainer);
+        BusinessError businessError = planItemLifeCycleEvent != null ? planItemLifeCycleEvent.getBusinessError() : null;
+        if (businessError == null && sentryHasFaultOnPart(sentry)) {
+            businessError = FaultPropagation.getCurrentBusinessError(commandContext);
+        }
+        if (businessError != null) {
+            resolveContainer = new CmmnFaultVariableContainer(businessError, variableContainer);
         }
 
         try {
@@ -744,6 +756,15 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             }
 
             throw e;
+        }
+        return false;
+    }
+
+    protected boolean sentryHasFaultOnPart(Sentry sentry) {
+        for (SentryOnPart onPart : sentry.getOnParts()) {
+            if (PlanItemTransition.FAULT.equals(onPart.getStandardEvent())) {
+                return true;
+            }
         }
         return false;
     }

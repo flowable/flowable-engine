@@ -1,3 +1,5 @@
 
 org.springframework.boot.EnvironmentPostProcessor=\
   org.flowable.spring.boot.environment.FlowableDefaultPropertiesEnvironmentPostProcessor
+org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitializationDetector=\
+  org.flowable.spring.boot.FlowableDependsOnDatabaseInitializationDetector

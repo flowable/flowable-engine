@@ -108,6 +108,7 @@ public class HttpServiceTaskTestServer {
             contextHandler.addServlet(new ServletHolder(new ArrayResponseServlet()), "/array-response");
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
             contextHandler.addServlet(new ServletHolder(new ClasspathResourceServlet()), "/resource");
+            contextHandler.addServlet(new ServletHolder(new BinaryEchoServlet()), "/binary");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -365,6 +366,25 @@ public class HttpServiceTaskTestServer {
             } else {
                 resp.sendError(400, "resource not provided");
             }
+        }
+    }
+
+    /**
+     * Echoes the raw request body back verbatim and reflects the received {@code Content-Type} back as the response
+     * content type, so a binary round-trip can assert both that the bytes were not corrupted and that the content type
+     * arrived correctly (exactly once).
+     */
+    protected static class BinaryEchoServlet extends HttpServlet {
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            byte[] body = IOUtils.toByteArray(req.getInputStream());
+            resp.setStatus(200);
+            String contentType = req.getContentType();
+            if (StringUtils.isNotEmpty(contentType)) {
+                resp.setContentType(contentType);
+            }
+            resp.getOutputStream().write(body);
         }
     }
 

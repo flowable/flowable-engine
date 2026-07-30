@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -99,8 +100,16 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected boolean withLocalizationFallback;
     protected boolean includeLocalVariables;
 
+    protected List<HistoricPlanItemInstanceQueryImpl> orQueryObjects = new ArrayList<>();
+    protected HistoricPlanItemInstanceQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
+
     public HistoricPlanItemInstanceQueryImpl() {
 
+    }
+
+    public HistoricPlanItemInstanceQueryImpl(CommandContext commandContext) {
+        super(commandContext);
     }
 
     public HistoricPlanItemInstanceQueryImpl(CommandExecutor commandExecutor) {
@@ -109,37 +118,61 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceId(String planItemInstanceId) {
-        this.planItemInstanceId = planItemInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.planItemInstanceId = planItemInstanceId;
+        } else {
+            this.planItemInstanceId = planItemInstanceId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceName(String planItemInstanceName) {
-        this.planItemInstanceName = planItemInstanceName;
+        if (inOrStatement) {
+            this.currentOrQueryObject.planItemInstanceName = planItemInstanceName;
+        } else {
+            this.planItemInstanceName = planItemInstanceName;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceState(String state) {
-        this.state = state;
+        if (inOrStatement) {
+            this.currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceCaseDefinitionId(String caseDefinitionId) {
-        this.caseDefinitionId = caseDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionId = caseDefinitionId;
+        } else {
+            this.caseDefinitionId = caseDefinitionId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceDerivedCaseDefinitionId(String derivedCaseDefinitionId) {
-        this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.derivedCaseDefinitionId = derivedCaseDefinitionId;
+        } else {
+            this.derivedCaseDefinitionId = derivedCaseDefinitionId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceCaseInstanceId(String caseInstanceId) {
-        this.caseInstanceId = caseInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceId = caseInstanceId;
+        } else {
+            this.caseInstanceId = caseInstanceId;
+        }
         return this;
     }
 
@@ -151,25 +184,41 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (caseInstanceIds.isEmpty()) {
             throw new FlowableIllegalArgumentException("Set of case instance ids is empty");
         }
-        this.caseInstanceIds = caseInstanceIds;
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseInstanceIds = caseInstanceIds;
+        } else {
+            this.caseInstanceIds = caseInstanceIds;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStageInstanceId(String stageInstanceId) {
-        this.stageInstanceId = stageInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.stageInstanceId = stageInstanceId;
+        } else {
+            this.stageInstanceId = stageInstanceId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceElementId(String elementId) {
-        this.elementId = elementId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementId = elementId;
+        } else {
+            this.elementId = elementId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceDefinitionId(String planItemDefinitionId) {
-        this.planItemDefinitionId = planItemDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.planItemDefinitionId = planItemDefinitionId;
+        } else {
+            this.planItemDefinitionId = planItemDefinitionId;
+        }
         return this;
     }
 
@@ -178,7 +227,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (planItemDefinitionType == null) {
             throw new FlowableIllegalArgumentException("Plan item definition type is null");
         }
-        this.planItemDefinitionType = planItemDefinitionType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.planItemDefinitionType = planItemDefinitionType;
+        } else {
+            this.planItemDefinitionType = planItemDefinitionType;
+        }
         return this;
     }
 
@@ -190,37 +243,61 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (planItemDefinitionTypes.isEmpty()) {
             throw new FlowableIllegalArgumentException("Plan item definition types is empty");
         }
-        this.planItemDefinitionTypes = planItemDefinitionTypes;
+        if (inOrStatement) {
+            this.currentOrQueryObject.planItemDefinitionTypes = planItemDefinitionTypes;
+        } else {
+            this.planItemDefinitionTypes = planItemDefinitionTypes;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
-        this.startUserId = startUserId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.startUserId = startUserId;
+        } else {
+            this.startUserId = startUserId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceAssignee(String assignee) {
-        this.assignee = assignee;
+        if (inOrStatement) {
+            this.currentOrQueryObject.assignee = assignee;
+        } else {
+            this.assignee = assignee;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy) {
-        this.completedBy = completedBy;
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedBy = completedBy;
+        } else {
+            this.completedBy = completedBy;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceReferenceId(String referenceId) {
-        this.referenceId = referenceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceId = referenceId;
+        } else {
+            this.referenceId = referenceId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceReferenceType(String referenceType) {
-        this.referenceType = referenceType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.referenceType = referenceType;
+        } else {
+            this.referenceType = referenceType;
+        }
         return this;
     }
 
@@ -229,7 +306,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (entryCriterionId == null) {
             throw new FlowableIllegalArgumentException("EntryCriterionId is null");
         }
-        this.entryCriterionId = entryCriterionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.entryCriterionId = entryCriterionId;
+        } else {
+            this.entryCriterionId = entryCriterionId;
+        }
         return this;
     }
 
@@ -238,7 +319,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (exitCriterionId == null) {
             throw new FlowableIllegalArgumentException("ExitCriterionId is null");
         }
-        this.exitCriterionId = exitCriterionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exitCriterionId = exitCriterionId;
+        } else {
+            this.exitCriterionId = exitCriterionId;
+        }
         return this;
     }
     
@@ -247,7 +332,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (formKey == null) {
             throw new FlowableIllegalArgumentException("formKey is null");
         }
-        this.formKey = formKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.formKey = formKey;
+        } else {
+            this.formKey = formKey;
+        }
         return this;
     }
     
@@ -256,7 +345,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (extraValue == null) {
             throw new FlowableIllegalArgumentException("extraValue is null");
         }
-        this.extraValue = extraValue;
+        if (inOrStatement) {
+            this.currentOrQueryObject.extraValue = extraValue;
+        } else {
+            this.extraValue = extraValue;
+        }
         return this;
     }
     
@@ -265,7 +358,11 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (involvedUser == null) {
             throw new FlowableIllegalArgumentException("involvedUser is null");
         }
-        this.involvedUser = involvedUser;
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedUser = involvedUser;
+        } else {
+            this.involvedUser = involvedUser;
+        }
         return this;
     }
     
@@ -274,25 +371,41 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (involvedGroups == null) {
             throw new FlowableIllegalArgumentException("involvedGroups is null");
         }
-        this.involvedGroups = involvedGroups;
+        if (inOrStatement) {
+            this.currentOrQueryObject.involvedGroups = involvedGroups;
+        } else {
+            this.involvedGroups = involvedGroups;
+        }
         return this;
     }
     
     @Override
     public HistoricPlanItemInstanceQuery onlyStages() {
-        this.onlyStages = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyStages = true;
+        } else {
+            this.onlyStages = true;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceTenantId(String tenantId) {
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery planItemInstanceWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
         return this;
     }
     
@@ -301,187 +414,311 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery createdBefore(Date createdBefore) {
-        this.createdBefore = createdBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.createdBefore = createdBefore;
+        } else {
+            this.createdBefore = createdBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery createdAfter(Date createdAfter) {
-        this.createdAfter = createdAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.createdAfter = createdAfter;
+        } else {
+            this.createdAfter = createdAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastAvailableBefore(Date lastAvailableBefore) {
-        this.lastAvailableBefore = lastAvailableBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastAvailableBefore = lastAvailableBefore;
+        } else {
+            this.lastAvailableBefore = lastAvailableBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastAvailableAfter(Date lastAvailableAfter) {
-        this.lastAvailableAfter = lastAvailableAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastAvailableAfter = lastAvailableAfter;
+        } else {
+            this.lastAvailableAfter = lastAvailableAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastUnavailableAfter(Date unavailableAfter) {
-        this.lastUnavailableAfter = unavailableAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastUnavailableAfter = unavailableAfter;
+        } else {
+            this.lastUnavailableAfter = unavailableAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastUnavailableBefore(Date unavailableBefore) {
-        this.lastUnavailableBefore = unavailableBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastUnavailableBefore = unavailableBefore;
+        } else {
+            this.lastUnavailableBefore = unavailableBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastEnabledBefore(Date lastEnabledBefore) {
-        this.lastEnabledBefore = lastEnabledBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastEnabledBefore = lastEnabledBefore;
+        } else {
+            this.lastEnabledBefore = lastEnabledBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastEnabledAfter(Date lastEnabledAfter) {
-        this.lastEnabledAfter = lastEnabledAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastEnabledAfter = lastEnabledAfter;
+        } else {
+            this.lastEnabledAfter = lastEnabledAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastDisabledBefore(Date lastDisabledBefore) {
-        this.lastDisabledBefore = lastDisabledBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastDisabledBefore = lastDisabledBefore;
+        } else {
+            this.lastDisabledBefore = lastDisabledBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastDisabledAfter(Date lastDisabledAfter) {
-        this.lastDisabledAfter = lastDisabledAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastDisabledAfter = lastDisabledAfter;
+        } else {
+            this.lastDisabledAfter = lastDisabledAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastStartedBefore(Date startedBefore) {
-        this.lastStartedBefore = startedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastStartedBefore = startedBefore;
+        } else {
+            this.lastStartedBefore = startedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastStartedAfter(Date startedAfter) {
-        this.lastStartedAfter = startedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastStartedAfter = startedAfter;
+        } else {
+            this.lastStartedAfter = startedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastSuspendedBefore(Date lastSuspendedBefore) {
-        this.lastSuspendedBefore = lastSuspendedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastSuspendedBefore = lastSuspendedBefore;
+        } else {
+            this.lastSuspendedBefore = lastSuspendedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery lastSuspendedAfter(Date lastSuspendedAfter) {
-        this.lastSuspendedAfter = lastSuspendedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.lastSuspendedAfter = lastSuspendedAfter;
+        } else {
+            this.lastSuspendedAfter = lastSuspendedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery completedBefore(Date completedBefore) {
-        this.completedBefore = completedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedBefore = completedBefore;
+        } else {
+            this.completedBefore = completedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery completedAfter(Date completedAfter) {
-        this.completedAfter = completedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.completedAfter = completedAfter;
+        } else {
+            this.completedAfter = completedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery occurredBefore(Date occurredBefore) {
-        this.occurredBefore = occurredBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.occurredBefore = occurredBefore;
+        } else {
+            this.occurredBefore = occurredBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery occurredAfter(Date occurredAfter) {
-        this.occurredAfter = occurredAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.occurredAfter = occurredAfter;
+        } else {
+            this.occurredAfter = occurredAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery terminatedBefore(Date terminatedBefore) {
-        this.terminatedBefore = terminatedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.terminatedBefore = terminatedBefore;
+        } else {
+            this.terminatedBefore = terminatedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery terminatedAfter(Date terminatedAfter) {
-        this.terminatedAfter = terminatedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.terminatedAfter = terminatedAfter;
+        } else {
+            this.terminatedAfter = terminatedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery failedBefore(Date failedBefore) {
-        this.failedBefore = failedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedBefore = failedBefore;
+        } else {
+            this.failedBefore = failedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery failedAfter(Date failedAfter) {
-        this.failedAfter = failedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.failedAfter = failedAfter;
+        } else {
+            this.failedAfter = failedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery exitBefore(Date exitBefore) {
-        this.exitBefore = exitBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exitBefore = exitBefore;
+        } else {
+            this.exitBefore = exitBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery exitAfter(Date exitAfter) {
-        this.exitAfter = exitAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exitAfter = exitAfter;
+        } else {
+            this.exitAfter = exitAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery endedBefore(Date endedBefore) {
-        this.endedBefore = endedBefore;
+        if (inOrStatement) {
+            this.currentOrQueryObject.endedBefore = endedBefore;
+        } else {
+            this.endedBefore = endedBefore;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery endedAfter(Date endedAfter) {
-        this.endedAfter = endedAfter;
+        if (inOrStatement) {
+            this.currentOrQueryObject.endedAfter = endedAfter;
+        } else {
+            this.endedAfter = endedAfter;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery ended() {
-        this.ended = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.ended = true;
+        } else {
+            this.ended = true;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery notEnded() {
-        this.notEnded = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.notEnded = true;
+        } else {
+            this.notEnded = true;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery started() {
-        this.started = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.started = true;
+        } else {
+            this.started = true;
+        }
         return this;
     }
 
     @Override
     public HistoricPlanItemInstanceQuery notStarted() {
-        this.notStarted = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.notStarted = true;
+        } else {
+            this.notStarted = true;
+        }
         return this;
     }
 
@@ -567,6 +804,33 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     @Override
     public HistoricPlanItemInstanceQuery orderByName() {
         return orderBy(HistoricPlanItemInstanceQueryProperty.NAME);
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery or() {
+        if (inOrStatement) {
+            throw new FlowableIllegalArgumentException("The query is already in an or statement");
+        }
+
+        inOrStatement = true;
+        if (commandContext != null) {
+            currentOrQueryObject = new HistoricPlanItemInstanceQueryImpl(commandContext);
+        } else {
+            currentOrQueryObject = new HistoricPlanItemInstanceQueryImpl(commandExecutor);
+        }
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public HistoricPlanItemInstanceQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableIllegalArgumentException("endOr() can only be called after calling or()");
+        }
+
+        inOrStatement = false;
+        currentOrQueryObject = null;
+        return this;
     }
 
     @Override
@@ -786,5 +1050,9 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
 
     public Collection<String> getCaseInstanceIds() {
         return caseInstanceIds;
+    }
+
+    public List<HistoricPlanItemInstanceQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
     }
 }

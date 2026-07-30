@@ -96,6 +96,18 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
 
     HistoricPlanItemInstanceQuery includeLocalVariables();
 
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     * OR statements cannot be nested: calling or() again before endOr() throws an exception. Sequential
+     * OR statements (or() ... endOr() ... or() ... endOr()) are allowed and are AND-ed together.
+     */
+    HistoricPlanItemInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    HistoricPlanItemInstanceQuery endOr();
+
     HistoricPlanItemInstanceQuery orderByCreateTime();
     HistoricPlanItemInstanceQuery orderByEndedTime();
     HistoricPlanItemInstanceQuery orderByLastAvailableTime();

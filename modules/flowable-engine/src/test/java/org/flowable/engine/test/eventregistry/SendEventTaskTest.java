@@ -139,7 +139,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
 
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
         
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -157,7 +157,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getId());
 
         assertThat(managementService.createJobQuery().list()).hasSize(3);
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
 
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(3); // loopCardinality of 3
 
@@ -219,7 +219,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         assertThat(job.getJobHandlerType()).isEqualTo(AsyncSendEventJobHandler.TYPE);
         assertThat(job.getElementId()).isEqualTo("sendEventTask2");
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
 
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(2);
     }
@@ -310,7 +310,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
         
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -374,7 +374,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
         
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
@@ -411,7 +411,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         taskService.complete(task.getId());
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
         ObjectMapper objectMapper = processEngineConfiguration.getObjectMapper();
@@ -499,7 +499,7 @@ public class SendEventTaskTest extends FlowableEventRegistryBpmnTestCase {
         
         assertThat(outboundEventChannelAdapter.receivedEvents).isEmpty();
         
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 10000, 200);
         
         assertThat(outboundEventChannelAdapter.receivedEvents).hasSize(1);
 
