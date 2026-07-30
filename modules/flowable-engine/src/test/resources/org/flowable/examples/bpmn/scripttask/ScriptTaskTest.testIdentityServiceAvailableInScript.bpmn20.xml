@@ -26,6 +26,7 @@
         <scriptTask id="script1" scriptFormat="groovy" flowable:autoStoreVariables="false">
             <script><![CDATA[
         execution.setVariable('userCount', identityService.createUserQuery().count());
+        execution.setVariable('legacyUserCount', identityServiceKey.createUserQuery().count());
         ]]></script>
         </scriptTask>
         <sequenceFlow id="flow2" sourceRef="script1" targetRef="theTask"/>

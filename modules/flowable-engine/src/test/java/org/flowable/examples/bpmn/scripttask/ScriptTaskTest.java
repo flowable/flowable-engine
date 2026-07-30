@@ -87,6 +87,8 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         try {
             String id = runtimeService.startProcessInstanceByKey("identityServiceInScript").getId();
             assertThat(runtimeService.getVariable(id, "userCount")).isEqualTo(1L);
+            // the identity service is still available under its former name
+            assertThat(runtimeService.getVariable(id, "legacyUserCount")).isEqualTo(1L);
         } finally {
             identityService.deleteUser("kermit");
         }
