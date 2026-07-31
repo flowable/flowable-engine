@@ -44,6 +44,8 @@ public class VariableScopeResolver implements Resolver {
             "managementService", ProcessEngineConfiguration::getManagementService,
             "historyService", ProcessEngineConfiguration::getHistoryService,
             "formService", ProcessEngineConfiguration::getFormService,
+            "identityService", ProcessEngineConfiguration::getIdentityService,
+            // the identity service was historically exposed under this name, kept for backwards compatibility
             "identityServiceKey", ProcessEngineConfiguration::getIdentityService
     );
 
