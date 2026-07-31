@@ -1646,7 +1646,8 @@ public abstract class AbstractDynamicStateManager {
             return false;
         }
         
-        if (sourceEvent.getEventDefinitions() != null && !sourceEvent.getEventDefinitions().isEmpty()) {
+        if (sourceEvent.getEventDefinitions() != null && !sourceEvent.getEventDefinitions().isEmpty()
+                && targetEvent.getEventDefinitions() != null && !targetEvent.getEventDefinitions().isEmpty()) {
             EventDefinition sourceEventDef = sourceEvent.getEventDefinitions().get(0);
             EventDefinition targetEventDef = targetEvent.getEventDefinitions().get(0);
             
