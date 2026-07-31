@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.cmd;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.db.IdBlock;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
@@ -34,7 +35,15 @@ public class GetNextIdBlockCmd implements Command<IdBlock> {
         PropertyEntity property = commandContext
                 .getPropertyEntityManager()
                 .findPropertyById("next.dbid");
-        long oldValue = Long.parseLong(property.getValue());
+        if (property == null) {
+            throw new ActivitiException("Property 'next.dbid' not found. Database may not have been properly initialized.");
+        }
+        long oldValue;
+        try {
+            oldValue = Long.parseLong(property.getValue());
+        } catch (NumberFormatException e) {
+            throw new ActivitiException("Invalid value for property 'next.dbid': " + property.getValue(), e);
+        }
         long newValue = oldValue + idBlockSize;
         property.setValue(Long.toString(newValue));
         return new IdBlock(oldValue, newValue - 1);

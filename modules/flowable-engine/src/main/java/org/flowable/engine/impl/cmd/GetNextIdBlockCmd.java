@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.db.IdBlock;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -33,7 +34,15 @@ public class GetNextIdBlockCmd implements Command<IdBlock> {
     @Override
     public IdBlock execute(CommandContext commandContext) {
         PropertyEntity property = (PropertyEntity) CommandContextUtil.getPropertyEntityManager(commandContext).findById("next.dbid");
-        long oldValue = Long.parseLong(property.getValue());
+        if (property == null) {
+            throw new FlowableException("Property 'next.dbid' not found. Database may not have been properly initialized.");
+        }
+        long oldValue;
+        try {
+            oldValue = Long.parseLong(property.getValue());
+        } catch (NumberFormatException e) {
+            throw new FlowableException("Invalid value for property 'next.dbid': " + property.getValue(), e);
+        }
         long newValue = oldValue + idBlockSize;
         property.setValue(Long.toString(newValue));
         return new IdBlock(oldValue, newValue - 1);
