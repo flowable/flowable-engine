@@ -55,11 +55,15 @@ import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tijs Rademakers
  */
 public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultInternalJobManager.class);
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
@@ -311,7 +315,11 @@ public class DefaultInternalJobManager extends ScopeAwareInternalJobManager {
         List<String> expression = Arrays.asList(originalExpression.split("/"));
         if (expression.size() > 1 && expression.get(0).startsWith("R")) {
             if (expression.get(0).length() > 1) {
-                times = Integer.parseInt(expression.get(0).substring(1));
+                try {
+                    times = Integer.parseInt(expression.get(0).substring(1));
+                } catch (NumberFormatException e) {
+                    LOGGER.warn("Failed to parse max iterations value from expression: {}", originalExpression, e);
+                }
             }
         }
         
