@@ -79,7 +79,6 @@ public class TestServer implements SmartLifecycle {
         return running;
     }
 
-    @Override
     public boolean isPauseable() {
         return false;
     }

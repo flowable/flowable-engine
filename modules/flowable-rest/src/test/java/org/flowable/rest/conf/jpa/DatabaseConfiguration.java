@@ -14,6 +14,8 @@ package org.flowable.rest.conf.jpa;
 
 import javax.sql.DataSource;
 
+import jakarta.persistence.EntityManagerFactory;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,6 +50,7 @@ public class DatabaseConfiguration {
     @Bean(name = "entityManagerFactory")
     public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactoryBean.setEntityManagerFactoryInterface(EntityManagerFactory.class);
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setPackagesToScan("org.flowable.rest.api.jpa.model");
         entityManagerFactoryBean.setPersistenceUnitName("test");

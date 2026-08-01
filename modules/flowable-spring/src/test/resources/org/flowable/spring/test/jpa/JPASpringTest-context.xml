@@ -33,6 +33,7 @@
     </bean>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="entityManagerFactoryInterface" value="jakarta.persistence.EntityManagerFactory"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="persistenceXmlLocation" value="classpath:/org/flowable/spring/test/jpa/custom-persistence.xml"/>
         <property name="jpaVendorAdapter">
