@@ -20,6 +20,14 @@ Homepage: https://www.flowable.org/
 
 Flowable is distributed under the Apache V2 license (http://www.apache.org/licenses/LICENSE-2.0.html).
 
+### SL Tantra fork boundary
+
+The `SL-Tantra-AI/flowable-engine` `java-25` branch is the organization engine
+fork. It owns only source changes that cannot be implemented through supported
+Flowable extension points, Platform Suite adapters or product-owned BPMN/CMMN/
+DMN/form resources. See
+[`docs/sl-tantra-ai/flowable-fork-architecture.md`](docs/sl-tantra-ai/flowable-fork-architecture.md).
+
 ### Download
 
 The Flowable downloads can be found on https://www.flowable.org/downloads.html.

@@ -1,6 +1,8 @@
 # SL Tantra Flowable Fork Architecture
 
-This fork exists only for changes that cannot be handled through Flowable configuration, BPMN assets, REST integration, or a wrapper UI in `SL-Tantra-AI/make-life-easy`.
+This fork exists only for changes that cannot be handled through Flowable
+configuration, supported extension points, Platform Suite adapters,
+product-owned BPMN/CMMN/DMN/form assets or product/platform UIs.
 
 ## Ownership Split
 
@@ -8,8 +10,20 @@ This fork exists only for changes that cannot be handled through Flowable config
 SL-Tantra-AI/flowable-engine
   Flowable source changes and custom image publication.
 
+SL-Tantra-AI/platform-suite
+  Product-neutral workflow contracts, Flowable adapters, runtime/database
+  baselines, IAM projection and integration boundaries.
+
+SL-Tantra-AI/customer-360-platform
+  CRM BPMN/form/decision assets, Customer workflow semantics, domain APIs and UI.
+
 SL-Tantra-AI/make-life-easy
-  Workflow architecture, BPMN/form/decision assets, workflow gateway, domain APIs, and product UI.
+  FAM BPMN/form/decision assets, Asset Operations workflow semantics, domain
+  APIs, workflow adapter and UI.
+
+SL-Tantra-AI/platform-composer
+  Selects published engine/platform/product artifacts for an immutable release;
+  it does not own workflow models or engine source.
 ```
 
 ## Image Publication
@@ -28,7 +42,7 @@ Example output image:
 ghcr.io/sl-tantra-ai/flowable-rest:2026.06.0
 ```
 
-The platform repo can consume the image through:
+Platform Suite or a deployment composition can consume the image through:
 
 ```env
 FLOWABLE_UI_IMAGE=ghcr.io/sl-tantra-ai/flowable-rest
@@ -57,3 +71,16 @@ git merge upstream/main
 ```
 
 Resolve upstream conflicts in dedicated sync PRs, separate from product changes.
+
+## Dependency and contribution rules
+
+- The fork may not depend on Platform Suite, CRM, FAM or Platform Composer.
+- Product process definitions never move into this repository merely because
+  the engine executes them.
+- A product request must first prove that configuration, BPMN/DMN/CMMN/forms, a
+  Java/Spring extension, REST integration or a Platform Suite adapter is
+  insufficient.
+- Every fork change records the upstream base, affected modules, compatibility
+  impact and focused engine regression evidence.
+- Platform Composer pins an immutable engine image/artifact through release
+  metadata; it never patches engine source during composition.
