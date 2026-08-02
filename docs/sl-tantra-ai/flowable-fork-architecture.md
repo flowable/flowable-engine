@@ -17,7 +17,7 @@ SL-Tantra-AI/platform-suite
 SL-Tantra-AI/customer-360-platform
   CRM BPMN/form/decision assets, Customer workflow semantics, domain APIs and UI.
 
-SL-Tantra-AI/make-life-easy
+SL-Tantra-AI/fixed-asset-management
   FAM BPMN/form/decision assets, Asset Operations workflow semantics, domain
   APIs, workflow adapter and UI.
 
