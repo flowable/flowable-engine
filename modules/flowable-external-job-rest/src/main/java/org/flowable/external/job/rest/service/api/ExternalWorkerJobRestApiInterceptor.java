@@ -16,6 +16,7 @@ import org.flowable.external.job.rest.service.api.acquire.AcquireExternalWorkerJ
 import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobCompleteRequest;
 import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobErrorRequest;
 import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobFailureRequest;
+import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobLockExtensionRequest;
 import org.flowable.external.job.rest.service.api.acquire.ExternalWorkerJobTerminateRequest;
 import org.flowable.external.job.rest.service.api.acquire.UnacquireExternalWorkerJobsRequest;
 import org.flowable.external.job.rest.service.api.query.ExternalWorkerJobQueryRequest;
@@ -33,6 +34,9 @@ public interface ExternalWorkerJobRestApiInterceptor {
     void accessExternalWorkerJobById(ExternalWorkerJob job);
 
     void accessAcquireExternalWorkerJobs(ExternalWorkerJobAcquireBuilder acquireBuilder, AcquireExternalWorkerJobRequest request);
+
+    default void extendExternalWorkerJobLock(ExternalWorkerJob job, ExternalWorkerJobLockExtensionRequest request) {
+    }
 
     void completeExternalWorkerJob(ExternalWorkerJob job, ExternalWorkerJobCompleteRequest request);
 

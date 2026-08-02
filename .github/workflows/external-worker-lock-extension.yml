@@ -1,0 +1,63 @@
+name: External Worker Lock Extension
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [java-25]
+    paths:
+      - "modules/flowable-job-service/**"
+      - "modules/flowable-engine/**"
+      - "modules/flowable-cmmn-engine/**"
+      - "modules/flowable-external-job-rest/**"
+      - "qa/external-worker-lock-contract-tests/**"
+      - ".github/workflows/external-worker-lock-extension.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: external-worker-lock-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify-lock-extension:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Verify native BPMN and CMMN lock renewal
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mvnw --batch-mode --no-transfer-progress \
+            -pl :flowable-engine,:flowable-cmmn-engine -am \
+            -Dsurefire.failIfNoSpecifiedTests=false \
+            -Dtest=org.flowable.engine.test.externalworker.ExternalWorkerLockExtensionTest,org.flowable.cmmn.test.externalworker.ExternalWorkerLockExtensionTest \
+            test
+
+      - name: Install patched REST production artifact
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mvnw --batch-mode --no-transfer-progress \
+            -Pdeploy \
+            -pl :flowable-external-job-rest -am \
+            -Dmaven.test.skip=true \
+            -Dgpg.skip=true \
+            -Dmaven.javadoc.skip=true \
+            -Dsource.skip=true \
+            install
+
+      - name: Verify isolated REST contracts
+        shell: bash
+        run: |
+          set -o pipefail
+          ./mvnw --batch-mode --no-transfer-progress \
+            -f qa/external-worker-lock-contract-tests/pom.xml \
+            test

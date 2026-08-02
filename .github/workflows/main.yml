@@ -9,6 +9,7 @@ env:
 
 jobs:
   test_jdk:
+    if: ${{ github.event_name != 'pull_request' || !github.event.pull_request.draft }}
     name: Linux (JDK ${{ matrix.java }})
     runs-on: ubuntu-latest
     strategy:
