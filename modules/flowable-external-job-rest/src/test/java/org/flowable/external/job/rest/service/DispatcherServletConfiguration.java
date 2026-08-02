@@ -13,14 +13,15 @@
 package org.flowable.external.job.rest.service;
 
 import java.util.Collections;
+import java.util.List;
 
+import org.flowable.common.rest.converter.Jackson3HttpMessageConverter;
 import org.flowable.external.job.rest.service.api.ExternalJobRestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverters;
-import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -35,9 +36,6 @@ import tools.jackson.databind.json.JsonMapper;
 })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    @Autowired
-    private JsonMapper jsonMapper;
-
     @Bean
     public ExternalJobRestResponseFactory externalJobRestResponseFactory(ObjectMapper objectMapper) {
         return new ExternalJobRestResponseFactory(objectMapper, Collections.emptyList());
@@ -49,8 +47,10 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Override
-    protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
-        builder.withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
+    protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        addDefaultHttpMessageConverters(converters);
+        converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
+        converters.add(new Jackson3HttpMessageConverter(JsonMapper.shared()));
     }
 
 }

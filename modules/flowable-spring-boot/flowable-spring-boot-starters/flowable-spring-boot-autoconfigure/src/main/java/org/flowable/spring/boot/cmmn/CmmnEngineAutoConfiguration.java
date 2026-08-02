@@ -52,6 +52,7 @@ import org.flowable.spring.boot.app.FlowableAppProperties;
 import org.flowable.spring.boot.condition.ConditionalOnCmmnEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.json.FlowableJackson3Configuration;
 import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
@@ -97,6 +98,7 @@ import tools.jackson.databind.ObjectMapper;
 })
 @Import({
     FlowableJobConfiguration.class,
+    FlowableJackson3Configuration.class,
     FlowableVariableJackson2JsonMapperConfiguration.class,
 })
 public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {

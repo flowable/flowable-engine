@@ -131,6 +131,7 @@
                         <Implementation-Title>Flowable</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
                         <Include-Resource>${flowable.osgi.include.resource}</Include-Resource>
+                        <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version>=${jdk.version}))"</Require-Capability>
                         <_versionpolicy>${flowable.osgi.import.default.version}</_versionpolicy>
                         <_removeheaders>${flowable.osgi.remove.headers}</_removeheaders>
                         <_failok>${flowable.osgi.failok}</_failok>

@@ -44,7 +44,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @AutoConfiguration(after = {
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineAutoConfiguration.class
-}, beforeName = "org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration")
+}, beforeName = "org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration")
 public class FlowableSecurityAutoConfiguration {
 
     @Configuration(proxyBeanMethods = false)

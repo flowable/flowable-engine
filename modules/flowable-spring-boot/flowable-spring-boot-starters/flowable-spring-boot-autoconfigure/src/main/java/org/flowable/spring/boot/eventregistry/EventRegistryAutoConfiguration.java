@@ -47,6 +47,7 @@ import org.flowable.spring.boot.ProcessEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineAutoConfiguration;
 import org.flowable.spring.boot.app.AppEngineServicesAutoConfiguration;
 import org.flowable.spring.boot.condition.ConditionalOnEventRegistry;
+import org.flowable.spring.boot.json.FlowableJackson3Configuration;
 import org.springframework.amqp.rabbit.core.RabbitOperations;
 import org.springframework.amqp.rabbit.listener.RabbitListenerEndpointRegistry;
 import org.springframework.beans.factory.ObjectProvider;
@@ -57,6 +58,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.Resource;
 import org.springframework.jms.config.JmsListenerEndpointRegistry;
 import org.springframework.jms.core.JmsOperations;
@@ -86,10 +88,11 @@ import tools.jackson.databind.ObjectMapper;
     ProcessEngineServicesAutoConfiguration.class,
 },
         afterName = {
-                "org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
-                "org.springframework.boot.jms.autoconfigure.JmsAutoConfiguration",
-                "org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration"
+                "org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration",
+                "org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration",
+                "org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration"
 })
+@Import(FlowableJackson3Configuration.class)
 public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 
     protected final FlowableEventRegistryProperties eventProperties;
@@ -278,4 +281,3 @@ public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConf
         }
     }
 }
-

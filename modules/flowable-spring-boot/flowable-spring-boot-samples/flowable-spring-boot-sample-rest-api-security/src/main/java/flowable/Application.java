@@ -43,7 +43,7 @@ public class Application {
         @Order(99)
         public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
-                    .securityMatcher(PathPatternRequestMatcher.pathPattern("/api/**"))
+                    .securityMatcher(PathPatternRequestMatcher.withDefaults().matcher("/api/**"))
                     .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
                     .httpBasic(Customizer.withDefaults());
 

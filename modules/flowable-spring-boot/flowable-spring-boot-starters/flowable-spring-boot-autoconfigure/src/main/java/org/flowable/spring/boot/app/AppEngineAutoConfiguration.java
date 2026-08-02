@@ -32,6 +32,7 @@ import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
+import org.flowable.spring.boot.json.FlowableJackson3Configuration;
 import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -59,6 +60,7 @@ import tools.jackson.databind.ObjectMapper;
     FlowableEventRegistryProperties.class,
 })
 @Import({
+    FlowableJackson3Configuration.class,
     FlowableVariableJackson2JsonMapperConfiguration.class,
 })
 public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfiguration {

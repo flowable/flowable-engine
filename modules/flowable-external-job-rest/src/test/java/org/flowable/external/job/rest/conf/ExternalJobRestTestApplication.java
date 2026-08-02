@@ -14,14 +14,19 @@ package org.flowable.external.job.rest.conf;
 
 import jakarta.servlet.MultipartConfigElement;
 
+import org.flowable.common.rest.converter.Jackson3HttpMessageConverter;
 import org.flowable.external.job.rest.service.DispatcherServletConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Filip Hrisafov
@@ -31,6 +36,19 @@ public class ExternalJobRestTestApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(ExternalJobRestTestApplication.class, args);
+    }
+
+    @Bean
+    public JsonMapper jsonMapper() {
+        return JsonMapper.shared();
+    }
+
+    @Bean
+    public RestTemplateCustomizer jackson3RestTemplateCustomizer(JsonMapper jsonMapper) {
+        return restTemplate -> {
+            restTemplate.getMessageConverters().removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
+            restTemplate.getMessageConverters().add(new Jackson3HttpMessageConverter(jsonMapper));
+        };
     }
 
     @Bean

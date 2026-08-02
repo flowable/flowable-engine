@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.app;
 
+import org.flowable.common.rest.converter.Jackson3HttpMessageConverter;
 import org.flowable.rest.app.properties.RestAppProperties;
 import org.flowable.rest.conf.BootstrapConfiguration;
 import org.flowable.rest.conf.DevelopmentConfiguration;
@@ -19,8 +20,10 @@ import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -60,6 +63,14 @@ public class FlowableRestApplication {
     @Bean
     public JsonMapper jsonMapper() {
         return JsonMapper.shared();
+    }
+
+    @Bean
+    public RestTemplateCustomizer jackson3RestTemplateCustomizer(JsonMapper jsonMapper) {
+        return restTemplate -> {
+            restTemplate.getMessageConverters().removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
+            restTemplate.getMessageConverters().add(new Jackson3HttpMessageConverter(jsonMapper));
+        };
     }
 
     @Bean
