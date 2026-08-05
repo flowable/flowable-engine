@@ -87,6 +87,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     U elementId(String elementId);
 
     /**
+     * Only select jobs whose element id is one of the given ids.
+     */
+    U elementIds(Collection<String> elementIds);
+
+    /**
      * Only select jobs which exist for the given element name
      */
     U elementName(String elementName);
@@ -95,6 +100,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Only select tasks for the given scope identifier.
      */
     U scopeId(String scopeId);
+
+    /**
+     * Only select jobs whose scope id is one of the given ids.
+     */
+    U scopeIds(Collection<String> scopeIds);
 
     /**
      * Only select jobs without a scope id value.
