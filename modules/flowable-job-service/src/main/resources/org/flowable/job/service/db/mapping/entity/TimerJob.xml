@@ -106,7 +106,7 @@
             <if test="elementId != null">
                 and RES.ELEMENT_ID_ = #{elementId, jdbcType=NVARCHAR}
             </if>
-            <if test="elementIds != null &amp;&amp; !elementIds.isEmpty()">
+            <if test="elementIds != null &amp;&amp; !elementIds.empty">
                 and RES.ELEMENT_ID_ in
                 <foreach item="elementId" index="index" collection="elementIds" open="(" separator="," close=")">
                     #{elementId, jdbcType=NVARCHAR}
@@ -118,7 +118,7 @@
             <if test="scopeId != null">
                 and RES.SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR}
             </if>
-            <if test="scopeIds != null &amp;&amp; !scopeIds.isEmpty()">
+            <if test="scopeIds != null &amp;&amp; !scopeIds.empty">
                 and RES.SCOPE_ID_ in
                 <foreach item="scopeId" index="index" collection="scopeIds" open="(" separator="," close=")">
                     #{scopeId, jdbcType=NVARCHAR}
@@ -227,7 +227,7 @@
                         <if test="orQueryObject.elementId != null">
                             or RES.ELEMENT_ID_ = #{orQueryObject.elementId, jdbcType=NVARCHAR}
                         </if>
-                        <if test="orQueryObject.elementIds != null &amp;&amp; !orQueryObject.elementIds.isEmpty()">
+                        <if test="orQueryObject.elementIds != null &amp;&amp; !orQueryObject.elementIds.empty">
                             or RES.ELEMENT_ID_ in
                             <foreach item="elementId" index="index" collection="orQueryObject.elementIds" open="(" separator="," close=")">
                                 #{elementId, jdbcType=NVARCHAR}
@@ -239,7 +239,7 @@
                         <if test="orQueryObject.scopeId != null">
                             or RES.SCOPE_ID_ = #{orQueryObject.scopeId, jdbcType=NVARCHAR}
                         </if>
-                        <if test="orQueryObject.scopeIds != null &amp;&amp; !orQueryObject.scopeIds.isEmpty()">
+                        <if test="orQueryObject.scopeIds != null &amp;&amp; !orQueryObject.scopeIds.empty">
                             or RES.SCOPE_ID_ in
                             <foreach item="scopeId" index="index" collection="orQueryObject.scopeIds" open="(" separator="," close=")">
                                 #{scopeId, jdbcType=NVARCHAR}
