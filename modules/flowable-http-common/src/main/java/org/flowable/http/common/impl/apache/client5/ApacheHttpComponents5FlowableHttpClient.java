@@ -32,10 +32,13 @@ import org.apache.hc.client5.http.async.HttpAsyncClient;
 import org.apache.hc.client5.http.async.methods.SimpleBody;
 import org.apache.hc.client5.http.async.methods.SimpleHttpResponse;
 import org.apache.hc.client5.http.async.methods.SimpleResponseConsumer;
+import org.apache.hc.client5.http.SchemePortResolver;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.entity.mime.HttpMultipartMode;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.DefaultHttpRequestRetryStrategy;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.DefaultSchemePortResolver;
 import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
@@ -46,7 +49,9 @@ import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
 import org.apache.hc.core5.http.HttpVersion;
 import org.apache.hc.core5.http.ParseException;
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity;
@@ -55,6 +60,7 @@ import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.http.nio.AsyncRequestProducer;
 import org.apache.hc.core5.http.nio.entity.AsyncEntityProducers;
 import org.apache.hc.core5.http.nio.support.AsyncRequestBuilder;
+import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.hc.core5.io.CloseMode;
 import org.apache.hc.core5.io.ModalCloseable;
 import org.apache.hc.core5.net.WWWFormCodec;
@@ -81,6 +87,8 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
     private static final String ENCODED_PLUS_CHARACTER = "%2B";
     private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
     private static final String ENCODED_SPACE_CHARACTER = "%20";
+
+    private static final String[] SENSITIVE_REDIRECT_HEADERS = { "Authorization", "Cookie", "Proxy-Authorization" };
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -119,6 +127,11 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             retryCount = config.getRequestRetryLimit();
         }
         httpClientBuilder.setRetryStrategy(new DefaultHttpRequestRetryStrategy(retryCount, TimeValue.ZERO_MILLISECONDS));
+
+        // By default HttpClient refuses to follow a redirect to a different host when the request carries credentials or
+        // cookies. Instead strip those sensitive headers on such cross-host redirects and follow the redirect, so that
+        // credentials are never leaked to the redirect target while still allowing the download to be retrieved.
+        httpClientBuilder.setRedirectStrategy(new SensitiveHeadersStrippingRedirectStrategy());
         clientBuilderCustomizer.accept(httpClientBuilder);
 
         // system settings
@@ -394,6 +407,44 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             );
 
             return responseFuture;
+        }
+    }
+
+    /**
+     * A {@link DefaultRedirectStrategy} that, instead of refusing to follow a redirect to a different authority when
+     * the request carries credentials or cookies (the default behaviour), strips those sensitive headers from the
+     * redirect request and allows it to be followed. This way the redirect is honoured without leaking credentials to
+     * the redirect target. The redirect request is copied by the exec chain after this check, so removing the headers
+     * here removes them from the request that is actually sent.
+     */
+    public static class SensitiveHeadersStrippingRedirectStrategy extends DefaultRedirectStrategy {
+
+        protected final SchemePortResolver schemePortResolver = DefaultSchemePortResolver.INSTANCE;
+
+        @Override
+        public boolean isRedirectAllowed(HttpHost currentTarget, HttpHost newTarget,
+                org.apache.hc.core5.http.HttpRequest redirect, HttpContext context) {
+            if (!isSameAuthority(currentTarget, newTarget)) {
+                for (String header : SENSITIVE_REDIRECT_HEADERS) {
+                    redirect.removeHeaders(header);
+                }
+                for (Header header : redirect.getHeaders()) {
+                    if (header.isSensitive()) {
+                        redirect.removeHeaders(header.getName());
+                    }
+                }
+            }
+            return true;
+        }
+
+        protected boolean isSameAuthority(HttpHost first, HttpHost second) {
+            if (first == null || second == null) {
+                return false;
+            }
+            if (!first.getHostName().equalsIgnoreCase(second.getHostName())) {
+                return false;
+            }
+            return schemePortResolver.resolve(first) == schemePortResolver.resolve(second);
         }
     }
 }

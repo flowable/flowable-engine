@@ -109,6 +109,8 @@ public class HttpServiceTaskTestServer {
             contextHandler.addServlet(new ServletHolder(new DeleteResponseServlet()), "/delete");
             contextHandler.addServlet(new ServletHolder(new ClasspathResourceServlet()), "/resource");
             contextHandler.addServlet(new ServletHolder(new BinaryEchoServlet()), "/binary");
+            contextHandler.addServlet(new ServletHolder(new RedirectServlet()), "/redirect");
+            contextHandler.addServlet(new ServletHolder(new EchoAuthorizationServlet()), "/echo-authorization");
             server.setHandler(contextHandler);
             server.start();
         } catch (Exception e) {
@@ -385,6 +387,37 @@ public class HttpServiceTaskTestServer {
                 resp.setContentType(contentType);
             }
             resp.getOutputStream().write(body);
+        }
+    }
+
+    /**
+     * Answers with a redirect (302 by default) to the URL given in the {@code location} query parameter. Used to test
+     * client-side redirect following without depending on an external host.
+     */
+    protected static class RedirectServlet extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+            String location = req.getParameter("location");
+            String statusParam = req.getParameter("status");
+            int status = StringUtils.isNotEmpty(statusParam) ? Integer.parseInt(statusParam) : HttpServletResponse.SC_FOUND;
+            resp.setStatus(status);
+            resp.setHeader("Location", location);
+        }
+    }
+
+    /**
+     * Echoes the received {@code Authorization} header back in the response body (as {@code auth=<value>}, or
+     * {@code auth=<none>} when absent). Used to verify whether credentials are forwarded across a redirect.
+     */
+    protected static class EchoAuthorizationServlet extends HttpServlet {
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            String authorization = req.getHeader("Authorization");
+            resp.setStatus(200);
+            resp.setContentType("text/plain");
+            resp.getWriter().print("auth=" + (authorization != null ? authorization : "<none>"));
         }
     }
 

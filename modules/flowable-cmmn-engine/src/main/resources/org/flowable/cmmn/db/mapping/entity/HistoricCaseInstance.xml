@@ -338,7 +338,7 @@
     <sql id="selectHistoricCaseInstancesWithVariablesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
         <!--
-            Doing a join on the definition table is OK, since it is a 1:1 relationship.
+            Doing a join on the definition table is OK, since it is an N:1 relationship.
             This has to be an outer join because historic data might exists, but definitions might have been deleted
         -->
         left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
@@ -348,7 +348,7 @@
     <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
         <!--
-            Doing a join on the definition table is OK, since it is a 1:1 relationship.
+            Doing a join on the definition table is OK, since it is an N:1 relationship.
             This has to be an outer join because historic data might exists, but definitions might have been deleted
         -->
         left outer join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_

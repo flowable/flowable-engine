@@ -449,7 +449,7 @@
     <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
         from ${prefix}ACT_HI_PROCINST RES
         <!--
-                Doing a join on the definition table is OK, since it is a 1:1 relationship.
+                Doing a join on the definition table is OK, since it is an N:1 relationship.
                 This has to be an outer join because historic data might exists, but definitions might have been deleted
         -->
         left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
@@ -497,7 +497,7 @@
   <sql id="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
     <!--
-        Doing a join on the definition table is OK, since it is a 1:1 relationship.
+        Doing a join on the definition table is OK, since it is an N:1 relationship.
         This has to be an outer join because historic data might exists, but definitions might have been deleted
      -->
     left outer join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_

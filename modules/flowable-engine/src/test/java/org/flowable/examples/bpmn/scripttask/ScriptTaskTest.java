@@ -82,6 +82,20 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment
+    public void testIdentityServiceAvailableInScript() {
+        identityService.saveUser(identityService.newUser("kermit"));
+        try {
+            String id = runtimeService.startProcessInstanceByKey("identityServiceInScript").getId();
+            assertThat(runtimeService.getVariable(id, "userCount")).isEqualTo(1L);
+            // the identity service is still available under its former name
+            assertThat(runtimeService.getVariable(id, "legacyUserCount")).isEqualTo(1L);
+        } finally {
+            identityService.deleteUser("kermit");
+        }
+    }
+
+    @Test
+    @Deployment
     public void testInputVariables() {
         // The first script should use the input variables
         // i.e. when input parameters are defined then doNotIncludeVariables is ignored
