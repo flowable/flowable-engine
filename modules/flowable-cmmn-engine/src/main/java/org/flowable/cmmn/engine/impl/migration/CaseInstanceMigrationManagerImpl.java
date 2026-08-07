@@ -330,8 +330,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         List<CaseInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
+            CaseDefinition sourceCaseDefinition = CaseDefinitionUtil.getCaseDefinition(originalCaseDefinitionId);
             for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
-                caseInstanceMigrationCallback.caseInstanceMigrated(caseInstance, caseDefinitionToMigrateTo, document);
+                caseInstanceMigrationCallback.caseInstanceMigrated(caseInstance, sourceCaseDefinition, caseDefinitionToMigrateTo, document);
             }
         }
 
@@ -359,6 +360,7 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         }
         
         LOGGER.debug("Updating case definition reference of case root execution with id:'{}' to '{}'", historicCaseInstance.getId(), caseDefinitionToMigrateTo.getId());
+        String originalCaseDefinitionId = historicCaseInstance.getCaseDefinitionId();
         historicCaseInstance.setCaseDefinitionId(caseDefinitionToMigrateTo.getId());
         historicCaseInstance.setCaseDefinitionKey(caseDefinitionToMigrateTo.getKey());
         historicCaseInstance.setCaseDefinitionName(caseDefinitionToMigrateTo.getName());
@@ -371,8 +373,9 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         List<CaseInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
+            CaseDefinition sourceCaseDefinition = CaseDefinitionUtil.getCaseDefinition(originalCaseDefinitionId);
             for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
-                caseInstanceMigrationCallback.historicCaseInstanceMigrated(historicCaseInstance, caseDefinitionToMigrateTo, document);
+                caseInstanceMigrationCallback.historicCaseInstanceMigrated(historicCaseInstance, sourceCaseDefinition, caseDefinitionToMigrateTo, document);
             }
         }
     }
