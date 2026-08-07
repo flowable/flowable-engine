@@ -51,6 +51,8 @@ import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManage
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN Timer Event Listener.
@@ -58,6 +60,8 @@ import org.joda.time.DateTime;
  * @author Joram Barrez
  */
 public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavior implements PlanItemActivityBehavior {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimerEventListenerActivityBehaviour.class);
 
     protected TimerEventListener timerEventListener;
 
@@ -130,14 +134,18 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
                     // Try to parse as ISO8601 first
                     try {
                         timerDueDate = DateUtil.parseDate(timerString);
-                    } catch (Exception e) { }
+                    } catch (Exception e) {
+                        LOGGER.debug("Failed to parse timer expression '{}' as ISO8601 date", timerString, e);
+                    }
 
                     // Try to parse as cron expression
                     try {
                         timerDueDate = businessCalendarManager.getBusinessCalendar(CycleBusinessCalendar.NAME).resolveDuedate(timerString);
                         isRepeating = true;
 
-                    } catch (Exception pe) { }
+                    } catch (Exception pe) {
+                        LOGGER.debug("Failed to parse timer expression '{}' as cron expression", timerString, pe);
+                    }
 
                 }
 

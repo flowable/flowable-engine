@@ -32,6 +32,8 @@ import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Cache;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Expression factory implementation.
@@ -75,6 +77,8 @@ import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
  * @author Christoph Beck
  */
 public class ExpressionFactoryImpl extends ExpressionFactory {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExpressionFactoryImpl.class);
 	/**
 	 * A profile provides a default set of language features that will define the builder's
 	 * behavior. A profile can be adjusted using the <code>javax.el.methodInvocations</code>,
@@ -266,7 +270,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 					try {
 						input.close();
 					} catch (IOException e) {
-						// ignore...
+						LOGGER.debug("Failed to close stream while loading default properties", e);
 					}
 				}
 				if (getClass().getName().equals(properties.getProperty("javax.el.ExpressionFactory"))) {
@@ -274,7 +278,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 				}
 			}
 		} catch (SecurityException e) {
-			// ignore...
+			LOGGER.debug("SecurityException while loading default properties", e);
 		}
 		if (getClass().getName().equals(System.getProperty("javax.el.ExpressionFactory"))) {
 			return System.getProperties();
