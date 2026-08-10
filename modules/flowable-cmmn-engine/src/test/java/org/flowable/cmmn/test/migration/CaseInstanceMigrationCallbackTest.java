@@ -128,6 +128,25 @@ public class CaseInstanceMigrationCallbackTest extends AbstractCaseMigrationTest
         assertThat(callback.getRuntimeTargetDefinitionIds()).containsExactly(destinationDefinition.getId());
     }
 
+    @Test
+    void legacyCallbackStillInvokedForHistoricMigration() {
+        LegacyRecordingCallback callback = new LegacyRecordingCallback();
+        cmmnEngineConfiguration.setCaseInstanceMigrationCallbacks(Collections.singletonList(callback));
+
+        deployCaseDefinition("test1", ONE_TASK_CASE);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", ONE_TASK_CASE);
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        cmmnMigrationService.createHistoricCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        assertThat(callback.getHistoricTargetDefinitionIds()).containsExactly(destinationDefinition.getId());
+    }
+
     static class RecordedMigration {
 
         private final CaseDefinition source;

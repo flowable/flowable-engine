@@ -501,8 +501,7 @@ public class ProcessInstanceMigrationManagerImpl extends AbstractDynamicStateMan
         
         List<ProcessInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
-            ProcessDefinition sourceProcessDefinition = originalProcessDefinitionId == null ? null
-                    : CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(originalProcessDefinitionId);
+            ProcessDefinition sourceProcessDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(originalProcessDefinitionId);
             for (ProcessInstanceMigrationCallback processInstanceMigrationCallback : migrationCallbacks) {
                 processInstanceMigrationCallback.processInstanceMigrated(processInstance, sourceProcessDefinition, procDefToMigrateTo, document, commandContext);
             }
