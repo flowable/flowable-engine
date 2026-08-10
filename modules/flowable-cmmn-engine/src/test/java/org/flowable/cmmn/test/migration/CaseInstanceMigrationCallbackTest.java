@@ -88,6 +88,31 @@ public class CaseInstanceMigrationCallbackTest extends AbstractCaseMigrationTest
     }
 
     @Test
+    void historicMigrationWithDeletedSourceDefinitionPassesNullSourceCaseDefinition() {
+        RecordingCallback callback = new RecordingCallback();
+        cmmnEngineConfiguration.setCaseInstanceMigrationCallbacks(Collections.singletonList(callback));
+
+        CaseDefinition sourceDefinition = deployCaseDefinition("test1", ONE_TASK_CASE);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testCase").start();
+        CaseDefinition destinationDefinition = deployCaseDefinition("test1", ONE_TASK_CASE);
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        cmmnTaskService.complete(task.getId());
+
+        // a non-cascading deployment delete keeps the historic case instance but removes its case definition
+        cmmnRepositoryService.deleteDeployment(sourceDefinition.getDeploymentId(), false);
+
+        cmmnMigrationService.createHistoricCaseInstanceMigrationBuilder()
+                .migrateToCaseDefinition(destinationDefinition.getId())
+                .migrate(caseInstance.getId());
+
+        assertThat(callback.getHistoricMigrations()).hasSize(1);
+        RecordedMigration migration = callback.getHistoricMigrations().get(0);
+        assertThat(migration.getSource()).isNull();
+        assertThat(migration.getTarget().getId()).isEqualTo(destinationDefinition.getId());
+    }
+
+    @Test
     void legacyCallbackStillInvokedForRuntimeMigration() {
         LegacyRecordingCallback callback = new LegacyRecordingCallback();
         cmmnEngineConfiguration.setCaseInstanceMigrationCallbacks(Collections.singletonList(callback));
@@ -157,7 +182,7 @@ public class CaseInstanceMigrationCallbackTest extends AbstractCaseMigrationTest
         }
     }
 
-    /** Implements only the old methods to verify the new overloads delegate to them. */
+    /** Implements only the deprecated methods to verify the new overloads delegate to them. */
     static class LegacyRecordingCallback implements CaseInstanceMigrationCallback {
 
         private final List<String> runtimeTargetDefinitionIds = new ArrayList<>();

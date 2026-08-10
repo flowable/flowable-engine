@@ -17,10 +17,21 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 
 public interface ProcessInstanceMigrationCallback {
-    
-    void processInstanceMigrated(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo, 
+
+    /**
+     * @deprecated use {@link #processInstanceMigrated(ProcessInstance, ProcessDefinition, ProcessDefinition, ProcessInstanceMigrationDocument, CommandContext)} instead.
+     */
+    @Deprecated
+    void processInstanceMigrated(ProcessInstance processInstance, ProcessDefinition procDefToMigrateTo,
             ProcessInstanceMigrationDocument document, CommandContext commandContext);
 
+    /**
+     * Called after a process instance has been migrated. This is the method invoked by the engine;
+     * the default implementation delegates to {@link #processInstanceMigrated(ProcessInstance, ProcessDefinition, ProcessInstanceMigrationDocument, CommandContext)}.
+     *
+     * @param sourceProcessDefinition the process definition the process instance was on before the migration,
+     *          or {@code null} when that definition no longer exists
+     */
     default void processInstanceMigrated(ProcessInstance processInstance, ProcessDefinition sourceProcessDefinition,
             ProcessDefinition procDefToMigrateTo, ProcessInstanceMigrationDocument document, CommandContext commandContext) {
         processInstanceMigrated(processInstance, procDefToMigrateTo, document, commandContext);

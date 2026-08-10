@@ -330,7 +330,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         List<CaseInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
-            CaseDefinition sourceCaseDefinition = CaseDefinitionUtil.getCaseDefinition(originalCaseDefinitionId);
+            CaseDefinition sourceCaseDefinition = originalCaseDefinitionId == null ? null
+                    : CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findById(originalCaseDefinitionId);
             for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
                 caseInstanceMigrationCallback.caseInstanceMigrated(caseInstance, sourceCaseDefinition, caseDefinitionToMigrateTo, document);
             }
@@ -373,7 +374,8 @@ public class CaseInstanceMigrationManagerImpl extends AbstractCmmnDynamicStateMa
         
         List<CaseInstanceMigrationCallback> migrationCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceMigrationCallbacks();
         if (migrationCallbacks != null && !migrationCallbacks.isEmpty()) {
-            CaseDefinition sourceCaseDefinition = CaseDefinitionUtil.getCaseDefinition(originalCaseDefinitionId);
+            CaseDefinition sourceCaseDefinition = originalCaseDefinitionId == null ? null
+                    : CommandContextUtil.getCaseDefinitionEntityManager(commandContext).findById(originalCaseDefinitionId);
             for (CaseInstanceMigrationCallback caseInstanceMigrationCallback : migrationCallbacks) {
                 caseInstanceMigrationCallback.historicCaseInstanceMigrated(historicCaseInstance, sourceCaseDefinition, caseDefinitionToMigrateTo, document);
             }

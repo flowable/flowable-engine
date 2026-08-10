@@ -17,16 +17,38 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 
 public interface CaseInstanceMigrationCallback {
-    
+
+    /**
+     * @deprecated use {@link #caseInstanceMigrated(CaseInstance, CaseDefinition, CaseDefinition, CaseInstanceMigrationDocument)} instead.
+     */
+    @Deprecated
     void caseInstanceMigrated(CaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, CaseInstanceMigrationDocument document);
 
+    /**
+     * Called after a case instance has been migrated. This is the method invoked by the engine;
+     * the default implementation delegates to {@link #caseInstanceMigrated(CaseInstance, CaseDefinition, CaseInstanceMigrationDocument)}.
+     *
+     * @param sourceCaseDefinition the case definition the case instance was on before the migration,
+     *          or {@code null} when that definition no longer exists
+     */
     default void caseInstanceMigrated(CaseInstance caseInstance, CaseDefinition sourceCaseDefinition, CaseDefinition caseDefToMigrateTo,
             CaseInstanceMigrationDocument document) {
         caseInstanceMigrated(caseInstance, caseDefToMigrateTo, document);
     }
 
+    /**
+     * @deprecated use {@link #historicCaseInstanceMigrated(HistoricCaseInstance, CaseDefinition, CaseDefinition, HistoricCaseInstanceMigrationDocument)} instead.
+     */
+    @Deprecated
     void historicCaseInstanceMigrated(HistoricCaseInstance caseInstance, CaseDefinition caseDefToMigrateTo, HistoricCaseInstanceMigrationDocument document);
 
+    /**
+     * Called after a historic case instance has been migrated. This is the method invoked by the engine;
+     * the default implementation delegates to {@link #historicCaseInstanceMigrated(HistoricCaseInstance, CaseDefinition, HistoricCaseInstanceMigrationDocument)}.
+     *
+     * @param sourceCaseDefinition the case definition the historic case instance was on before the migration,
+     *          or {@code null} when that definition no longer exists
+     */
     default void historicCaseInstanceMigrated(HistoricCaseInstance caseInstance, CaseDefinition sourceCaseDefinition, CaseDefinition caseDefToMigrateTo,
             HistoricCaseInstanceMigrationDocument document) {
         historicCaseInstanceMigrated(caseInstance, caseDefToMigrateTo, document);
