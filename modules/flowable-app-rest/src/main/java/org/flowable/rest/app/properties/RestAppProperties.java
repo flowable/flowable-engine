@@ -31,6 +31,10 @@ public class RestAppProperties {
      * Configures the way user credentials are verified when doing a REST API call:
      * 'any-user' : the user needs to exist and the password need to match. Any user is allowed to do the call (this is the pre 6.3.0 behavior)
      * 'verify-privilege' : the user needs to exist, the password needs to match and the user needs to have the 'rest-api' privilege
+     * 'pre-auth' : the request is trusted to have been authenticated by a reverse proxy in front of the app, and the user id is
+     *              read from a request header (see {@link PreAuth}) instead of HTTP Basic. The password is not checked; privileges
+     *              are still loaded from the IDM engine so authorization behaves as with 'verify-privilege'. Only use this when the
+     *              app cannot be reached except through a trusted proxy that strips any client-supplied copy of the header.
      * If nothing set, defaults to 'verify-privilege'
      */
     private String authenticationMode = "verify-privilege";
@@ -50,6 +54,9 @@ public class RestAppProperties {
 
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
+
+    @NestedConfigurationProperty
+    private final PreAuth preAuth = new PreAuth();
 
     /**
      * The default role prefix that needs to be used by Spring Security.
@@ -86,6 +93,10 @@ public class RestAppProperties {
 
     public Admin getAdmin() {
         return admin;
+    }
+
+    public PreAuth getPreAuth() {
+        return preAuth;
     }
 
     public String getRolePrefix() {
@@ -136,6 +147,29 @@ public class RestAppProperties {
 
         public void setLastName(String lastName) {
             this.lastName = lastName;
+        }
+    }
+
+    /**
+     * Settings for the 'pre-auth' authentication mode, where a trusted reverse proxy has already
+     * authenticated the caller and passes the user id in a request header.
+     */
+    public static class PreAuth {
+
+        /**
+         * The request header that carries the already-authenticated user id. Defaults to
+         * {@code X-Forwarded-User}, which is what most authenticating reverse proxies emit
+         * (oauth2-proxy, and Databricks Apps also forwards {@code X-Forwarded-Email} /
+         * {@code X-Forwarded-Preferred-Username}).
+         */
+        private String principalHeader = "X-Forwarded-User";
+
+        public String getPrincipalHeader() {
+            return principalHeader;
+        }
+
+        public void setPrincipalHeader(String principalHeader) {
+            this.principalHeader = principalHeader;
         }
     }
 
