@@ -51,8 +51,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String category;
     protected String categoryLike;
     protected String elementId;
+    protected Collection<String> elementIds;
     protected String elementName;
     protected String scopeId;
+    protected Collection<String> scopeIds;
     protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
@@ -204,6 +206,19 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         }
         return this;
     }
+
+    @Override
+    public DeadLetterJobQuery elementIds(Collection<String> elementIds) {
+        if (elementIds == null) {
+            throw new FlowableIllegalArgumentException("Provided element ids are null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementIds = elementIds;
+        } else {
+            this.elementIds = elementIds;
+        }
+        return this;
+    }
     
     @Override
     public DeadLetterJobQueryImpl elementName(String elementName) {
@@ -227,6 +242,19 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             this.currentOrQueryObject.scopeId = scopeId;
         } else {
             this.scopeId = scopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery scopeIds(Collection<String> scopeIds) {
+        if (scopeIds == null) {
+            throw new FlowableIllegalArgumentException("Provided scope ids are null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeIds = scopeIds;
+        } else {
+            this.scopeIds = scopeIds;
         }
         return this;
     }
@@ -682,12 +710,20 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return elementId;
     }
 
+    public Collection<String> getElementIds() {
+        return elementIds;
+    }
+
     public String getElementName() {
         return elementName;
     }
     
     public String getScopeId() {
         return scopeId;
+    }
+
+    public Collection<String> getScopeIds() {
+        return scopeIds;
     }
 
     public boolean isWithoutScopeId() {
