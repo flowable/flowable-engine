@@ -47,6 +47,7 @@ import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.DeleteReason;
 import org.flowable.common.engine.impl.callback.CallbackData;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -298,14 +299,16 @@ public class ErrorPropagation {
                 LOGGER.debug(
                         "Ending and deleting child executions for parent execution '{}'. Reason: Parent Execution is processIntanceType. Current Execution '{}'",
                         parentExecution, currentExecution);
-                executionEntityManager.deleteChildExecutions(parentExecution, null, true);
+                executionEntityManager.deleteChildExecutions(parentExecution,
+                        DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + event.getId() + ")", true);
             } else if (!currentExecution.getParentId().equals(parentExecution.getId())) {
                 LOGGER.debug("Planing destroyScopeOperation for execution {}. Reason: {}. Parent execution: {}", currentExecution,
                         "Current execution parentId odes not match parentExecution id", parentExecution);
                 CommandContextUtil.getAgenda().planDestroyScopeOperation(currentExecution);
             } else {
                 LOGGER.debug("Deleting execution and related data for execution {}.", currentExecution);
-                executionEntityManager.deleteExecutionAndRelatedData(currentExecution, null, false);
+                executionEntityManager.deleteExecutionAndRelatedData(currentExecution,
+                        DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + event.getId() + ")", false);
             }
 
             ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);

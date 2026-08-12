@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="deleteReason">
+
+  <process id="errorEventSubProcessDeleteReason" isExecutable="true">
+
+    <startEvent id="start"/>
+    <sequenceFlow id="toFork" sourceRef="start" targetRef="fork"/>
+    <parallelGateway id="fork"/>
+
+    <!-- Branch A: a call activity whose child parks on a user task. -->
+    <sequenceFlow id="toWaiting" sourceRef="fork" targetRef="waitingCall"/>
+    <callActivity id="waitingCall" name="Waiting Call" calledElement="waitingChild"/>
+    <sequenceFlow id="waitingToEnd" sourceRef="waitingCall" targetRef="endA"/>
+    <endEvent id="endA"/>
+
+    <!-- Branch B: a start execution listener raises a BpmnError. -->
+    <sequenceFlow id="toThrowing" sourceRef="fork" targetRef="throwingTask"/>
+    <serviceTask id="throwingTask" name="Throwing Task"
+                 flowable:class="org.flowable.engine.test.api.deletereason.NoopDelegate">
+      <extensionElements>
+        <flowable:executionListener event="start"
+            class="org.flowable.engine.test.api.deletereason.ThrowBpmnErrorListener"/>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="throwingToEnd" sourceRef="throwingTask" targetRef="endB"/>
+    <endEvent id="endB"/>
+
+    <!-- Interrupting error event sub-process: catches, and terminates the scope. -->
+    <subProcess id="errorHandler" triggeredByEvent="true">
+      <startEvent id="errorHandlerStart" isInterrupting="true">
+        <errorEventDefinition/>
+      </startEvent>
+      <sequenceFlow id="handlerToEnd" sourceRef="errorHandlerStart" targetRef="errorHandlerEnd"/>
+      <endEvent id="errorHandlerEnd"/>
+    </subProcess>
+
+  </process>
+
+  <!-- Branch A's called process: raises a user task and waits. -->
+  <process id="waitingChild" isExecutable="true">
+    <startEvent id="childStart"/>
+    <sequenceFlow id="childToTask" sourceRef="childStart" targetRef="waitingTask"/>
+    <userTask id="waitingTask" name="Waiting Task" flowable:assignee="kermit"/>
+    <sequenceFlow id="childTaskToEnd" sourceRef="waitingTask" targetRef="childEnd"/>
+    <endEvent id="childEnd"/>
+  </process>
+</definitions>
