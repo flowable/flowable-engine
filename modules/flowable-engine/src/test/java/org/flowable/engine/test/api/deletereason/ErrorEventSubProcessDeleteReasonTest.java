@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.engine.test.api.deletereason;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,19 +25,20 @@ import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
- * Companion to DeleteReasonTest#testInterruptingBoundaryEvent.
+ * Companion to {@link DeleteReasonTest#testInterruptingBoundaryEvent()}, for the
+ * interrupting error event sub-process.
  *
- * An interrupting error event sub-process terminates the executions in its
- * scope with a null delete reason, so an activity it killed is indistinguishable
- * in history from one that completed normally. Every other interrupting event
- * sub-process start type records DeleteReason.EVENT_SUBPROCESS_INTERRUPTING.
+ * An activity terminated by an interrupting start event is recorded with
+ * DeleteReason.EVENT_SUBPROCESS_INTERRUPTING, so history can tell it apart from
+ * one that completed normally.
  */
 public class ErrorEventSubProcessDeleteReasonTest extends PluggableFlowableTestCase {
 
     /**
-     * A forked process: one branch parks on a user task, the other throws a
-     * BpmnError from a start execution listener. The interrupting error event
-     * sub-process catches it and terminates the whole scope.
+     * A forked process: one branch parks on a user task inside a call activity,
+     * the other throws a BpmnError from a start execution listener. The
+     * interrupting error event sub-process catches it and terminates the whole
+     * scope, including the parked branch.
      */
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/deletereason/ErrorEventSubProcessDeleteReasonTest.bpmn20.xml")
@@ -40,27 +53,25 @@ public class ErrorEventSubProcessDeleteReasonTest extends PluggableFlowableTestC
 
         HistoricActivityInstance parkedBranch = historicActivity(processInstance.getId(), "waitingCall");
 
-        // It has an end time and a called process instance, exactly as a call
-        // activity that ran to completion does. By the documented contract of
-        // getDeleteReason() -- "if completed normally, no delete reason is set"
-        // -- a null reason here says this activity finished. It did not.
+        // An end time and a called process instance are also what a call
+        // activity that ran to completion records, so the delete reason is the
+        // only thing separating the two.
         assertThat(parkedBranch.getEndTime()).isNotNull();
         assertThat(parkedBranch.getCalledProcessInstanceId()).isNotNull();
 
-        // FAILS: actual is null.
         assertThat(parkedBranch.getDeleteReason())
                 .as("delete reason on an activity terminated by the interrupting error event sub-process")
                 .isEqualTo(DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(errorHandlerStart)");
     }
 
     /**
-     * The same shape with an interrupting *boundary* event rather than an event
-     * sub-process. This one passes: BoundaryEventActivityBehavior records
-     * DeleteReason.BOUNDARY_EVENT_INTERRUPTING.
+     * The same BpmnError caught by an interrupting boundary event instead, which
+     * records DeleteReason.BOUNDARY_EVENT_INTERRUPTING. The two paths differ only
+     * in which vehicle catches the error.
      */
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/deletereason/ErrorEventSubProcessDeleteReasonTest.boundary.bpmn20.xml")
-    public void testInterruptingBoundaryEventForComparison() {
+    public void testInterruptingBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryDeleteReason");
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
