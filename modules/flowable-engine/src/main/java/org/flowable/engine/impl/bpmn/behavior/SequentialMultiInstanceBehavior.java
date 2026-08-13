@@ -87,7 +87,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
         aggregateVariablesForChildExecution(execution, multiInstanceRootExecution);
 
-        boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
+        boolean completeConditionSatisfied = completionConditionSatisfied(execution);
         if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
             if (completeConditionSatisfied) {
                 sendCompletedWithConditionEvent(multiInstanceRootExecution);
