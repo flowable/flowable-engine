@@ -12,7 +12,9 @@
  */
 package org.flowable.rest.app.properties;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -164,12 +166,36 @@ public class RestAppProperties {
          */
         private String principalHeader = "X-Forwarded-User";
 
+        /**
+         * Optional defence-in-depth allowlist of trusted proxy source addresses, as IPs or CIDR
+         * ranges (e.g. {@code 10.0.0.0/8}, {@code 192.168.1.5}). Empty by default, which keeps
+         * the behaviour of trusting the principal header on every request.
+         *
+         * <p>When set, the principal header is only honoured if the request's <em>transport
+         * peer</em> ({@code ServletRequest#getRemoteAddr()}, not an {@code X-Forwarded-For}
+         * value) matches one of these entries; otherwise the request is treated as if it carried
+         * no header and is denied. This binds the trusted identity to the proxy it came from
+         * rather than to the header alone, so a single misconfiguration (the app becoming
+         * reachable off the proxy, or a proxy that forwards an inbound {@code X-Forwarded-*}
+         * header) cannot be exploited from an arbitrary source. It complements, and does not
+         * replace, the requirement that the proxy strip client-supplied copies of the header.
+         */
+        private List<String> trustedProxies = new ArrayList<>();
+
         public String getPrincipalHeader() {
             return principalHeader;
         }
 
         public void setPrincipalHeader(String principalHeader) {
             this.principalHeader = principalHeader;
+        }
+
+        public List<String> getTrustedProxies() {
+            return trustedProxies;
+        }
+
+        public void setTrustedProxies(List<String> trustedProxies) {
+            this.trustedProxies = trustedProxies;
         }
     }
 

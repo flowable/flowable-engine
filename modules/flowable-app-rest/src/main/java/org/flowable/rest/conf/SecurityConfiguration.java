@@ -12,6 +12,9 @@
  */
 package org.flowable.rest.conf;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.rest.app.properties.RestAppProperties;
@@ -33,6 +36,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
 
 @Configuration(proxyBeanMethods = false)
 @EnableWebSecurity
@@ -110,7 +114,8 @@ public class SecurityConfiguration {
             // Identity comes from a header set by a trusted proxy, not HTTP Basic. The filter
             // builds a PreAuthenticatedAuthenticationToken from the header, which the
             // PreAuthenticatedAuthenticationProvider above resolves against IDM.
-            RequestHeaderAuthenticationFilter preAuthFilter = new RequestHeaderAuthenticationFilter();
+            RequestHeaderAuthenticationFilter preAuthFilter = trustedProxyAware(
+                    new RequestHeaderAuthenticationFilter());
             preAuthFilter.setPrincipalRequestHeader(restAppProperties.getPreAuth().getPrincipalHeader());
             // Missing header simply yields an anonymous request that the authorization rules
             // above reject with 401/403, rather than a 500.
@@ -135,6 +140,39 @@ public class SecurityConfiguration {
 
     protected boolean isPreAuth() {
         return MODE_PRE_AUTH.equals(restAppProperties.getAuthenticationMode());
+    }
+
+    /**
+     * Wraps the pre-auth filter so that, when a trusted-proxy allowlist is configured, the
+     * principal header is only read from requests whose transport peer address matches the
+     * allowlist. A request from any other source is treated as if it carried no header
+     * (principal resolves to {@code null}) and is denied by the authorization rules, exactly
+     * like a missing header. With no allowlist configured the plain filter is returned and
+     * behaviour is unchanged.
+     */
+    protected RequestHeaderAuthenticationFilter trustedProxyAware(RequestHeaderAuthenticationFilter delegate) {
+        List<String> trustedProxies = restAppProperties.getPreAuth().getTrustedProxies();
+        if (trustedProxies == null || trustedProxies.isEmpty()) {
+            return delegate;
+        }
+        List<IpAddressMatcher> matchers = new ArrayList<>(trustedProxies.size());
+        for (String entry : trustedProxies) {
+            matchers.add(new IpAddressMatcher(entry));
+        }
+        return new RequestHeaderAuthenticationFilter() {
+
+            @Override
+            protected Object getPreAuthenticatedPrincipal(jakarta.servlet.http.HttpServletRequest request) {
+                String remoteAddr = request.getRemoteAddr();
+                for (IpAddressMatcher matcher : matchers) {
+                    if (matcher.matches(remoteAddr)) {
+                        return super.getPreAuthenticatedPrincipal(request);
+                    }
+                }
+                // Untrusted source: ignore the header entirely.
+                return null;
+            }
+        };
     }
 
     protected boolean isSwaggerDocsEnabled() {
