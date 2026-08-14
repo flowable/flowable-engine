@@ -17,8 +17,7 @@
 
     <!-- Branch B: a start execution listener raises a BpmnError. -->
     <sequenceFlow id="toThrowing" sourceRef="fork" targetRef="throwingTask"/>
-    <serviceTask id="throwingTask" name="Throwing Task"
-                 flowable:class="org.flowable.engine.test.api.deletereason.NoopDelegate">
+    <serviceTask id="throwingTask" name="Throwing Task" flowable:expression="${true}">
       <extensionElements>
         <flowable:executionListener event="start"
             class="org.flowable.engine.test.api.deletereason.ThrowBpmnErrorListener"/>

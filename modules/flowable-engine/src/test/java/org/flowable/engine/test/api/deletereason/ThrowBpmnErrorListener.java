@@ -26,13 +26,3 @@ public class ThrowBpmnErrorListener implements ExecutionListener {
     }
 
 }
-
-/** Never reached; the listener throws before the behaviour runs. */
-class NoopDelegate implements JavaDelegate {
-
-    @Override
-    public void execute(DelegateExecution execution) {
-        // no-op
-    }
-
-}
