@@ -15,7 +15,6 @@ package org.flowable.engine.test.api.deletereason;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.JavaDelegate;
 
 /** Raises a BpmnError from a start execution listener. */
 public class ThrowBpmnErrorListener implements ExecutionListener {
