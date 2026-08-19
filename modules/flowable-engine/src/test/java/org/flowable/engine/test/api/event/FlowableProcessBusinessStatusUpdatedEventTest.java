@@ -88,6 +88,51 @@ public class FlowableProcessBusinessStatusUpdatedEventTest extends PluggableFlow
         assertThat(events).hasSize(1);
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testBusinessStatusUpdatedEventWithUpdateBuilder() {
+        List<FlowableEvent> events = new ArrayList<>();
+        businessStatusUpdatedEventListener.eventConsumer = (flowableEvent) -> {
+            if (flowableEvent instanceof FlowableProcessBusinessStatusUpdatedEvent processBusinessStatusUpdatedEvent) {
+                Execution execution = (Execution) processBusinessStatusUpdatedEvent.getEntity();
+                assertThat(processBusinessStatusUpdatedEvent.getScopeType()).isEqualTo(ScopeTypes.BPMN);
+                assertThat(processBusinessStatusUpdatedEvent.getScopeId()).isNotNull().isEqualTo(execution.getId());
+                assertThat(processBusinessStatusUpdatedEvent.getOldBusinessStatus()).isEqualTo("oldStatus");
+                assertThat(processBusinessStatusUpdatedEvent.getNewBusinessStatus()).isEqualTo("newStatus");
+                events.add(flowableEvent);
+            }
+        };
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .businessStatus("oldStatus")
+                .start();
+
+        runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
+                .businessStatus("newStatus")
+                .update();
+
+        assertThat(events).hasSize(1);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
+    public void testNoBusinessStatusUpdatedEventWhenUpdateBuilderDoesNotSetBusinessStatus() {
+        List<FlowableEvent> events = new ArrayList<>();
+        businessStatusUpdatedEventListener.eventConsumer = events::add;
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .businessStatus("oldStatus")
+                .start();
+
+        runtimeService.createProcessInstanceUpdateBuilder(processInstance.getId())
+                .name("newName")
+                .update();
+
+        assertThat(events).isEmpty();
+    }
+
     public static class CustomEventListener extends AbstractFlowableEventListener {
 
         private Consumer<FlowableEvent> eventConsumer;
