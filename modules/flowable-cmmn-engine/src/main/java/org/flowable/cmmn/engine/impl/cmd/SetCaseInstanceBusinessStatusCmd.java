@@ -15,16 +15,13 @@ package org.flowable.cmmn.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.impl.event.FlowableCmmnEventBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 
 public class SetCaseInstanceBusinessStatusCmd implements Command<Void>, Serializable {
 
@@ -50,13 +47,7 @@ public class SetCaseInstanceBusinessStatusCmd implements Command<Void>, Serializ
             throw new FlowableObjectNotFoundException("No case instance found for id = '" + caseInstanceId + "'.", CaseInstance.class);
         }
 
-        String oldBusinessStatus = caseInstanceEntity.getBusinessStatus();
         caseInstanceEntityManager.updateCaseInstanceBusinessStatus(caseInstanceEntity, businessStatus);
-
-        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableCmmnEventBuilder.createCaseBusinessStatusUpdatedEvent(caseInstanceEntity, oldBusinessStatus, businessStatus), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
-        }
 
         return null;
     }
