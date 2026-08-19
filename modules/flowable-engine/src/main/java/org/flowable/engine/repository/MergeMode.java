@@ -15,6 +15,7 @@ package org.flowable.engine.repository;
 
 /**
  * @author Valentin Zickner
+ * @author Yanming Zhou
  */
 public enum MergeMode {
 
@@ -23,7 +24,7 @@ public enum MergeMode {
     AS_OLD("as-old"),
     BY_DATE("by-date");
 
-    protected String name;
+    private final String name;
 
     MergeMode(String name) {
         this.name = name;
