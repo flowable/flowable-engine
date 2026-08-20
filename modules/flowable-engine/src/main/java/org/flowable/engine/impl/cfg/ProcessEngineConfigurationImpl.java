@@ -71,6 +71,7 @@ import org.flowable.common.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.common.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.common.engine.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -121,7 +122,6 @@ import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 import org.flowable.common.engine.impl.tenant.ChangeTenantIdManager;
 import org.flowable.common.engine.impl.tenant.MyBatisChangeTenantIdManager;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
-import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionFactory;
 import org.flowable.engine.BpmnChangeTenantIdEntityTypes;
 import org.flowable.engine.CandidateManager;
 import org.flowable.engine.DecisionTableVariableManager;
@@ -209,7 +209,6 @@ import org.flowable.engine.impl.bpmn.parser.handler.ProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ReceiveTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ScriptTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SendEventServiceTaskParseHandler;
-import org.flowable.engine.impl.bpmn.parser.handler.TerminateEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SendTaskParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SequenceFlowParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.ServiceTaskParseHandler;
@@ -217,6 +216,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.SignalEventDefinitionParseHa
 import org.flowable.engine.impl.bpmn.parser.handler.StartEventParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.SubProcessParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TaskParseHandler;
+import org.flowable.engine.impl.bpmn.parser.handler.TerminateEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
@@ -394,7 +394,6 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
 import org.flowable.mail.common.api.client.FlowableMailClient;
 import org.flowable.task.api.TaskQueryInterceptor;
 import org.flowable.task.api.history.HistoricTaskQueryInterceptor;
@@ -1335,8 +1334,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         
         if (!sessionFactories.containsKey(VariableListenerSession.class)) {
-            VariableListenerSessionFactory variableListenerSessionFactory = new VariableListenerSessionFactory();
-            sessionFactories.put(VariableListenerSession.class, variableListenerSessionFactory);
+            sessionFactories.put(VariableListenerSession.class, new GenericManagerFactory(VariableListenerSession.class, VariableListenerSession::new));
         }
 
         if (customSessionFactories != null) {
