@@ -17,6 +17,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -248,19 +252,23 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
 
     protected Schema createSchema() throws SAXException {
         SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        Schema schema = null;
+        URL xsdUrl = null;
         if (classloader != null) {
-            schema = factory.newSchema(classloader.getResource(BPMN_XSD));
+            xsdUrl = classloader.getResource(BPMN_XSD);
         }
-
-        if (schema == null) {
-            schema = factory.newSchema(BpmnXMLConverter.class.getClassLoader().getResource(BPMN_XSD));
+        if (xsdUrl == null) {
+            xsdUrl = BpmnXMLConverter.class.getClassLoader().getResource(BPMN_XSD);
         }
-
-        if (schema == null) {
+        if (xsdUrl == null) {
             throw new XMLException("BPMN XSD could not be found");
         }
-        return schema;
+        try {
+            // Xerces cannot resolve xsd:include/import against a schema URL whose path contains
+            // non-ASCII characters unless the URL is ASCII-encoded.
+            return factory.newSchema(URI.create(xsdUrl.toURI().toASCIIString()).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
+            return factory.newSchema(xsdUrl);
+        }
     }
 
     public BpmnModel convertToBpmnModel(InputStreamProvider inputStreamProvider, boolean validateSchema, boolean enableSafeBpmnXml) {
