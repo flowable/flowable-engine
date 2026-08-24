@@ -57,7 +57,8 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
-        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
+        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters(),
+                caseTask.isInheritVariables());
         this.caseRefExpression = caseRefExpression;
         this.caseRef = caseTask.getCaseRef();
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();

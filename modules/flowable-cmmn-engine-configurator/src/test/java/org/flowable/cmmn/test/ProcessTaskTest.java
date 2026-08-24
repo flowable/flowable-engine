@@ -1017,6 +1017,33 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
+    public void testProcessTaskInheritVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .variable("caseVariableB", "world")
+                .variable("caseVariableC", 42)
+                .start();
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        assertThat(processInstance).isNotNull();
+
+        // All case variables are inherited into the child process instance (like a BPMN call activity)
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isEqualTo("hello");
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableC")).isEqualTo(42);
+
+        // An explicit in parameter takes precedence over the inherited variable
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableB")).isEqualTo("overridden");
+    }
+
+    @Test
+    @CmmnDeployment
     public void testProcessTaskWithSkipExpressions() {
         processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
 

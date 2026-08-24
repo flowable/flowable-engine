@@ -43,6 +43,7 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
     protected String isBlockingExpression;
     protected List<IOParameter> inParameters;
     protected List<IOParameter> outParameters;
+    protected boolean inheritVariables;
 
     public ChildTaskActivityBehavior(boolean isBlocking, String isBlockingExpression) {
         this.isBlocking = isBlocking;
@@ -50,9 +51,15 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
     }
 
     public ChildTaskActivityBehavior(boolean isBlocking, String isBlockingExpression, List<IOParameter> inParameters, List<IOParameter> outParameters) {
+        this(isBlocking, isBlockingExpression, inParameters, outParameters, false);
+    }
+
+    public ChildTaskActivityBehavior(boolean isBlocking, String isBlockingExpression, List<IOParameter> inParameters, List<IOParameter> outParameters,
+            boolean inheritVariables) {
         this(isBlocking, isBlockingExpression);
         this.inParameters = inParameters;
         this.outParameters = outParameters;
+        this.inheritVariables = inheritVariables;
     }
 
     @Override
@@ -82,6 +89,12 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
     protected void handleInParameters(PlanItemInstanceEntity planItemInstanceEntity,
                                       CmmnEngineConfiguration cmmnEngineConfiguration, Map<String, Object> inParametersMap,
                                       ExpressionManager expressionManager) {
+
+        if (inheritVariables) {
+            // Inherit all variables from the parent. Explicit in parameters are
+            // applied afterwards, so they take precedence over the inherited variables.
+            inParametersMap.putAll(planItemInstanceEntity.getVariables());
+        }
 
         IOParameterUtil.processInParameters(inParameters, planItemInstanceEntity, inParametersMap, expressionManager);
     }

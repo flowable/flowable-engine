@@ -1237,6 +1237,32 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testCaseTaskInheritVariables.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testCaseTaskInheritVariables() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .variable("caseVariableB", "world")
+                .variable("caseVariableC", 42)
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+        assertThat(subCase).isNotNull();
+
+        // All parent case variables are inherited into the child case instance (like a BPMN call activity)
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableA")).isEqualTo("hello");
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableC")).isEqualTo(42);
+
+        // An explicit in parameter takes precedence over the inherited variable
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableB")).isEqualTo("overridden");
+    }
+
+    @Test
     @CmmnDeployment
     public void testIdVariableName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

@@ -57,7 +57,8 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
-        super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters());
+        super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters(),
+                processTask.isInheritVariables());
         this.process = process;
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
