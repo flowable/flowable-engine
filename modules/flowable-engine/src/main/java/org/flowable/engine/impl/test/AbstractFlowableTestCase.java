@@ -50,8 +50,6 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.DefaultHistoryManager;
-import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ActivityInstance;
@@ -399,40 +397,13 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     //
     
     protected void deleteDeployments() {
-        boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
-
-        HistoryManager asyncHistoryManager = null;
-        if (isAsyncHistoryEnabled) {
-            processEngineConfiguration.setAsyncHistoryEnabled(false);
-            asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
-        }
-        
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
-        
-        if (isAsyncHistoryEnabled) {
-            processEngineConfiguration.setAsyncHistoryEnabled(true);
-            processEngineConfiguration.setHistoryManager(asyncHistoryManager);
-        }
     }
-    
+
     protected void deleteDeployment(String deploymentId) {
-        boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
-        HistoryManager asyncHistoryManager = null;
-        if (isAsyncHistoryEnabled) {
-            processEngineConfiguration.setAsyncHistoryEnabled(false);
-            asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-            processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
-        }
-        
         repositoryService.deleteDeployment(deploymentId, true);
-        
-        if (isAsyncHistoryEnabled) {
-            processEngineConfiguration.setAsyncHistoryEnabled(true);
-            processEngineConfiguration.setHistoryManager(asyncHistoryManager);
-        }
     }
 
     protected void assertHistoricTasksDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... taskNames) {
