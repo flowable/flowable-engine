@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +80,33 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public Runnable getNextOperation() {
         if (operations.isEmpty() && !evaluateCriteriaOperations.isEmpty()) {
-            return evaluateCriteriaOperations.poll();
+            return pollNextEvaluateCriteriaOperation();
         }
         return super.getNextOperation();
+    }
+
+    /**
+     * Returns the next criteria evaluation to execute, giving precedence to evaluations that do not also
+     * evaluate stage/case instance completion. A completion evaluation is planned (with no plan item lifecycle
+     * event) when the agenda is becoming stable. If such a completion evaluation were allowed to run before a
+     * still-pending lifecycle event - for example the 'complete' transition of a case task whose child case
+     * completed synchronously in the same command - it would complete the stage/case before the entry sentry
+     * depending on that event (e.g. a following human task with an onComplete on-part) had a chance to fire.
+     * Because a single-on-part entry sentry only fires on the evaluation that actually carries its lifecycle
+     * event, that activation would be lost and the plan item terminated instead. Deferring completion
+     * evaluations until all other criteria evaluations have been processed keeps completion the last decision.
+     */
+    protected EvaluateCriteriaOperation pollNextEvaluateCriteriaOperation() {
+        for (Iterator<EvaluateCriteriaOperation> it = evaluateCriteriaOperations.iterator(); it.hasNext();) {
+            EvaluateCriteriaOperation evaluateCriteriaOperation = it.next();
+            if (!evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted()) {
+                it.remove();
+                return evaluateCriteriaOperation;
+            }
+        }
+
+        // Only completion evaluations remain: take the first one in planning order.
+        return evaluateCriteriaOperations.poll();
     }
 
     public void addOperation(CmmnOperation operation) {
