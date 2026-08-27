@@ -61,6 +61,8 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -340,6 +342,183 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         managementService.deleteJob(managementService.createJobQuery().handlerType("Type1").singleResult().getId());
         managementService.deleteJob(managementService.createJobQuery().handlerType("Type2").singleResult().getId());
+    }
+
+    @Test
+    public void testQueryByScopeIdsAndElementIds() {
+        // scope1/element1 = content agent job, scope2/element2 = tree agent job, null scope = classify job (elementId only)
+        JobEntity job1 = createJobWithScope("agent", "scope1", "element1");
+        JobEntity job2 = createJobWithScope("agent", "scope2", "element2");
+        JobEntity classifyJob = createJobWithScope("agent", null, "element3");
+
+        // scopeIds
+        assertThat(managementService.createJobQuery().scopeIds(List.of("scope1", "scope2")).count()).isEqualTo(2);
+        assertThat(managementService.createJobQuery().scopeIds(List.of("scope1")).count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().scopeIds(List.of("unknown")).count()).isZero();
+
+        // elementIds
+        assertThat(managementService.createJobQuery().elementIds(List.of("element1", "element2", "element3")).count()).isEqualTo(3);
+        assertThat(managementService.createJobQuery().elementIds(List.of("element1")).count()).isEqualTo(1);
+        assertThat(managementService.createJobQuery().elementIds(List.of("unknown")).count()).isZero();
+
+        // scopeIds OR elementIds: job1 matches by scope, job2 + classifyJob match by element
+        assertThat(managementService.createJobQuery().or()
+                .scopeIds(List.of("scope1"))
+                .elementIds(List.of("element2", "element3"))
+                .endOr().list())
+                .extracting(Job::getId)
+                .containsExactlyInAnyOrder(job1.getId(), job2.getId(), classifyJob.getId());
+
+        // the AgentJobResolver shape: scopeType = agent AND (scopeId IN ... OR elementId IN ...)
+        assertThat(managementService.createJobQuery()
+                .scopeType("agent")
+                .or()
+                    .scopeIds(List.of("scope1", "scope2"))
+                    .elementIds(List.of("element3"))
+                .endOr()
+                .list())
+                .extracting(Job::getId)
+                .containsExactlyInAnyOrder(job1.getId(), job2.getId(), classifyJob.getId());
+
+        // that same AND narrows the scope type: no jobs for a different scope type
+        assertThat(managementService.createJobQuery()
+                .scopeType("other")
+                .or()
+                    .scopeIds(List.of("scope1", "scope2"))
+                    .elementIds(List.of("element3"))
+                .endOr()
+                .count()).isZero();
+
+        // empty collections are ignored (the filter is not applied)
+        assertThat(managementService.createJobQuery().scopeIds(new ArrayList<>()).count())
+                .isEqualTo(managementService.createJobQuery().count());
+        assertThat(managementService.createJobQuery().elementIds(new ArrayList<>()).count())
+                .isEqualTo(managementService.createJobQuery().count());
+
+        // null throws
+        assertThatThrownBy(() -> managementService.createJobQuery().scopeIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> managementService.createJobQuery().elementIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        managementService.deleteJob(job1.getId());
+        managementService.deleteJob(job2.getId());
+        managementService.deleteJob(classifyJob.getId());
+    }
+
+    @Test
+    public void testTimerQueryByElementIds() {
+        TimerJobQuery query = managementService.createTimerJobQuery().elementIds(List.of("escalationTimer", "unknown"));
+        verifyQueryResults(query, 3);
+
+        query = managementService.createTimerJobQuery().elementIds(List.of("unknown"));
+        verifyQueryResults(query, 0);
+
+        // empty collection is ignored (the filter is not applied)
+        query = managementService.createTimerJobQuery().elementIds(new ArrayList<>());
+        verifyQueryResults(query, 3);
+
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().elementIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testTimerJobQueryByScopeIds() {
+        // covers the SCOPE_ID_ block of TimerJob.xml, which the elementIds test does not exercise
+        TimerJobEntity job1 = createTimerJobWithScope("agent", "scope1", "element1");
+        TimerJobEntity job2 = createTimerJobWithScope("agent", null, "element2");
+
+        assertThat(managementService.createTimerJobQuery().scopeIds(List.of("scope1")).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().scopeIds(List.of("scope1", "scope2")).count()).isEqualTo(1);
+        assertThat(managementService.createTimerJobQuery().scopeIds(List.of("unknown")).count()).isZero();
+
+        // scopeIds OR elementIds inside an or()
+        assertThat(managementService.createTimerJobQuery().or()
+                .scopeIds(List.of("scope1"))
+                .elementIds(List.of("element2"))
+                .endOr().list())
+                .extracting(Job::getId)
+                .containsExactlyInAnyOrder(job1.getId(), job2.getId());
+
+        // empty collection is ignored (the filter is not applied)
+        assertThat(managementService.createTimerJobQuery().scopeIds(new ArrayList<>()).count())
+                .isEqualTo(managementService.createTimerJobQuery().count());
+
+        assertThatThrownBy(() -> managementService.createTimerJobQuery().scopeIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
+            timerJobEntityManager.delete(job1.getId());
+            timerJobEntityManager.delete(job2.getId());
+            return null;
+        });
+    }
+
+    @Test
+    public void testSuspendedJobQueryByScopeIdsAndElementIds() {
+        SuspendedJobEntity job1 = createSuspendedJobWithScope("agent", "scope1", "element1");
+        SuspendedJobEntity job2 = createSuspendedJobWithScope("agent", null, "element2");
+
+        assertThat(managementService.createSuspendedJobQuery().scopeIds(List.of("scope1")).count()).isEqualTo(1);
+        assertThat(managementService.createSuspendedJobQuery().elementIds(List.of("element1", "element2")).count()).isEqualTo(2);
+        assertThat(managementService.createSuspendedJobQuery().scopeIds(List.of("unknown")).count()).isZero();
+
+        // scopeIds OR elementIds inside an or()
+        assertThat(managementService.createSuspendedJobQuery().or()
+                .scopeIds(List.of("scope1"))
+                .elementIds(List.of("element2"))
+                .endOr().list())
+                .extracting(Job::getId)
+                .containsExactlyInAnyOrder(job1.getId(), job2.getId());
+
+        // empty collections are ignored
+        assertThat(managementService.createSuspendedJobQuery().scopeIds(new ArrayList<>()).count())
+                .isEqualTo(managementService.createSuspendedJobQuery().count());
+
+        assertThatThrownBy(() -> managementService.createSuspendedJobQuery().scopeIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> managementService.createSuspendedJobQuery().elementIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            suspendedJobEntityManager.delete(job1.getId());
+            suspendedJobEntityManager.delete(job2.getId());
+            return null;
+        });
+    }
+
+    @Test
+    public void testDeadLetterJobQueryByScopeIdsAndElementIds() {
+        DeadLetterJobEntity job1 = createDeadLetterJobWithScope("agent", "scope1", "element1");
+        DeadLetterJobEntity job2 = createDeadLetterJobWithScope("agent", null, "element2");
+
+        assertThat(managementService.createDeadLetterJobQuery().scopeIds(List.of("scope1")).count()).isEqualTo(1);
+        assertThat(managementService.createDeadLetterJobQuery().elementIds(List.of("element1", "element2")).count()).isEqualTo(2);
+        assertThat(managementService.createDeadLetterJobQuery().scopeIds(List.of("unknown")).count()).isZero();
+
+        // scopeIds OR elementIds inside an or()
+        assertThat(managementService.createDeadLetterJobQuery().or()
+                .scopeIds(List.of("scope1"))
+                .elementIds(List.of("element2"))
+                .endOr().list())
+                .extracting(Job::getId)
+                .containsExactlyInAnyOrder(job1.getId(), job2.getId());
+
+        // empty collections are ignored
+        assertThat(managementService.createDeadLetterJobQuery().elementIds(new ArrayList<>()).count())
+                .isEqualTo(managementService.createDeadLetterJobQuery().count());
+
+        assertThatThrownBy(() -> managementService.createDeadLetterJobQuery().scopeIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+        assertThatThrownBy(() -> managementService.createDeadLetterJobQuery().elementIds(null))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+
+        managementService.deleteDeadLetterJob(job1.getId());
+        managementService.deleteDeadLetterJob(job2.getId());
     }
 
     @Test
@@ -1612,6 +1791,71 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 assertThat(result.getId()).isNotNull();
                 return result;
             }
+        });
+    }
+
+    private JobEntity createJobWithScope(String scopeType, String scopeId, String elementId) {
+        CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
+        return commandExecutor.execute(new Command<>() {
+
+            @Override
+            public JobEntity execute(CommandContext commandContext) {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity result = jobService.createJob();
+                result.setJobType(Job.JOB_TYPE_MESSAGE);
+                result.setRetries(0);
+                result.setScopeType(scopeType);
+                result.setScopeId(scopeId);
+                result.setElementId(elementId);
+                jobService.insertJob(result);
+                assertThat(result.getId()).isNotNull();
+                return result;
+            }
+        });
+    }
+
+    private SuspendedJobEntity createSuspendedJobWithScope(String scopeType, String scopeId, String elementId) {
+        return managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            SuspendedJobEntityManager suspendedJobEntityManager = jobServiceConfiguration.getSuspendedJobEntityManager();
+            SuspendedJobEntity job = suspendedJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeType(scopeType);
+            job.setScopeId(scopeId);
+            job.setElementId(elementId);
+            suspendedJobEntityManager.insert(job);
+            assertThat(job.getId()).isNotNull();
+            return job;
+        });
+    }
+
+    private DeadLetterJobEntity createDeadLetterJobWithScope(String scopeType, String scopeId, String elementId) {
+        return managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            DeadLetterJobEntityManager deadLetterJobEntityManager = jobServiceConfiguration.getDeadLetterJobEntityManager();
+            DeadLetterJobEntity job = deadLetterJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_MESSAGE);
+            job.setScopeType(scopeType);
+            job.setScopeId(scopeId);
+            job.setElementId(elementId);
+            deadLetterJobEntityManager.insert(job);
+            assertThat(job.getId()).isNotNull();
+            return job;
+        });
+    }
+
+    private TimerJobEntity createTimerJobWithScope(String scopeType, String scopeId, String elementId) {
+        return managementService.executeCommand(commandContext -> {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext).getJobServiceConfiguration();
+            TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
+            TimerJobEntity job = timerJobEntityManager.create();
+            job.setJobType(Job.JOB_TYPE_TIMER);
+            job.setScopeType(scopeType);
+            job.setScopeId(scopeId);
+            job.setElementId(elementId);
+            timerJobEntityManager.insert(job);
+            assertThat(job.getId()).isNotNull();
+            return job;
         });
     }
 

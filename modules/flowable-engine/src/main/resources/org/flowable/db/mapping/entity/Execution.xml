@@ -655,7 +655,7 @@
 
     <sql id="selectExecutionsByQueryCriteriaSql">
         from ${prefix}ACT_RU_EXECUTION RES
-        <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->
+        <!-- Doing an inner join on the definition table is OK. It is an N:1 relationship -->
         inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
         <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
     </sql>
@@ -693,7 +693,7 @@
 
   <sql id="selectProcessInstanceWithVariablesByQueryCriteriaSql">
     from ${prefix}ACT_RU_EXECUTION RES
-    <!-- Doing an inner join on the definition table is OK, since it is a 1:1 relationship -->
+    <!-- Doing an inner join on the definition table is OK. It is an N:1 relationship -->
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <include refid="commonSelectExecutionsByQueryCriteriaSql"/>
   </sql>

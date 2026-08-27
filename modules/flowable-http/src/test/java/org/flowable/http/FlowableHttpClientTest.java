@@ -88,6 +88,46 @@ class FlowableHttpClientTest {
 
     @ParameterizedTest
     @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postBinaryBody(FlowableHttpClient httpClient) {
+        // Bytes spanning the full 0-255 range would be corrupted if sent through the textual body.
+        byte[] content = new byte[1024];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = (byte) i;
+        }
+
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/binary");
+        request.setMethod("POST");
+        request.setBodyBytes(content);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/pdf");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(content);
+        // The caller-supplied Content-Type header wins over the application/octet-stream default, exactly once.
+        assertThat(response.getHttpHeaders().get("Content-Type")).containsExactly("application/pdf");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void putBinaryBodyWithoutContentTypeDefaultsToOctetStream(FlowableHttpClient httpClient) {
+        byte[] content = { 0, 1, 2, 3, (byte) 200, (byte) 255 };
+
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/binary");
+        request.setMethod("PUT");
+        request.setBodyBytes(content);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(content);
+        assertThat(response.getHttpHeaders().get("Content-Type")).containsExactly("application/octet-stream");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
     void getWithAllParameters(FlowableHttpClient httpClient) {
         HttpRequest request = new HttpRequest();
         request.setUrl("http://localhost:9798/api/test?testArg=testValue");

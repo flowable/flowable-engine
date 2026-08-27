@@ -714,6 +714,12 @@
       "name": "flowable.process.async-history.executor.timer-runnable-needed",
       "type": "java.lang.Boolean",
       "defaultValue": false
+    },
+    {
+      "name": "flowable.depends-on-database-initialization-detection",
+      "type": "java.lang.Boolean",
+      "description": "Whether Flowable engine beans should be marked as depending on Spring Boot managed database initializers (Flyway, Liquibase, spring.sql.init), ensuring they start only after schema initialization has run.",
+      "defaultValue": true
     }
   ],
   "hints": [
@@ -761,7 +767,6 @@
           "value": "spring_delegating_noop",
           "description": "Use the Spring Security 5 PasswordEncoderFactories.createDelegatingPasswordEncoder(). With NoopPasswordEncoder as the default password encoder for matches. This should be used for backwards compatibility with older versions."
         }
-
       ]
     },
     {

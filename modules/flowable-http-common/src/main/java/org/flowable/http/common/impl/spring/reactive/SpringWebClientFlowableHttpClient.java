@@ -51,7 +51,10 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.http.client.HttpClientRequest;
+import reactor.netty.http.client.HttpClientResponse;
 import reactor.netty.resources.ConnectionProvider;
+import reactor.util.context.Context;
 
 /**
  * @author Filip Hrisafov
@@ -63,6 +66,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
     private static final String ENCODED_SPACE_CHARACTER = "%20";
 
+    // Class qualified to avoid collisions with other keys that might be present in the Reactor context.
+    private static final String FOLLOW_REDIRECT_CONTEXT_KEY = SpringWebClientFlowableHttpClient.class.getName() + ".followRedirect";
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final WebClient webClient;
@@ -73,7 +79,12 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 .builder("flowableHttpClient")
                 .maxConnections(500)
                 .build())
-                .compress(true);
+                .compress(true)
+                // Whether a redirect is followed is decided per request through the Reactor context written in
+                // callAsync (populated from HttpRequest#isNoRedirects). Reactor Netty drops the sensitive headers
+                // (Authorization, Proxy-Authorization, ...) when a followed redirect targets a different domain, so
+                // credentials are not leaked to the redirect target.
+                .followRedirect(SpringWebClientFlowableHttpClient::shouldFollowRedirect);
 
         if (config.isDisableCertVerify()) {
             try {
@@ -155,10 +166,16 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             setHeaders(headersSpec, requestInfo.getHttpHeaders());
             setHeaders(headersSpec, requestInfo.getSecureHttpHeaders());
 
-            return new WebClientExecutableHttpRequest(headersSpec);
+            return new WebClientExecutableHttpRequest(headersSpec, !requestInfo.isNoRedirects());
         } catch (URISyntaxException ex) {
             throw new FlowableException("Invalid URL exception occurred", ex);
         }
+    }
+
+    public static boolean shouldFollowRedirect(HttpClientRequest request, HttpClientResponse response) {
+        boolean followRedirect = request.currentContextView().getOrDefault(FOLLOW_REDIRECT_CONTEXT_KEY, Boolean.FALSE);
+        int statusCode = response.status().code();
+        return followRedirect && statusCode >= 300 && statusCode < 400;
     }
 
     protected WebClient determineWebClient(HttpRequest requestInfo) {
@@ -190,6 +207,10 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
 
             requestBodySpec.bodyValue(requestInfo.getBody());
+        } else if (requestInfo.getBodyBytes() != null) {
+            // A caller-supplied Content-Type header (added afterwards) takes precedence over this default.
+            requestBodySpec.contentType(MediaType.APPLICATION_OCTET_STREAM);
+            requestBodySpec.bodyValue(requestInfo.getBodyBytes());
         } else if (requestInfo.getMultiValueParts() != null) {
             MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
             for (MultiValuePart part : requestInfo.getMultiValueParts()) {
@@ -270,9 +291,11 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     protected class WebClientExecutableHttpRequest implements AsyncExecutableHttpRequest {
 
         protected final WebClient.RequestHeadersSpec<?> request;
+        protected final boolean followRedirect;
 
-        public WebClientExecutableHttpRequest(WebClient.RequestHeadersSpec<?> request) {
+        public WebClientExecutableHttpRequest(WebClient.RequestHeadersSpec<?> request, boolean followRedirect) {
             this.request = request;
+            this.followRedirect = followRedirect;
         }
 
         @Override
@@ -280,6 +303,7 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             return request
                     .exchangeToMono(response -> response.toEntity(ByteArrayResource.class))
                     .map(SpringWebClientFlowableHttpClient.this::toFlowableHttpResponse)
+                    .contextWrite(Context.of(FOLLOW_REDIRECT_CONTEXT_KEY, followRedirect))
                     .toFuture();
         }
 

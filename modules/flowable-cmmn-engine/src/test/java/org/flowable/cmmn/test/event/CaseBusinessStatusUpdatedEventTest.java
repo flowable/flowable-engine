@@ -100,6 +100,51 @@ public class CaseBusinessStatusUpdatedEventTest extends FlowableCmmnTestCase {
         assertThat(events).hasSize(1);
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void testBusinessStatusUpdatedEventWithUpdateBuilder() {
+        List<FlowableEvent> events = new ArrayList<>();
+        businessStatusUpdatedEventListener.eventConsumer = (flowableEvent) -> {
+            if (flowableEvent instanceof FlowableCaseBusinessStatusUpdatedEvent caseBusinessStatusUpdatedEvent) {
+                CaseInstance eventCaseInstance = (CaseInstance) caseBusinessStatusUpdatedEvent.getEntity();
+                assertThat(caseBusinessStatusUpdatedEvent.getScopeType()).isEqualTo(ScopeTypes.CMMN);
+                assertThat(caseBusinessStatusUpdatedEvent.getScopeId()).isNotNull().isEqualTo(eventCaseInstance.getId());
+                assertThat(caseBusinessStatusUpdatedEvent.getOldBusinessStatus()).isEqualTo("oldStatus");
+                assertThat(caseBusinessStatusUpdatedEvent.getNewBusinessStatus()).isEqualTo("newStatus");
+                events.add(flowableEvent);
+            }
+        };
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessStatus("oldStatus")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
+                .businessStatus("newStatus")
+                .update();
+
+        assertThat(events).hasSize(1);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
+    public void testNoBusinessStatusUpdatedEventWhenUpdateBuilderDoesNotSetBusinessStatus() {
+        List<FlowableEvent> events = new ArrayList<>();
+        businessStatusUpdatedEventListener.eventConsumer = events::add;
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessStatus("oldStatus")
+                .start();
+
+        cmmnRuntimeService.createCaseInstanceUpdateBuilder(caseInstance.getId())
+                .name("newName")
+                .update();
+
+        assertThat(events).isEmpty();
+    }
+
     public static class CustomEventListener extends AbstractFlowableEventListener {
 
         private Consumer<FlowableEvent> eventConsumer;

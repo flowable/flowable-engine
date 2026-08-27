@@ -16,7 +16,6 @@ package org.flowable.cmmn.engine.test.impl;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -24,8 +23,6 @@ import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
-import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.test.EngineTestCache;
@@ -141,38 +138,21 @@ public abstract class CmmnTestHelper {
 
     public static void deleteDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, String deploymentId) {
         if (deploymentId != null) {
-            deleteWithoutGeneratingHistoryJobs(cmmnEngineConfiguration,
-                configuration -> configuration.getCmmnRepositoryService().deleteDeployment(deploymentId, true));
+            deleteHistoryJobs(cmmnEngineConfiguration);
+            cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
         }
     }
 
-    public static void deleteWithoutGeneratingHistoryJobs(CmmnEngineConfiguration cmmnEngineConfiguration, Consumer<CmmnEngineConfiguration> consumer) {
-        boolean isAsyncHistoryEnabled = cmmnEngineConfiguration.isAsyncHistoryEnabled();
-        if (isAsyncHistoryEnabled) {
+    /**
+     * Deletes all history jobs when async history is enabled, so that jobs created by a test do not leak into the next one.
+     */
+    public static void deleteHistoryJobs(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
             CmmnManagementService cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
             List<HistoryJob> historyJobs = cmmnManagementService.createHistoryJobQuery().list();
             for (HistoryJob historyJob : historyJobs) {
                 cmmnManagementService.deleteHistoryJob(historyJob.getId());
             }
-        }
-
-        CmmnHistoryManager asyncHistoryManager = null;
-        try {
-            if (isAsyncHistoryEnabled) {
-                cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
-                asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
-            }
-
-            consumer.accept(cmmnEngineConfiguration);
-
-        } finally {
-
-            if (isAsyncHistoryEnabled) {
-                cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
-                cmmnEngineConfiguration.setCmmnHistoryManager(asyncHistoryManager);
-            }
-
         }
     }
 

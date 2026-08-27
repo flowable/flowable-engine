@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="deleteReason">
+
+  <error id="someError" errorCode="someError"/>
+
+  <!--
+    The same BpmnError as the event sub-process case, caught by a boundary event
+    instead. BoundaryEventActivityBehavior records
+    DeleteReason.BOUNDARY_EVENT_INTERRUPTING on the activity it interrupts, so
+    the only difference between this file and the other one is which vehicle
+    catches the error.
+  -->
+  <process id="boundaryDeleteReason" isExecutable="true">
+
+    <startEvent id="start"/>
+    <sequenceFlow id="toSubProcess" sourceRef="start" targetRef="theSubProcess"/>
+
+    <subProcess id="theSubProcess" name="The Sub Process">
+      <startEvent id="innerStart"/>
+      <sequenceFlow id="innerToTask" sourceRef="innerStart" targetRef="innerTask"/>
+      <userTask id="innerTask" name="Inner Task" flowable:assignee="kermit"/>
+      <sequenceFlow id="innerTaskToError" sourceRef="innerTask" targetRef="innerErrorEnd"/>
+      <endEvent id="innerErrorEnd">
+        <errorEventDefinition errorRef="someError"/>
+      </endEvent>
+    </subProcess>
+
+    <sequenceFlow id="subProcessToEnd" sourceRef="theSubProcess" targetRef="endNormal"/>
+    <endEvent id="endNormal"/>
+
+    <boundaryEvent id="errorBoundary" attachedToRef="theSubProcess" cancelActivity="true">
+      <errorEventDefinition/>
+    </boundaryEvent>
+    <sequenceFlow id="boundaryToEnd" sourceRef="errorBoundary" targetRef="endCaught"/>
+    <endEvent id="endCaught"/>
+
+  </process>
+</definitions>

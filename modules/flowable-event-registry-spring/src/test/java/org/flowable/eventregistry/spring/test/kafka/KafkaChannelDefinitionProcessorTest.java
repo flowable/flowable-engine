@@ -1328,6 +1328,7 @@ class KafkaChannelDefinitionProcessorTest {
     void exponentialBackOffRetryWithDelaySuffixing() throws Exception {
         createTopic("exponential-backoff-delay");
         createTopic("exponential-backoff-delay-retry-topic-100");
+        createTopic("exponential-backoff-delay-retry-topic-200");
         createTopic("exponential-backoff-delay-dlt-topic");
 
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
@@ -1457,6 +1458,10 @@ class KafkaChannelDefinitionProcessorTest {
     @Test
     void exponentialRandomBackOffRetry() throws Exception {
         createTopic("random-exponential-backoff");
+        createTopic("random-exponential-backoff-retry-0");
+        createTopic("random-exponential-backoff-retry-1");
+        createTopic("random-exponential-backoff-retry-2");
+        createTopic("random-exponential-backoff-dlt");
 
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {
@@ -1599,6 +1604,8 @@ class KafkaChannelDefinitionProcessorTest {
     @Test
     void fixedBackOffMultiTopicRetry() throws Exception {
         createTopic("fixed-backoff-multi");
+        createTopic("fixed-backoff-multi-retry-topic-0");
+        createTopic("fixed-backoff-multi-retry-topic-1");
         createTopic("fixed-backoff-multi-dlt-topic");
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {
@@ -1745,6 +1752,7 @@ class KafkaChannelDefinitionProcessorTest {
     @Test
     void fixedBackOffRetry() throws Exception {
         createTopic("fixed-backoff");
+        createTopic("fixed-backoff-retry-topic");
         createTopic("fixed-backoff-dlt-topic");
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {

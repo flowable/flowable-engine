@@ -24,6 +24,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import tools.jackson.databind.node.ObjectNode;
@@ -40,7 +41,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getAssignee()).isEqualTo("test");
         taskService.complete(task.getId());
 
@@ -66,7 +67,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getOwner()).isEqualTo("ownerTest");
         taskService.complete(task.getId());
 
@@ -92,7 +93,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateUserTestFound = false;
         for (IdentityLink identityLink : taskIdentityLinks) {
@@ -159,7 +160,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateGroupTestFound = false;
         for (IdentityLink identityLink : taskIdentityLinks) {
@@ -226,7 +227,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
         boolean candidateUserTestFound = false;
         boolean candidateGroupTestFound = false;
@@ -317,7 +318,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isNull();
         assertThat(task.getDescription()).isNull();
         taskService.complete(task.getId());
@@ -346,7 +347,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task 1");
         assertThat(task.getDescription()).isNull();
         taskService.complete(task.getId());
@@ -375,7 +376,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Task 1");
         assertThat(task.getDescription()).isNull();
         taskService.complete(task.getId());
@@ -405,7 +406,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask", variables);
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getName()).isEqualTo("Resolved task name");
         taskService.complete(task.getId());
 
@@ -433,7 +434,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getPriority()).isEqualTo(50);
         assertThat(task.getCategory()).isNull();
         taskService.complete(task.getId());
@@ -462,7 +463,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask");
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
@@ -490,7 +491,7 @@ public class DynamicUserTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicUserTask", varMap);
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
-        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task.getFormKey()).isEqualTo("test");
         taskService.complete(task.getId());
 
