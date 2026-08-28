@@ -329,6 +329,14 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceWaitingForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
+        // Only the state (and lastUpdatedTime) needs to be synced to history; there is no dedicated timestamp for the
+        // 'waiting for repetition' transition of a leftover collection repetition template.
+        recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, cmmnEngineConfiguration.getClock().getCurrentTime(),
+            historicPlanItemInstanceEntity -> { });
+    }
+
+    @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
         recordHistoricPlanItemInstanceEntity(planItemInstanceEntity, planItemInstanceEntity.getLastAvailableTime(),
             h -> h.setLastAvailableTime(planItemInstanceEntity.getLastAvailableTime()));
