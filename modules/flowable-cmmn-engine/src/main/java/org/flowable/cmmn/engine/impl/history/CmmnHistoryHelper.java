@@ -53,7 +53,7 @@ public class CmmnHistoryHelper {
         }
 
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
-        historicVariableInstanceEntityManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(caseInstanceIds, ScopeTypes.CMMN);
+        historicVariableInstanceEntityManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(caseInstanceIds, cmmnEngineConfiguration.getDependentScopeTypes());
 
         TaskHelper.bulkDeleteHistoricTaskInstancesByCaseInstanceIds(caseInstanceIds, cmmnEngineConfiguration);
 
