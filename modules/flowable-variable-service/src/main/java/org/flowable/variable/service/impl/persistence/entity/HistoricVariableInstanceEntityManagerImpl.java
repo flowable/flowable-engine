@@ -107,6 +107,14 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
+    public void deleteHistoricVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        List<HistoricVariableInstanceEntity> historicVariables = dataManager.findHistoricalVariableInstancesByScopeIdAndScopeTypes(scopeId, scopeTypes);
+        for (HistoricVariableInstanceEntity historicVariable : historicVariables) {
+            delete(historicVariable);
+        }
+    }
+
+    @Override
     public long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery) {
         return dataManager.findHistoricVariableInstanceCountByQueryCriteria(historicProcessVariableQuery);
     }
@@ -148,6 +156,11 @@ public class HistoricVariableInstanceEntityManagerImpl
     }
 
     @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        return dataManager.findHistoricalVariableInstancesByScopeIdAndScopeTypes(scopeId, scopeTypes);
+    }
+
+    @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
         return dataManager.findHistoricalVariableInstancesBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
@@ -173,6 +186,11 @@ public class HistoricVariableInstanceEntityManagerImpl
     @Override
     public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType) {
         dataManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(scopeIds, scopeType);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes) {
+        dataManager.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(scopeIds, scopeTypes);
     }
 
     @Override
