@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.itemcontrol;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,7 +81,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C (na - na)", AVAILABLE);
     }
 
@@ -130,7 +131,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C (na - na)", AVAILABLE);
     }
 
@@ -182,7 +183,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task B (E - 0)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task B (F - 1)", ACTIVE);
         assertPlanItemInstanceState(planItemInstances, "Task C (na - na)", AVAILABLE);
@@ -194,7 +195,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C (na - na)", AVAILABLE);
     }
 
@@ -260,7 +261,7 @@ public class PlanItemRepetitionWithCollectionVariableAndConditionDynamicNameTest
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B (na - na)", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C (na - na)", AVAILABLE);
     }
 

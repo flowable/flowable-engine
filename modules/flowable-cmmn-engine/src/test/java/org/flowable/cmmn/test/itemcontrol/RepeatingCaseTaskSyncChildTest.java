@@ -14,7 +14,7 @@ package org.flowable.cmmn.test.itemcontrol;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
-import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,9 +66,10 @@ public class RepeatingCaseTaskSyncChildTest extends FlowableCmmnTestCase {
                     .as("iteration %s: Task C should be active after the single case-task repetition completed", i)
                     .hasSize(1);
 
-            // The repeating case task keeps its available repetition template, waiting for a possible next on-part.
-            assertThat(getPlanItemInstances(caseInstance, "Task B", AVAILABLE))
-                    .as("iteration %s: the case task repetition template should still be available", i)
+            // The repeating case task keeps its repetition template, now moved to the completion-neutral 'waiting for
+            // repetition' state as its single created instance has completed, ready for a possible next on-part.
+            assertThat(getPlanItemInstances(caseInstance, "Task B", WAITING_FOR_REPETITION))
+                    .as("iteration %s: the case task repetition template should be waiting for repetition", i)
                     .hasSize(1);
 
             assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult())
