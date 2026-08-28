@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+    <!-- Variant of processCompleteOne that seeds a THREE-element 'caseList' collection variable, driving three
+         repetitions of the collection-repeating case task in caseCompleteOne. Same process id as
+         processCompleteOne so caseCompleteOne.cmmn resolves to it when this file is deployed instead. -->
+    <process id="processCompleteOne" name="Process complete one">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="initVariables"/>
+        <scriptTask id="initVariables" name="Initialize variables" scriptFormat="groovy">
+            <script>
+                execution.setVariable("caseList", ["a", "b", "c"])
+                execution.setVariable("processOne", true)
+            </script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="initVariables" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+</definitions>

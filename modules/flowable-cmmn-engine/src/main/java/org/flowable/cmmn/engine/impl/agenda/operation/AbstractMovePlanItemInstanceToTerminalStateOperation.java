@@ -35,6 +35,7 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.OnParentEndDependantActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.BaseVariableAggregatorContext;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -136,8 +137,55 @@ public abstract class AbstractMovePlanItemInstanceToTerminalStateOperation exten
             } else if (shouldAggregate) {
                 aggregateVariablesForAllInstances(planItemInstanceEntity, aggregations);
             }
-            
+
+            if (PlanItemInstanceState.COMPLETED.equals(plannedNewState)) {
+                transitionLeftoverCollectionRepetitionTemplateIfLastChild();
+            }
+
             removeSentryRelatedData();
+        }
+    }
+
+    /**
+     * A collection based repetition that is gated by an entry criterion (on-part) creates an instance per collection element but keeps its original plan
+     * item instance behind as a template in the available state, waiting for the on-part to trigger and (re)handle the collection. While the created
+     * instances are still running the template must keep the parent from completing, but once the last created instance has completed the leftover template
+     * should no longer, by itself, keep a non-auto-complete parent stage or case from completing. This moves the template to the completion-neutral
+     * 'waiting for repetition' state (which is still evaluated for entry criteria, so re-triggering keeps working), mirroring how a non-collection repetition
+     * template already sits in that state after it first triggered. The template is only moved once its last created instance completes, so during the
+     * triggering pass - when the freshly created instances are not yet attached to the parent - the still-available template continues to block completion.
+     */
+    protected void transitionLeftoverCollectionRepetitionTemplateIfLastChild() {
+        PlanItem planItem = planItemInstanceEntity.getPlanItem();
+        if (!hasRepetitionOnCollection(planItem) || !hasRepetitionRuleEntryCriteria(planItem)) {
+            return;
+        }
+
+        // The parent container is the enclosing stage, or the case plan model (i.e. the case instance) for a plan item directly in it.
+        PlanItemInstanceContainer container = planItemInstanceEntity.getStagePlanItemInstanceEntity();
+        if (container == null) {
+            container = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+        }
+        if (container == null || container.getChildPlanItemInstances() == null) {
+            return;
+        }
+
+        PlanItemInstanceEntity template = null;
+        for (PlanItemInstanceEntity sibling : container.getChildPlanItemInstances()) {
+            if (sibling == planItemInstanceEntity || !Objects.equals(sibling.getPlanItem().getId(), planItem.getId())) {
+                continue;
+            }
+            if (PlanItemInstanceState.AVAILABLE.equals(sibling.getState())) {
+                // the leftover template waiting in available state for the next on-part triggering
+                template = sibling;
+            } else if (!PlanItemInstanceState.END_STATES.contains(sibling.getState())) {
+                // another created instance of the same repetition is still running, so the template must keep blocking
+                return;
+            }
+        }
+
+        if (template != null) {
+            PlanItemInstanceUtil.moveCollectionRepetitionTemplateToWaitingForRepetition(template, commandContext);
         }
     }
 

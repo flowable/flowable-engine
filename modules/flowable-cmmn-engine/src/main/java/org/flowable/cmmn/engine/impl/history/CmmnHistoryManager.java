@@ -83,6 +83,8 @@ public interface CmmnHistoryManager {
 
     void recordPlanItemInstanceUpdated(PlanItemInstanceEntity planItemInstanceEntity);
 
+    void recordPlanItemInstanceWaitingForRepetition(PlanItemInstanceEntity planItemInstanceEntity);
+
     void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity);
 
     void recordPlanItemInstanceUnavailable(PlanItemInstanceEntity planItemInstanceEntity);
