@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <!--
+         Root-level counterpart of caseCompleteOneWithCompletionNeutralUserEventListener: the repeating 'Trigger' user
+         event listener is marked completion-neutral and sits directly in the non-auto-complete case plan model (no
+         stage). Unlike the plain repeating variant - where the available listener keeps the case open for further
+         triggers - a completion-neutral available listener does NOT block completion, so once a single triggered
+         'Repeating task' and its case task repetition finish, the case plan model completes even though the listener
+         is still available.
+    -->
+    <case id="caseCompleteRoot" name="Case complete root">
+        <casePlanModel id="cpmRoot" name="Case plan model" flowable:autoComplete="false">
+
+            <planItem id="planItemHumanTask" name="Human task" definitionRef="humanTask"/>
+
+            <planItem id="planItemProcessOne" name="Process complete one" definitionRef="processTaskOne">
+                <entryCriterion id="ecProcessOne" flowable:sentryRef="sentryProcessOne"/>
+            </planItem>
+
+            <planItem id="planItemTrigger" name="Trigger" definitionRef="triggerUel">
+                <itemControl>
+                    <extensionElements>
+                        <flowable:completionNeutralRule/>
+                    </extensionElements>
+                    <repetitionRule></repetitionRule>
+                </itemControl>
+            </planItem>
+
+            <planItem id="planItemRepeatingTask" name="Repeating task" definitionRef="repeatingTask">
+                <itemControl>
+                    <repetitionRule></repetitionRule>
+                </itemControl>
+                <entryCriterion id="ecRepeatingTask" flowable:sentryRef="sentryRepeatingTask"/>
+            </planItem>
+
+            <planItem id="planItemCaseTwo" name="Case complete two" definitionRef="caseTaskTwo">
+                <itemControl>
+                    <repetitionRule flowable:collectionVariable="caseList"
+                                    flowable:elementVariable="caseItem"></repetitionRule>
+                </itemControl>
+                <entryCriterion id="ecCaseTwo" flowable:sentryRef="sentryCaseTwo"/>
+            </planItem>
+
+            <sentry id="sentryProcessOne">
+                <planItemOnPart id="opProcessOne" sourceRef="planItemHumanTask">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <sentry id="sentryRepeatingTask">
+                <planItemOnPart id="opRepeatingTask" sourceRef="planItemTrigger">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <sentry id="sentryCaseTwo">
+                <planItemOnPart id="opCaseTwo" sourceRef="planItemRepeatingTask">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="humanTask" name="Human task"/>
+
+            <processTask id="processTaskOne" name="Process complete one">
+                <extensionElements>
+                    <flowable:out source="caseList" target="caseList"/>
+                    <flowable:out source="processOne" target="processOne"/>
+                </extensionElements>
+                <processRefExpression><![CDATA[processCompleteOne]]></processRefExpression>
+            </processTask>
+
+            <userEventListener id="triggerUel" name="Trigger"/>
+
+            <humanTask id="repeatingTask" name="Repeating task"/>
+
+            <caseTask id="caseTaskTwo" name="Case complete two" caseRef="caseCompleteTwo">
+                <extensionElements>
+                    <flowable:in source="caseItem" target="caseItem"/>
+                </extensionElements>
+            </caseTask>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

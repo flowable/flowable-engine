@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <!--
+         Root-level counterpart of caseCompleteOne: the blocking process task and the collection-repeating case task
+         sit DIRECTLY in the (non-auto-complete) case plan model instead of inside a stage. This exercises the
+         container == null -> case instance fallback of the leftover-template cleanup, since plan items directly in the
+         case plan model have no enclosing stage plan item instance. The 'Human task' is the single initial wait state;
+         once it completes, the process task produces 'caseList' and gates the collection-repeating case task. Once the
+         repetition's created instances have completed (or the collection was empty), the leftover template must no
+         longer keep the non-auto-complete case plan model active, so the case instance completes.
+    -->
+    <case id="caseCompleteRoot" name="Case complete root">
+        <casePlanModel id="cpmRoot" name="Case plan model" flowable:autoComplete="false">
+
+            <planItem id="planItemHumanTask" name="Human task" definitionRef="humanTask"/>
+
+            <planItem id="planItemProcessOne" name="Process complete one" definitionRef="processTaskOne">
+                <entryCriterion id="ecProcessOne" flowable:sentryRef="sentryProcessOne"/>
+            </planItem>
+
+            <planItem id="planItemCaseTwo" name="Case complete two" definitionRef="caseTaskTwo">
+                <itemControl>
+                    <repetitionRule flowable:collectionVariable="caseList"
+                                    flowable:elementVariable="caseItem"/>
+                </itemControl>
+                <entryCriterion id="ecCaseTwo" flowable:sentryRef="sentryCaseTwo"/>
+            </planItem>
+
+            <sentry id="sentryProcessOne">
+                <planItemOnPart id="opProcessOne" sourceRef="planItemHumanTask">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <sentry id="sentryCaseTwo">
+                <planItemOnPart id="opCaseTwo" sourceRef="planItemProcessOne">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="humanTask" name="Human task"/>
+
+            <processTask id="processTaskOne" name="Process complete one">
+                <extensionElements>
+                    <flowable:out source="caseList" target="caseList"/>
+                    <flowable:out source="processOne" target="processOne"/>
+                </extensionElements>
+                <processRefExpression><![CDATA[processCompleteOne]]></processRefExpression>
+            </processTask>
+
+            <caseTask id="caseTaskTwo" name="Case complete two" caseRef="caseCompleteTwo">
+                <extensionElements>
+                    <flowable:in source="caseItem" target="caseItem"/>
+                </extensionElements>
+            </caseTask>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

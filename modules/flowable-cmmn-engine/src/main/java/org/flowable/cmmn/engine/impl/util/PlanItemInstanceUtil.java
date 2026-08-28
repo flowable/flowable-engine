@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.PlanItemEvaluationResult;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -105,6 +107,7 @@ public class PlanItemInstanceUtil {
                     
                 } else {
 
+                    int createdInstanceCount = 0;
                     if (collection != null) {
                         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
                         int index = 0;
@@ -114,6 +117,7 @@ public class PlanItemInstanceUtil {
                                 repetitionRule, planItemInstanceEntity, null, item, index++, commandContext);
 
                             evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
+                            createdInstanceCount++;
                         }
                     }
 
@@ -131,6 +135,12 @@ public class PlanItemInstanceUtil {
                     if (!ExpressionUtil.hasOnParts(planItem)) {
                         // if there is no on-part, we don't need this plan item instance anymore, so terminate it
                         CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
+                    } else if (collection != null && createdInstanceCount == 0) {
+                        // the collection was available but empty, so no instance was created and there will be no child completion to move this leftover
+                        // template out of the available state. Move it to the completion-neutral waiting for repetition state now, so it does not keep a
+                        // non-auto-complete parent from completing, while remaining re-fireable if the on-part triggers again with a non-empty collection
+                        // (mirrors the last-child cleanup in AbstractMovePlanItemInstanceToTerminalStateOperation).
+                        moveCollectionRepetitionTemplateToWaitingForRepetition(planItemInstanceEntity, commandContext);
                     }
                 }
                 
@@ -148,7 +158,25 @@ public class PlanItemInstanceUtil {
 
         return activatePlanItemInstance;
     }
-    
+
+    /**
+     * Moves a leftover collection repetition template - a plan item instance kept behind in the available state after its collection was handled, waiting for
+     * its on-part to (re)trigger - to the completion-neutral {@link PlanItemInstanceState#WAITING_FOR_REPETITION} state. That state is still evaluated for entry
+     * criteria, so re-triggering keeps working, but it no longer, by itself, keeps a non-auto-complete parent from completing. The history state change is
+     * recorded explicitly (recordPlanItemInstanceUpdated does not sync the state) and lifecycle listeners are notified of the transition.
+     *
+     * @param template the available collection repetition template to move to waiting for repetition
+     * @param commandContext the current command context
+     */
+    public static void moveCollectionRepetitionTemplateToWaitingForRepetition(PlanItemInstanceEntity template, CommandContext commandContext) {
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+        String oldState = template.getState();
+        template.setState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+        cmmnEngineConfiguration.getCmmnHistoryManager().recordPlanItemInstanceWaitingForRepetition(template);
+        cmmnEngineConfiguration.getListenerNotificationHelper()
+                .executeLifecycleListeners(commandContext, template, oldState, PlanItemInstanceState.WAITING_FOR_REPETITION);
+    }
+
     public static PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity, CommandContext commandContext) {
         PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
 

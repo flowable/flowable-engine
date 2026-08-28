@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.itemcontrol;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.AVAILABLE;
+import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
 import java.util.Arrays;
 import java.util.List;
@@ -80,7 +81,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
         // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
@@ -134,7 +135,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(5);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", ACTIVE, ACTIVE, WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
         assertPlanItemLocalVariables(caseInstance.getId(), "Task B", taskOutputList, Arrays.asList(0, 1));
@@ -148,7 +149,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
         // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
@@ -216,7 +217,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(3);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
-        assertPlanItemInstanceState(planItemInstances, "Task B", AVAILABLE);
+        assertPlanItemInstanceState(planItemInstances, "Task B", WAITING_FOR_REPETITION);
         assertPlanItemInstanceState(planItemInstances, "Task C", AVAILABLE);
 
         // make sure we have synced the runtime and historic plan items, even with the collection of created plan items

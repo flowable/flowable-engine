@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+    <!-- Synchronous child process of the process task in caseCompleteOne. It initialises the
+         'caseList' collection variable (a single element), which is out-mapped to the case and drives
+         the single repetition of the case task, then completes without any wait state. -->
+    <process id="processCompleteOne" name="Process complete one">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="initVariables"/>
+        <scriptTask id="initVariables" name="Initialize variables" scriptFormat="groovy">
+            <script>
+                execution.setVariable("caseList", ["zero"])
+                execution.setVariable("processOne", true)
+            </script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="initVariables" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+</definitions>

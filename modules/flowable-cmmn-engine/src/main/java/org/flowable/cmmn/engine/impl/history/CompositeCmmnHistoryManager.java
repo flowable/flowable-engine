@@ -236,6 +236,13 @@ public class CompositeCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
+    public void recordPlanItemInstanceWaitingForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
+        for (CmmnHistoryManager historyManager : historyManagers) {
+            historyManager.recordPlanItemInstanceWaitingForRepetition(planItemInstanceEntity);
+        }
+    }
+
+    @Override
     public void recordPlanItemInstanceAvailable(PlanItemInstanceEntity planItemInstanceEntity) {
         for (CmmnHistoryManager historyManager : historyManagers) {
             historyManager.recordPlanItemInstanceAvailable(planItemInstanceEntity);
