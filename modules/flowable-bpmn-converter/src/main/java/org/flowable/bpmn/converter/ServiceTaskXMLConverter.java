@@ -76,6 +76,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_CASE_TASK_CASE_INSTANCE_NAME),
             new ExtensionAttribute(ATTRIBUTE_BUSINESS_KEY),
             new ExtensionAttribute(ATTRIBUTE_INHERIT_BUSINESS_KEY),
+            new ExtensionAttribute(ATTRIBUTE_INHERIT_VARIABLES),
             new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT),
             new ExtensionAttribute(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT),
             new ExtensionAttribute(ATTRIBUTE_ID_VARIABLE_NAME));
@@ -235,6 +236,9 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
         }
         if (caseServiceTask.isInheritBusinessKey()) {
             writeQualifiedAttribute(ATTRIBUTE_INHERIT_BUSINESS_KEY, "true", xtw);
+        }
+        if (caseServiceTask.isInheritVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_INHERIT_VARIABLES, "true", xtw);
         }
         if (caseServiceTask.isSameDeployment()) {
             writeQualifiedAttribute(ATTRIBUTE_SAME_DEPLOYMENT, "true", xtw);
@@ -432,6 +436,7 @@ public class ServiceTaskXMLConverter extends BaseBpmnXMLConverter {
 
         caseServiceTask.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_BUSINESS_KEY, xtr));
         caseServiceTask.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_INHERIT_BUSINESS_KEY, xtr)));
+        caseServiceTask.setInheritVariables(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_INHERIT_VARIABLES, xtr)));
         caseServiceTask.setSameDeployment(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_SAME_DEPLOYMENT, xtr)));
         caseServiceTask.setFallbackToDefaultTenant(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_FALLBACK_TO_DEFAULT_TENANT, xtr)));
         caseServiceTask.setCaseInstanceIdVariableName(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_ID_VARIABLE_NAME, xtr));

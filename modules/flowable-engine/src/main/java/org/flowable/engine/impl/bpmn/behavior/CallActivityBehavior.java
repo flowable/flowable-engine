@@ -36,6 +36,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -160,11 +161,13 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
                 // The executionVariables contain all variables, including the transient variables.
                 // Hence why that map is iterated and the transient variables are split off
                 String variableName = entry.getKey();
+                // JSON variables are deep copied so the parent and child don't share the same instance
+                Object variableValue = JsonUtil.deepCopyIfJson(entry.getValue());
                 if (transientVariables.containsKey(variableName)) {
-                    instanceBeforeContext.getTransientVariables().put(variableName, entry.getValue());
+                    instanceBeforeContext.getTransientVariables().put(variableName, variableValue);
 
                 } else {
-                    instanceBeforeContext.getVariables().put(variableName, entry.getValue());
+                    instanceBeforeContext.getVariables().put(variableName, variableValue);
 
                 }
             }

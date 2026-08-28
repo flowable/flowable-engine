@@ -1017,6 +1017,72 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Test
     @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/inheritVariablesChildProcess.bpmn20.xml")
+    public void testProcessTaskInheritVariables() {
+        ObjectNode jsonVariable = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+        jsonVariable.put("field", "value");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .variable("caseVariableB", "world")
+                .variable("caseVariableC", 42)
+                .variable("caseVariableJson", jsonVariable)
+                .transientVariable("caseTransientVariable", "temp")
+                .transientVariable("collisionVar", "fromTransient")
+                .start();
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+        ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        assertThat(processInstance).isNotNull();
+
+        // All case variables are inherited into the child process instance (like a BPMN call activity)
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isEqualTo("hello");
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableC")).isEqualTo(42);
+
+        // JSON variables are inherited (deep copied, consistent with in parameter handling)
+        JsonNode childJson = (JsonNode) processEngineRuntimeService.getVariable(processInstanceId, "caseVariableJson");
+        assertThat(childJson.path("field").asString()).isEqualTo("value");
+
+        // An explicit in parameter takes precedence over the inherited variable
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableB")).isEqualTo("overridden");
+
+        // Transient variables are inherited as transient: available while the child starts (the child task
+        // name resolves the ${caseTransientVariable} expression) but not persisted on the child.
+        assertThat(processEngineTaskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getName()).isEqualTo("temp");
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseTransientVariable")).isNull();
+
+        // An explicit in parameter targeting the same name as an inherited transient variable wins on the
+        // persisted child: the inherited value goes to the (non-persisted) transient channel, so once the
+        // transient state is gone only the explicit in parameter's persistent value remains.
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "collisionVar")).isEqualTo("fromInParam");
+    }
+
+    @Test
+    @CmmnDeployment
+    @org.flowable.engine.test.Deployment(resources = "org/flowable/cmmn/test/inheritVariablesDisabledChildProcess.bpmn20.xml")
+    public void testProcessTaskInheritVariablesDisabled() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .start();
+
+        PlanItemInstance processTaskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionType(PlanItemDefinitionType.PROCESS_TASK)
+                .singleResult();
+        String processInstanceId = processTaskPlanItemInstance.getReferenceId();
+
+        // Without inheritVariables, parent variables are not copied into the child process
+        assertThat(processEngineRuntimeService.getVariable(processInstanceId, "caseVariableA")).isNull();
+    }
+
+    @Test
+    @CmmnDeployment
     public void testProcessTaskWithSkipExpressions() {
         processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/processWithSkipExpressions.bpmn20.xml").deploy();
 
