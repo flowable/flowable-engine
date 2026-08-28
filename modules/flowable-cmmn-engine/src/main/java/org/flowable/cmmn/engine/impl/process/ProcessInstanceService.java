@@ -35,14 +35,14 @@ public interface ProcessInstanceService {
      * Starts a process instance without a reference to a plan item instance (i.e. non-blocking behavior).
      */
     String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Map<String, Object> inParametersMap, String businessKey,
+            String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**
      * Starts a process instance with a reference to a plan item instance (i.e. blocking behavior).
      */
     String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Map<String, Object> inParametersMap, String businessKey,
+            String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome);
 
     /**

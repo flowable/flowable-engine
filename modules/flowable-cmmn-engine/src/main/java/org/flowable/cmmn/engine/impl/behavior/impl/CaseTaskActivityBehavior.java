@@ -96,7 +96,8 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         Map<String, Object> finalVariableMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, cmmnEngineConfiguration.getExpressionManager());
+        Map<String, Object> transientVariablesMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
 
         // Needed for the form field handler later
         Map<String, Object> variablesFromFormSubmission = null;
@@ -123,6 +124,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
+        if (!transientVariablesMap.isEmpty()) {
+            caseInstanceBuilder.transientVariables(transientVariablesMap);
+        }
 
         if (sameDeployment) {
             caseInstanceBuilder.caseDefinitionParentDeploymentId(

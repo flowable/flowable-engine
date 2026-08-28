@@ -6,11 +6,7 @@
     <case id="myCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Case" definitionRef="theCase"/>
-            <caseTask id="theCase" caseRef="inheritVariablesChildCase" isBlocking="true" flowable:inheritVariables="true">
-                <extensionElements>
-                    <flowable:in sourceExpression="${'overridden'}" target="caseVariableB"/>
-                </extensionElements>
-            </caseTask>
+            <caseTask id="theCase" caseRef="oneTaskCase" isBlocking="true"/>
         </casePlanModel>
     </case>
 </definitions>

@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -1597,6 +1598,92 @@ public class CaseTaskTest extends AbstractProcessEngineIntegrationTest {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
                     .parentProcessInstanceId(processInstance.getId())
                     .singleResult()).isNotNull();
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testCaseTaskInheritVariables() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskInheritVariablesProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            ObjectNode jsonVariable = processEngineConfiguration.getObjectMapper().createObjectNode();
+            jsonVariable.put("field", "value");
+
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("parentVar1", "hello");
+            variables.put("parentVar2", "world");
+            variables.put("parentVarJson", jsonVariable);
+            ProcessInstance processInstance = processEngineRuntimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("inheritVariablesProcess")
+                    .variables(variables)
+                    .transientVariables(Collections.singletonMap("parentTransientVar", "temp"))
+                    .start();
+
+            Execution caseTaskExecution = processEngineRuntimeService.createExecutionQuery()
+                    .onlyChildExecutions()
+                    .processInstanceId(processInstance.getId())
+                    .activityId("caseServiceTask")
+                    .singleResult();
+            assertThat(caseTaskExecution).isNotNull();
+
+            CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceCallbackId(caseTaskExecution.getId())
+                    .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+                    .singleResult();
+            assertThat(childCaseInstance).isNotNull();
+
+            // All parent process variables are inherited into the child case instance (like a call activity)
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "parentVar1")).isEqualTo("hello");
+
+            // JSON variables are inherited (deep copied, consistent with in parameter handling)
+            JsonNode childJson = (JsonNode) cmmnRuntimeService.getVariable(childCaseInstance.getId(), "parentVarJson");
+            assertThat(childJson.path("field").asString()).isEqualTo("value");
+
+            // An explicit in parameter takes precedence over the inherited variable
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "parentVar2")).isEqualTo("overridden");
+
+            // Transient variables are inherited as transient: available while the child starts (the child task
+            // name resolves the ${parentTransientVar} expression) but not persisted on the child.
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(childCaseInstance.getId()).singleResult().getName()).isEqualTo("temp");
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "parentTransientVar")).isNull();
+
+        } finally {
+            processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/caseTaskInheritVariablesDisabledChildCase.cmmn")
+    public void testCaseTaskInheritVariablesDisabled() {
+        Deployment deployment = processEngineRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/caseTaskInheritVariablesDisabledProcess.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessInstance processInstance = processEngineRuntimeService.startProcessInstanceByKey(
+                    "inheritVariablesDisabledProcess", Collections.<String, Object>singletonMap("parentVar1", "hello"));
+
+            Execution caseTaskExecution = processEngineRuntimeService.createExecutionQuery()
+                    .onlyChildExecutions()
+                    .processInstanceId(processInstance.getId())
+                    .activityId("caseServiceTask")
+                    .singleResult();
+            assertThat(caseTaskExecution).isNotNull();
+
+            CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseInstanceCallbackId(caseTaskExecution.getId())
+                    .caseInstanceCallbackType(CallbackTypes.EXECUTION_CHILD_CASE)
+                    .singleResult();
+            assertThat(childCaseInstance).isNotNull();
+
+            // Without inheritVariables, parent variables are not copied into the child case
+            assertThat(cmmnRuntimeService.getVariable(childCaseInstance.getId(), "parentVar1")).isNull();
 
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);

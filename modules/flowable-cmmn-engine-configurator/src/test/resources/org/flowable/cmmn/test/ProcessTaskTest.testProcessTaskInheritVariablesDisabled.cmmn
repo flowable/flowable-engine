@@ -7,12 +7,8 @@
     <case id="myCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
-            <processTask id="theProcess" isBlocking="true" flowable:inheritVariables="true">
-                <extensionElements>
-                    <flowable:in sourceExpression="${'overridden'}" target="caseVariableB" />
-                    <flowable:in sourceExpression="${'fromInParam'}" target="collisionVar" />
-                </extensionElements>
-                <processRefExpression><![CDATA[inheritVariablesChildProcess]]></processRefExpression>
+            <processTask id="theProcess" isBlocking="true">
+                <processRefExpression><![CDATA[inheritVariablesDisabledChildProcess]]></processRefExpression>
             </processTask>
         </casePlanModel>
     </case>

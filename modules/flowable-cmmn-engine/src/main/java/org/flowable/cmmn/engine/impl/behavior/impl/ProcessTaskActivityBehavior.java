@@ -88,7 +88,8 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
 
         Map<String, Object> inParametersMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, cmmnEngineConfiguration.getExpressionManager());
+        Map<String, Object> transientVariablesMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
 
         FormInfo variableFormInfo = null;
         Map<String, Object> variableFormVariables = null;
@@ -136,7 +137,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
             try {
                 processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                        planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+                        planItemInstanceEntity.getTenantId(), inParametersMap, transientVariablesMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
             } catch (BusinessError businessError) {
                 // An uncaught BusinessError from the child BPMN process propagates as a fault on this plan item.
                 // Clean up the orphaned child process instance (consistent with BPMN ErrorPropagation.executeCatch
@@ -150,7 +151,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         } else {
             processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+                    planItemInstanceEntity.getTenantId(), inParametersMap, transientVariablesMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         if (!blocking) {
