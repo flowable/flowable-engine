@@ -22,8 +22,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import javax.imageio.ImageIO;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
@@ -98,6 +100,20 @@ public class ProcessDiagramLayoutFactory {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         // Get one that understands namespaces
         factory.setNamespaceAware(true);
+        
+        try {
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        } catch (ParserConfigurationException e) {
+            throw new FlowableException("Error configuring XML parser for safe BPMN parsing", e);
+        }
 
         DocumentBuilder builder;
         Document bpmnModel;
