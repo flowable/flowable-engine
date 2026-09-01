@@ -19,6 +19,7 @@ import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ItemDefinition;
+import static org.flowable.bpmn.model.BpmnModel.*;
 
 /**
  * @author Tijs Rademakers
@@ -27,7 +28,7 @@ public class ItemDefinitionParser implements BpmnXMLConstants {
 
     public void parse(XMLStreamReader xtr, BpmnModel model) throws Exception {
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_ID))) {
-            String itemDefinitionId = model.getTargetNamespace() + ":" + xtr.getAttributeValue(null, ATTRIBUTE_ID);
+            String itemDefinitionId = normalizeIdValue(xtr.getAttributeValue(null, ATTRIBUTE_ID), model);
             String structureRef = xtr.getAttributeValue(null, ATTRIBUTE_STRUCTURE_REF);
             if (StringUtils.isNotEmpty(structureRef)) {
                 ItemDefinition item = new ItemDefinition();
