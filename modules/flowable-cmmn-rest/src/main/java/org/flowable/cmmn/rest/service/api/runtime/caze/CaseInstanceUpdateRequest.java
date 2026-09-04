@@ -22,6 +22,7 @@ public class CaseInstanceUpdateRequest extends RestActionRequest {
 
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
 
     public String getName() {
         return name;
@@ -34,5 +35,11 @@ public class CaseInstanceUpdateRequest extends RestActionRequest {
     }
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 }

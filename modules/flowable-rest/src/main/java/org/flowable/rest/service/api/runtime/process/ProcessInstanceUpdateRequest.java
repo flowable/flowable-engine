@@ -27,6 +27,7 @@ public class ProcessInstanceUpdateRequest extends RestActionRequest {
 
     protected String name;
     protected String businessKey;
+    protected String businessStatus;
 
     @Override
     @ApiModelProperty(value = "Action to perform: Either activate or suspend", example = "activate", required = true)
@@ -45,5 +46,11 @@ public class ProcessInstanceUpdateRequest extends RestActionRequest {
     }
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+    public String getBusinessStatus() {
+        return businessStatus;
+    }
+    public void setBusinessStatus(String businessStatus) {
+        this.businessStatus = businessStatus;
     }
 }

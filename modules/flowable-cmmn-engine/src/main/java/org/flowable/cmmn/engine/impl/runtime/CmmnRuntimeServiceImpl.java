@@ -22,6 +22,7 @@ import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
@@ -94,6 +95,7 @@ import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.UpdateCaseInstanceCmd;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
@@ -118,6 +120,15 @@ public class CmmnRuntimeServiceImpl extends CommonEngineServiceImpl<CmmnEngineCo
     @Override
     public CaseInstanceBuilder createCaseInstanceBuilder() {
         return new CaseInstanceBuilderImpl(this);
+    }
+
+    @Override
+    public CaseInstanceUpdateBuilder createCaseInstanceUpdateBuilder(String caseInstanceId) {
+        return new CaseInstanceUpdateBuilderImpl(this, caseInstanceId);
+    }
+
+    public void updateCaseInstance(CaseInstanceUpdateBuilderImpl builder) {
+        commandExecutor.execute(new UpdateCaseInstanceCmd(builder));
     }
 
     @Override

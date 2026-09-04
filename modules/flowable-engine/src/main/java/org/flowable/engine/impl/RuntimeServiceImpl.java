@@ -85,8 +85,10 @@ import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
+import org.flowable.engine.impl.cmd.UpdateProcessInstanceCmd;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceUpdateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionModificationBuilderImpl;
@@ -99,6 +101,7 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
 import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
@@ -826,6 +829,15 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public ProcessInstanceBuilder createProcessInstanceBuilder() {
         return new ProcessInstanceBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessInstanceUpdateBuilder createProcessInstanceUpdateBuilder(String processInstanceId) {
+        return new ProcessInstanceUpdateBuilderImpl(this, processInstanceId);
+    }
+
+    public void updateProcessInstance(ProcessInstanceUpdateBuilderImpl builder) {
+        commandExecutor.execute(new UpdateProcessInstanceCmd(builder));
     }
 
     @Override

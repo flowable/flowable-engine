@@ -424,6 +424,51 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testUpdateCaseInstanceProperties() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .start();
+
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"updated name\", \"businessKey\": \"updated key\", \"businessStatus\": \"updated status\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("name").asText()).isEqualTo("updated name");
+        assertThat(responseNode.get("businessKey").asText()).isEqualTo("updated key");
+        assertThat(responseNode.get("businessStatus").asText()).isEqualTo("updated status");
+
+        CaseInstance updatedInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(updatedInstance.getName()).isEqualTo("updated name");
+        assertThat(updatedInstance.getBusinessKey()).isEqualTo("updated key");
+        assertThat(updatedInstance.getBusinessStatus()).isEqualTo("updated status");
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/oneHumanTaskCaseWithStartForm.cmmn" })
+    public void testClearCaseInstanceProperties() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .name("original name")
+                .businessKey("original key")
+                .businessStatus("original status")
+                .start();
+
+        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"\", \"businessKey\": \"\", \"businessStatus\": \"\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        CaseInstance updatedInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(updatedInstance.getName()).isEmpty();
+        assertThat(updatedInstance.getBusinessKey()).isEmpty();
+        assertThat(updatedInstance.getBusinessStatus()).isEmpty();
+    }
+
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/changeStateCase.cmmn" })
     public void testChangeStateCaseInstance() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()

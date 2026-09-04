@@ -280,4 +280,47 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey()).isEqualTo("key two");
 
     }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstanceProperties() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"updated name\", \"businessKey\": \"updated key\", \"businessStatus\": \"updated status\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("name").asText()).isEqualTo("updated name");
+        assertThat(responseNode.get("businessKey").asText()).isEqualTo("updated key");
+        assertThat(responseNode.get("businessStatus").asText()).isEqualTo("updated status");
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getName()).isEqualTo("updated name");
+        assertThat(updatedInstance.getBusinessKey()).isEqualTo("updated key");
+        assertThat(updatedInstance.getBusinessStatus()).isEqualTo("updated status");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testClearProcessInstanceProperties() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processOne")
+                .name("original name")
+                .businessKey("original key")
+                .businessStatus("original status")
+                .start();
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"\", \"businessKey\": \"\", \"businessStatus\": \"\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getName()).isEmpty();
+        assertThat(updatedInstance.getBusinessKey()).isEmpty();
+        assertThat(updatedInstance.getBusinessStatus()).isEmpty();
+    }
 }

@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionDeletionBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceStartEventSubscriptionModificationBuilder;
@@ -49,6 +50,14 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 public interface CmmnRuntimeService {
 
     CaseInstanceBuilder createCaseInstanceBuilder();
+
+    /**
+     * Create a {@link CaseInstanceUpdateBuilder}, that allows to update various properties of a case instance.
+     *
+     * @param caseInstanceId
+     *     id of the case instance to update, cannot be null
+     */
+    CaseInstanceUpdateBuilder createCaseInstanceUpdateBuilder(String caseInstanceId);
 
     PlanItemInstanceTransitionBuilder createPlanItemInstanceTransitionBuilder(String planItemInstanceId);
     
