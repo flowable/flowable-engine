@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="validationParentParallel" name="Validation parent parallel v2">
+
+        <startEvent id="startEvent" />
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="callAvis" />
+
+        <callActivity id="callAvis" name="Call activity" calledElement="avisChild">
+            <extensionElements>
+                <flowable:in source="decideur" target="role" />
+                <flowable:in source="initiator" target="initiator" />
+                <flowable:out source="role" target="role" />
+                <flowable:out source="decision" target="decision" />
+            </extensionElements>
+            <multiInstanceLoopCharacteristics isSequential="false"
+                                              flowable:collection="${decideurs}"
+                                              flowable:elementVariable="decideur">
+                <extensionElements>
+                    <flowable:variableAggregation target="listAvis">
+                        <variable source="role" target="role" />
+                        <variable source="decision" target="decision" />
+                    </flowable:variableAggregation>
+                    <flowable:variableAggregation target="overviewAvis" createOverviewVariable="true">
+                        <variable source="role" target="role" />
+                        <variable source="decision" target="decision" />
+                    </flowable:variableAggregation>
+                </extensionElements>
+            </multiInstanceLoopCharacteristics>
+        </callActivity>
+
+        <sequenceFlow id="flow2" sourceRef="callAvis" targetRef="afterTask" />
+
+        <userTask id="afterTask" name="After task" />
+        <sequenceFlow id="flow3" sourceRef="afterTask" targetRef="endEvent" />
+
+        <endEvent id="endEvent" />
+
+    </process>
+
+</definitions>
