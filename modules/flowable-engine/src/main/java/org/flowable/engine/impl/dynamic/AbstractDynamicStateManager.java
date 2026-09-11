@@ -92,6 +92,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.impl.util.TimerUtil;
+import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.interceptor.MigrationContext;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -108,6 +109,8 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -908,6 +911,7 @@ public abstract class AbstractDynamicStateManager {
                         newChildExecution.setMultiInstanceRoot(true);
                         newChildExecution.setActive(false);
                         processInstanceChangeState.addCreatedMultiInstanceRootExecution(newFlowElement.getId(), newChildExecution);
+                        updateAggregatedVariableExecutionReferences(movingExecutions.get(0), newChildExecution);
                     }
                     
                     if (newFlowElement instanceof UserTask
@@ -1469,6 +1473,28 @@ public abstract class AbstractDynamicStateManager {
         return false;
     }
     
+    protected void updateAggregatedVariableExecutionReferences(ExecutionEntity oldMultiInstanceRootExecution, ExecutionEntity newMultiInstanceRootExecution) {
+        // The overview aggregation variable (of type BpmnAggregatedVariableType) stores the id of the multi
+        // instance root execution. Since the multi instance root execution is recreated (with a new id) during
+        // the migration, those references have to be updated to the new execution id. Otherwise reading the
+        // overview variable would try to resolve the old (now removed) execution and fail with a NullPointerException.
+        ExecutionEntity processInstanceExecution = newMultiInstanceRootExecution.getProcessInstance();
+        if (processInstanceExecution == null) {
+            return;
+        }
+
+        String oldExecutionId = oldMultiInstanceRootExecution.getId();
+        String newExecutionId = newMultiInstanceRootExecution.getId();
+        for (VariableInstance variableInstance : processInstanceExecution.getVariableInstancesLocal().values()) {
+            if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity
+                    && BpmnAggregatedVariableType.TYPE_NAME.equals(variableInstanceEntity.getTypeName())
+                    && oldExecutionId.equals(variableInstanceEntity.getTextValue())) {
+                variableInstanceEntity.setTextValue(newExecutionId);
+                variableInstanceEntity.forceUpdate();
+            }
+        }
+    }
+
     protected boolean isTopLevelMultiInstanceRoot(ExecutionEntity execution) {
         boolean topLevelMultiInstanceRoot = false;
         if (execution.isMultiInstanceRoot()) {
