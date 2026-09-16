@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="disabledChildCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItem1" name="Child Task" definitionRef="theTask" />
+            <humanTask id="theTask" name="Child Task" />
+        </casePlanModel>
+    </case>
+
+</definitions>

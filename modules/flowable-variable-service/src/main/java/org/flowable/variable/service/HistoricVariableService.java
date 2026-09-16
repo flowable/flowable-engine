@@ -48,10 +48,14 @@ public interface HistoricVariableService {
     void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
     
     void deleteHistoricVariableInstancesByTaskId(String taskId);
+
+    void deleteHistoricVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
     
     void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds);
     
     void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
+
+    void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes);
     
     void deleteHistoricVariableInstancesForNonExistingProcessInstances();
     

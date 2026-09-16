@@ -25,6 +25,7 @@ public class CaseServiceTask extends ServiceTask implements HasOutParameters, Ha
     protected boolean sameDeployment;
     protected String businessKey;
     protected boolean inheritBusinessKey;
+    protected boolean inheritVariables;
     protected boolean fallbackToDefaultTenant;
     protected String caseInstanceIdVariableName;
     
@@ -69,6 +70,14 @@ public class CaseServiceTask extends ServiceTask implements HasOutParameters, Ha
 
     public void setInheritBusinessKey(boolean inheritBusinessKey) {
         this.inheritBusinessKey = inheritBusinessKey;
+    }
+
+    public boolean isInheritVariables() {
+        return inheritVariables;
+    }
+
+    public void setInheritVariables(boolean inheritVariables) {
+        this.inheritVariables = inheritVariables;
     }
 
     public boolean isFallbackToDefaultTenant() {
@@ -131,6 +140,7 @@ public class CaseServiceTask extends ServiceTask implements HasOutParameters, Ha
         setCaseInstanceName(otherElement.getCaseInstanceName());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setInheritVariables(otherElement.isInheritVariables());
         setSameDeployment(otherElement.isSameDeployment());
         setFallbackToDefaultTenant(otherElement.isFallbackToDefaultTenant());
         setCaseInstanceIdVariableName(otherElement.getCaseInstanceIdVariableName());
