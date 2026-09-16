@@ -44,16 +44,13 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertThat(task).isNotNull();
-            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
-            assertThat(task.getName()).isEqualTo("my task");
+            assertThatCaseTaskWasCreated(task);
 
-            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
-            assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(caseInstance);
 
             processEngineTaskService.complete(task.getId());
 
-            eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
+            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription).isNull();
 
             Task task2 = processEngineTaskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
@@ -94,22 +91,18 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertThat(task).isNotNull();
-            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
-            assertThat(task.getName()).isEqualTo("my task");
+            assertThatCaseTaskWasCreated(task);
 
-            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
-            assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(caseInstance);
 
-            EventSubscription anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
-            assertThat(anotherEventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(anotherCaseInstance);
 
             processEngineTaskService.complete(task.getId());
 
-            eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
+            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription).isNull();
 
-            anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
+            EventSubscription anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
             assertThat(anotherEventSubscription).isNull();
 
             Task task2 = processEngineTaskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
@@ -152,16 +145,13 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
-            assertThat(task).isNotNull();
-            assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
-            assertThat(task.getName()).isEqualTo("my task");
+            assertThatCaseTaskWasCreated(task);
 
-            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
-            assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(caseInstance);
 
             processEngineTaskService.complete(task.getId());
 
-            eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
+            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription).isNull();
 
             Task task2 = processEngineTaskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
@@ -201,19 +191,17 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
-            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
-            assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(caseInstance);
 
-            EventSubscription anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
-            assertThat(anotherEventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(anotherCaseInstance);
 
             Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
             processEngineTaskService.complete(task.getId());
 
-            eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
+            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
             assertThat(eventSubscription).isNull();
 
-            anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
+            EventSubscription anotherEventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(anotherCaseInstance.getId()).singleResult();
             assertThat(anotherEventSubscription.getEventName()).isEqualTo("testSignal");
 
             Task task2 = processEngineTaskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
@@ -259,8 +247,7 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 
             assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
 
-            EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).singleResult();
-            assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+            assertThatEventSubscriptionExists(caseInstance);
 
             cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
 
@@ -299,6 +286,47 @@ public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
         assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
             .containsOnly(entry("hello", "world"), entry("someNumber", 12345));
 
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/test/processTaskWithSignalListener.cmmn" })
+    public void multipleSignalSubscribers() {
+        Deployment deployment = this.processEngineRepositoryService.createDeployment().
+                addClasspathResource("org/flowable/cmmn/test/signalProcess.bpmn20.xml").
+                deploy();
+
+        try {
+            CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
+            CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("signalCase").start();
+
+            assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance1.getId()).count()).isZero();
+            assertThat(cmmnRuntimeService.createEventSubscriptionQuery().count()).isEqualTo(2L);
+
+            Task task = processEngineTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance1.getId()).singleResult();
+
+            assertThatCaseTaskWasCreated(task);
+            assertThatEventSubscriptionExists(caseInstance1);
+            assertThatEventSubscriptionExists(caseInstance2);
+
+            processEngineTaskService.complete(task.getId());
+
+            assertThat(cmmnRuntimeService.createEventSubscriptionQuery().count())
+                    .as("The signal triggers 2 subscribers.")
+                    .isZero();
+        } finally {
+            processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    private void assertThatEventSubscriptionExists(CaseInstance caseInstance1) {
+        EventSubscription eventSubscription = cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance1.getId()).singleResult();
+        assertThat(eventSubscription.getEventName()).isEqualTo("testSignal");
+    }
+
+    private static void assertThatCaseTaskWasCreated(Task task) {
+        assertThat(task).isNotNull();
+        assertThat(task.getTaskDefinitionKey()).isEqualTo("theTask");
+        assertThat(task.getName()).isEqualTo("my task");
     }
 
 }
