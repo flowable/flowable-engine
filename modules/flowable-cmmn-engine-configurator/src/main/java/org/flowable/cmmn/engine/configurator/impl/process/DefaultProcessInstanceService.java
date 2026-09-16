@@ -60,16 +60,16 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
     @Override
     public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String stageInstanceId,
-            String tenantId, Map<String, Object> inParametersMap, String businessKey,
+            String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
 
         return startProcessInstance(processDefinitionId, predefinedProcessInstanceId, null, stageInstanceId, tenantId,
-                inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+                inParametersMap, transientVariablesMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
     }
 
     @Override
     public String startProcessInstance(String processDefinitionId, String predefinedProcessInstanceId, String planItemInstanceId, String stageInstanceId,
-            String tenantId, Map<String, Object> inParametersMap, String businessKey,
+            String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap, String businessKey,
             Map<String, Object> variableFormVariables, FormInfo variableFormInfo, String variableFormOutcome) {
 
         ProcessInstanceBuilder processInstanceBuilder = processEngineConfiguration.getRuntimeService().createProcessInstanceBuilder();
@@ -89,6 +89,10 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
 
         for (String target : inParametersMap.keySet()) {
             processInstanceBuilder.variable(target, inParametersMap.get(target));
+        }
+
+        if (transientVariablesMap != null && !transientVariablesMap.isEmpty()) {
+            processInstanceBuilder.transientVariables(transientVariablesMap);
         }
 
         if (businessKey != null) {

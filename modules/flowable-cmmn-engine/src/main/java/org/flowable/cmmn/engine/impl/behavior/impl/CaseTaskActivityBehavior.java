@@ -57,7 +57,8 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
-        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
+        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters(),
+                caseTask.isInheritVariables());
         this.caseRefExpression = caseRefExpression;
         this.caseRef = caseTask.getCaseRef();
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
@@ -95,7 +96,8 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         Map<String, Object> finalVariableMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, cmmnEngineConfiguration.getExpressionManager());
+        Map<String, Object> transientVariablesMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
 
         // Needed for the form field handler later
         Map<String, Object> variablesFromFormSubmission = null;
@@ -122,6 +124,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
+        if (!transientVariablesMap.isEmpty()) {
+            caseInstanceBuilder.transientVariables(transientVariablesMap);
+        }
 
         if (sameDeployment) {
             caseInstanceBuilder.caseDefinitionParentDeploymentId(

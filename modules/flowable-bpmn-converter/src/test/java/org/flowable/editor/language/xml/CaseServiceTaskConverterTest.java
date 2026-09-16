@@ -37,6 +37,7 @@ class CaseServiceTaskConverterTest {
 
         assertThat(caseServiceTask.isFallbackToDefaultTenant()).isTrue();
         assertThat(caseServiceTask.isSameDeployment()).isFalse();
+        assertThat(caseServiceTask.isInheritVariables()).isTrue();
 
         List<IOParameter> parameters = caseServiceTask.getInParameters();
         assertThat(parameters)
