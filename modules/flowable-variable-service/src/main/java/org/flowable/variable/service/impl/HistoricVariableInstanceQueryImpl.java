@@ -422,6 +422,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return executionIds;
     }
 
+    public List<List<String>> getSafeExecutionIds() {
+        return getSafeList(executionIds);
+    }
+
     public boolean isExcludeTaskRelated() {
         return excludeTaskRelated;
     }

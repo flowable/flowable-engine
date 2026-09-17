@@ -196,11 +196,15 @@
             <if test="parameter.taskId != null">
                 AND TASK_ID_ = #{parameter.taskId, jdbcType=NVARCHAR}
             </if>
-            <if test="parameter.taskIds != null">
-                AND TASK_ID_ in
-                <foreach collection="parameter.taskIds" item="taskId" open="(" separator="," close=")">
-                    #{taskId, jdbcType=NVARCHAR}
+            <if test="parameter.taskIds != null and !parameter.taskIds.empty">
+                AND (
+                <foreach collection="parameter.safeTaskIds" item="listItem" separator="OR">
+                    TASK_ID_ in
+                    <foreach collection="listItem" item="taskId" open="(" separator="," close=")">
+                        #{taskId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="parameter.processInstanceId != null">
                 AND PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
@@ -208,11 +212,15 @@
             <if test="parameter.executionId != null">
                 AND EXECUTION_ID_ = #{parameter.executionId, jdbcType=NVARCHAR}
             </if>
-            <if test="parameter.executionIds != null">
-                AND EXECUTION_ID_ in
-                <foreach collection="parameter.executionIds" item="executionId" open="(" separator="," close=")">
-                    #{executionId, jdbcType=NVARCHAR}
+            <if test="parameter.executionIds != null and !parameter.executionIds.empty">
+                AND (
+                <foreach collection="parameter.safeExecutionIds" item="listItem" separator="OR">
+                    EXECUTION_ID_ in
+                    <foreach collection="listItem" item="executionId" open="(" separator="," close=")">
+                        #{executionId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="parameter.withoutTaskId">
                 AND TASK_ID_ is null
@@ -221,19 +229,27 @@
                 AND SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.scopeIds != null and !parameter.scopeIds.empty">
-                AND SCOPE_ID_ in
-                <foreach collection="parameter.scopeIds" item="scopeId" open="(" separator="," close=")">
-                    #{scopeId, jdbcType=NVARCHAR}
+                AND (
+                <foreach collection="parameter.safeScopeIds" item="listItem" separator="OR">
+                    SCOPE_ID_ in
+                    <foreach collection="listItem" item="scopeId" open="(" separator="," close=")">
+                        #{scopeId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="parameter.subScopeId != null">
                 AND SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR}
             </if>
             <if test="parameter.subScopeIds != null and !parameter.subScopeIds.empty">
-                AND SUB_SCOPE_ID_ in
-                <foreach collection="parameter.subScopeIds" item="subScopeId" open="(" separator="," close=")">
-                    #{subScopeId, jdbcType=NVARCHAR}
+                AND (
+                <foreach collection="parameter.safeSubScopeIds" item="listItem" separator="OR">
+                    SUB_SCOPE_ID_ in
+                    <foreach collection="listItem" item="subScopeId" open="(" separator="," close=")">
+                        #{subScopeId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="parameter.withoutSubScopeId">
                 AND SUB_SCOPE_ID_ is null
@@ -287,19 +303,27 @@
                 and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="executionIds != null and !executionIds.empty">
-                and RES.EXECUTION_ID_ in
-                <foreach item="executionId" index="index" collection="executionIds" open="(" separator="," close=")">
-                    #{executionId, jdbcType=NVARCHAR}
+                and (
+                <foreach collection="safeExecutionIds" item="listItem" separator="OR">
+                    RES.EXECUTION_ID_ in
+                    <foreach collection="listItem" item="executionId" open="(" separator="," close=")">
+                        #{executionId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="taskId != null">
                 and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
             </if>
             <if test="taskIds != null and !taskIds.empty">
-                and RES.TASK_ID_ in
-                <foreach item="taskId" index="index" collection="taskIds" open="(" separator="," close=")">
-                    #{taskId, jdbcType=NVARCHAR}
+                and (
+                <foreach collection="safeTaskIds" item="listItem" separator="OR">
+                    RES.TASK_ID_ in
+                    <foreach collection="listItem" item="taskId" open="(" separator="," close=")">
+                        #{taskId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
