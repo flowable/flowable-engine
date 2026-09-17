@@ -25,5 +25,15 @@ public interface SchemaManagerLockConfiguration {
 
     LockManager getLockManager(String lockName);
 
+    /**
+     * @param reuseCurrentCommandContext when {@code true}, the returned lock manager acquires/releases the lock using the
+     *         currently active command context (same connection/transaction), instead of a brand new one. This must be used
+     *         when locking around schema creation/update, to avoid a self-deadlock on databases with transactional DDL
+     *         (SQL Server, PostgreSQL, ...) - see {@code LockManagerImpl} for details.
+     */
+    default LockManager getLockManager(String lockName, boolean reuseCurrentCommandContext) {
+        return getLockManager(lockName);
+    }
+
     Duration getSchemaLockWaitTime();
 }

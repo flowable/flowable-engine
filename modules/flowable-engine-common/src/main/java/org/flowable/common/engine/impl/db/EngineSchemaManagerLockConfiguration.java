@@ -44,6 +44,11 @@ public class EngineSchemaManagerLockConfiguration implements SchemaManagerLockCo
     }
 
     @Override
+    public LockManager getLockManager(String lockName, boolean reuseCurrentCommandContext) {
+        return getEngineConfiguration().getLockManager(lockName, reuseCurrentCommandContext);
+    }
+
+    @Override
     public Duration getSchemaLockWaitTime() {
         return getEngineConfiguration().getSchemaLockWaitTime();
     }
