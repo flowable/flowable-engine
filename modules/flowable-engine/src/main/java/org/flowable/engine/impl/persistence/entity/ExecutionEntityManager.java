@@ -62,6 +62,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
+    List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
     Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(String processInstanceId);
 
     Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);

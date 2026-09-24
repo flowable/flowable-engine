@@ -113,6 +113,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean returnIdsOnly;
 
     public CaseInstanceQueryImpl() {
     }
@@ -1084,6 +1085,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         return this;
     }
 
+    @Override
+    public CaseInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
+        return this;
+    }
+
     // results ////////////////////////////////////////////////////
 
     @Override
@@ -1096,13 +1103,16 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     public List<CaseInstance> executeList(CommandContext commandContext) {
         ensureVariablesInitialized();
         List<CaseInstance> caseInstances = null;
-        if (this.isIncludeCaseVariables()) {
+        if (returnIdsOnly) {
+            caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findIdsByCriteria(this);
+        } else if (this.isIncludeCaseVariables()) {
             caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this);
         } else {
             caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findByCriteria(this);
         }
 
-        if (cmmnEngineConfiguration.getCaseLocalizationManager() != null) {
+        // Id only results have no name to localize
+        if (!returnIdsOnly && cmmnEngineConfiguration.getCaseLocalizationManager() != null) {
             for (CaseInstance caseInstance : caseInstances) {
                 cmmnEngineConfiguration.getCaseLocalizationManager().localize(caseInstance, locale, withLocalizationFallback);
             }
