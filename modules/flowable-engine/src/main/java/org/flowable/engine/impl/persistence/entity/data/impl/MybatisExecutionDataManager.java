@@ -267,6 +267,15 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        // Not going through the cache: the entities only have their id populated
+        // and must never be returned by later lookups in the same command context as a fully loaded execution
+        setSafeInValueLists(processInstanceQuery);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery, getManagedEntityClass());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap);
     }

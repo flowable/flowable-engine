@@ -269,6 +269,11 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      */
     CaseInstanceQuery withLocalizationFallback();
 
+    /**
+     * Return only the id value of the case instances, to reduce any additional instance data to be returned.
+     */
+    CaseInstanceQuery returnIdsOnly();
+
     CaseInstanceQuery orderByCaseInstanceId();
     CaseInstanceQuery orderByCaseDefinitionKey();
     CaseInstanceQuery orderByCaseDefinitionId();

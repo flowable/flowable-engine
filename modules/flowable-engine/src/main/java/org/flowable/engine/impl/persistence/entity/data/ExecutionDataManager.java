@@ -51,6 +51,8 @@ public interface ExecutionDataManager extends DataManager<ExecutionEntity> {
 
     List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
+    List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
     Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(final String processInstanceId);
 
     Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(final String activityId, final String processInstanceId);
