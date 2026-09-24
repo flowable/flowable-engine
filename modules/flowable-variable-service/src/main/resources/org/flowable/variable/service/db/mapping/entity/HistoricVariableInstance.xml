@@ -421,10 +421,14 @@
                 and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="executionIds != null and !executionIds.empty">
-                and RES.EXECUTION_ID_ in
-                <foreach item="executionId" index="index" collection="executionIds" open="(" separator="," close=")">
-                    #{executionId, jdbcType=NVARCHAR}
+                and (
+                <foreach item="listItem" collection="safeExecutionIds" separator="OR">
+                    RES.EXECUTION_ID_ in
+                    <foreach item="executionId" collection="listItem" open="(" separator="," close=")">
+                        #{executionId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="taskId != null">
                 and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}

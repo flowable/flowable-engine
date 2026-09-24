@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -2272,5 +2273,131 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(result)
                 .extracting(CaseInstance::getId)
                 .containsExactlyInAnyOrder(oneTaskCase2PlanItemInstance.getReferenceId());
+    }
+
+    @Test
+    public void getCaseInstanceIdsOnly() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessKey("returnIdsOnly1")
+                .start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .businessKey("returnIdsOnly2")
+                .start();
+
+        List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().returnIdsOnly().list();
+        assertThat(caseInstances)
+                .extracting(CaseInstance::getId)
+                .contains(caseInstance1.getId(), caseInstance2.getId())
+                .containsExactlyInAnyOrderElementsOf(cmmnRuntimeService.createCaseInstanceQuery().list().stream().map(CaseInstance::getId).toList());
+        assertThat(caseInstances)
+                .allSatisfy(caseInstance -> {
+                    assertThat(caseInstance.getId()).isNotNull();
+                    assertThat(caseInstance.getCaseDefinitionId()).isNull();
+                    assertThat(caseInstance.getCaseDefinitionKey()).isNull();
+                    assertThat(caseInstance.getBusinessKey()).isNull();
+                    assertThat(caseInstance.getStartTime()).isNull();
+                });
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().returnIdsOnly().count()).isEqualTo(caseInstances.size());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("oneTaskCase").returnIdsOnly().list())
+                .extracting(CaseInstance::getId, CaseInstance::getCaseDefinitionId)
+                .containsExactlyInAnyOrder(
+                        tuple(caseInstance1.getId(), null),
+                        tuple(caseInstance2.getId(), null)
+                );
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKey("returnIdsOnly2").returnIdsOnly().singleResult();
+        assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+        assertThat(caseInstance.getCaseDefinitionId()).isNull();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceBusinessKey("returnIdsOnly2").singleResult();
+        assertThat(caseInstance.getId()).isEqualTo(caseInstance2.getId());
+        assertThat(caseInstance.getCaseDefinitionId()).isNotNull();
+        assertThat(caseInstance.getStartTime()).isNotNull();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .caseInstanceBusinessKey("returnIdsOnly1")
+                .caseInstanceId("undefined")
+                .endOr()
+                .returnIdsOnly()
+                .singleResult();
+        assertThat(caseInstance.getId()).isEqualTo(caseInstance1.getId());
+        assertThat(caseInstance.getCaseDefinitionId()).isNull();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("invalid").returnIdsOnly().singleResult()).isNull();
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseDefinitionKey("invalid").returnIdsOnly().list()).isEmpty();
+    }
+
+    @Test
+    public void getCaseInstanceIdsOnlyByVariableValue() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("returnIdsOnlyVar", "match")
+                .start();
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("returnIdsOnlyVar", "noMatch")
+                .start();
+        CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("returnIdsOnlyVar", "match")
+                .start();
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("returnIdsOnlyVar", "match").returnIdsOnly().list())
+                .extracting(CaseInstance::getId, CaseInstance::getCaseDefinitionId)
+                .containsExactlyInAnyOrder(
+                        tuple(caseInstance1.getId(), null),
+                        tuple(caseInstance3.getId(), null)
+                );
+
+        // includeCaseVariables is ignored when only returning ids
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().variableValueEquals("returnIdsOnlyVar", "match").includeCaseVariables()
+                .returnIdsOnly().list())
+                .extracting(CaseInstance::getId, CaseInstance::getCaseVariables)
+                .containsExactlyInAnyOrder(
+                        tuple(caseInstance1.getId(), Collections.emptyMap()),
+                        tuple(caseInstance3.getId(), Collections.emptyMap())
+                );
+    }
+
+    @Test
+    public void getCaseInstanceIdsOnlyOrderedAndPaged() {
+        for (int i = 0; i < 4; i++) {
+            cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+        }
+
+        List<String> expectedAscIds = cmmnRuntimeService.createCaseInstanceQuery().orderByCaseInstanceId().asc().list().stream()
+                .map(CaseInstance::getId)
+                .toList();
+        assertThat(expectedAscIds).hasSizeGreaterThanOrEqualTo(5);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseInstanceId().asc().returnIdsOnly().list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyElementsOf(expectedAscIds);
+
+        List<String> pagedIds = new ArrayList<>();
+        for (int firstResult = 0; firstResult < expectedAscIds.size(); firstResult += 2) {
+            List<CaseInstance> page = cmmnRuntimeService.createCaseInstanceQuery().orderByCaseInstanceId().asc().returnIdsOnly().listPage(firstResult, 2);
+            assertThat(page).hasSizeLessThanOrEqualTo(2);
+            assertThat(page).extracting(CaseInstance::getCaseDefinitionId).containsOnlyNulls();
+            page.forEach(caseInstance -> pagedIds.add(caseInstance.getId()));
+        }
+        assertThat(pagedIds).containsExactlyElementsOf(expectedAscIds);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseInstanceId().desc().returnIdsOnly().listPage(1, 3))
+                .extracting(CaseInstance::getId)
+                .containsExactlyElementsOf(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseInstanceId().desc().listPage(1, 3).stream()
+                        .map(CaseInstance::getId).toList());
+
+        // Ordering by a column of the joined case definition
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionKey().asc().orderByCaseInstanceId().asc().returnIdsOnly().listPage(1, 3))
+                .extracting(CaseInstance::getId)
+                .containsExactlyElementsOf(cmmnRuntimeService.createCaseInstanceQuery().orderByCaseDefinitionKey().asc().orderByCaseInstanceId().asc()
+                        .listPage(1, 3).stream().map(CaseInstance::getId).toList());
     }
 }

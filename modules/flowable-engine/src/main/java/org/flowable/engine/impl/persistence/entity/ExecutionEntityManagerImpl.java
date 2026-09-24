@@ -207,6 +207,11 @@ public class ExecutionEntityManagerImpl
     }
 
     @Override
+    public List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery) {
+        return dataManager.findProcessInstanceIdsByQueryCriteria(executionQuery);
+    }
+
+    @Override
     public Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(final String processInstanceId) {
         return dataManager.findInactiveExecutionsByProcessInstanceId(processInstanceId);
     }
