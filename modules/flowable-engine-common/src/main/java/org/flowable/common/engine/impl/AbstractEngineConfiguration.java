@@ -379,6 +379,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
+    public static final String DATABASE_TYPE_SPANNER = "spanner";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         return DbUtil.getDefaultDatabaseTypeMappings();

@@ -139,6 +139,11 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             } else if ("cockroachdb".equals(databaseType)) {
                 tableName = tableName.toLowerCase(); // same as postgres
                 schema = "public"; // CRDB only supports public right now
+            } else if ("spanner".equals(databaseType)) {
+                tableName = tableName.toUpperCase();
+                if (schema == null) {
+                    schema = "";
+                }
             }
 
             if (schema != null && "oracle".equals(databaseType)) {
