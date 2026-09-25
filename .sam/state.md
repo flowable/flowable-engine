@@ -1,9 +1,9 @@
 # SAM Migration State
 
 - **Branch:** `spanner-migration`
-- **Stage:** Conversion (Unit 3 Complete, moving to Unit 4)
+- **Stage:** Conversion (Unit 4 Complete, moving to Unit 5)
 - **Status:** In Progress
-- **Updated:** 2026-09-25T09:03:38Z
+- **Updated:** 2026-09-25T09:49:55Z
 
 ## Confirmed Stack & Policies
 
@@ -31,7 +31,7 @@
   - [x] Unit 1: Root Spanner Configuration (Accepted & Committed)
   - [x] Unit 2: Spanner Engine Dialect & Session Configuration (Accepted & Committed)
   - [x] Unit 3: Transaction Abort Handling & Spanner Retry Interceptor (Accepted & Committed)
-  - [ ] Unit 4: MyBatis Mapper Adjustments for GoogleSQL
+  - [x] Unit 4: MyBatis Mapper Adjustments for GoogleSQL (Accepted & Committed)
   - [ ] Unit 5: Engine Common & Process Engine Schema DDL Scripts
   - [ ] Unit 6: Sub-Engines Schema DDL Scripts
   - [ ] Unit 7: Verification & Test Harness for Cloud Spanner
