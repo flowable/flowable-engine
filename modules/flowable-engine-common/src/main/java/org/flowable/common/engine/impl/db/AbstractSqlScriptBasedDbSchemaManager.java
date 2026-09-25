@@ -247,14 +247,28 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         logger.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
+        SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
+        Connection connection = databaseConfiguration.getConnection();
+        boolean initialAutoCommit = true;
+        boolean resetAutoCommit = false;
         try {
-            SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
-            Connection connection = databaseConfiguration.getConnection();
+            String databaseType = databaseConfiguration.getDatabaseType();
+            if ("spanner".equals(databaseType)) {
+                try {
+                    initialAutoCommit = connection.getAutoCommit();
+                    if (!initialAutoCommit) {
+                        connection.setAutoCommit(true);
+                        resetAutoCommit = true;
+                    }
+                } catch (Exception e) {
+                    logger.debug("Could not toggle autoCommit for Spanner DDL", e);
+                }
+            }
+
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
             String ddlStatements = new String(bytes, StandardCharsets.UTF_8);
 
-            String databaseType = databaseConfiguration.getDatabaseType();
             // Special DDL handling for certain databases
             try {
                 if ("mysql".equals(databaseType)) {
@@ -319,21 +333,39 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length() - 1));
                         }
 
-                        try (Statement jdbcStatement = connection.createStatement();) {
+                        boolean executed = false;
+                        int retryCount = 0;
+                        while (!executed) {
+                            try (Statement jdbcStatement = connection.createStatement()) {
 
-                            logger.debug("SQL: {}", sqlStatement);
-                            jdbcStatement.execute(sqlStatement);
-                            
-                        } catch (Exception e) {
-                            if (exception == null) {
-                                exception = e;
-                                exceptionSqlStatement = sqlStatement;
+                                logger.debug("SQL: {}", sqlStatement);
+                                jdbcStatement.execute(sqlStatement);
+                                executed = true;
+
+                            } catch (Exception e) {
+                                if ("spanner".equals(databaseType) && isSpannerConcurrentSchemaChange(e) && retryCount < 5) {
+                                    retryCount++;
+                                    logger.warn("Spanner concurrent schema change in progress, retrying statement (attempt {}/5): {}", retryCount, sqlStatement);
+                                    try {
+                                        Thread.sleep(200L * retryCount);
+                                    } catch (InterruptedException ie) {
+                                        Thread.currentThread().interrupt();
+                                    }
+                                } else {
+                                    if ("spanner".equals(databaseType) && "drop".equals(operation) && isSpannerNotFoundException(e)) {
+                                        logger.debug("ignoring not found error on Spanner during drop, statement {}: {}", sqlStatement, e.getMessage());
+                                    } else {
+                                        if (exception == null) {
+                                            exception = e;
+                                            exceptionSqlStatement = sqlStatement;
+                                        }
+                                        logger.error("problem during schema {}, statement {}", operation, sqlStatement, e);
+                                    }
+                                    executed = true;
+                                }
                             }
-                            logger.error("problem during schema {}, statement {}", operation, sqlStatement, e);
-                            
-                        } finally {
-                            sqlStatement = null;
                         }
+                        sqlStatement = null;
                         
                     } else {
                         sqlStatement = addSqlStatementPiece(sqlStatement, line);
@@ -351,6 +383,14 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
 
         } catch (Exception e) {
             throw new FlowableException("couldn't " + operation + " db schema: " + exceptionSqlStatement, e);
+        } finally {
+            if (resetAutoCommit) {
+                try {
+                    connection.setAutoCommit(initialAutoCommit);
+                } catch (Exception e) {
+                    logger.debug("Could not restore autoCommit after Spanner DDL", e);
+                }
+            }
         }
     }
 
@@ -404,6 +444,36 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
                 return true;
             }
+        }
+        return false;
+    }
+
+    protected boolean isSpannerConcurrentSchemaChange(Throwable e) {
+        Throwable current = e;
+        while (current != null) {
+            String msg = current.getMessage();
+            if (msg != null && (msg.contains("concurrent schema change operation") || msg.contains("a concurrent schema change"))) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    protected boolean isSpannerNotFoundException(Throwable e) {
+        Throwable current = e;
+        while (current != null) {
+            String msg = current.getMessage();
+            if (msg != null) {
+                if (msg.contains("is not a constraint in")
+                        || msg.contains("Table not found")
+                        || msg.contains("NOT_FOUND")
+                        || msg.contains("Constraint not found")
+                        || msg.contains("Index not found")) {
+                    return true;
+                }
+            }
+            current = current.getCause();
         }
         return false;
     }
