@@ -2,8 +2,9 @@
 
 - **Branch:** `spanner-migration`
 - **Stage:** Migration Complete
-- **Status:** Complete (All Units Accepted & Committed)
-- **Updated:** 2026-09-25T13:16:55Z
+- **Status:** Complete (All Units Accepted, Committed & PR Created)
+- **Pull Request:** https://github.com/flowable/flowable-engine/pull/4294
+- **Updated:** 2026-09-29T16:29:35Z
 
 ## Confirmed Stack & Policies
 
