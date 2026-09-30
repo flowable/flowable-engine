@@ -37,6 +37,8 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
 
     List<CaseInstance> findWithVariablesByCriteria(CaseInstanceQuery query);
 
+    List<CaseInstance> findIdsByCriteria(CaseInstanceQuery query);
+
     long countByCriteria(CaseInstanceQuery query);
 
     void delete(String caseInstanceId, boolean cascade, String deleteReason);

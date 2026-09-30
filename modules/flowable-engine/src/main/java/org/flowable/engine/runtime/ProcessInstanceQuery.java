@@ -431,6 +431,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery withLocalizationFallback();
 
     /**
+     * Return only the id value of the process instances, to reduce any additional instance data to be returned.
+     */
+    ProcessInstanceQuery returnIdsOnly();
+
+    /**
      * Include process variables in the process query result
      */
     ProcessInstanceQuery includeProcessVariables();
