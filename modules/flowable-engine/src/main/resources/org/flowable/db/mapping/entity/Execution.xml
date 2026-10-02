@@ -435,6 +435,10 @@
     <result property="claimedBy" column="CLAIMED_BY_" jdbcType="NVARCHAR" />
   </resultMap>
 
+  <resultMap id="processInstanceIdResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+  </resultMap>
+
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
     <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -643,6 +647,15 @@
         <if test="needsPaging">${limitBefore}</if>
         SELECT RES.* <if test="needsPaging">${limitBetween}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as
         ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.CATEGORY_ as ProcessDefinitionCategory, P.DEPLOYMENT_ID_ as DeploymentId
+        <include refid="selectExecutionsByQueryCriteriaSql"/>
+        ${orderBy}
+        <if test="needsPaging">${limitAfter}</if>
+    </select>
+
+    <!--  same as selectProcessInstanceByQueryCriteria, but only selecting the id -->
+    <select id="selectProcessInstanceIdsByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceIdResultMap">
+        <if test="needsPaging">${limitBefore}</if>
+        SELECT RES.ID_ <if test="needsPaging">${limitBetween}</if>
         <include refid="selectExecutionsByQueryCriteriaSql"/>
         ${orderBy}
         <if test="needsPaging">${limitAfter}</if>

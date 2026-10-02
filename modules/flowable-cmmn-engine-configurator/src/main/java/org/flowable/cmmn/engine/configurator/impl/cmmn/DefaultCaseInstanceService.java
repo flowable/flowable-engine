@@ -53,7 +53,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
 
     @Override
     public String startCaseInstance(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
-            String executionId, String tenantId, Map<String, Object> inParametersMap) {
+            String executionId, String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap) {
 
         CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();
         caseInstanceBuilder.caseDefinitionId(caseDefinitionId);
@@ -74,6 +74,10 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
 
         for (String target : inParametersMap.keySet()) {
             caseInstanceBuilder.variable(target, inParametersMap.get(target));
+        }
+
+        if (transientVariablesMap != null && !transientVariablesMap.isEmpty()) {
+            caseInstanceBuilder.transientVariables(transientVariablesMap);
         }
 
         if (businessKey != null) {

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/cmmn"
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+            <planItem id="planItem1" name="The Process" definitionRef="theProcess" />
+            <processTask id="theProcess" isBlocking="true" flowable:inheritVariables="true">
+                <extensionElements>
+                    <flowable:in sourceExpression="${'overridden'}" target="caseVariableB" />
+                    <flowable:in sourceExpression="${'fromInParam'}" target="collisionVar" />
+                </extensionElements>
+                <processRefExpression><![CDATA[inheritVariablesChildProcess]]></processRefExpression>
+            </processTask>
+        </casePlanModel>
+    </case>
+
+</definitions>

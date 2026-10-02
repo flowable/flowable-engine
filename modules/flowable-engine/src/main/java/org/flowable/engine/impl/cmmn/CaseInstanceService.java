@@ -29,7 +29,7 @@ public interface CaseInstanceService {
     String generateNewCaseInstanceId();
 
     String startCaseInstance(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
-            String executionId, String tenantId, Map<String, Object> inParametersMap);
+            String executionId, String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap);
 
     void handleSignalEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> variables);
 

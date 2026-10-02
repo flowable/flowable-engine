@@ -32,6 +32,9 @@ public abstract class AbstractChildTaskExport<T extends ChildTask> extends Abstr
         if (planItemDefinition.isInheritBusinessKey()) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INHERIT_BUSINESS_KEY, String.valueOf(planItemDefinition.isInheritBusinessKey()));
         }
+        if (planItemDefinition.isInheritVariables()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INHERIT_VARIABLES, String.valueOf(planItemDefinition.isInheritVariables()));
+        }
     }
 
     @Override

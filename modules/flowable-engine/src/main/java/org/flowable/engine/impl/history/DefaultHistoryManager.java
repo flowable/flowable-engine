@@ -51,6 +51,7 @@ import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,8 +137,12 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
 
             if (getHistoryConfigurationSettings().isHistoryEnabledForVariables(processDefinitionId)) {
-                processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
-                        .deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+                HistoricVariableService historicVariableService = processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService();
+                historicVariableService.deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
+
+                // Variables stored under a dependent scope type have no process instance id, they are linked to the process instance through the scope id
+                historicVariableService.deleteHistoricVariableInstancesByScopeIdAndScopeTypes(processInstanceId,
+                        processEngineConfiguration.getDependentScopeTypes());
             }
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
             TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
@@ -178,7 +183,12 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordBulkDeleteProcessInstances(Collection<String> processInstanceIds) {
         if (isHistoryEnabled() && processInstanceIds != null && !processInstanceIds.isEmpty()) {
             getHistoricDetailEntityManager().bulkDeleteHistoricDetailsByProcessInstanceIds(processInstanceIds);
-            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+            HistoricVariableService historicVariableService = processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService();
+            historicVariableService.bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
+
+            // Variables stored under a dependent scope type have no process instance id, they are linked to the process instance through the scope id
+            historicVariableService.bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(processInstanceIds,
+                    processEngineConfiguration.getDependentScopeTypes());
             getHistoricActivityInstanceEntityManager().bulkDeleteHistoricActivityInstancesByProcessInstanceIds(processInstanceIds);
             TaskHelper.bulkDeleteHistoricTaskInstancesForProcessInstanceIds(processInstanceIds);
             processEngineConfiguration.getIdentityLinkServiceConfiguration().getHistoricIdentityLinkService().bulkDeleteHistoricIdentityLinksForProcessInstanceIds(processInstanceIds);

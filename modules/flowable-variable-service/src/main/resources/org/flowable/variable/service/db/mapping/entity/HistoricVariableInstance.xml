@@ -247,6 +247,45 @@
         </foreach>)
         and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
     </delete>
+
+    <delete id="bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeTypes" parameterType="map">
+        delete <if test="_databaseId == 'mysql' or _databaseId == 'mssql'"> BYTES_ </if> from ${prefix}ACT_GE_BYTEARRAY BYTES_
+        where BYTES_.ID_ in (
+            select VARINST.BYTEARRAY_ID_
+            from ${prefix}ACT_HI_VARINST VARINST
+            where 
+            (<foreach item="listItem" index="listIndex" collection="scopeIds">
+                <if test="listIndex &gt; 0">
+                or
+                </if>
+                VARINST.SCOPE_ID_ in 
+                <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+                  #{scopeId, jdbcType=NVARCHAR}
+                </foreach>
+            </foreach>)
+            and VARINST.SCOPE_TYPE_ in
+            <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+              #{scopeType, jdbcType=NVARCHAR}
+            </foreach>
+        )
+    </delete>
+
+    <delete id="bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeTypes" parameterType="map">
+        delete from ${prefix}ACT_HI_VARINST where 
+        (<foreach item="listItem" index="listIndex" collection="scopeIds">
+            <if test="listIndex &gt; 0">
+            or
+            </if>
+            SCOPE_ID_ in 
+            <foreach item="scopeId" index="index" collection="listItem" open="(" separator="," close=")">
+              #{scopeId, jdbcType=NVARCHAR}
+            </foreach>
+        </foreach>)
+        and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="scopeTypes" open="(" separator="," close=")">
+          #{scopeType, jdbcType=NVARCHAR}
+        </foreach>
+    </delete>
     
     <delete id="bulkDeleteHistoricVariableInstancesForNonExistingProcessInstances" parameterType="java.util.Map">
         delete <if test="_databaseId != 'postgres' and _databaseId != 'cockroachdb' and _databaseId != 'db2'"> VARINST </if> from ${prefix}ACT_HI_VARINST VARINST where VARINST.PROC_INST_ID_ is not null and VARINST.PROC_INST_ID_ != '' and
@@ -382,10 +421,14 @@
                 and RES.EXECUTION_ID_ = #{executionId, jdbcType=NVARCHAR}
             </if>
             <if test="executionIds != null and !executionIds.empty">
-                and RES.EXECUTION_ID_ in
-                <foreach item="executionId" index="index" collection="executionIds" open="(" separator="," close=")">
-                    #{executionId, jdbcType=NVARCHAR}
+                and (
+                <foreach item="listItem" collection="safeExecutionIds" separator="OR">
+                    RES.EXECUTION_ID_ in
+                    <foreach item="executionId" collection="listItem" open="(" separator="," close=")">
+                        #{executionId, jdbcType=NVARCHAR}
+                    </foreach>
                 </foreach>
+                )
             </if>
             <if test="taskId != null">
                 and RES.TASK_ID_ = #{taskId, jdbcType=NVARCHAR}
@@ -550,6 +593,16 @@
         </if>
     </select>
     
+    <select id="selectHistoricVariableInstanceByScopeIdAndScopeTypes" resultMap="historicProcessVariableResultMap">
+        select *
+        from ${prefix}ACT_HI_VARINST
+        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR}
+        and SCOPE_TYPE_ in
+        <foreach item="scopeType" index="index" collection="parameter.scopeTypes" open="(" separator="," close=")">
+            #{scopeType, jdbcType=NVARCHAR}
+        </foreach>
+    </select>
+
     <select id="selectHistoricVariableInstanceBySubScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
         select * from ${prefix}ACT_HI_VARINST where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
     </select>

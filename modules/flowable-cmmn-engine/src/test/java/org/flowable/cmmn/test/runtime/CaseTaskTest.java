@@ -1237,6 +1237,66 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testCaseTaskInheritVariables.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.inheritVariablesChildCase.cmmn"
+    })
+    public void testCaseTaskInheritVariables() {
+        ObjectNode jsonVariable = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
+        jsonVariable.put("field", "value");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .variable("caseVariableB", "world")
+                .variable("caseVariableC", 42)
+                .variable("caseVariableJson", jsonVariable)
+                .transientVariable("caseTransientVariable", "temp")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("inheritVariablesChildCase")
+                .singleResult();
+        assertThat(subCase).isNotNull();
+
+        // All parent case variables are inherited into the child case instance (like a BPMN call activity)
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableA")).isEqualTo("hello");
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableC")).isEqualTo(42);
+
+        // JSON variables are inherited (deep copied, consistent with in parameter handling)
+        JsonNode childJson = (JsonNode) cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableJson");
+        assertThat(childJson.path("field").asString()).isEqualTo("value");
+
+        // An explicit in parameter takes precedence over the inherited variable
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableB")).isEqualTo("overridden");
+
+        // Transient variables are inherited as transient: available while the child starts (the child task
+        // name resolves the ${caseTransientVariable} expression) but not persisted on the child.
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(subCase.getId()).singleResult().getName()).isEqualTo("temp");
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseTransientVariable")).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testCaseTaskInheritVariablesDisabled.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testCaseTaskInheritVariablesDisabled() {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("caseVariableA", "hello")
+                .start();
+
+        CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseDefinitionKey("oneTaskCase")
+                .singleResult();
+        assertThat(subCase).isNotNull();
+
+        // Without inheritVariables, parent variables are not copied into the child case
+        assertThat(cmmnRuntimeService.getVariable(subCase.getId(), "caseVariableA")).isNull();
+    }
+
+    @Test
     @CmmnDeployment
     public void testIdVariableName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

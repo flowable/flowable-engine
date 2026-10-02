@@ -13,6 +13,7 @@
 package org.flowable.variable.service.impl.persistence.entity.data.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByScopeIdAndScopeTypeMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByScopeIdAndScopeTypesMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByTaskIdMatcher;
 
@@ -45,6 +47,9 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByScopeIdAndScopeTypeMatcher 
         = new HistoricVariableInstanceByScopeIdAndScopeTypeMatcher();
     
+    protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByScopeIdAndScopeTypesMatcher
+        = new HistoricVariableInstanceByScopeIdAndScopeTypesMatcher();
+
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceBySubScopeIdAndScopeTypeMatcher 
         = new HistoricVariableInstanceBySubScopeIdAndScopeTypeMatcher();
     
@@ -119,11 +124,23 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     }
     
     @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        if (scopeTypes == null || scopeTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("scopeId", scopeId);
+        params.put("scopeTypes", scopeTypes);
+        return getList("selectHistoricVariableInstanceByScopeIdAndScopeTypes", params, historicVariableInstanceByScopeIdAndScopeTypesMatcher, true);
+    }
+
+    @Override
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
         Map<String, String> params = new HashMap<>(2);
         params.put("subScopeId", subScopeId);
         params.put("scopeType", scopeType);
-        return getList("selectHistoricVariableInstanceByScopeIdAndScopeType", params, historicVariableInstanceByScopeIdAndScopeTypeMatcher, true);
+        return getList("selectHistoricVariableInstanceBySubScopeIdAndScopeType", params, historicVariableInstanceBySubScopeIdAndScopeTypeMatcher, true);
     }
 
     @Override
@@ -160,6 +177,21 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
         // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
         getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
         getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeType", params, HistoricVariableInstanceEntity.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes) {
+        if (scopeTypes == null || scopeTypes.isEmpty()) {
+            return;
+        }
+
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("scopeIds", createSafeInValuesList(scopeIds));
+        params.put("scopeTypes", scopeTypes);
+
+        // Using HistoricVariableInstanceEntity as the entity, because the deletion order of the ByteArrayEntity is after the HistoricVariableInstanceEntity
+        getDbSqlSession().delete("bulkDeleteBytesForHistoricVariableInstancesForScopeIdsAndScopeTypes", params, HistoricVariableInstanceEntity.class);
+        getDbSqlSession().delete("bulkDeleteHistoricVariableInstancesForScopeIdsAndScopeTypes", params, HistoricVariableInstanceEntity.class);
     }
 
     @Override

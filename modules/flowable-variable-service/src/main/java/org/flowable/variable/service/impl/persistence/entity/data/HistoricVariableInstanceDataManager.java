@@ -42,6 +42,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
     
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType, Collection<String> variableNames);
 
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
+
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByNativeQuery(Map<String, Object> parameterMap);
@@ -53,6 +55,8 @@ public interface HistoricVariableInstanceDataManager extends DataManager<Histori
     void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
     
     void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+
+    void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes);
 
     void deleteHistoricVariableInstancesForNonExistingProcessInstances();
     

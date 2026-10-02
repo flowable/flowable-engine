@@ -48,6 +48,8 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
 
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType, Collection<String> variableNames);
 
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
+
     List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
@@ -59,12 +61,16 @@ public interface HistoricVariableInstanceEntityManager extends EntityManager<His
     void deleteHistoricVariableInstancesByTaskId(String taskId);
 
     void deleteHistoricVariableInstanceByProcessInstanceId(String historicProcessInstanceId);
+
+    void deleteHistoricVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes);
     
     void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds);
     
     void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds);
     
     void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType);
+
+    void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes);
 
     void deleteHistoricVariableInstancesForNonExistingProcessInstances();
     

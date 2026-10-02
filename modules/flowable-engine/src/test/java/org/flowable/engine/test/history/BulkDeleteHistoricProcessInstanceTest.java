@@ -16,8 +16,10 @@ package org.flowable.engine.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -34,10 +36,15 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.types.SerializableType;
 import org.junit.jupiter.api.Test;
 
 public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTestCase {
+
+    protected static final String TEST_DEPENDENT_SCOPE_TYPE = "testDependentScope";
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml" })
@@ -552,6 +559,87 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
         } finally {
             processEngineConfiguration.setHistoryLevel(historyLevel);
         }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml" })
+    public void deleteHistoricProcessInstanceRemovesDependentScopeVariables() {
+        processEngineConfiguration.addDependentScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+            HistoricVariableInstanceEntity dependentVariable = createDependentScopeHistoricVariable(processInstance.getId());
+            String byteArrayId = dependentVariable.getByteArrayRef().getId();
+            assertThat(byteArrayId).isNotNull();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
+
+            historyService.deleteHistoricProcessInstance(processInstance.getId());
+
+            assertThat(findHistoricVariableInstanceById(dependentVariable.getId())).isNull();
+            assertThat(findByteArrayById(byteArrayId)).isNull();
+        } finally {
+            processEngineConfiguration.getDependentScopeTypes().remove(TEST_DEPENDENT_SCOPE_TYPE);
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/oneTask.bpmn20.xml" })
+    public void bulkDeleteHistoricProcessInstancesRemovesDependentScopeVariables() {
+        processEngineConfiguration.addDependentScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+        try {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+            HistoricVariableInstanceEntity dependentVariable = createDependentScopeHistoricVariable(processInstance.getId());
+            String byteArrayId = dependentVariable.getByteArrayRef().getId();
+            assertThat(byteArrayId).isNotNull();
+
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+            waitForHistoryJobExecutorToProcessAllJobs(10000, 400);
+
+            historyService.bulkDeleteHistoricProcessInstances(Collections.singletonList(processInstance.getId()));
+
+            assertThat(findHistoricVariableInstanceById(dependentVariable.getId())).isNull();
+            assertThat(findByteArrayById(byteArrayId)).isNull();
+        } finally {
+            processEngineConfiguration.getDependentScopeTypes().remove(TEST_DEPENDENT_SCOPE_TYPE);
+        }
+    }
+
+    /**
+     * Mimics a consumer that records history for its own dependent scope type: the row has no process instance id,
+     * only the process instance id as scope id and an execution id as sub scope id.
+     */
+    protected HistoricVariableInstanceEntity createDependentScopeHistoricVariable(String processInstanceId) {
+        String executionId = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().singleResult().getId();
+        return managementService.executeCommand(commandContext -> {
+            VariableServiceConfiguration variableServiceConfiguration = processEngineConfiguration.getVariableServiceConfiguration();
+            HistoricVariableService historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+
+            HistoricVariableInstanceEntity historicVariable = historicVariableService.createHistoricVariableInstance();
+            historicVariable.setName("dependentScopeVariable");
+            historicVariable.setScopeId(processInstanceId);
+            historicVariable.setSubScopeId(executionId);
+            historicVariable.setScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+            historicVariable.setVariableType(variableServiceConfiguration.getVariableTypes().getVariableType(SerializableType.TYPE_NAME));
+            historicVariable.setCreateTime(new Date());
+            historicVariable.setLastUpdatedTime(historicVariable.getCreateTime());
+            historicVariable.setBytes("dependent scope value".getBytes(StandardCharsets.UTF_8));
+
+            historicVariableService.insertHistoricVariableInstance(historicVariable);
+            return historicVariable;
+        });
+    }
+
+    protected HistoricVariableInstanceEntity findHistoricVariableInstanceById(String id) {
+        return managementService.executeCommand(commandContext -> processEngineConfiguration.getVariableServiceConfiguration()
+                .getHistoricVariableService().getHistoricVariableInstance(id));
+    }
+
+    protected ByteArrayEntity findByteArrayById(String id) {
+        return managementService.executeCommand(
+                commandContext -> CommandContextUtil.getByteArrayEntityManager(commandContext).findById(id));
     }
 
     protected void validateEmptyHistoricDataForProcessInstance(String processInstanceId) {

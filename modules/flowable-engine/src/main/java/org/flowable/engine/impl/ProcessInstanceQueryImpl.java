@@ -108,6 +108,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String referenceType;
     protected String locale;
     protected boolean withLocalizationFallback;
+    protected boolean returnIdsOnly;
 
     protected String tenantId;
     protected String tenantIdLike;
@@ -1001,6 +1002,12 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery returnIdsOnly() {
+        this.returnIdsOnly = true;
+        return this;
+    }
+
+    @Override
     public ProcessInstanceQuery startedBefore(Date beforeTime) {
         if (inOrStatement) {
             this.currentOrQueryObject.startedBefore = beforeTime;
@@ -1081,13 +1088,17 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             processEngineConfiguration.getProcessInstanceQueryInterceptor().beforeProcessInstanceQueryExecute(this);
         }
         
-        if (includeProcessVariables) {
+        if (returnIdsOnly) {
+            processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceIdsByQueryCriteria(this);
+        } else if (includeProcessVariables) {
             processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceAndVariablesByQueryCriteria(this);
         } else {
             processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceByQueryCriteria(this);
         }
 
-        if (processEngineConfiguration.getPerformanceSettings().isEnableLocalization() && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
+        // Id only results have no name or description to localize
+        if (!returnIdsOnly && processEngineConfiguration.getPerformanceSettings().isEnableLocalization()
+                && processEngineConfiguration.getInternalProcessLocalizationManager() != null) {
             for (ProcessInstance processInstance : processInstances) {
                 processEngineConfiguration.getInternalProcessLocalizationManager().localize(processInstance, locale, withLocalizationFallback);
             }

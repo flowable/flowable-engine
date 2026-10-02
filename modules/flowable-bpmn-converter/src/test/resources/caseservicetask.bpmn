@@ -9,7 +9,7 @@
     targetNamespace="http://www.flowable.org/test">
     
   <process id="process" name="process1" isExecutable="true">
-    <serviceTask id="caseServiceTask" flowable:type="case" name="Case task" flowable:caseDefinitionKey="caseId" flowable:fallbackToDefaultTenant="true">
+    <serviceTask id="caseServiceTask" flowable:type="case" name="Case task" flowable:caseDefinitionKey="caseId" flowable:fallbackToDefaultTenant="true" flowable:inheritVariables="true">
       <extensionElements>
         <flowable:in source="test" target="test"></flowable:in>
         <flowable:in sourceExpression="${test}" target="test"></flowable:in>

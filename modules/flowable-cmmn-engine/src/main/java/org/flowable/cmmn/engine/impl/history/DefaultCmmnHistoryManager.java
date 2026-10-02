@@ -218,7 +218,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
 
             HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
             List<HistoricVariableInstanceEntity> historicVariableInstanceEntities = historicVariableInstanceEntityManager
-                    .findHistoricalVariableInstancesByScopeIdAndScopeType(caseInstanceId, ScopeTypes.CMMN);
+                    .findHistoricalVariableInstancesByScopeIdAndScopeTypes(caseInstanceId, cmmnEngineConfiguration.getDependentScopeTypes());
             for (HistoricVariableInstanceEntity historicVariableInstanceEntity : historicVariableInstanceEntities) {
                 historicVariableInstanceEntityManager.delete(historicVariableInstanceEntity);
             }

@@ -2743,4 +2743,136 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
                 .isEmpty();
     }
 
+    @Test
+    public void testQueryReturnIdsOnly() {
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().returnIdsOnly().list();
+        assertThat(processInstances)
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrderElementsOf(processInstanceIds)
+                .containsExactlyInAnyOrderElementsOf(runtimeService.createProcessInstanceQuery().list().stream().map(ProcessInstance::getId).toList());
+
+        assertThat(processInstances)
+                .allSatisfy(processInstance -> {
+                    assertThat(processInstance.getId()).isNotNull();
+                    assertThat(processInstance.getProcessDefinitionId()).isNull();
+                    assertThat(processInstance.getProcessDefinitionKey()).isNull();
+                    assertThat(processInstance.getDeploymentId()).isNull();
+                    assertThat(processInstance.getBusinessKey()).isNull();
+                    assertThat(processInstance.getStartTime()).isNull();
+                });
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY_2).singleResult();
+        assertThat(processInstance.getProcessDefinitionId()).isNotNull();
+        assertThat(processInstance.getStartTime()).isNotNull();
+
+        assertThat(runtimeService.createProcessInstanceQuery().returnIdsOnly().count()).isEqualTo(PROCESS_DEPLOY_COUNT);
+    }
+
+    @Test
+    public void testQueryReturnIdsOnlyByProcessDefinitionKey() {
+        List<String> expectedIds = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).list().stream()
+                .map(ProcessInstance::getId)
+                .toList();
+        assertThat(expectedIds).hasSize(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).returnIdsOnly().list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrderElementsOf(expectedIds);
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY).returnIdsOnly().count())
+                .isEqualTo(PROCESS_DEFINITION_KEY_DEPLOY_COUNT);
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY_2).returnIdsOnly().singleResult();
+        assertThat(processInstance.getId()).isEqualTo(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT));
+        assertThat(processInstance.getProcessDefinitionId()).isNull();
+
+        processInstance = runtimeService.createProcessInstanceQuery()
+                .or()
+                .processDefinitionKey(PROCESS_DEFINITION_KEY_2)
+                .processInstanceId("undefined")
+                .endOr()
+                .returnIdsOnly()
+                .singleResult();
+        assertThat(processInstance.getId()).isEqualTo(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT));
+        assertThat(processInstance.getProcessDefinitionId()).isNull();
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").returnIdsOnly().singleResult()).isNull();
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("invalid").returnIdsOnly().list()).isEmpty();
+    }
+
+    @Test
+    public void testQueryReturnIdsOnlyByVariableValue() {
+        runtimeService.setVariable(processInstanceIds.get(0), "returnIdsOnlyVar", "match");
+        runtimeService.setVariable(processInstanceIds.get(2), "returnIdsOnlyVar", "match");
+        runtimeService.setVariable(processInstanceIds.get(3), "returnIdsOnlyVar", "noMatch");
+
+        List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery()
+                .variableValueEquals("returnIdsOnlyVar", "match")
+                .returnIdsOnly()
+                .list();
+        assertThat(processInstances)
+                .extracting(ProcessInstance::getId, ProcessInstance::getProcessDefinitionId)
+                .containsExactlyInAnyOrder(
+                        tuple(processInstanceIds.get(0), null),
+                        tuple(processInstanceIds.get(2), null)
+                );
+
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY)
+                .variableValueEquals("returnIdsOnlyVar", "match").returnIdsOnly().count())
+                .isEqualTo(2);
+    }
+
+    @Test
+    public void testQueryReturnIdsOnlyOrderedAndPaged() {
+        List<String> expectedAscIds = runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().asc().list().stream()
+                .map(ProcessInstance::getId)
+                .toList();
+        assertThat(expectedAscIds)
+                .containsExactlyInAnyOrderElementsOf(processInstanceIds);
+
+        assertThat(runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().asc().returnIdsOnly().list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyElementsOf(expectedAscIds);
+
+        List<String> pagedIds = new ArrayList<>();
+        for (int firstResult = 0; firstResult < PROCESS_DEPLOY_COUNT; firstResult += 2) {
+            List<ProcessInstance> page = runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().asc().returnIdsOnly().listPage(firstResult, 2);
+            assertThat(page).hasSizeLessThanOrEqualTo(2);
+            assertThat(page).extracting(ProcessInstance::getProcessDefinitionId).containsOnlyNulls();
+            page.forEach(processInstance -> pagedIds.add(processInstance.getId()));
+        }
+        assertThat(pagedIds).containsExactlyElementsOf(expectedAscIds);
+
+        assertThat(runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().desc().returnIdsOnly().listPage(1, 3))
+                .extracting(ProcessInstance::getId)
+                .containsExactlyElementsOf(runtimeService.createProcessInstanceQuery().orderByProcessInstanceId().desc().listPage(1, 3).stream()
+                        .map(ProcessInstance::getId).toList());
+
+        // Ordering by a column of the joined process definition
+        assertThat(runtimeService.createProcessInstanceQuery().orderByProcessDefinitionKey().desc().orderByProcessInstanceId().asc()
+                .returnIdsOnly().listPage(0, 2))
+                .extracting(ProcessInstance::getId)
+                .containsExactly(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT), expectedAscIds.stream()
+                        .filter(id -> !id.equals(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT)))
+                        .findFirst()
+                        .orElseThrow());
+    }
+
+    @Test
+    public void testQueryReturnIdsOnlyDoesNotCachePartialProcessInstances() {
+        managementService.executeCommand(commandContext -> {
+            List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY_2)
+                    .returnIdsOnly().list();
+            assertThat(processInstances)
+                    .extracting(ProcessInstance::getId, ProcessInstance::getProcessDefinitionId)
+                    .containsExactly(tuple(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT), null));
+
+            // A regular query in the same command context should return the fully populated process instance
+            ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey(PROCESS_DEFINITION_KEY_2).singleResult();
+            assertThat(processInstance.getId()).isEqualTo(processInstanceIds.get(PROCESS_DEFINITION_KEY_DEPLOY_COUNT));
+            assertThat(processInstance.getProcessDefinitionId()).isNotNull();
+            assertThat(processInstance.getStartTime()).isNotNull();
+            return null;
+        });
+    }
+
 }

@@ -179,6 +179,13 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstanceWithVariablesByQueryCriteria", query, getManagedEntityClass());
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<CaseInstance> findIdsByCriteria(CaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectCaseInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
+
     @Override
     public long countByCriteria(CaseInstanceQueryImpl query) {
         setSafeInValueLists(query);

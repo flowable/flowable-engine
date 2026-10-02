@@ -22,6 +22,7 @@ public class ChildTask extends Task implements HasInParameters, HasOutParameters
 
     protected String businessKey;
     protected boolean inheritBusinessKey;
+    protected boolean inheritVariables;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
 
@@ -39,6 +40,14 @@ public class ChildTask extends Task implements HasInParameters, HasOutParameters
 
     public void setInheritBusinessKey(boolean inheritBusinessKey) {
         this.inheritBusinessKey = inheritBusinessKey;
+    }
+
+    public boolean isInheritVariables() {
+        return inheritVariables;
+    }
+
+    public void setInheritVariables(boolean inheritVariables) {
+        this.inheritVariables = inheritVariables;
     }
 
     @Override
