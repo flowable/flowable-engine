@@ -446,7 +446,7 @@ All events dispatched are a subtype of org.flowable.engine.common.api.delegate.e
 
 ### Event listener implementation
 
-The only requirement for an event-listener is to implement org.flowable.engine.delegate.event.FlowableEventListener. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
+The only requirement for an event-listener is to implement org.flowable.common.engine.api.delegate.event.FlowableEventListener. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
 
     public class MyEventListener implements FlowableEventListener {
 
@@ -494,7 +494,7 @@ There are a few base implementations provided by Flowable to facilitate common u
 
 If an event-listener is configured in the process engine configuration, it will be active when the process engine starts and will remain active after subsequent reboots of the engine.
 
-The property eventListeners expects a list of org.flowable.engine.delegate.event.FlowableEventListener instances. As usual, you can either declare an inline bean definition or use a ref to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
+The property eventListeners expects a list of org.flowable.common.engine.api.delegate.event.FlowableEventListener instances. As usual, you can either declare an inline bean definition or use a ref to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
 
     <bean id="processEngineConfiguration"
         class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
@@ -506,7 +506,7 @@ The property eventListeners expects a list of org.flowable.engine.delegate.event
         </property>
     </bean>
 
-To get notified when certain types of events get dispatched, use the typedEventListeners property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of org.flowable.engine.delegate.event.FlowableEventListener instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
+To get notified when certain types of events get dispatched, use the typedEventListeners property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of org.flowable.common.engine.api.delegate.event.FlowableEventListener instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
 
     <bean id="processEngineConfiguration"
         class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
@@ -639,7 +639,7 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
 
 ### Supported event types
 
-Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the org.flowable.engine.common.api.delegate.event.FlowableEventType.
+Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the org.flowable.common.engine.api.delegate.event.FlowableEventType (or org.flowable.idm.api.event.FlowableIdmEventType for identity management events).
 
 <table>
 <caption>Supported events</caption>
@@ -868,17 +868,17 @@ Listed below are all event types that can occur in the engine. Each type corresp
 </tr>
 <tr class="odd">
 <td><p>MEMBERSHIP_CREATED</p></td>
-<td><p>A user has been added to a group. The event contains the ids of the user and group involved.</p></td>
+<td><p>A user has been added to a group. The event contains the ids of the user and group involved. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 <tr class="even">
 <td><p>MEMBERSHIP_DELETED</p></td>
-<td><p>A user has been removed from a group. The event contains the ids of the user and group involved.</p></td>
+<td><p>A user has been removed from a group. The event contains the ids of the user and group involved. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 <tr class="odd">
 <td><p>MEMBERSHIPS_DELETED</p></td>
-<td><p>All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual MEMBERSHIP_DELETED events will be thrown if all members are deleted at once, for performance reasons.</p></td>
+<td><p>All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual MEMBERSHIP_DELETED events will be thrown if all members are deleted at once, for performance reasons. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 </tbody>
