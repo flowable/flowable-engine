@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
     private String initialForceTo;
+    private Charset initialDefaultCharset;
     private MailClientProvider initialMailClientProvider;
     private Map<String, MailServerInfo> initialMailServers;
 
@@ -39,6 +41,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
     protected void setUp() throws Exception {
 
         initialForceTo = processEngineConfiguration.getMailServerForceTo();
+        initialDefaultCharset = processEngineConfiguration.getMailServerDefaultCharset();
         initialMailClientProvider = processEngineConfiguration.getMailClientProvider();
         reinitilizeMailClients();
         Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
@@ -66,6 +69,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
+        processEngineConfiguration.setMailServerDefaultCharset(initialDefaultCharset);
         processEngineConfiguration.setMailServers(initialMailServers);
         processEngineConfiguration.setMailClientProvider(initialMailClientProvider);
     }
