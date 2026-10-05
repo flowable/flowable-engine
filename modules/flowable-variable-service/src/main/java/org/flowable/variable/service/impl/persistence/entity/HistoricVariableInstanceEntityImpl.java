@@ -52,6 +52,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     protected String metaInfo;
 
     protected Object cachedValue;
+    protected boolean valueUnresolvable;
 
     public HistoricVariableInstanceEntityImpl() {
 
@@ -88,6 +89,9 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
 
     @Override
     public Object getValue() {
+        if (valueUnresolvable) {
+            return null;
+        }
         if (!variableType.isCachable() || cachedValue == null) {
             cachedValue = variableType.getValue(this);
         }
@@ -187,6 +191,16 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public void setCachedValue(Object cachedValue) {
         this.cachedValue = cachedValue;
+    }
+
+    @Override
+    public boolean isValueUnresolvable() {
+        return valueUnresolvable;
+    }
+
+    @Override
+    public void setValueUnresolvable(boolean valueUnresolvable) {
+        this.valueUnresolvable = valueUnresolvable;
     }
 
     @Override

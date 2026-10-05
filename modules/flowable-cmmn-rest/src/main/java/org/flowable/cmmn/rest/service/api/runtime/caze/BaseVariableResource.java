@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -36,6 +38,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.util.VariableValueUtil;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -105,17 +108,25 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
     }
 
     protected RestVariable getVariableFromRequestWithoutAccessCheck(String instanceId, String variableName, int variableType, boolean includeBinary) {
-        Object value = null;
+        // The variable is read in one command, so a variable whose value could not be resolved can be marked
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(instanceId, variableName, variableType, includeBinary));
+    }
+
+    protected RestVariable readVariable(String instanceId, String variableName, int variableType, boolean includeBinary) {
+        VariableInstance variableInstance = null;
 
         if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM) {
-            value = runtimeService.getLocalVariable(instanceId, variableName);
+            variableInstance = runtimeService.getLocalVariableInstance(instanceId, variableName);
         } else if (variableType == CmmnRestResponseFactory.VARIABLE_CASE) {
-            value = runtimeService.getVariable(instanceId, variableName);
+            variableInstance = runtimeService.getVariableInstance(instanceId, variableName);
         } else {
             throw new FlowableIllegalArgumentException("Unknown variable type " + variableType);
         }
 
-        if (value == null) {
+        // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
+        Object value = VariableValueUtil.resolveValue(variableInstance);
+        boolean valueUnresolvable = VariableValueUtil.isValueUnresolvable(variableInstance);
+        if (value == null && !valueUnresolvable) {
             if (variableType == CmmnRestResponseFactory.VARIABLE_PLAN_ITEM) {
                 throw new FlowableObjectNotFoundException(
                         "Plan item instance '" + instanceId + "' doesn't have a variable with name: '" + variableName + "'.",
@@ -128,7 +139,9 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         }
 
         //we use null for the scope, because the extraction from request does not require the scope
-        return constructRestVariable(variableName, value, instanceId, variableType, includeBinary, null);
+        RestVariable restVariable = constructRestVariable(variableName, value, instanceId, variableType, includeBinary, null);
+        restVariable.setValueUnresolvable(valueUnresolvable);
+        return restVariable;
     }
 
     protected byte[] getVariableDataByteArray(CaseInstance caseInstance, String variableName, HttpServletResponse response) {
@@ -264,15 +277,25 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
     }
     
     protected List<RestVariable> addVariables(CaseInstance caseInstance) {
-        Map<String, Object> rawVariables = runtimeService.getVariables(caseInstance.getId());
+        // The variables are read in one command, so the variables whose value could not be resolved can be marked
+        Set<String> unresolvableVariableNames = new HashSet<>();
+        Map<String, Object> rawVariables = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
+            Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(caseInstance.getId());
+            Map<String, Object> variables = VariableValueUtil.resolveValues(variableInstances);
+            unresolvableVariableNames.addAll(VariableValueUtil.getUnresolvableVariableNames(variableInstances.values()));
+            return variables;
+        });
         if (restApiInterceptor != null) {
             rawVariables = restApiInterceptor.accessCaseInstanceVariables(caseInstance, rawVariables);
         }
-        return restResponseFactory.createRestVariables(rawVariables, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE);
+        List<RestVariable> restVariables = restResponseFactory.createRestVariables(rawVariables, caseInstance.getId(), CmmnRestResponseFactory.VARIABLE_CASE);
+        restResponseFactory.setValueUnresolvable(restVariables, unresolvableVariableNames);
+        return restVariables;
     }
     
     public void deleteAllVariables(CaseInstance caseInstance) {
-        Collection<String> currentVariables = runtimeService.getVariables(caseInstance.getId()).keySet();
+        Collection<String> currentVariables = runtimeService.getVariableInstances(caseInstance.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstanceVariables(caseInstance, currentVariables);
         }

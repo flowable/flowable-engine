@@ -17,7 +17,10 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,7 +30,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
 import tools.jackson.databind.JsonNode;
@@ -187,6 +192,82 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
     }
 
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testVariableWithUnresolvableValue() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("customer", "Kermit")
+                .variable("order", new TestSerializableVariable(1))
+                .start();
+
+        // Make the value of the order variable unresolvable
+        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            VariableInstanceEntity variableInstance = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .variableName("order")
+                    .excludeVariableInitialization()
+                    .singleResult();
+            ByteArrayEntity byteArray = cmmnEngineConfiguration.getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+            byteArray.setBytes("not a serialized object".getBytes(StandardCharsets.UTF_8));
+            return null;
+        });
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCES) + "?caseInstanceId=" + caseInstance.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        Map<String, JsonNode> variables = new HashMap<>();
+        node.path("data").forEach(variableInstanceNode -> variables.put(variableInstanceNode.path("variable").path("name").asString(),
+                variableInstanceNode.path("variable")));
+        assertUnresolvableOrderVariable(variables);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_COLLECTION, caseInstance.getId());
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        node = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        variables.clear();
+        node.forEach(variableNode -> variables.put(variableNode.path("name").asString(), variableNode));
+        assertUnresolvableOrderVariable(variables);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE, caseInstance.getId(), "order");
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        node = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(node.path("name").asString()).isEqualTo("order");
+        assertThat(node.path("value").isNull()).isTrue();
+        assertThat(node.path("valueUnresolvable").asBoolean()).isTrue();
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId());
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        node = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        variables.clear();
+        node.forEach(variableNode -> variables.put(variableNode.path("name").asString(), variableNode));
+        assertUnresolvableOrderVariable(variables);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE, task.getId(), "order");
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        node = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(node.path("name").asString()).isEqualTo("order");
+        assertThat(node.path("valueUnresolvable").asBoolean()).isTrue();
+    }
+
+    protected void assertUnresolvableOrderVariable(Map<String, JsonNode> variables) {
+        assertThat(variables).containsOnlyKeys("customer", "order");
+        assertThat(variables.get("customer").path("value").asString()).isEqualTo("Kermit");
+        assertThat(variables.get("customer").has("valueUnresolvable")).isFalse();
+        assertThat(variables.get("order").path("value").isNull()).isTrue();
+        assertThat(variables.get("order").path("valueUnresolvable").asBoolean()).isTrue();
+    }
+
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
             throws IOException {
 
@@ -216,6 +297,21 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                 }
             }
             assertThat(variableFound).as("Variable " + variableName + " is missing").isTrue();
+        }
+    }
+
+    public static class TestSerializableVariable implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        protected int number;
+
+        public TestSerializableVariable(int number) {
+            this.number = number;
+        }
+
+        public int getNumber() {
+            return number;
         }
     }
 }

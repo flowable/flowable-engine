@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -58,6 +59,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired
     protected CmmnRepositoryService repositoryService;

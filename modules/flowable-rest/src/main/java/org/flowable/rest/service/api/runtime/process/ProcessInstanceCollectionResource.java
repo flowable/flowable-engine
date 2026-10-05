@@ -14,14 +14,17 @@
 package org.flowable.rest.service.api.runtime.process;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -29,6 +32,8 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.rest.service.api.BulkDeleteInstancesRestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,6 +70,9 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     
     @Autowired
     protected RepositoryService repositoryService;
+
+    @Autowired
+    protected ManagementService managementService;
 
     @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
@@ -426,12 +434,22 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             if (request.getReturnVariables()) {
                 Map<String, Object> runtimeVariableMap = null;
                 List<HistoricVariableInstance> historicVariableList = null;
+                Set<String> unresolvableVariableNames = new HashSet<>();
                 if (instance.isEnded()) {
                     historicVariableList = historyService.createHistoricVariableInstanceQuery().processInstanceId(instance.getId()).list();
                 } else {
-                    runtimeVariableMap = runtimeService.getVariables(instance.getId());
+                    // The variables are read in one command, so the variables whose value could not be resolved can be marked
+                    String processInstanceId = instance.getId();
+                    runtimeVariableMap = managementService.executeCommand(commandContext -> {
+                        // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
+                        Map<String, VariableInstance> variableInstances = runtimeService.getVariableInstances(processInstanceId);
+                        Map<String, Object> variables = VariableValueUtil.resolveValues(variableInstances);
+                        unresolvableVariableNames.addAll(VariableValueUtil.getUnresolvableVariableNames(variableInstances.values()));
+                        return variables;
+                    });
                 }
                 processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance, true, runtimeVariableMap, historicVariableList);
+                restResponseFactory.setValueUnresolvable(processInstanceResponse.getVariables(), unresolvableVariableNames);
 
             } else {
                 processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance);

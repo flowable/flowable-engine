@@ -25,13 +25,16 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.util.VariableValueUtil;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -53,6 +56,9 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     @Autowired
     protected RuntimeService runtimeService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -285,20 +291,24 @@ public class BaseExecutionVariableResource implements InitializingBean {
     }
 
     public RestVariable getVariableFromRequestWithoutAccessCheck(Execution execution, String variableName, RestVariableScope variableScope, boolean includeBinary) {
+        // The variable is read in one command, so a variable whose value could not be resolved can be marked
+        return managementService.executeCommand(commandContext -> readVariable(execution, variableName, variableScope, includeBinary));
+    }
 
+    protected RestVariable readVariable(Execution execution, String variableName, RestVariableScope variableScope, boolean includeBinary) {
         boolean variableFound = false;
-        Object value = null;
+        VariableInstance variableInstance = null;
 
         if (variableScope == null) {
             // First, check local variables (which have precedence when no scope
             // is supplied)
-            if (runtimeService.hasVariableLocal(execution.getId(), variableName)) {
-                value = runtimeService.getVariableLocal(execution.getId(), variableName);
+            variableInstance = runtimeService.getVariableInstanceLocal(execution.getId(), variableName);
+            if (variableInstance != null) {
                 variableScope = RestVariableScope.LOCAL;
                 variableFound = true;
             } else {
                 if (execution.getParentId() != null) {
-                    value = runtimeService.getVariable(execution.getParentId(), variableName);
+                    variableInstance = runtimeService.getVariableInstance(execution.getParentId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
                     variableFound = true;
                 }
@@ -306,13 +316,13 @@ public class BaseExecutionVariableResource implements InitializingBean {
         } else if (variableScope == RestVariableScope.GLOBAL) {
             // Use parent to get variables
             if (execution.getParentId() != null) {
-                value = runtimeService.getVariable(execution.getParentId(), variableName);
+                variableInstance = runtimeService.getVariableInstance(execution.getParentId(), variableName);
                 variableScope = RestVariableScope.GLOBAL;
                 variableFound = true;
             }
         } else if (variableScope == RestVariableScope.LOCAL) {
 
-            value = runtimeService.getVariableLocal(execution.getId(), variableName);
+            variableInstance = runtimeService.getVariableInstanceLocal(execution.getId(), variableName);
             variableScope = RestVariableScope.LOCAL;
             variableFound = true;
         }
@@ -320,7 +330,11 @@ public class BaseExecutionVariableResource implements InitializingBean {
         if (!variableFound) {
             throw new FlowableObjectNotFoundException("Execution '" + execution.getId() + "' does not have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
-            return constructRestVariable(variableName, value, variableScope, execution.getId(), includeBinary);
+            // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
+            Object value = VariableValueUtil.resolveValue(variableInstance);
+            RestVariable restVariable = constructRestVariable(variableName, value, variableScope, execution.getId(), includeBinary);
+            restVariable.setValueUnresolvable(VariableValueUtil.isValueUnresolvable(variableInstance));
+            return restVariable;
         }
     }
 

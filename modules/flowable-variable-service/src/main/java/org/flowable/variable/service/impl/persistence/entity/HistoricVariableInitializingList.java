@@ -20,6 +20,7 @@ import org.flowable.common.engine.impl.context.Context;
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
+import org.flowable.variable.service.impl.util.VariableValueUtil;
 
 /**
  * List that initialises binary variable values if command-context is active.
@@ -63,7 +64,8 @@ public class HistoricVariableInitializingList extends ArrayList<HistoricVariable
      */
     protected void initializeVariable(HistoricVariableInstanceEntity e) {
         if (Context.getCommandContext() != null && e != null && e.getVariableType() != null) {
-            e.getValue();
+            // A variable whose value cannot be resolved is kept with a null value instead of failing the query that includes the variables
+            VariableValueUtil.initializeValue(e);
 
             // make sure JPA entities are cached for later retrieval
             if (JPAEntityVariableType.TYPE_NAME.equals(e.getVariableType().getTypeName()) || JPAEntityListVariableType.TYPE_NAME.equals(e.getVariableType().getTypeName())) {

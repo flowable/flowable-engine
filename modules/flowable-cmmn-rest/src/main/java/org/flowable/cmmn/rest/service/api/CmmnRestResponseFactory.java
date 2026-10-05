@@ -15,9 +15,13 @@ package org.flowable.cmmn.rest.service.api;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +34,10 @@ import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.deployer.ResourceNameUtil;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
@@ -63,6 +71,7 @@ import org.flowable.common.rest.variable.BigIntegerRestVariableConverter;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
+import org.flowable.common.rest.variable.EngineRestVariable;
 import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
 import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
@@ -84,8 +93,14 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HasUnresolvableValue;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.util.VariableValueUtil;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -149,17 +164,24 @@ public class CmmnRestResponseFactory {
             response.setCaseInstanceUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, response.getCaseInstanceId()));
         }
 
+        List<VariableInstanceEntity> taskQueryVariables = task instanceof TaskEntity taskEntity ? taskEntity.getQueryVariables() : null;
         Map<String, Object> variableMap = task.getProcessVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() == null);
             for (String name : variableMap.keySet()) {
-                response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                response.addVariable(restVariable);
             }
         }
 
         variableMap = task.getTaskLocalVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() != null);
             for (String name : variableMap.keySet()) {
-                response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                response.addVariable(restVariable);
             }
         }
 
@@ -256,6 +278,58 @@ public class CmmnRestResponseFactory {
         } catch (Exception e) {
             throw new FlowableException("Error writing form model response", e);
         }
+    }
+
+    /**
+     * Creates the REST variables for the passed variable instances. A variable whose value cannot be resolved is returned with a null value
+     * and is marked as having an unresolvable value.
+     */
+    public List<RestVariable> createRestVariables(Collection<VariableInstance> variableInstances, String id, int variableType, RestVariableScope scope) {
+        List<RestVariable> result = new ArrayList<>(variableInstances.size());
+        for (VariableInstance variableInstance : variableInstances) {
+            if (variableInstance != null) {
+                result.add(createRestVariable(variableInstance, scope, id, variableType, false));
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Creates the REST variable for the passed variable instance. A variable whose value cannot be resolved is returned with a null value
+     * and is marked as having an unresolvable value.
+     */
+    public RestVariable createRestVariable(VariableInstance variableInstance, RestVariableScope scope, String id, int variableType, boolean includeBinaryValue) {
+        Object value = VariableValueUtil.resolveValue(variableInstance);
+        RestVariable restVariable = createRestVariable(variableInstance.getName(), value, scope, id, variableType, includeBinaryValue);
+        restVariable.setValueUnresolvable(VariableValueUtil.isValueUnresolvable(variableInstance));
+        return restVariable;
+    }
+
+    /**
+     * Marks the passed REST variables whose name is one of the passed names as variables whose value could not be resolved.
+     */
+    public void setValueUnresolvable(Collection<? extends EngineRestVariable> restVariables, Set<String> unresolvableVariableNames) {
+        if (restVariables != null && !unresolvableVariableNames.isEmpty()) {
+            for (EngineRestVariable restVariable : restVariables) {
+                if (unresolvableVariableNames.contains(restVariable.getName())) {
+                    restVariable.setValueUnresolvable(true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns whether the value of the passed variable could not be resolved when it was read, its value is null in that case.
+     */
+    protected boolean isValueUnresolvable(Object variable) {
+        return VariableValueUtil.isValueUnresolvable(variable);
+    }
+
+    protected <T extends HasUnresolvableValue> Set<String> getUnresolvableVariableNames(List<T> queryVariables, Predicate<T> filter) {
+        if (queryVariables == null) {
+            return Collections.emptySet();
+        }
+        return VariableValueUtil.getUnresolvableVariableNames(queryVariables.stream().filter(filter).toList());
     }
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType) {
@@ -489,8 +563,13 @@ public class CmmnRestResponseFactory {
         result.setReferenceType(caseInstance.getReferenceType());
         result.setTenantId(caseInstance.getTenantId());
 
+        Set<String> unresolvableVariableNames = caseInstance instanceof CaseInstanceEntity caseInstanceEntity
+                ? VariableValueUtil.getUnresolvableVariableNames(caseInstanceEntity.getQueryVariables()) : Collections.emptySet();
         for (String name : caseInstance.getCaseVariables().keySet()) {
-            result.addVariable(createRestVariable(name, caseInstance.getCaseVariables().get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE, false, urlBuilder));
+            RestVariable restVariable = createRestVariable(name, caseInstance.getCaseVariables().get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE,
+                    false, urlBuilder);
+            restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+            result.addVariable(restVariable);
         }
 
         return result;
@@ -589,9 +668,13 @@ public class CmmnRestResponseFactory {
 
         Map<String, Object> variableMap = planItemInstance.getPlanItemInstanceLocalVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = planItemInstance instanceof PlanItemInstanceEntity planItemInstanceEntity
+                    ? VariableValueUtil.getUnresolvableVariableNames(planItemInstanceEntity.getQueryVariables()) : Collections.emptySet();
             for (String name : variableMap.keySet()) {
-                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
-                        planItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, planItemInstance.getId(), VARIABLE_PLAN_ITEM, false,
+                        urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                result.addLocalVariable(restVariable);
             }
         }
 
@@ -628,9 +711,10 @@ public class CmmnRestResponseFactory {
             scope = RestVariableScope.GLOBAL;
         }
 
-        result.setVariable(
-                createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false,
-                        urlBuilder));
+        RestVariable restVariable = createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE,
+                false, urlBuilder);
+        restVariable.setValueUnresolvable(isValueUnresolvable(variableInstance));
+        result.setVariable(restVariable);
         return result;
     }
 
@@ -733,8 +817,13 @@ public class CmmnRestResponseFactory {
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE, caseInstance.getId()));
         Map<String, Object> variableMap = caseInstance.getCaseVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = caseInstance instanceof HistoricCaseInstanceEntity historicCaseInstanceEntity
+                    ? VariableValueUtil.getUnresolvableVariableNames(historicCaseInstanceEntity.getQueryVariables()) : Collections.emptySet();
             for (String name : variableMap.keySet()) {
-                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_HISTORY_CASE, false, urlBuilder));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_HISTORY_CASE, false,
+                        urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                result.addVariable(restVariable);
             }
         }
         result.setTenantId(caseInstance.getTenantId());
@@ -797,17 +886,26 @@ public class CmmnRestResponseFactory {
         result.setTaskDefinitionKey(taskInstance.getTaskDefinitionKey());
         result.setWorkTimeInMillis(taskInstance.getWorkTimeInMillis());
         result.setUrl(urlBuilder.buildUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE, taskInstance.getId()));
+        List<HistoricVariableInstanceEntity> taskQueryVariables = taskInstance instanceof HistoricTaskInstanceEntity historicTaskInstanceEntity
+                ? historicTaskInstanceEntity.getQueryVariables() : null;
         Map<String, Object> variableMap = taskInstance.getProcessVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() == null);
             for (String name : variableMap.keySet()) {
-                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
+                        urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                result.addVariable(restVariable);
             }
         }
         variableMap = taskInstance.getTaskLocalVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() != null);
             for (String name : variableMap.keySet()) {
-                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
-                        urlBuilder));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
+                        urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                result.addVariable(restVariable);
             }
         }
         return result;
@@ -844,8 +942,10 @@ public class CmmnRestResponseFactory {
             scope = RestVariableScope.GLOBAL;
         }
 
-        result.setVariable(createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), scope, variableInstance.getId(),
-                VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
+        RestVariable restVariable = createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), scope, variableInstance.getId(),
+                VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder);
+        restVariable.setValueUnresolvable(isValueUnresolvable(variableInstance));
+        result.setVariable(restVariable);
         return result;
     }
 
@@ -965,9 +1065,13 @@ public class CmmnRestResponseFactory {
 
         Map<String, Object> variableMap = historicPlanItemInstance.getPlanItemInstanceLocalVariables();
         if (variableMap != null) {
+            Set<String> unresolvableVariableNames = historicPlanItemInstance instanceof HistoricPlanItemInstanceEntity historicPlanItemInstanceEntity
+                    ? VariableValueUtil.getUnresolvableVariableNames(historicPlanItemInstanceEntity.getQueryVariables()) : Collections.emptySet();
             for (String name : variableMap.keySet()) {
-                result.addLocalVariable((createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL,
-                        historicPlanItemInstance.getId(), VARIABLE_PLAN_ITEM, false, urlBuilder)));
+                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, historicPlanItemInstance.getId(), VARIABLE_PLAN_ITEM,
+                        false, urlBuilder);
+                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
+                result.addLocalVariable(restVariable);
             }
         }
 

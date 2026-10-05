@@ -23,7 +23,7 @@ import org.flowable.variable.api.types.VariableType;
  * @author Marcus Klimstra (CGI)
  * @author Joram Barrez
  */
-public interface VariableInstanceEntity extends VariableInstance, Entity, HasRevision {
+public interface VariableInstanceEntity extends VariableInstance, Entity, HasRevision, HasUnresolvableValue {
 
     void forceUpdate();
 
