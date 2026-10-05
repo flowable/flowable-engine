@@ -13,6 +13,7 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +63,7 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
+        processEngineConfiguration.setMailServerDefaultCharset(initialDefaultCharset);
         processEngineConfiguration.setMailServers(initialMailServers);
         reinitilizeMailClients();
     }

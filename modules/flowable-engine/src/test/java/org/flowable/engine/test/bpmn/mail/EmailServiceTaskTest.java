@@ -503,6 +503,52 @@ public class EmailServiceTaskTest extends EmailTestCase {
     }
 
     @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testTextMailWithDataSourceAttachment.bpmn20.xml")
+    public void testTextMailWithDataSourceAttachmentLongNonAsciiFileName() throws Exception {
+        String fileName = "Précis of Evidence VA23-5-1034 Lorge Chocolatier PN 1136882 Retail Henry Street Kenmare Co.pdf";
+        String fileContent = "This is the file content";
+        HashMap<String, Object> vars = new HashMap<>();
+        vars.put("attachmentsBean", new AttachmentsBean());
+        vars.put("fileContent", fileContent);
+        vars.put("fileName", fileName);
+        runtimeService.startProcessInstanceByKey("textMailWithDataSourceAttachment", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        WiserMessage message = messages.get(0);
+        MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
+        assertThat(mm.getCount()).isEqualTo(2);
+        String attachmentFileName = mm.getBodyPart(1).getDataHandler().getName();
+        assertThat(attachmentFileName).isEqualTo(fileName);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/mail/EmailServiceTaskTest.testTextMailWithDataSourceAttachment.bpmn20.xml")
+    public void testTextMailWithDataSourceAttachmentUsesConfiguredCharset() throws Exception {
+        processEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.ISO_8859_1);
+        reinitilizeMailClients();
+
+        String fileName = "café.pdf";
+        String fileContent = "This is the file content";
+        HashMap<String, Object> vars = new HashMap<>();
+        vars.put("attachmentsBean", new AttachmentsBean());
+        vars.put("fileContent", fileContent);
+        vars.put("fileName", fileName);
+        runtimeService.startProcessInstanceByKey("textMailWithDataSourceAttachment", vars);
+
+        List<WiserMessage> messages = wiser.getMessages();
+        assertThat(messages).hasSize(1);
+        WiserMessage message = messages.get(0);
+        MimeMultipart mm = (MimeMultipart) message.getMimeMessage().getContent();
+        String contentDisposition = mm.getBodyPart(1).getHeader("Content-Disposition")[0];
+
+        // 'é' is a single byte (0xE9) in ISO-8859-1 but two bytes (0xC3 0xA9) in UTF-8: this string can only
+        // appear if the configured ISO-8859-1 charset was actually used to encode the attachment file name.
+        assertThat(contentDisposition).contains("ISO-8859-1''caf%E9.pdf");
+        assertThat(mm.getBodyPart(1).getDataHandler().getName()).isEqualTo(fileName);
+    }
+
+    @Test
     @Deployment
     public void testTextMailWithNotExistingFileAttachment() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
