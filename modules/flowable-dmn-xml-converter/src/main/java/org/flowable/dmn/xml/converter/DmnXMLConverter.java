@@ -339,8 +339,7 @@ public class DmnXMLConverter implements DmnXMLConstants {
                     currentDecision.setExpression(currentDecisionTable);
                     parentElement = currentDecisionTable;
                 } else if (ELEMENT_DESCRIPTION.equals(xtr.getLocalName())) {
-                    // limit description to 255 characters
-                    parentElement.setDescription(StringUtils.abbreviate(xtr.getElementText(), 255));
+                    parentElement.setDescription(xtr.getElementText());
                 } else if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     while (xtr.hasNext()) {
                         xtr.next();
@@ -673,6 +672,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
                 if (StringUtils.isNotEmpty(decisionService.getName())) {
                     xtw.writeAttribute(ATTRIBUTE_NAME, decisionService.getName());
                 }
+
+                DmnXMLUtil.writeElementDescription(decisionService, xtw);
 
                 for (DmnElementReference reference : decisionService.getOutputDecisions()) {
                     xtw.writeStartElement(ELEMENT_OUTPUT_DECISION);

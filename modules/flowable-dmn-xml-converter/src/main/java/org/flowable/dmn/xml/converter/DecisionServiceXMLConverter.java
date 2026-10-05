@@ -38,6 +38,9 @@ public class DecisionServiceXMLConverter extends BaseDmnXMLConverter {
         try {
             while (!readyWithDecisionService && xtr.hasNext()) {
                 xtr.next();
+                if (xtr.isStartElement() && ELEMENT_DESCRIPTION.equalsIgnoreCase(xtr.getLocalName())) {
+                    decisionService.setDescription(xtr.getElementText());
+                }
                 if (xtr.isStartElement() && ELEMENT_OUTPUT_DECISION.equalsIgnoreCase(xtr.getLocalName())) {
                     DmnElementReference ref = new DmnElementReference();
                     ref.setHref(xtr.getAttributeValue(null, ATTRIBUTE_HREF));

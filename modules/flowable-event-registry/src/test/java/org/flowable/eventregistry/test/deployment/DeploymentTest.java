@@ -61,6 +61,23 @@ public class DeploymentTest extends AbstractFlowableEventTest {
     }
 
     @Test
+    public void deployChannelDefinitionWithDescriptionLongerThanColumnSize() {
+        String description = "a".repeat(2500) + "b".repeat(2500);
+        EventDeployment deployment = repositoryService.createDeployment()
+                .addString("longDescription.channel", "{\"key\": \"longDescriptionChannel\", \"category\": \"channel\", \"name\": \"Long description channel\","
+                        + " \"description\": \"" + description + "\", \"channelType\": \"inbound\", \"type\": \"jms\", \"destination\": \"testQueue\","
+                        + " \"deserializerType\": \"json\", \"channelEventKeyDetection\": {\"fixedValue\": \"myEvent\"}}")
+                .deploy();
+
+        try {
+            ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            assertThat(channelDefinition.getDescription()).isEqualTo(description.substring(0, 4000));
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId());
+        }
+    }
+
+    @Test
     @ChannelDeploymentAnnotation(resources = "org/flowable/eventregistry/test/deployment/simpleChannel.channel")
     public void deploySingleChannelDefinition() {
         ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery()

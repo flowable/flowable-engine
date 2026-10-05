@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
@@ -45,6 +46,11 @@ import org.slf4j.LoggerFactory;
 public class ChannelDefinitionParse {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ChannelDefinitionParse.class);
+
+    /**
+     * Max length of the database field FLW_CHANNEL_DEFINITION.DESCRIPTION_
+     */
+    protected static final int DESCRIPTION_MAX_LENGTH = 4000;
 
     protected String name;
 
@@ -79,7 +85,7 @@ public class ChannelDefinitionParse {
                 channelDefinitionEntity.setKey(channelModel.getKey());
                 channelDefinitionEntity.setCategory(channelModel.getCategory());
                 channelDefinitionEntity.setName(channelModel.getName());
-                channelDefinitionEntity.setDescription(channelModel.getDescription());
+                channelDefinitionEntity.setDescription(StringUtils.truncate(channelModel.getDescription(), DESCRIPTION_MAX_LENGTH));
                 channelDefinitionEntity.setType(channelModel.getChannelType());
                 channelDefinitionEntity.setImplementation(channelModel.getType());
                 channelDefinitionEntity.setResourceName(name);
