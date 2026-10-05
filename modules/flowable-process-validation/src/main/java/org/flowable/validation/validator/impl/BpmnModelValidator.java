@@ -53,10 +53,6 @@ public class BpmnModelValidator extends ValidatorImpl {
             validationContext.addError(Problems.PROCESS_DEFINITION_NAME_TOO_LONG, process,
                     "The name of the process definition must not contain more than " + Constraints.PROCESS_DEFINITION_NAME_MAX_LENGTH + " characters");
         }
-        if (process.getDocumentation() != null && process.getDocumentation().length() > Constraints.PROCESS_DEFINITION_DOCUMENTATION_MAX_LENGTH) {
-            validationContext.addError(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, process,
-                    "The documentation of the process definition must not contain more than " + Constraints.PROCESS_DEFINITION_DOCUMENTATION_MAX_LENGTH + " characters");
-        }
     }
 
     protected void handleBPMNModelConstraints(BpmnModel bpmnModel, ProcessValidationContext validationContext) {

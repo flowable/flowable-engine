@@ -106,17 +106,39 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    public void testViolateProcessDefinitionNameAndDescriptionMaximumLength() {
+    public void testViolateProcessDefinitionNameMaximumLength() {
         assertThatThrownBy(() ->
                 repositoryService.createDeployment()
                         .addClasspathResource("org/flowable/engine/test/bpmn/deployment/processWithLongNameAndDescription.bpmn20.xml")
                         .deploy())
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessageContaining(Problems.PROCESS_DEFINITION_NAME_TOO_LONG)
-                .hasMessageContaining(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG);
+                .hasMessageNotContaining(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG);
 
         // Verify that nothing is deployed
         assertThat(repositoryService.createDeploymentQuery().count()).isZero();
+    }
+
+    @Test
+    public void testProcessDefinitionDescriptionIsTruncatedToMaximumLength() {
+        String documentation = "a".repeat(1500) + "b".repeat(1500) + "c".repeat(1500);
+        String deploymentId = repositoryService.createDeployment()
+                .addString("processWithLongDescription.bpmn20.xml",
+                        "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\" targetNamespace=\"org.flowable.engine.test.bpmn.deployment\">"
+                                + "<process id=\"processWithLongDescription\" isExecutable=\"true\">"
+                                + "<documentation>" + documentation + "</documentation>"
+                                + "<startEvent id=\"start\" />"
+                                + "<sequenceFlow id=\"flow1\" sourceRef=\"start\" targetRef=\"end\" />"
+                                + "<endEvent id=\"end\" />"
+                                + "</process>"
+                                + "</definitions>")
+                .deploy()
+                .getId();
+        deploymentIdsForAutoCleanup.add(deploymentId);
+
+        int expectedLength = "oracle".equals(processEngineConfiguration.getDatabaseType()) ? 2000 : 4000;
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentId).singleResult();
+        assertThat(processDefinition.getDescription()).isEqualTo(documentation.substring(0, expectedLength));
     }
 
     @Test

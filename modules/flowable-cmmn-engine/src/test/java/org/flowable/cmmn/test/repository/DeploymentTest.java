@@ -257,4 +257,24 @@ public class DeploymentTest extends FlowableCmmnTestCase {
         assertThat(caseDefinition).isNotNull();
 
     }
+
+    @Test
+    public void testCaseDefinitionDescriptionIsTruncatedToMaximumLength() {
+        String documentation = "a".repeat(2500) + "b".repeat(2500);
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addString("caseWithLongDescription.cmmn",
+                        "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\" targetNamespace=\"http://flowable.org/cmmn\">"
+                                + "<case id=\"caseWithLongDescription\">"
+                                + "<documentation>" + documentation + "</documentation>"
+                                + "<casePlanModel id=\"myPlanModel\" />"
+                                + "</case>"
+                                + "</definitions>")
+                .deploy();
+        autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("caseWithLongDescription")
+                .singleResult();
+        assertThat(caseDefinition.getDescription()).isEqualTo(documentation.substring(0, 4000));
+    }
 }
