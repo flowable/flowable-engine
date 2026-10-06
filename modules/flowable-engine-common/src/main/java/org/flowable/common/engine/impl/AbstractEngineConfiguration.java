@@ -96,6 +96,7 @@ import org.flowable.common.engine.impl.interceptor.CrDbRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
+import org.flowable.common.engine.impl.interceptor.SpannerRetryInterceptor;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.logging.LoggingListener;
@@ -379,6 +380,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
+    public static final String DATABASE_TYPE_SPANNER = "spanner";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         return DbUtil.getDefaultDatabaseTypeMappings();
@@ -569,6 +571,8 @@ public abstract class AbstractEngineConfiguration {
 
             if (DATABASE_TYPE_COCKROACHDB.equals(databaseType)) {
                 interceptors.add(new CrDbRetryInterceptor());
+            } else if (DATABASE_TYPE_SPANNER.equals(databaseType)) {
+                interceptors.add(new SpannerRetryInterceptor());
             }
 
             CommandInterceptor transactionInterceptor = createTransactionInterceptor();

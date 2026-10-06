@@ -103,6 +103,7 @@ import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.logging.LoggingSession;
 import org.flowable.common.engine.impl.logging.LoggingSessionFactory;
 import org.flowable.common.engine.impl.persistence.GenericManagerFactory;
+import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.common.engine.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
@@ -2157,9 +2158,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     @Override
     public void initIdGenerator() {
         if (idGenerator == null) {
-            DbIdGenerator dbIdGenerator = new DbIdGenerator();
-            dbIdGenerator.setIdBlockSize(idBlockSize);
-            idGenerator = dbIdGenerator;
+            if (DATABASE_TYPE_SPANNER.equals(databaseType)) {
+                idGenerator = new StrongUuidGenerator();
+            } else {
+                DbIdGenerator dbIdGenerator = new DbIdGenerator();
+                dbIdGenerator.setIdBlockSize(idBlockSize);
+                idGenerator = dbIdGenerator;
+            }
         }
 
         if (idGenerator instanceof DbIdGenerator dbIdGenerator) {
