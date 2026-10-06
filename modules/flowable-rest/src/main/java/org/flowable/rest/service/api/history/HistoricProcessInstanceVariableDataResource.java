@@ -26,6 +26,8 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,8 +91,14 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String processInstanceId, String variableName) {
+        // Only the value of the requested variable is resolved, in the same command as the query
+        return managementService.executeCommand(commandContext -> readVariable(includeBinary, processInstanceId, variableName));
+    }
 
-        HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+    protected RestVariable readVariable(boolean includeBinary, String processInstanceId, String variableName) {
+        HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
+                .includeProcessVariables(true)
+                .singleResult();
 
         if (processObject == null) {
             throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' could not be found.", HistoricProcessInstanceEntity.class);
@@ -100,7 +108,13 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
             restApiInterceptor.accessHistoryProcessInfoById(processObject);
         }
 
-        Object value = processObject.getProcessVariables().get(variableName);
+        HistoricVariableInstance variableInstance = null;
+        for (HistoricVariableInstanceEntity queryVariable : ((HistoricProcessInstanceEntity) processObject).getQueryVariables()) {
+            if (queryVariable.getId() != null && queryVariable.getTaskId() == null && variableName.equals(queryVariable.getName())) {
+                variableInstance = queryVariable;
+            }
+        }
+        Object value = variableInstance != null ? variableInstance.getValue() : null;
 
         if (value == null) {
             throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' variable value for " + variableName + " could not be found.", VariableInstanceEntity.class);

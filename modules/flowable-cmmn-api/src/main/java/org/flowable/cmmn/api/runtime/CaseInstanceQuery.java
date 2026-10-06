@@ -250,6 +250,20 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
 
     /**
+     * Includes case variables into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    CaseInstanceQuery includeCaseVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the case variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    CaseInstanceQuery includeCaseVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
+
+    /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
      */
     CaseInstanceQuery or();

@@ -41,6 +41,7 @@ import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Joram Barrez
@@ -114,6 +115,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
     protected Collection<String> variableNamesToInclude;
+    protected boolean excludeVariableInitialization;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -940,11 +942,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findIdsByCriteria(this);
             
         } else if (includeCaseVariables) {
-            results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
+            results = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization, () -> {
+                List<HistoricCaseInstance> caseInstances = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findWithVariablesByQueryCriteria(this);
 
-            if (caseInstanceId != null) {
-                addCachedVariableForQueryById(commandContext, results);
-            }
+                if (caseInstanceId != null) {
+                    addCachedVariableForQueryById(commandContext, caseInstances);
+                }
+                return caseInstances;
+            });
 
         } else {
             results = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().findByCriteria(this);
@@ -1047,6 +1052,20 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         includeCaseVariables();
         this.variableNamesToInclude = new LinkedHashSet<>(variableNames);
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery includeCaseVariables(boolean excludeVariableInitialization) {
+        includeCaseVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames, boolean excludeVariableInitialization) {
+        includeCaseVariables(variableNames);
+        this.excludeVariableInitialization = excludeVariableInitialization;
         return this;
     }
 
@@ -1553,6 +1572,10 @@ public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public Collection<String> getVariableNamesToInclude() {
         return variableNamesToInclude;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public List<HistoricCaseInstanceQueryImpl> getOrQueryObjects() {

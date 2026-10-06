@@ -21,7 +21,9 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.rest.service.api.BulkDeleteInstancesRestActionRequest;
+import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
+import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.api.DataResponse;
@@ -423,8 +425,14 @@ public class CaseInstanceCollectionResource extends BaseCaseInstanceResource {
 
             CaseInstanceResponse caseInstanceResponse = null;
             if (request.getReturnVariables()) {
-                Map<String, Object> runtimeVariableMap = runtimeService.getVariables(instance.getId());
-                caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(instance, true, runtimeVariableMap);
+                // The variable values are resolved when the response is created, so a variable whose value cannot be resolved does not fail the response
+                CaseInstance startedInstance = instance;
+                caseInstanceResponse = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+                    CaseInstanceResponse response = restResponseFactory.createCaseInstanceResponse(startedInstance, true, null);
+                    restResponseFactory.createRestVariables(runtimeService.getVariableInstances(startedInstance.getId()).values(), startedInstance.getId(),
+                            CmmnRestResponseFactory.VARIABLE_CASE, RestVariableScope.LOCAL).forEach(response::addVariable);
+                    return response;
+                });
 
             } else {
                 caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(instance);

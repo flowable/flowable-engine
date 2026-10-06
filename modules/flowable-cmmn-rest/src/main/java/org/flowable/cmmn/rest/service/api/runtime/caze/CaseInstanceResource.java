@@ -24,7 +24,6 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
 import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -54,9 +53,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceResource extends BaseCaseInstanceResource {
-    
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired
     protected CmmnMigrationService cmmnMigrationService;

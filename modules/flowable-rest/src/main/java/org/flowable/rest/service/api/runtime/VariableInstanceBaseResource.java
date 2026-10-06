@@ -22,6 +22,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -47,12 +48,15 @@ public class VariableInstanceBaseResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<VariableInstanceResponse> getQueryResponse(VariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
-        VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+        VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().excludeVariableInitialization();
 
         // Populate query based on request
         if (Boolean.TRUE.equals(queryRequest.getExcludeTaskVariables())) {
@@ -92,8 +96,9 @@ public class VariableInstanceBaseResource {
             restApiInterceptor.accessVariableInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
-                restResponseFactory::createVariableInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return managementService.executeCommand(commandContext -> paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
+                restResponseFactory::createVariableInstanceResponseList));
     }
 
     protected void addVariables(VariableInstanceQuery variableInstanceQuery, List<QueryVariable> variables) {

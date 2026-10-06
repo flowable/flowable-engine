@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.VariableInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
@@ -51,12 +52,15 @@ public class VariableInstanceBaseResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<VariableInstanceResponse> getQueryResponse(VariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
-        VariableInstanceQuery query = runtimeService.createVariableInstanceQuery();
+        VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().excludeVariableInitialization();
 
         // Populate query based on request
         if (Boolean.TRUE.equals(queryRequest.getExcludeTaskVariables())) {
@@ -96,8 +100,9 @@ public class VariableInstanceBaseResource {
             restApiInterceptor.accessVariableInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
-                restResponseFactory::createVariableInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(allRequestParams, queryRequest, query, "variableName",
+                allowedSortProperties, restResponseFactory::createVariableInstanceResponseList));
     }
     
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {

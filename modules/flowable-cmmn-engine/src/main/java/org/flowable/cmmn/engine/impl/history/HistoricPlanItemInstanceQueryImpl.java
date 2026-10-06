@@ -28,6 +28,7 @@ import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.query.AbstractQuery;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Dennis Federico
@@ -99,6 +100,7 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     protected String locale;
     protected boolean withLocalizationFallback;
     protected boolean includeLocalVariables;
+    protected boolean excludeVariableInitialization;
 
     protected List<HistoricPlanItemInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricPlanItemInstanceQueryImpl currentOrQueryObject;
@@ -740,6 +742,13 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
         return this;
     }
 
+    @Override
+    public HistoricPlanItemInstanceQuery includeLocalVariables(boolean excludeVariableInitialization) {
+        includeLocalVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
 
     @Override
     public HistoricPlanItemInstanceQuery orderByCreateTime() {
@@ -842,7 +851,8 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     public List<HistoricPlanItemInstance> executeList(CommandContext commandContext) {
         List<HistoricPlanItemInstance> historicPlanItems;
         if (includeLocalVariables){
-            historicPlanItems = CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findWithVariablesByCriteria(this);
+            historicPlanItems = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization,
+                    () -> CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findWithVariablesByCriteria(this));
         } else {
              historicPlanItems =CommandContextUtil.getHistoricPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
         }
@@ -1030,6 +1040,10 @@ public class HistoricPlanItemInstanceQueryImpl extends AbstractQuery<HistoricPla
     }
     public boolean isIncludeLocalVariables() {
         return includeLocalVariables;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public List<List<String>> getSafeInvolvedGroups() {

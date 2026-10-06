@@ -37,4 +37,13 @@ public interface RestVariableConverter {
      * Converts the given value and sets the converted value in the given {@link EngineRestVariable}.
      */
     void convertVariableValue(Object variableValue, EngineRestVariable result);
+
+    /**
+     * Whether this converter converts the values of the engine variable type with the given name. It is used to determine the REST type of
+     * a variable whose value cannot be resolved, the converter is otherwise selected based on the value.
+     * By default, the variable type name is compared with the {@link #getRestTypeName() REST type name}, ignoring the case.
+     */
+    default boolean isVariableTypeSupported(String variableTypeName) {
+        return getRestTypeName().equalsIgnoreCase(variableTypeName);
+    }
 }

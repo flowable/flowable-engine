@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
@@ -68,6 +69,9 @@ public class HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
@@ -239,13 +243,13 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getIncludeTaskLocalVariables() != null) {
             if (queryRequest.getIncludeTaskLocalVariables()) {
-                query.includeTaskLocalVariables();
+                query.includeTaskLocalVariables(true);
             }
         }
 
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
         }
 
@@ -288,8 +292,9 @@ public class HistoricTaskInstanceBaseResource {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
-            restResponseFactory::createHistoricTaskInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(allRequestParams, queryRequest, query, "taskInstanceId",
+                allowedSortProperties, restResponseFactory::createHistoricTaskInstanceResponseList));
     }
     
     /**

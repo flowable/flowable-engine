@@ -560,6 +560,20 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
 
     /**
+     * Include process variables in the process query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the process variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
+
+    /**
      * Only select process instances that failed due to an exception happening during a job execution.
      */
     HistoricProcessInstanceQuery withJobException();
