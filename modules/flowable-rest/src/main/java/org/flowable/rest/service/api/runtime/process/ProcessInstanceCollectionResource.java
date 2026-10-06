@@ -27,9 +27,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.rest.service.api.BulkDeleteInstancesRestActionRequest;
-import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -437,10 +435,8 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                         return restResponseFactory.createProcessInstanceResponse(startedInstance, true, null, historicVariableList);
                     }
 
-                    ProcessInstanceResponse response = restResponseFactory.createProcessInstanceResponse(startedInstance, true, null, null);
-                    restResponseFactory.createRestVariables(runtimeService.getVariableInstances(startedInstance.getId()).values(), startedInstance.getId(),
-                            RestResponseFactory.VARIABLE_PROCESS, RestVariableScope.LOCAL).forEach(response::addVariable);
-                    return response;
+                    return restResponseFactory.createProcessInstanceResponse(startedInstance, true,
+                            runtimeService.getVariableInstances(startedInstance.getId()).values(), null);
                 });
 
             } else {
