@@ -63,7 +63,6 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
-        processEngineConfiguration.setMailServerDefaultCharset(initialDefaultCharset);
         processEngineConfiguration.setMailServers(initialMailServers);
         reinitilizeMailClients();
     }
