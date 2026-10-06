@@ -63,7 +63,7 @@
         <db2-jcc.version>12.1.4.0</db2-jcc.version>
         <h2.version>2.4.240</h2.version>
         <hsqldb.version>2.7.4</hsqldb.version>
-        <mariadb.version>3.5.8</mariadb.version>
+        <mariadb.version>3.5.9</mariadb.version>
         <mssql-jdbc.version>13.4.0.jre11</mssql-jdbc.version>
         <mysql-connector.version>9.7.0</mysql-connector.version>
         <oracle.jdbc.version>23.26.1.0.0</oracle.jdbc.version>
