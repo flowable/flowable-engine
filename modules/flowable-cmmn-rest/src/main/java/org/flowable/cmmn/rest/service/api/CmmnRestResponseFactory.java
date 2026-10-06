@@ -628,7 +628,7 @@ public class CmmnRestResponseFactory {
         return result;
     }
 
-    public CaseInstanceResponse createCaseInstanceResponse(CaseInstance caseInstance, boolean returnVariables, Map<String, Object> runtimeVariableMap) {
+    public CaseInstanceResponse createCaseInstanceResponse(CaseInstance caseInstance, boolean returnVariables, Collection<VariableInstance> variableInstances) {
 
         RestUrlBuilder urlBuilder = createUrlBuilder();
         CaseInstanceResponse result = new CaseInstanceResponse();
@@ -654,9 +654,9 @@ public class CmmnRestResponseFactory {
 
         if (returnVariables) {
 
-            if (runtimeVariableMap != null) {
-                for (String name : runtimeVariableMap.keySet()) {
-                    result.addVariable(createRestVariable(name, runtimeVariableMap.get(name), RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE, false, urlBuilder));
+            if (variableInstances != null) {
+                for (VariableInstance variableInstance : variableInstances) {
+                    result.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, caseInstance.getId(), VARIABLE_CASE, false, urlBuilder));
                 }
             }
         }

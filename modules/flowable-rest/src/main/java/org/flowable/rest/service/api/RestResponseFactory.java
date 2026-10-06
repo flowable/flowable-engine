@@ -725,7 +725,7 @@ public class RestResponseFactory {
     }
 
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, boolean returnVariables,
-            Map<String, Object> runtimeVariableMap, List<HistoricVariableInstance> historicVariableList) {
+            Collection<VariableInstance> variableInstances, List<HistoricVariableInstance> historicVariableList) {
 
         RestUrlBuilder urlBuilder = createUrlBuilder();
         ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
@@ -740,9 +740,9 @@ public class RestResponseFactory {
                 }
 
             } else {
-                if (runtimeVariableMap != null) {
-                    for (String name : runtimeVariableMap.keySet()) {
-                        result.addVariable(createRestVariable(name, runtimeVariableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
+                if (variableInstances != null) {
+                    for (VariableInstance variableInstance : variableInstances) {
+                        result.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
                     }
                 }
             }
