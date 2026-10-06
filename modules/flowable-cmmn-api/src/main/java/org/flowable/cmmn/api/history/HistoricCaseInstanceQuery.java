@@ -198,6 +198,20 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
 
     /**
+     * Include historic case variables in the historic case query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricCaseInstanceQuery includeCaseVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the historic case variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricCaseInstanceQuery includeCaseVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
+
+    /**
      * Only select historic case instances that are defined by a case definition with the given deployment identifier.
      */
     HistoricCaseInstanceQuery deploymentId(String deploymentId);

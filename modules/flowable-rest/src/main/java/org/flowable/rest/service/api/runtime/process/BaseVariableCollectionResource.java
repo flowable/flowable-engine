@@ -73,7 +73,7 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     }
 
     public void deleteAllLocalVariables(Execution execution) {
-        Collection<String> currentVariables = runtimeService.getVariablesLocal(execution.getId()).keySet();
+        Collection<String> currentVariables = runtimeService.getVariableInstancesLocal(execution.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteExecutionVariables(execution, currentVariables, RestVariableScope.LOCAL);
         }
@@ -183,8 +183,10 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     }
 
     protected void addGlobalVariables(Execution execution, Map<String, RestVariable> variableMap) {
-        Map<String, Object> rawVariables = runtimeService.getVariables(execution.getId());
-        List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, execution.getId(), variableType, RestVariableScope.GLOBAL);
+        // The variable values are resolved in one command. A variable whose value cannot be resolved is returned with a null value
+        // and is marked as having an unresolvable value.
+        List<RestVariable> globalVariables = managementService.executeCommand(commandContext -> restResponseFactory.createRestVariables(
+                runtimeService.getVariableInstances(execution.getId()).values(), execution.getId(), variableType, RestVariableScope.GLOBAL));
 
         // Overlay global variables over local ones. In case they are present
         // the values are not overridden,
@@ -197,8 +199,10 @@ public class BaseVariableCollectionResource extends BaseExecutionVariableResourc
     }
 
     protected void addLocalVariables(Execution execution, Map<String, RestVariable> variableMap) {
-        Map<String, Object> rawLocalvariables = runtimeService.getVariablesLocal(execution.getId());
-        List<RestVariable> localVariables = restResponseFactory.createRestVariables(rawLocalvariables, execution.getId(), variableType, RestVariableScope.LOCAL);
+        // The variable values are resolved in one command. A variable whose value cannot be resolved is returned with a null value
+        // and is marked as having an unresolvable value.
+        List<RestVariable> localVariables = managementService.executeCommand(commandContext -> restResponseFactory.createRestVariables(
+                runtimeService.getVariableInstancesLocal(execution.getId()).values(), execution.getId(), variableType, RestVariableScope.LOCAL));
 
         for (RestVariable var : localVariables) {
             variableMap.put(var.getName(), var);

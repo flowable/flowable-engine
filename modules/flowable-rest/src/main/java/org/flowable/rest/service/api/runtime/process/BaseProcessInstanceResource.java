@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.impl.ProcessInstanceQueryProperty;
@@ -58,6 +59,9 @@ public class BaseProcessInstanceResource {
 
     @Autowired
     protected RuntimeService runtimeService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired
     protected RepositoryService repositoryService;
@@ -202,11 +206,11 @@ public class BaseProcessInstanceResource {
         }
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
         }
         if (queryRequest.getIncludeProcessVariablesNames() != null) {
-            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames());
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -246,7 +250,9 @@ public class BaseProcessInstanceResource {
             restApiInterceptor.accessProcessInstanceInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<ProcessInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<ProcessInstanceResponse> responseList = managementService.executeCommand(commandContext -> paginateList(requestParams, queryRequest, query,
+                "id", allowedSortProperties, restResponseFactory::createProcessInstanceResponseList));
         
         Set<String> processDefinitionIds = new HashSet<>();
         List<ProcessInstanceResponse> processInstanceList = responseList.getData();

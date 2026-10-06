@@ -220,7 +220,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAllLocalTaskVariables(@ApiParam(name = "taskId") @PathVariable String taskId) {
         Task task = getTaskFromRequestWithoutAccessCheck(taskId);
-        Collection<String> currentVariables = taskService.getVariablesLocal(task.getId()).keySet();
+        Collection<String> currentVariables = taskService.getVariableInstancesLocal(task.getId()).keySet();
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteTaskVariables(task, currentVariables, RestVariableScope.LOCAL);
         }
@@ -229,8 +229,11 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     protected void addGlobalVariables(Task task, Map<String, RestVariable> variableMap) {
         if (task.getExecutionId() != null) {
-            Map<String, Object> rawVariables = runtimeService.getVariables(task.getExecutionId());
-            List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.GLOBAL);
+            // The variable values are resolved in one command. A variable whose value cannot be resolved is returned with a null value
+            // and is marked as having an unresolvable value.
+            List<RestVariable> globalVariables = managementService.executeCommand(commandContext -> restResponseFactory.createRestVariables(
+                    runtimeService.getVariableInstances(task.getExecutionId()).values(), task.getId(), RestResponseFactory.VARIABLE_TASK,
+                    RestVariableScope.GLOBAL));
 
             // Overlay global variables over local ones. In case they are present the values are not overridden,
             // since local variables get precedence over global ones at all times.
@@ -243,8 +246,10 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     }
 
     protected void addLocalVariables(Task task, Map<String, RestVariable> variableMap) {
-        Map<String, Object> rawVariables = taskService.getVariablesLocal(task.getId());
-        List<RestVariable> localVariables = restResponseFactory.createRestVariables(rawVariables, task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.LOCAL);
+        // The variable values are resolved in one command. A variable whose value cannot be resolved is returned with a null value
+        // and is marked as having an unresolvable value.
+        List<RestVariable> localVariables = managementService.executeCommand(commandContext -> restResponseFactory.createRestVariables(
+                taskService.getVariableInstancesLocal(task.getId()).values(), task.getId(), RestResponseFactory.VARIABLE_TASK, RestVariableScope.LOCAL));
 
         for (RestVariable var : localVariables) {
             variableMap.put(var.getName(), var);

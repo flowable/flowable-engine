@@ -14,9 +14,7 @@
 package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.runtime.caze.BaseVariableResource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,9 +36,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @Api(tags = { "Plan Item Instance" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceVariableCollectionResource extends BaseVariableResource {
-
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @ApiOperation(value = "Create a variable on a plan item", tags = { "Plan Item Instances" }, nickname = "createPlanItemInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"

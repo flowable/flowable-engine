@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
@@ -51,12 +52,15 @@ public class HistoricVariableInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
     protected DataResponse<HistoricVariableInstanceResponse> getQueryResponse(HistoricVariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
-        HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
+        HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery().excludeVariableInitialization();
 
         // Populate query based on request
         if (Boolean.TRUE.equals(queryRequest.getExcludeTaskVariables())) {
@@ -96,8 +100,9 @@ public class HistoricVariableInstanceBaseResource {
             restApiInterceptor.accessHistoryVariableInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "variableName", allowedSortProperties,
-                restResponseFactory::createHistoricVariableInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(allRequestParams, queryRequest, query, "variableName",
+                allowedSortProperties, restResponseFactory::createHistoricVariableInstanceResponseList));
     }
     
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {

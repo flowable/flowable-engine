@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -57,6 +58,9 @@ public class HistoricCaseInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired
     protected CmmnRepositoryService repositoryService;
@@ -221,11 +225,11 @@ public class HistoricCaseInstanceBaseResource {
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                query.includeCaseVariables();
+                query.includeCaseVariables(true);
             }
         }
         if (queryRequest.getIncludeCaseVariablesNames() != null) {
-            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -256,8 +260,9 @@ public class HistoricCaseInstanceBaseResource {
             restApiInterceptor.accessHistoryCaseInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<HistoricCaseInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties,
-            restResponseFactory::createHistoricCaseInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<HistoricCaseInstanceResponse> responseList = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(
+                allRequestParams, queryRequest, query, "caseInstanceId", allowedSortProperties, restResponseFactory::createHistoricCaseInstanceResponseList));
         
         Set<String> caseDefinitionIds = new HashSet<>();
         List<HistoricCaseInstanceResponse> caseInstanceList = responseList.getData();

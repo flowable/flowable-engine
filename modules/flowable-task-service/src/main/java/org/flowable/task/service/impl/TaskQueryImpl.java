@@ -38,6 +38,7 @@ import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -164,6 +165,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
     protected boolean includeCaseVariables;
+    protected boolean excludeVariableInitialization;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -1989,6 +1991,27 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQuery includeTaskLocalVariables(boolean excludeVariableInitialization) {
+        includeTaskLocalVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public TaskQuery includeProcessVariables(boolean excludeVariableInitialization) {
+        includeProcessVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public TaskQuery includeCaseVariables(boolean excludeVariableInitialization) {
+        includeCaseVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
     public TaskQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
@@ -2170,16 +2193,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks || includeCaseVariables) {
-            tasks = taskServiceConfiguration.getTaskEntityManager()
-                    .findTasksWithRelatedEntitiesByQueryCriteria(this);
+            tasks = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization, () -> {
+                List<Task> tasksWithRelatedEntities = taskServiceConfiguration.getTaskEntityManager()
+                        .findTasksWithRelatedEntitiesByQueryCriteria(this);
 
-            if (taskId != null) {
-                if (includeProcessVariables || includeCaseVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, false);
-                } else if (includeTaskLocalVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, true);
+                if (taskId != null) {
+                    if (includeProcessVariables || includeCaseVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, false);
+                    } else if (includeTaskLocalVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, true);
+                    }
                 }
-            }
+                return tasksWithRelatedEntities;
+            });
 
         } else {
             tasks = taskServiceConfiguration.getTaskEntityManager()
@@ -2582,6 +2608,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public boolean isIncludeCaseVariables() {
         return includeCaseVariables;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public boolean isIncludeIdentityLinks() {

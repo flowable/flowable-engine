@@ -97,6 +97,13 @@ public interface HistoricPlanItemInstanceQuery extends Query<HistoricPlanItemIns
     HistoricPlanItemInstanceQuery includeLocalVariables();
 
     /**
+     * Include local plan item instance variables in the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricPlanItemInstanceQuery includeLocalVariables(boolean excludeVariableInitialization);
+
+    /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
      * OR statements cannot be nested: calling or() again before endOr() throws an exception. Sequential
      * OR statements (or() ... endOr() ... or() ... endOr()) are allowed and are AND-ed together.

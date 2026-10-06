@@ -28,6 +28,7 @@ import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,44 +64,42 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
     }
 
     public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, String scope, boolean includeBinary) {
+        // The variable value is resolved in the same command as the variable is read
+        return managementService.executeCommand(commandContext -> readVariable(task, variableName, scope, includeBinary));
+    }
 
+    protected RestVariable readVariable(Task task, String variableName, String scope, boolean includeBinary) {
         String taskId = task.getId();
-        boolean variableFound = false;
-        Object value = null;
+        VariableInstance variableInstance = null;
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
         if (variableScope == null) {
             // First, check local variables (which have precedence when no scope
             // is supplied)
-            if (taskService.hasVariableLocal(taskId, variableName)) {
-                value = taskService.getVariableLocal(taskId, variableName);
+            variableInstance = taskService.getVariableInstanceLocal(taskId, variableName);
+            if (variableInstance != null) {
                 variableScope = RestVariableScope.LOCAL;
-                variableFound = true;
             } else {
                 // Revert to execution-variable when not present local on the task
-                if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
-                    value = runtimeService.getVariable(task.getExecutionId(), variableName);
+                if (task.getExecutionId() != null) {
+                    variableInstance = runtimeService.getVariableInstance(task.getExecutionId(), variableName);
                     variableScope = RestVariableScope.GLOBAL;
-                    variableFound = true;
                 }
             }
 
         } else if (variableScope == RestVariableScope.GLOBAL) {
-            if (task.getExecutionId() != null && runtimeService.hasVariable(task.getExecutionId(), variableName)) {
-                value = runtimeService.getVariable(task.getExecutionId(), variableName);
-                variableFound = true;
+            if (task.getExecutionId() != null) {
+                variableInstance = runtimeService.getVariableInstance(task.getExecutionId(), variableName);
             }
 
         } else if (variableScope == RestVariableScope.LOCAL) {
-            if (taskService.hasVariableLocal(taskId, variableName)) {
-                value = taskService.getVariableLocal(taskId, variableName);
-                variableFound = true;
-            }
+            variableInstance = taskService.getVariableInstanceLocal(taskId, variableName);
         }
 
-        if (!variableFound) {
+        if (variableInstance == null) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' does not have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
-            return restResponseFactory.createRestVariable(variableName, value, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
+            // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
+            return restResponseFactory.createRestVariable(variableInstance, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
         }
     }
 

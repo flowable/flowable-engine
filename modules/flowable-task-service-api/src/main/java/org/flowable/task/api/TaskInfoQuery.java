@@ -925,6 +925,27 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T includeCaseVariables();
 
     /**
+     * Include local task variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    T includeTaskLocalVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include global process variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    T includeProcessVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include global case variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    T includeCaseVariables(boolean excludeVariableInitialization);
+
+    /**
      * Include identity links in the task query result
      */
     T includeIdentityLinks();
