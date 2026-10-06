@@ -562,12 +562,9 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
      */
     protected Map<String, VariableInstanceEntity> createCaseVariablesFromHistoricCaseInstance(HistoricCaseInstance historicCaseInstance) {
         VariableService variableService = cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableService();
-        // The values are resolved when they are copied below and not by the query, as the query leaves out a variable whose value cannot be resolved
-        // and such a variable must fail the reactivation instead of being lost
         List<HistoricVariableInstance> variables = cmmnEngineConfiguration.getCmmnHistoryService()
             .createHistoricVariableInstanceQuery()
             .caseInstanceId(historicCaseInstance.getId())
-            .excludeVariableInitialization()
             .list();
 
         if (variables != null) {

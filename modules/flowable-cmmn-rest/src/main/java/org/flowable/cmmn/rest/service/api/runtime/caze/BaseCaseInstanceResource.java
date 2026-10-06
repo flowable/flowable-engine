@@ -208,11 +208,11 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                query.includeCaseVariables();
+                query.includeCaseVariables(true);
             }
         }
         if (queryRequest.getIncludeCaseVariablesNames() != null) {
-            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -246,7 +246,9 @@ public class BaseCaseInstanceResource {
             restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<CaseInstanceResponse> responseList = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(requestParams,
+                queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList));
 
         Set<String> caseDefinitionIds = new HashSet<>();
         List<CaseInstanceResponse> caseInstanceList = responseList.getData();

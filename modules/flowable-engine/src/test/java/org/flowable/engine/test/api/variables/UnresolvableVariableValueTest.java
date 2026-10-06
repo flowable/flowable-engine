@@ -14,44 +14,62 @@ package org.flowable.engine.test.api.variables;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.variables.SerializableVariableTest.TestSerializableVariable;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.util.VariableValueUtil;
 import org.junit.jupiter.api.Test;
 
 /**
- * A variable whose value cannot be resolved is returned with a null value by the variable queries and the queries that include variables,
- * instead of failing them. The variable is marked as having an unresolvable value. Getting the variables through the services still fails.
+ * A variable whose value cannot be resolved fails the queries that resolve the variable values. A query that includes variables can exclude
+ * the variable initialization, the value of a variable is then only resolved when it is read.
  */
 class UnresolvableVariableValueTest extends PluggableFlowableTestCase {
 
+    // The variables of a query that includes variables are initialized while the query result is mapped, the failure is wrapped by MyBatis
+    protected static final String UNRESOLVABLE_VALUE_MESSAGE = "Couldn't deserialize object in variable 'order'";
+
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-    void variableInstanceQueryReturnsVariableWithUnresolvableValue() {
+    void variableInstanceQueriesWithUnresolvableValue() {
         ProcessInstance processInstance = startProcessWithUnresolvableOrderVariable();
 
-        assertThat(runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).list())
-                .extracting(VariableInstance::getName, VariableInstance::getValue, VariableValueUtil::isValueUnresolvable)
-                .containsExactlyInAnyOrder(
-                        tuple("customer", "Kermit", false),
-                        tuple("order", null, true)
-                );
+        assertThatThrownBy(() -> runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).list())
+                .isInstanceOf(FlowableException.class);
+        assertUnresolvableOrderVariable(runtimeService.createVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .excludeVariableInitialization()
+                .list());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatThrownBy(() -> historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list())
+                    .isInstanceOf(FlowableException.class);
+            assertUnresolvableOrderHistoricVariable(historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .excludeVariableInitialization()
+                    .list());
+        }
     }
 
     @Test
@@ -82,38 +100,103 @@ class UnresolvableVariableValueTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-    void historicVariableInstanceQueryReturnsVariableWithUnresolvableValue() {
-        if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            return;
-        }
-
+    void queriesIncludingVariablesFailForVariableWithUnresolvableValue() {
         ProcessInstance processInstance = startProcessWithUnresolvableOrderVariable();
 
-        assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list())
-                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue, VariableValueUtil::isValueUnresolvable)
-                .containsExactlyInAnyOrder(
-                        tuple("customer", "Kermit", false),
-                        tuple("order", null, true)
-                );
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().list())
+                .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+        assertThatThrownBy(() -> taskService.createTaskQuery().processInstanceId(processInstance.getId()).includeProcessVariables().list())
+                .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThatThrownBy(() -> historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables()
+                    .list())
+                    .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+            assertThatThrownBy(() -> historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables()
+                    .list())
+                    .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+        }
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-    void queriesIncludingVariablesReturnVariableWithUnresolvableValue() {
+    void queriesIncludingVariablesWithoutVariableInitialization() {
         ProcessInstance processInstance = startProcessWithUnresolvableOrderVariable();
 
-        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()
-                .getProcessVariables())
-                .containsOnly(entry("customer", "Kermit"), entry("order", null));
+        ProcessInstance processInstanceWithVariables = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables(true)
+                .singleResult();
+        assertUnresolvableOrderVariable(((ExecutionEntity) processInstanceWithVariables).getQueryVariables());
+        // The value of a variable is resolved when it is read
+        assertThatThrownBy(processInstanceWithVariables::getProcessVariables).isInstanceOf(FlowableException.class);
 
-        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).includeProcessVariables().singleResult()
-                .getProcessVariables())
-                .containsOnly(entry("customer", "Kermit"), entry("order", null));
+        processInstanceWithVariables = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .includeProcessVariables(Arrays.asList("customer", "order"), true)
+                .singleResult();
+        assertUnresolvableOrderVariable(((ExecutionEntity) processInstanceWithVariables).getQueryVariables());
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).includeProcessVariables(true).singleResult();
+        assertUnresolvableOrderVariable(((TaskEntity) task).getQueryVariables());
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables()
-                    .singleResult().getProcessVariables())
-                    .containsOnly(entry("customer", "Kermit"), entry("order", null));
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables(true)
+                    .singleResult();
+            assertUnresolvableOrderHistoricVariable(((HistoricProcessInstanceEntity) historicProcessInstance).getQueryVariables());
+
+            historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables(Arrays.asList("customer", "order"), true)
+                    .singleResult();
+            assertUnresolvableOrderHistoricVariable(((HistoricProcessInstanceEntity) historicProcessInstance).getQueryVariables());
+
+            HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables(true)
+                    .singleResult();
+            assertUnresolvableOrderHistoricVariable(((HistoricTaskInstanceEntity) historicTask).getQueryVariables());
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void excludeVariableInitializationOnlyAppliesToTheQuery() {
+        ProcessInstance processInstance = startProcessWithUnresolvableOrderVariable();
+
+        managementService.executeCommand(commandContext -> {
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).includeProcessVariables(true).list())
+                    .hasSize(1);
+            assertThat(VariableInitializingList.isVariableInitializationExcluded(commandContext)).isFalse();
+            return null;
+        });
+    }
+
+    protected void assertUnresolvableOrderVariable(Collection<? extends VariableInstance> variableInstances) {
+        assertThat(variableInstances)
+                .extracting(VariableInstance::getName)
+                .containsExactlyInAnyOrder("customer", "order");
+        for (VariableInstance variableInstance : variableInstances) {
+            if ("customer".equals(variableInstance.getName())) {
+                assertThat(variableInstance.getValue()).isEqualTo("Kermit");
+            } else {
+                assertThatThrownBy(variableInstance::getValue).isInstanceOf(FlowableException.class);
+            }
+        }
+    }
+
+    protected void assertUnresolvableOrderHistoricVariable(Collection<? extends HistoricVariableInstance> historicVariableInstances) {
+        assertThat(historicVariableInstances)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("customer", "order");
+        for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
+            if ("customer".equals(historicVariableInstance.getVariableName())) {
+                assertThat(historicVariableInstance.getValue()).isEqualTo("Kermit");
+            } else {
+                assertThatThrownBy(historicVariableInstance::getValue).isInstanceOf(FlowableException.class);
+            }
         }
     }
 

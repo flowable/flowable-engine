@@ -32,6 +32,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Joram Barrez
@@ -99,6 +100,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected boolean withoutTenantId;
     protected boolean includeCaseVariables;
     protected Collection<String> variableNamesToInclude;
+    protected boolean excludeVariableInitialization;
     protected String activePlanItemDefinitionId;
     protected Set<String> activePlanItemDefinitionIds;
     protected String involvedUser;
@@ -1074,6 +1076,20 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
 
     @Override
+    public CaseInstanceQuery includeCaseVariables(boolean excludeVariableInitialization) {
+        includeCaseVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public CaseInstanceQuery includeCaseVariables(Collection<String> variableNames, boolean excludeVariableInitialization) {
+        includeCaseVariables(variableNames);
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
     public CaseInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;
@@ -1106,7 +1122,8 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
         if (returnIdsOnly) {
             caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findIdsByCriteria(this);
         } else if (this.isIncludeCaseVariables()) {
-            caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this);
+            caseInstances = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization,
+                    () -> cmmnEngineConfiguration.getCaseInstanceEntityManager().findWithVariablesByCriteria(this));
         } else {
             caseInstances = cmmnEngineConfiguration.getCaseInstanceEntityManager().findByCriteria(this);
         }
@@ -1381,6 +1398,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public Collection<String> getVariableNamesToInclude() {
         return variableNamesToInclude;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public boolean isNeedsCaseDefinitionOuterJoin() {

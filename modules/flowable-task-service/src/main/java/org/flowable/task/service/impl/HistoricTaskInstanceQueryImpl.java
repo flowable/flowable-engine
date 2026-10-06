@@ -38,6 +38,7 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Tom Baeyens
@@ -171,6 +172,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
     protected boolean includeCaseVariables;
+    protected boolean excludeVariableInitialization;
     protected boolean includeIdentityLinks;
     protected List<HistoricTaskInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected HistoricTaskInstanceQueryImpl currentOrQueryObject;
@@ -219,16 +221,19 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks || includeCaseVariables) {
-            tasks = taskServiceConfiguration.getHistoricTaskInstanceEntityManager()
-                    .findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
+            tasks = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization, () -> {
+                List<HistoricTaskInstance> tasksWithRelatedEntities = taskServiceConfiguration.getHistoricTaskInstanceEntityManager()
+                        .findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(this);
 
-            if (taskId != null) {
-                if (includeProcessVariables ||includeCaseVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, false);
-                } else if (includeTaskLocalVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, true);
+                if (taskId != null) {
+                    if (includeProcessVariables || includeCaseVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, false);
+                    } else if (includeTaskLocalVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, true);
+                    }
                 }
-            }
+                return tasksWithRelatedEntities;
+            });
 
         } else {
             tasks = taskServiceConfiguration.getHistoricTaskInstanceEntityManager().findHistoricTaskInstancesByQueryCriteria(this);
@@ -2055,6 +2060,27 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery includeTaskLocalVariables(boolean excludeVariableInitialization) {
+        includeTaskLocalVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery includeProcessVariables(boolean excludeVariableInitialization) {
+        includeProcessVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public HistoricTaskInstanceQuery includeCaseVariables(boolean excludeVariableInitialization) {
+        includeCaseVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery includeIdentityLinks() {
         this.includeIdentityLinks = true;
         return this;
@@ -2480,6 +2506,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public boolean isIncludeProcessVariables() {
         return includeProcessVariables;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public boolean isIncludeIdentityLinks() {

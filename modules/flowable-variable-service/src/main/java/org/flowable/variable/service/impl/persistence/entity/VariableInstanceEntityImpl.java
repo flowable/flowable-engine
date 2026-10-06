@@ -54,7 +54,6 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
     protected String metaInfo;
 
     protected Object cachedValue;
-    protected boolean valueUnresolvable;
     protected boolean forcedUpdate;
     protected boolean deleted;
 
@@ -133,9 +132,6 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
 
     @Override
     public Object getValue() {
-        if (valueUnresolvable) {
-            return null;
-        }
         if (!type.isCachable() || cachedValue == null) {
             cachedValue = type.getValue(this);
         }
@@ -144,7 +140,6 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
 
     @Override
     public void setValue(Object value) {
-        valueUnresolvable = false;
         type.setValue(value, this);
         typeName = type.getTypeName();
 
@@ -316,16 +311,6 @@ public class VariableInstanceEntityImpl extends AbstractVariableServiceEntity im
     @Override
     public void setCachedValue(Object cachedValue) {
         this.cachedValue = cachedValue;
-    }
-
-    @Override
-    public boolean isValueUnresolvable() {
-        return valueUnresolvable;
-    }
-
-    @Override
-    public void setValueUnresolvable(boolean valueUnresolvable) {
-        this.valueUnresolvable = valueUnresolvable;
     }
 
     // misc methods ///////////////////////////////////////////////////////////////

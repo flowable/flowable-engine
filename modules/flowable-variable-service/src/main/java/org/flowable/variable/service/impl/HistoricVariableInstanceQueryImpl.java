@@ -28,7 +28,6 @@ import org.flowable.variable.service.impl.persistence.entity.HistoricVariableIns
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.VariableValueUtil;
 
 /**
  * @author Joram Barrez
@@ -320,8 +319,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
             for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
                 if (historicVariableInstance instanceof HistoricVariableInstanceEntity variableEntity) {
                     if (variableEntity.getVariableType() != null) {
-                        // A variable whose value cannot be resolved is kept with a null value instead of failing the whole query
-                        VariableValueUtil.initializeValue(variableEntity);
+                        variableEntity.getValue();
 
                         // make sure JPA entities are cached for later retrieval
                         if (JPAEntityVariableType.TYPE_NAME.equals(variableEntity.getVariableType().getTypeName()) || JPAEntityListVariableType.TYPE_NAME.equals(variableEntity.getVariableType().getTypeName())) {

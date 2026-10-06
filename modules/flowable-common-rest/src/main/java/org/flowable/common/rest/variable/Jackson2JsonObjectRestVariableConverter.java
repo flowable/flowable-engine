@@ -39,6 +39,11 @@ public class Jackson2JsonObjectRestVariableConverter implements RestVariableConv
     }
 
     @Override
+    public boolean isVariableTypeSupported(String variableTypeName) {
+        return "json".equals(variableTypeName) || "longJson".equals(variableTypeName);
+    }
+
+    @Override
     public Class<?> getVariableType() {
         return JsonNode.class;
     }

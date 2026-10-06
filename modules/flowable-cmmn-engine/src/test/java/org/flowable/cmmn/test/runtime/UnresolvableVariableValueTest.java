@@ -14,67 +14,68 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.entry;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.util.VariableValueUtil;
 import org.junit.jupiter.api.Test;
 
 /**
- * A variable whose value cannot be resolved is returned with a null value by the variable queries and the queries that include variables,
- * instead of failing them. The variable is marked as having an unresolvable value. Getting the variables through the services still fails.
+ * A variable whose value cannot be resolved fails the queries that resolve the variable values. A query that includes variables can exclude
+ * the variable initialization, the value of a variable is then only resolved when it is read.
  */
 public class UnresolvableVariableValueTest extends FlowableCmmnTestCase {
 
+    // The variables of a query that includes variables are initialized while the query result is mapped, the failure is wrapped by MyBatis
+    protected static final String UNRESOLVABLE_VALUE_MESSAGE = "Couldn't deserialize object in variable 'order'";
+
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    public void variableInstanceQueriesReturnVariableWithUnresolvableValue() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .variable("customer", "Kermit")
-                .variable("order", new TestSerializableVariable(1))
-                .start();
-        corruptRuntimeAndHistoricSerializedValue(caseInstance.getId(), "order");
+    public void variableInstanceQueriesWithUnresolvableValue() {
+        CaseInstance caseInstance = startCaseWithUnresolvableOrderVariable();
 
-        assertThat(cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(VariableInstance::getName, VariableInstance::getValue, VariableValueUtil::isValueUnresolvable)
-                .containsExactlyInAnyOrder(
-                        tuple("customer", "Kermit", false),
-                        tuple("order", null, true)
-                );
+        assertThatThrownBy(() -> cmmnRuntimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .isInstanceOf(FlowableException.class);
+        assertUnresolvableVariable(cmmnRuntimeService.createVariableInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .excludeVariableInitialization()
+                .list(), "customer", "order");
 
-        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list())
-                .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue, VariableValueUtil::isValueUnresolvable)
-                .containsExactlyInAnyOrder(
-                        tuple("customer", "Kermit", false),
-                        tuple("order", null, true)
-                );
+        assertThatThrownBy(() -> cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list())
+                .isInstanceOf(FlowableException.class);
+        assertUnresolvableHistoricVariable(cmmnHistoryService.createHistoricVariableInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .excludeVariableInitialization()
+                .list(), "customer", "order");
     }
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
     public void getVariablesFailsForVariableWithUnresolvableValue() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneTaskCase")
-                .variable("customer", "Kermit")
-                .variable("order", new TestSerializableVariable(1))
-                .start();
-        corruptRuntimeAndHistoricSerializedValue(caseInstance.getId(), "order");
+        CaseInstance caseInstance = startCaseWithUnresolvableOrderVariable();
 
         assertThatThrownBy(() -> cmmnRuntimeService.getVariables(caseInstance.getId())).isInstanceOf(FlowableException.class);
         assertThatThrownBy(() -> cmmnRuntimeService.getVariable(caseInstance.getId(), "order")).isInstanceOf(FlowableException.class);
@@ -90,25 +91,93 @@ public class UnresolvableVariableValueTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
-    public void queriesIncludingVariablesReturnVariableWithUnresolvableValue() {
+    public void queriesIncludingVariablesFailForVariableWithUnresolvableValue() {
+        CaseInstance caseInstance = startCaseWithUnresolvableOrderVariable();
+
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().list())
+                .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+        assertThatThrownBy(() -> cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().list())
+                .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+        assertThatThrownBy(() -> cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().list())
+                .hasMessageContaining(UNRESOLVABLE_VALUE_MESSAGE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void queriesIncludingVariablesWithoutVariableInitialization() {
+        CaseInstance caseInstance = startCaseWithUnresolvableOrderVariable();
+
+        CaseInstance caseInstanceWithVariables = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables(true)
+                .singleResult();
+        assertUnresolvableVariable(((CaseInstanceEntity) caseInstanceWithVariables).getQueryVariables(), "customer", "order");
+        // The value of a variable is resolved when it is read
+        assertThatThrownBy(caseInstanceWithVariables::getCaseVariables).isInstanceOf(FlowableException.class);
+
+        caseInstanceWithVariables = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables(Arrays.asList("customer", "order"), true)
+                .singleResult();
+        assertUnresolvableVariable(((CaseInstanceEntity) caseInstanceWithVariables).getQueryVariables(), "customer", "order");
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables(true).singleResult();
+        assertUnresolvableVariable(((TaskEntity) task).getQueryVariables(), "customer", "order");
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables(true)
+                .singleResult();
+        assertUnresolvableHistoricVariable(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables(), "customer", "order");
+
+        historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .includeCaseVariables(Arrays.asList("customer", "order"), true)
+                .singleResult();
+        assertUnresolvableHistoricVariable(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables(), "customer", "order");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void planItemInstanceQueriesIncludingLocalVariablesWithoutVariableInitialization() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
-                .variable("customer", "Kermit")
-                .variable("order", new TestSerializableVariable(1))
                 .start();
-        corruptRuntimeAndHistoricSerializedValue(caseInstance.getId(), "order");
+        String planItemInstanceId = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult().getId();
+        Map<String, Object> localVariables = new HashMap<>();
+        localVariables.put("localCustomer", "Kermit");
+        localVariables.put("localOrder", new TestSerializableVariable(1));
+        cmmnRuntimeService.setLocalVariables(planItemInstanceId, localVariables);
+        corruptRuntimeAndHistoricSerializedValue(caseInstance.getId(), "localOrder");
 
-        assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().singleResult()
-                .getCaseVariables())
-                .containsOnly(entry("customer", "Kermit"), entry("order", null));
+        assertThatThrownBy(() -> cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstanceId).includeLocalVariables().list())
+                .hasMessageContaining("Couldn't deserialize object in variable 'localOrder'");
 
-        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().singleResult()
-                .getCaseVariables())
-                .containsOnly(entry("customer", "Kermit"), entry("order", null));
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstanceId)
+                .includeLocalVariables(true)
+                .singleResult();
+        assertUnresolvableVariable(((PlanItemInstanceEntity) planItemInstance).getQueryVariables(), "localCustomer", "localOrder");
 
-        assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables().singleResult()
-                .getCaseVariables())
-                .containsOnly(entry("customer", "Kermit"), entry("order", null));
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstanceId)
+                .includeLocalVariables(true)
+                .singleResult();
+        assertUnresolvableHistoricVariable(((HistoricPlanItemInstanceEntity) historicPlanItemInstance).getQueryVariables(), "localCustomer",
+                "localOrder");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void excludeVariableInitializationOnlyAppliesToTheQuery() {
+        CaseInstance caseInstance = startCaseWithUnresolvableOrderVariable();
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).includeCaseVariables(true).list())
+                    .hasSize(1);
+            assertThat(VariableInitializingList.isVariableInitializationExcluded(commandContext)).isFalse();
+            return null;
+        });
     }
 
     @Test
@@ -131,6 +200,44 @@ public class UnresolvableVariableValueTest extends FlowableCmmnTestCase {
         assertThatThrownBy(() -> cmmnHistoryService.createCaseReactivationBuilder(historicCaseInstance.getId()).reactivate())
                 .isInstanceOf(FlowableException.class);
         assertThat(cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+
+    protected CaseInstance startCaseWithUnresolvableOrderVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .variable("customer", "Kermit")
+                .variable("order", new TestSerializableVariable(1))
+                .start();
+        corruptRuntimeAndHistoricSerializedValue(caseInstance.getId(), "order");
+        return caseInstance;
+    }
+
+    protected void assertUnresolvableVariable(Collection<? extends VariableInstance> variableInstances, String resolvableName, String unresolvableName) {
+        assertThat(variableInstances)
+                .extracting(VariableInstance::getName)
+                .containsExactlyInAnyOrder(resolvableName, unresolvableName);
+        for (VariableInstance variableInstance : variableInstances) {
+            if (resolvableName.equals(variableInstance.getName())) {
+                assertThat(variableInstance.getValue()).isEqualTo("Kermit");
+            } else {
+                assertThatThrownBy(variableInstance::getValue).isInstanceOf(FlowableException.class);
+            }
+        }
+    }
+
+    protected void assertUnresolvableHistoricVariable(Collection<? extends HistoricVariableInstance> historicVariableInstances, String resolvableName,
+            String unresolvableName) {
+
+        assertThat(historicVariableInstances)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder(resolvableName, unresolvableName);
+        for (HistoricVariableInstance historicVariableInstance : historicVariableInstances) {
+            if (resolvableName.equals(historicVariableInstance.getVariableName())) {
+                assertThat(historicVariableInstance.getValue()).isEqualTo("Kermit");
+            } else {
+                assertThatThrownBy(historicVariableInstance::getValue).isInstanceOf(FlowableException.class);
+            }
+        }
     }
 
     protected String getActivePlanItemInstanceId(String caseInstanceId, String name) {

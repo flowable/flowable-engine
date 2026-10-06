@@ -23,7 +23,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
-import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -48,9 +47,6 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
     @Autowired
     protected RuntimeService runtimeService;
 
-    @Autowired
-    protected ManagementService managementService;
-
     protected boolean isSerializableVariableAllowed;
 
     @Override
@@ -68,7 +64,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
     }
 
     public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, String scope, boolean includeBinary) {
-        // The variable is read in one command, so a variable whose value could not be resolved can be marked
+        // The variable value is resolved in the same command as the variable is read
         return managementService.executeCommand(commandContext -> readVariable(task, variableName, scope, includeBinary));
     }
 

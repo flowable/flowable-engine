@@ -21,8 +21,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,14 +32,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
 
 import tools.jackson.databind.JsonNode;
@@ -58,50 +54,6 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
     /**
      * Test getting all process variables. GET runtime/process-instances/{processInstanceId}/variables
      */
-    @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
-    public void testGetVariablesWithUnresolvableValue() throws Exception {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("oneTaskProcess")
-                .variable("customer", "Kermit")
-                .variable("order", new OrderVariable(1))
-                .start();
-
-        // Make the value of the order variable unresolvable
-        managementService.executeCommand(commandContext -> {
-            VariableInstanceEntity variableInstance = (VariableInstanceEntity) runtimeService.createVariableInstanceQuery()
-                    .processInstanceId(processInstance.getId())
-                    .variableName("order")
-                    .excludeVariableInitialization()
-                    .singleResult();
-            ByteArrayEntity byteArray = processEngineConfiguration.getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
-            byteArray.setBytes("not a serialized object".getBytes(StandardCharsets.UTF_8));
-            return null;
-        });
-
-        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX
-                + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId())), HttpStatus.SC_OK);
-        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-
-        Map<String, JsonNode> variables = new HashMap<>();
-        responseNode.forEach(variableNode -> variables.put(variableNode.path("name").asString(), variableNode));
-        assertThat(variables).containsOnlyKeys("customer", "order");
-        assertThat(variables.get("customer").path("value").asString()).isEqualTo("Kermit");
-        assertThat(variables.get("customer").has("valueUnresolvable")).isFalse();
-        assertThat(variables.get("order").hasNonNull("value")).isFalse();
-        assertThat(variables.get("order").path("valueUnresolvable").asBoolean()).isTrue();
-
-        response = executeRequest(new HttpGet(SERVER_URL_PREFIX
-                + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE, processInstance.getId(), "order")), HttpStatus.SC_OK);
-        responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-
-        assertThat(responseNode.path("name").asString()).isEqualTo("order");
-        assertThat(responseNode.hasNonNull("value")).isFalse();
-        assertThat(responseNode.path("valueUnresolvable").asBoolean()).isTrue();
-    }
-
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testGetProcessVariables() throws Exception {
@@ -629,20 +581,5 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
 
         // Check if local variables are gone and global remain unchanged
         assertThat(runtimeService.getVariablesLocal(processInstance.getId())).isEmpty();
-    }
-
-    public static class OrderVariable implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        protected int number;
-
-        public OrderVariable(int number) {
-            this.number = number;
-        }
-
-        public int getNumber() {
-            return number;
-        }
     }
 }

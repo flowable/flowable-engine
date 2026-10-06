@@ -27,7 +27,6 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
-import org.flowable.variable.service.impl.util.VariableValueUtil;
 
 /**
  * @author Joram Barrez
@@ -298,8 +297,7 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
             for (VariableInstance variableInstance : variableInstances) {
                 if (variableInstance instanceof VariableInstanceEntity variableEntity) {
                     if (variableEntity.getType() != null) {
-                        // A variable whose value cannot be resolved is kept with a null value instead of failing the whole query
-                        VariableValueUtil.initializeValue(variableEntity);
+                        variableEntity.getValue();
 
                         // make sure JPA entities are cached for later retrieval
                         if (JPAEntityVariableType.TYPE_NAME.equals(variableEntity.getType().getTypeName()) || JPAEntityListVariableType.TYPE_NAME.equals(variableEntity.getType().getTypeName())) {

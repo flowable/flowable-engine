@@ -26,7 +26,7 @@ import org.flowable.variable.api.types.VariableType;
  * @author Christian Lipphardt (camunda)
  * @author Joram Barrez
  */
-public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVariableInstance, Entity, HasRevision, HasUnresolvableValue {
+public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVariableInstance, Entity, HasRevision {
 
     VariableType getVariableType();
 

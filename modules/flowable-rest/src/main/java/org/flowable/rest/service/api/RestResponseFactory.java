@@ -16,12 +16,9 @@ package org.flowable.rest.service.api;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.batch.api.Batch;
@@ -36,7 +33,6 @@ import org.flowable.common.rest.variable.BigIntegerRestVariableConverter;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
-import org.flowable.common.rest.variable.EngineRestVariable;
 import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
 import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
@@ -125,10 +121,11 @@ import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEnt
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.persistence.entity.HasUnresolvableValue;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.util.VariableValueUtil;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -143,6 +140,8 @@ import tools.jackson.databind.ObjectMapper;
  * @author Ryan Johnston (@rjfsu)
  */
 public class RestResponseFactory {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(RestResponseFactory.class);
 
     public static final int VARIABLE_TASK = 1;
     public static final int VARIABLE_EXECUTION = 2;
@@ -195,23 +194,31 @@ public class RestResponseFactory {
             response.setProcessInstanceUrl(urlBuilder.buildUrl(RestUrls.URL_PROCESS_INSTANCE, response.getProcessInstanceId()));
         }
 
-        List<VariableInstanceEntity> taskQueryVariables = task instanceof TaskEntity taskEntity ? taskEntity.getQueryVariables() : null;
-        if (task.getProcessVariables() != null) {
-            Map<String, Object> variableMap = task.getProcessVariables();
-            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() == null);
-            for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                response.addVariable(restVariable);
+        if (task instanceof TaskEntity taskEntity && hasQueryVariables(taskEntity.getQueryVariables())) {
+            for (VariableInstanceEntity variableInstance : taskEntity.getQueryVariables()) {
+                if (task.getProcessInstanceId() != null && task.getProcessInstanceId().equals(variableInstance.getProcessInstanceId())
+                        && variableInstance.getTaskId() == null) {
+                    response.addVariable(createRestVariable(variableInstance, RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                }
             }
-        }
-        if (task.getTaskLocalVariables() != null) {
-            Map<String, Object> variableMap = task.getTaskLocalVariables();
-            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() != null);
-            for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                response.addVariable(restVariable);
+            for (VariableInstanceEntity variableInstance : taskEntity.getQueryVariables()) {
+                if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
+                    response.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                }
+            }
+
+        } else {
+            if (task.getProcessVariables() != null) {
+                Map<String, Object> variableMap = task.getProcessVariables();
+                for (String name : variableMap.keySet()) {
+                    response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                }
+            }
+            if (task.getTaskLocalVariables() != null) {
+                Map<String, Object> variableMap = task.getTaskLocalVariables();
+                for (String name : variableMap.keySet()) {
+                    response.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, task.getId(), VARIABLE_TASK, false, urlBuilder));
+                }
             }
         }
 
@@ -311,55 +318,91 @@ public class RestResponseFactory {
     }
 
     /**
-     * Creates the REST variables for the passed variable instances. A variable whose value cannot be resolved is returned with a null value
+     * Creates the REST variables for the passed variable instances. A variable whose value cannot be resolved is returned without a value
      * and is marked as having an unresolvable value.
      */
     public List<RestVariable> createRestVariables(Collection<VariableInstance> variableInstances, String id, int variableType, RestVariableScope scope) {
+        RestUrlBuilder urlBuilder = createUrlBuilder();
         List<RestVariable> result = new ArrayList<>(variableInstances.size());
         for (VariableInstance variableInstance : variableInstances) {
-            if (variableInstance != null) {
-                result.add(createRestVariable(variableInstance, scope, id, variableType, false));
-            }
+            result.add(createRestVariable(variableInstance, scope, id, variableType, false, urlBuilder));
         }
         return result;
     }
 
+    public RestVariable createRestVariable(VariableInstance variableInstance, RestVariableScope scope, String id, int variableType, boolean includeBinaryValue) {
+        return createRestVariable(variableInstance, scope, id, variableType, includeBinaryValue, createUrlBuilder());
+    }
+
     /**
-     * Creates the REST variable for the passed variable instance. A variable whose value cannot be resolved is returned with a null value
+     * Creates the REST variable for the passed variable instance. A variable whose value cannot be resolved is returned without a value
+     * and is marked as having an unresolvable value.
+     * The value is resolved here, so a query can include the variables without initializing their values, as long as the REST variable
+     * is created in the same command as the query.
+     */
+    public RestVariable createRestVariable(VariableInstance variableInstance, RestVariableScope scope, String id, int variableType, boolean includeBinaryValue,
+            RestUrlBuilder urlBuilder) {
+
+        Object value;
+        try {
+            value = variableInstance.getValue();
+        } catch (RuntimeException e) {
+            return createUnresolvableRestVariable(variableInstance.getName(), variableInstance.getTypeName(), scope, id, variableType, urlBuilder, e);
+        }
+        return createRestVariable(variableInstance.getName(), value, scope, id, variableType, includeBinaryValue, urlBuilder);
+    }
+
+    /**
+     * Creates the REST variable for the passed historic variable instance. A variable whose value cannot be resolved is returned without a value
      * and is marked as having an unresolvable value.
      */
-    public RestVariable createRestVariable(VariableInstance variableInstance, RestVariableScope scope, String id, int variableType, boolean includeBinaryValue) {
-        Object value = VariableValueUtil.resolveValue(variableInstance);
-        RestVariable restVariable = createRestVariable(variableInstance.getName(), value, scope, id, variableType, includeBinaryValue);
-        restVariable.setValueUnresolvable(VariableValueUtil.isValueUnresolvable(variableInstance));
+    public RestVariable createRestVariable(HistoricVariableInstance historicVariableInstance, RestVariableScope scope, String id, int variableType,
+            boolean includeBinaryValue, RestUrlBuilder urlBuilder) {
+
+        Object value;
+        try {
+            value = historicVariableInstance.getValue();
+        } catch (RuntimeException e) {
+            return createUnresolvableRestVariable(historicVariableInstance.getVariableName(), historicVariableInstance.getVariableTypeName(), scope, id,
+                    variableType, urlBuilder, e);
+        }
+        return createRestVariable(historicVariableInstance.getVariableName(), value, scope, id, variableType, includeBinaryValue, urlBuilder);
+    }
+
+    protected RestVariable createUnresolvableRestVariable(String name, String variableTypeName, RestVariableScope scope, String id, int variableType,
+            RestUrlBuilder urlBuilder, RuntimeException exception) {
+
+        LOGGER.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", name, id, exception.getMessage());
+        RestVariable restVariable = createRestVariable(name, null, scope, id, variableType, false, urlBuilder);
+        restVariable.setType(getRestVariableTypeName(variableTypeName));
+        restVariable.setValueUnresolvable(true);
         return restVariable;
     }
 
     /**
-     * Marks the passed REST variables whose name is one of the passed names as variables whose value could not be resolved.
+     * Returns the REST variable type for the passed variable type name of the engine. It is used for a variable whose value cannot be resolved,
+     * as the REST variable type is otherwise determined from the value: the type of the converter that supports the variable type, or the
+     * binary or serializable type that is used for a value without a converter.
      */
-    public void setValueUnresolvable(Collection<? extends EngineRestVariable> restVariables, Set<String> unresolvableVariableNames) {
-        if (restVariables != null && !unresolvableVariableNames.isEmpty()) {
-            for (EngineRestVariable restVariable : restVariables) {
-                if (unresolvableVariableNames.contains(restVariable.getName())) {
-                    restVariable.setValueUnresolvable(true);
-                }
+    public String getRestVariableTypeName(String variableTypeName) {
+        if (variableTypeName == null) {
+            return null;
+        }
+
+        for (RestVariableConverter converter : variableConverters) {
+            if (converter.isVariableTypeSupported(variableTypeName)) {
+                return converter.getRestTypeName();
             }
         }
-    }
 
-    /**
-     * Returns whether the value of the passed variable could not be resolved when it was read, its value is null in that case.
-     */
-    protected boolean isValueUnresolvable(Object variable) {
-        return VariableValueUtil.isValueUnresolvable(variable);
-    }
-
-    protected <T extends HasUnresolvableValue> Set<String> getUnresolvableVariableNames(List<T> queryVariables, Predicate<T> filter) {
-        if (queryVariables == null) {
-            return Collections.emptySet();
+        if (ByteArrayType.TYPE_NAME.equals(variableTypeName)) {
+            return BYTE_ARRAY_VARIABLE_TYPE;
         }
-        return VariableValueUtil.getUnresolvableVariableNames(queryVariables.stream().filter(filter).toList());
+        return SERIALIZABLE_VARIABLE_TYPE;
+    }
+
+    protected boolean hasQueryVariables(List<?> queryVariables) {
+        return queryVariables != null && !queryVariables.isEmpty();
     }
 
     public List<RestVariable> createRestVariables(Map<String, Object> variables, String id, int variableType, RestVariableScope scope) {
@@ -658,15 +701,17 @@ public class RestResponseFactory {
 
     public ProcessInstanceResponse createProcessInstanceResponse(ProcessInstance processInstance, RestUrlBuilder urlBuilder) {
         ProcessInstanceResponse result = internalCreateProcessInstanceResponse(processInstance, urlBuilder);
-        if (processInstance.getProcessVariables() != null) {
+        if (processInstance instanceof ExecutionEntity executionEntity && hasQueryVariables(executionEntity.getQueryVariables())) {
+            for (VariableInstanceEntity variableInstance : executionEntity.getQueryVariables()) {
+                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                    result.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
+                }
+            }
+
+        } else if (processInstance.getProcessVariables() != null) {
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            Set<String> unresolvableVariableNames = processInstance instanceof ExecutionEntity executionEntity
-                    ? VariableValueUtil.getUnresolvableVariableNames(executionEntity.getQueryVariables()) : Collections.emptySet();
             for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false,
-                        urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                result.addVariable(restVariable);
+                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
             }
         }
 
@@ -684,10 +729,7 @@ public class RestResponseFactory {
             if (processInstance.isEnded()) {
                 if (historicVariableList != null) {
                     for (HistoricVariableInstance historicVariable : historicVariableList) {
-                        RestVariable restVariable = createRestVariable(historicVariable.getVariableName(), historicVariable.getValue(), RestVariableScope.LOCAL,
-                                processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder);
-                        restVariable.setValueUnresolvable(isValueUnresolvable(historicVariable));
-                        result.addVariable(restVariable);
+                        result.addVariable(createRestVariable(historicVariable, RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_PROCESS, false, urlBuilder));
                     }
                 }
 
@@ -837,10 +879,7 @@ public class RestResponseFactory {
             scope = RestVariableScope.GLOBAL;
         }
 
-        RestVariable restVariable = createRestVariable(variableInstance.getName(), variableInstance.getValue(), scope, variableInstance.getId(), VARIABLE_VARINSTANCE,
-                false, urlBuilder);
-        restVariable.setValueUnresolvable(isValueUnresolvable(variableInstance));
-        result.setVariable(restVariable);
+        result.setVariable(createRestVariable(variableInstance, scope, variableInstance.getId(), VARIABLE_VARINSTANCE, false, urlBuilder));
         return result;
     }
 
@@ -930,15 +969,19 @@ public class RestResponseFactory {
         result.setState(processInstance.getState());
         result.setSuperProcessInstanceId(processInstance.getSuperProcessInstanceId());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE, processInstance.getId()));
-        if (processInstance.getProcessVariables() != null) {
+        if (processInstance instanceof HistoricProcessInstanceEntity historicProcessInstanceEntity
+                && hasQueryVariables(historicProcessInstanceEntity.getQueryVariables())) {
+            for (HistoricVariableInstanceEntity variableInstance : historicProcessInstanceEntity.getQueryVariables()) {
+                if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {
+                    result.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS, false,
+                            urlBuilder));
+                }
+            }
+
+        } else if (processInstance.getProcessVariables() != null) {
             Map<String, Object> variableMap = processInstance.getProcessVariables();
-            Set<String> unresolvableVariableNames = processInstance instanceof HistoricProcessInstanceEntity historicProcessInstanceEntity
-                    ? VariableValueUtil.getUnresolvableVariableNames(historicProcessInstanceEntity.getQueryVariables()) : Collections.emptySet();
             for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS,
-                        false, urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                result.addVariable(restVariable);
+                result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, processInstance.getId(), VARIABLE_HISTORY_PROCESS, false, urlBuilder));
             }
         }
         result.setCallbackId(processInstance.getCallbackId());
@@ -997,26 +1040,31 @@ public class RestResponseFactory {
         result.setTaskDefinitionKey(taskInstance.getTaskDefinitionKey());
         result.setWorkTimeInMillis(taskInstance.getWorkTimeInMillis());
         result.setUrl(urlBuilder.buildUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE, taskInstance.getId()));
-        List<HistoricVariableInstanceEntity> taskQueryVariables = taskInstance instanceof HistoricTaskInstanceEntity historicTaskInstanceEntity
-                ? historicTaskInstanceEntity.getQueryVariables() : null;
-        if (taskInstance.getProcessVariables() != null) {
-            Map<String, Object> variableMap = taskInstance.getProcessVariables();
-            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() == null);
-            for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
-                        urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                result.addVariable(restVariable);
+        if (taskInstance instanceof HistoricTaskInstanceEntity historicTaskInstanceEntity && hasQueryVariables(historicTaskInstanceEntity.getQueryVariables())) {
+            for (HistoricVariableInstanceEntity variableInstance : historicTaskInstanceEntity.getQueryVariables()) {
+                if (taskInstance.getProcessInstanceId() != null && taskInstance.getProcessInstanceId().equals(variableInstance.getProcessInstanceId())
+                        && variableInstance.getTaskId() == null) {
+                    result.addVariable(createRestVariable(variableInstance, RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                }
             }
-        }
-        if (taskInstance.getTaskLocalVariables() != null) {
-            Map<String, Object> variableMap = taskInstance.getTaskLocalVariables();
-            Set<String> unresolvableVariableNames = getUnresolvableVariableNames(taskQueryVariables, variable -> variable.getTaskId() != null);
-            for (String name : variableMap.keySet()) {
-                RestVariable restVariable = createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false,
-                        urlBuilder);
-                restVariable.setValueUnresolvable(unresolvableVariableNames.contains(name));
-                result.addVariable(restVariable);
+            for (HistoricVariableInstanceEntity variableInstance : historicTaskInstanceEntity.getQueryVariables()) {
+                if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
+                    result.addVariable(createRestVariable(variableInstance, RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                }
+            }
+
+        } else {
+            if (taskInstance.getProcessVariables() != null) {
+                Map<String, Object> variableMap = taskInstance.getProcessVariables();
+                for (String name : variableMap.keySet()) {
+                    result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.GLOBAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                }
+            }
+            if (taskInstance.getTaskLocalVariables() != null) {
+                Map<String, Object> variableMap = taskInstance.getTaskLocalVariables();
+                for (String name : variableMap.keySet()) {
+                    result.addVariable(createRestVariable(name, variableMap.get(name), RestVariableScope.LOCAL, taskInstance.getId(), VARIABLE_HISTORY_TASK, false, urlBuilder));
+                }
             }
         }
         return result;
@@ -1114,10 +1162,7 @@ public class RestResponseFactory {
         }
         result.setTaskId(variableInstance.getTaskId());
         result.setExecutionId(variableInstance.getExecutionId());
-        RestVariable restVariable = createRestVariable(variableInstance.getVariableName(), variableInstance.getValue(), scope, variableInstance.getId(),
-                VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder);
-        restVariable.setValueUnresolvable(isValueUnresolvable(variableInstance));
-        result.setVariable(restVariable);
+        result.setVariable(createRestVariable(variableInstance, scope, variableInstance.getId(), VARIABLE_HISTORY_VARINSTANCE, false, urlBuilder));
         return result;
     }
 

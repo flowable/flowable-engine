@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
@@ -67,6 +68,9 @@ public class TaskBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
@@ -275,13 +279,13 @@ public class TaskBaseResource {
 
         if (request.getIncludeTaskLocalVariables() != null) {
             if (request.getIncludeTaskLocalVariables()) {
-                taskQuery.includeTaskLocalVariables();
+                taskQuery.includeTaskLocalVariables(true);
             }
         }
 
         if (request.getIncludeProcessVariables() != null) {
             if (request.getIncludeProcessVariables()) {
-                taskQuery.includeProcessVariables();
+                taskQuery.includeProcessVariables(true);
             }
         }
 
@@ -354,7 +358,9 @@ public class TaskBaseResource {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }
 
-        return paginateList(requestParams, request, taskQuery, "id", properties, restResponseFactory::createTaskResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(requestParams, request, taskQuery, "id", properties,
+                restResponseFactory::createTaskResponseList));
     }
 
     protected void addTaskvariables(TaskQuery taskQuery, List<QueryVariable> variables) {

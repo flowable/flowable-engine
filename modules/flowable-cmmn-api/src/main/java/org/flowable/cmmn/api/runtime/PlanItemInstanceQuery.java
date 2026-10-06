@@ -406,6 +406,13 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery includeLocalVariables();
 
     /**
+     * Include local plan item instance variables in the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    PlanItemInstanceQuery includeLocalVariables(boolean excludeVariableInitialization);
+
+    /**
      * Localize plan item name to specified locale.
      */
     PlanItemInstanceQuery locale(String locale);

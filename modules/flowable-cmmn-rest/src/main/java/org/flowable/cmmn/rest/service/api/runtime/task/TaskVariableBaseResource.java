@@ -20,7 +20,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable.RestVariableScope;
@@ -49,9 +48,6 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
     @Autowired
     protected CmmnRuntimeService runtimeService;
 
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
-
     protected boolean isSerializableVariableAllowed;
 
     @Override
@@ -70,7 +66,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
     }
 
     public RestVariable getVariableFromRequestWithoutAccessCheck(Task task, String variableName, RestVariableScope variableScope, boolean includeBinary) {
-        // The variable is read in one command, so a variable whose value could not be resolved can be marked
+        // The variable value is resolved in the same command as the variable is read
         return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(task, variableName, variableScope, includeBinary));
     }
 
