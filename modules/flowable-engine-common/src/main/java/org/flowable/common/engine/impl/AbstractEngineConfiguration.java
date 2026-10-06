@@ -1121,7 +1121,16 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public LockManager getLockManager(String lockName) {
-        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate(), getEngineCfgKey());
+        return getLockManager(lockName, false);
+    }
+
+    /**
+     * @param reuseCurrentCommandContext see {@link LockManagerImpl#LockManagerImpl(CommandExecutor, String, Duration, Duration, String, boolean)}.
+     *         Pass {@code true} when the lock is (or may be) acquired from within a command that already holds uncommitted DDL
+     *         on the current connection, e.g. schema creation/update, to avoid a self-deadlock on databases with transactional DDL.
+     */
+    public LockManager getLockManager(String lockName, boolean reuseCurrentCommandContext) {
+        return new LockManagerImpl(commandExecutor, lockName, getLockPollRate(), null, getEngineCfgKey(), reuseCurrentCommandContext);
     }
 
     // getters and setters

@@ -51,6 +51,24 @@ public class LockManagerImpl implements LockManager {
     }
 
     public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, Duration forceAcquireAfter, String engineType) {
+        this(commandExecutor, lockName, lockPollRate, forceAcquireAfter, engineType, false);
+    }
+
+    /**
+     * @param reuseCurrentCommandContext when {@code true}, lock commands are executed on the currently active
+     *         {@link org.flowable.common.engine.impl.interceptor.CommandContext} (i.e. the same database connection/transaction),
+     *         instead of the default behaviour of always running them in a brand new, independently committed transaction.
+     *         <p>
+     *         This must be used whenever the lock is acquired from a command that may already hold uncommitted DDL on the
+     *         same connection (typically during schema creation/update). On databases with transactional DDL (SQL Server,
+     *         PostgreSQL, ...) a schema-modification lock taken by such DDL is held until the enclosing transaction commits.
+     *         If the lock command were to run on a <em>different</em>, newly opened connection/transaction (the default),
+     *         it would block forever waiting for that still-open outer transaction to release the schema lock - which it
+     *         can't do until the (nested) lock command itself returns. This is a self-deadlock: the same call stack is
+     *         waiting on itself, on two different connections, so no database deadlock detector will ever catch it.
+     */
+    public LockManagerImpl(CommandExecutor commandExecutor, String lockName, Duration lockPollRate, Duration forceAcquireAfter, String engineType,
+            boolean reuseCurrentCommandContext) {
         this.commandExecutor = commandExecutor;
         if (lockName.length() > 64) {
             this.lockName = StringUtils.substring(lockName, 0, LOCK_NAME_MAX_LENGTH);
@@ -61,7 +79,9 @@ public class LockManagerImpl implements LockManager {
         }
         this.lockPollRate = lockPollRate;
         this.engineType = engineType;
-        this.lockCommandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
+        this.lockCommandConfig = reuseCurrentCommandContext
+                ? new CommandConfig(true, TransactionPropagation.REQUIRED)
+                : new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         this.lockForceAcquireAfter = forceAcquireAfter;
     }
 
