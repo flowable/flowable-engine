@@ -49,7 +49,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class BaseExecutionVariableResource implements InitializingBean {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseExecutionVariableResource.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     protected Environment env;
@@ -341,16 +341,18 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     /**
      * Creates the REST variable for the passed variable instance. A variable whose value cannot be resolved is returned without a value
-     * and is marked as having an unresolvable value.
+     * and is marked as having an unresolvable value. When the binary value is requested, a value that cannot be resolved fails instead.
      */
     protected RestVariable constructRestVariable(VariableInstance variableInstance, RestVariableScope variableScope, String executionId, boolean includeBinary) {
         Object value;
         try {
             value = variableInstance.getValue();
         } catch (RuntimeException e) {
-            LOGGER.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", variableInstance.getName(),
+            if (includeBinary) {
+                throw e;
+            }
+            logger.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", variableInstance.getName(),
                     executionId, e.getMessage());
-            LOGGER.debug("Could not resolve the value of variable '{}' of '{}'", variableInstance.getName(), executionId, e);
             RestVariable restVariable = constructRestVariable(variableInstance.getName(), null, variableScope, executionId, false);
             restVariable.setType(restResponseFactory.getRestVariableTypeName(variableInstance.getTypeName()));
             restVariable.setValueUnresolvable(true);

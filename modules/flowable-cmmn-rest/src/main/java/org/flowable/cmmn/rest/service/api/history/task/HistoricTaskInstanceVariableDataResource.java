@@ -28,6 +28,8 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,17 +95,22 @@ public class HistoricTaskInstanceVariableDataResource extends HistoricTaskInstan
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String taskId, String variableName, String scope) {
+        // Only the value of the requested variable is resolved, in the same command as the query
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(includeBinary, taskId, variableName, scope));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String taskId, String variableName, String scope) {
         RestVariableScope variableScope = RestVariable.getScopeFromString(scope);
         HistoricTaskInstanceQuery taskQuery = historyService.createHistoricTaskInstanceQuery().taskId(taskId);
 
         if (variableScope != null) {
             if (variableScope == RestVariableScope.GLOBAL) {
-                taskQuery.includeProcessVariables();
+                taskQuery.includeProcessVariables(true);
             } else {
-                taskQuery.includeTaskLocalVariables();
+                taskQuery.includeTaskLocalVariables(true);
             }
         } else {
-            taskQuery.includeTaskLocalVariables().includeProcessVariables();
+            taskQuery.includeTaskLocalVariables(true).includeProcessVariables(true);
         }
 
         HistoricTaskInstance taskObject = taskQuery.singleResult();
@@ -116,26 +123,47 @@ public class HistoricTaskInstanceVariableDataResource extends HistoricTaskInstan
             restApiInterceptor.accessHistoryTaskInfoById(taskObject);
         }
 
-        Object value = null;
+        HistoricVariableInstance variableInstance = null;
         if (variableScope != null) {
             if (variableScope == RestVariableScope.GLOBAL) {
-                value = taskObject.getProcessVariables().get(variableName);
+                variableInstance = getProcessVariable(taskObject, variableName);
             } else {
-                value = taskObject.getTaskLocalVariables().get(variableName);
+                variableInstance = getTaskLocalVariable(taskObject, variableName);
             }
         } else {
             // look for local task variables first
-            if (taskObject.getTaskLocalVariables().containsKey(variableName)) {
-                value = taskObject.getTaskLocalVariables().get(variableName);
-            } else {
-                value = taskObject.getProcessVariables().get(variableName);
+            variableInstance = getTaskLocalVariable(taskObject, variableName);
+            if (variableInstance == null) {
+                variableInstance = getProcessVariable(taskObject, variableName);
             }
         }
+        Object value = variableInstance != null ? variableInstance.getValue() : null;
 
         if (value == null) {
             throw new FlowableObjectNotFoundException("Historic task instance '" + taskId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);
         } else {
             return restResponseFactory.createRestVariable(variableName, value, null, taskId, CmmnRestResponseFactory.VARIABLE_HISTORY_TASK, includeBinary);
         }
+    }
+
+    protected HistoricVariableInstance getTaskLocalVariable(HistoricTaskInstance taskObject, String variableName) {
+        HistoricVariableInstance variableInstance = null;
+        for (HistoricVariableInstanceEntity queryVariable : ((HistoricTaskInstanceEntity) taskObject).getQueryVariables()) {
+            if (queryVariable.getId() != null && queryVariable.getTaskId() != null && variableName.equals(queryVariable.getName())) {
+                variableInstance = queryVariable;
+            }
+        }
+        return variableInstance;
+    }
+
+    protected HistoricVariableInstance getProcessVariable(HistoricTaskInstance taskObject, String variableName) {
+        HistoricVariableInstance variableInstance = null;
+        for (HistoricVariableInstanceEntity queryVariable : ((HistoricTaskInstanceEntity) taskObject).getQueryVariables()) {
+            if (taskObject.getProcessInstanceId() != null && taskObject.getProcessInstanceId().equals(queryVariable.getProcessInstanceId())
+                    && queryVariable.getTaskId() == null && variableName.equals(queryVariable.getName())) {
+                variableInstance = queryVariable;
+            }
+        }
+        return variableInstance;
     }
 }

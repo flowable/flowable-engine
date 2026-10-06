@@ -23,6 +23,8 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
@@ -102,6 +104,51 @@ public class UnresolvableVariableValueResourceTest extends BaseSpringRestTestCas
         assertUnresolvableOrderVariableInstance(responseNode);
     }
 
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
+    public void testDataResources() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("order", new OrderVariable(1))
+                .variable("document", "Kermit".getBytes(StandardCharsets.UTF_8))
+                .start();
+        String processInstanceId = processInstance.getId();
+        corruptStoredValue(processInstanceId, "order");
+        String historicDetailId = corruptHistoricDetailValue(processInstanceId, "order");
+        String taskId = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult().getId();
+        String variableInstanceId = runtimeService.createVariableInstanceQuery().processInstanceId(processInstanceId).variableName("order")
+                .excludeVariableInitialization().singleResult().getId();
+        String historicVariableInstanceId = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceId).variableName("order")
+                .excludeVariableInitialization().singleResult().getId();
+
+        // The binary value of a variable whose value cannot be resolved cannot be returned
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstanceId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstanceId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, taskId, "order"), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCE_DATA, variableInstanceId), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, historicVariableInstanceId),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_VARIABLE_DATA, processInstanceId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, taskId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_DETAIL_VARIABLE_DATA, historicDetailId), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+        // The binary value of another variable is still returned
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstanceId, "document"), HttpStatus.SC_OK);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstanceId, "document"), HttpStatus.SC_OK);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, taskId, "document"), HttpStatus.SC_OK);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_VARIABLE_DATA, processInstanceId, "document"),
+                HttpStatus.SC_OK);
+        assertDataStatus(RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, taskId, "document"), HttpStatus.SC_OK);
+    }
+
+    protected void assertDataStatus(String url, int expectedStatus) {
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + url), expectedStatus));
+    }
+
     protected JsonNode getJson(String url) throws Exception {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
@@ -158,6 +205,19 @@ public class UnresolvableVariableValueResourceTest extends BaseSpringRestTestCas
                     .singleResult();
             corruptByteArray(historicVariableInstance.getByteArrayRef().getId());
             return null;
+        });
+    }
+
+    protected String corruptHistoricDetailValue(String processInstanceId, String variableName) {
+        return managementService.executeCommand(commandContext -> {
+            for (HistoricDetail historicDetail : historyService.createHistoricDetailQuery().processInstanceId(processInstanceId).variableUpdates().list()) {
+                HistoricDetailVariableInstanceUpdateEntity variableUpdate = (HistoricDetailVariableInstanceUpdateEntity) historicDetail;
+                if (variableName.equals(variableUpdate.getVariableName())) {
+                    corruptByteArray(variableUpdate.getByteArrayRef().getId());
+                    return variableUpdate.getId();
+                }
+            }
+            throw new IllegalStateException("No historic detail found for variable " + variableName);
         });
     }
 

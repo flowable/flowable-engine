@@ -55,7 +55,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class BaseVariableResource extends BaseCaseInstanceResource implements InitializingBean{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseVariableResource.class);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -125,13 +125,17 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
             throw new FlowableIllegalArgumentException("Unknown variable type " + variableType);
         }
 
-        // A variable whose value cannot be resolved is returned without a value and is marked as having an unresolvable value
+        // A variable whose value cannot be resolved is returned without a value and is marked as having an unresolvable value,
+        // unless the binary value is requested
         Object value = null;
         boolean valueUnresolvable = false;
         if (variableInstance != null) {
             try {
                 value = variableInstance.getValue();
             } catch (RuntimeException e) {
+                if (includeBinary) {
+                    throw e;
+                }
                 logUnresolvableValue(variableInstance, instanceId, e);
                 valueUnresolvable = true;
             }
@@ -321,9 +325,8 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
     }
 
     protected void logUnresolvableValue(VariableInstance variableInstance, String instanceId, RuntimeException exception) {
-        LOGGER.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", variableInstance.getName(),
+        logger.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", variableInstance.getName(),
                 instanceId, exception.getMessage());
-        LOGGER.debug("Could not resolve the value of variable '{}' of '{}'", variableInstance.getName(), instanceId, exception);
     }
     
     public void deleteAllVariables(CaseInstance caseInstance) {

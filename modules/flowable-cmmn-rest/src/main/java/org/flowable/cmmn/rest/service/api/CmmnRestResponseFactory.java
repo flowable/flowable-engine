@@ -308,7 +308,7 @@ public class CmmnRestResponseFactory {
      * Creates the REST variable for the passed variable instance. A variable whose value cannot be resolved is returned without a value
      * and is marked as having an unresolvable value.
      * The value is resolved here, so a query can include the variables without initializing their values, as long as the REST variable
-     * is created in the same command as the query.
+     * is created in the same command as the query. When the binary value is requested, a value that cannot be resolved fails instead.
      */
     public RestVariable createRestVariable(VariableInstance variableInstance, RestVariableScope scope, String id, int variableType, boolean includeBinaryValue,
             RestUrlBuilder urlBuilder) {
@@ -317,6 +317,9 @@ public class CmmnRestResponseFactory {
         try {
             value = variableInstance.getValue();
         } catch (RuntimeException e) {
+            if (includeBinaryValue) {
+                throw e;
+            }
             return createUnresolvableRestVariable(variableInstance.getName(), variableInstance.getTypeName(), scope, id, variableType, urlBuilder, e);
         }
         return createRestVariable(variableInstance.getName(), value, scope, id, variableType, includeBinaryValue, urlBuilder);
@@ -324,7 +327,7 @@ public class CmmnRestResponseFactory {
 
     /**
      * Creates the REST variable for the passed historic variable instance. A variable whose value cannot be resolved is returned without a value
-     * and is marked as having an unresolvable value.
+     * and is marked as having an unresolvable value. When the binary value is requested, a value that cannot be resolved fails instead.
      */
     public RestVariable createRestVariable(HistoricVariableInstance historicVariableInstance, RestVariableScope scope, String id, int variableType,
             boolean includeBinaryValue, RestUrlBuilder urlBuilder) {
@@ -333,6 +336,9 @@ public class CmmnRestResponseFactory {
         try {
             value = historicVariableInstance.getValue();
         } catch (RuntimeException e) {
+            if (includeBinaryValue) {
+                throw e;
+            }
             return createUnresolvableRestVariable(historicVariableInstance.getVariableName(), historicVariableInstance.getVariableTypeName(), scope, id,
                     variableType, urlBuilder, e);
         }
@@ -343,7 +349,6 @@ public class CmmnRestResponseFactory {
             RestUrlBuilder urlBuilder, RuntimeException exception) {
 
         LOGGER.warn("Could not resolve the value of variable '{}' of '{}', the variable is returned without a value: {}", name, id, exception.getMessage());
-        LOGGER.debug("Could not resolve the value of variable '{}' of '{}'", name, id, exception);
         RestVariable restVariable = createRestVariable(name, null, scope, id, variableType, false, urlBuilder);
         restVariable.setType(getRestVariableTypeName(variableTypeName));
         restVariable.setValueUnresolvable(true);

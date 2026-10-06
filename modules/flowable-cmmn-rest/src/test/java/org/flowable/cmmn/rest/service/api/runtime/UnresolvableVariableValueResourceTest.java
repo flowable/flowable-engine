@@ -131,6 +131,67 @@ public class UnresolvableVariableValueResourceTest extends BaseSpringRestTestCas
         assertUnresolvableVariable(responseNode.path("data").path(0).path("variables"), "taskCustomer", "taskOrder");
     }
 
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testDataResources() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("order", new TestSerializableVariable(1))
+                .variable("document", "Kermit".getBytes(StandardCharsets.UTF_8))
+                .start();
+        String caseInstanceId = caseInstance.getId();
+        String planItemInstanceId = runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId).singleResult().getId();
+        String taskId = taskService.createTaskQuery().caseInstanceId(caseInstanceId).singleResult().getId();
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("localOrder", new TestSerializableVariable(1));
+        variables.put("localDocument", "Kermit".getBytes(StandardCharsets.UTF_8));
+        runtimeService.setLocalVariables(planItemInstanceId, variables);
+
+        variables.clear();
+        variables.put("taskOrder", new TestSerializableVariable(1));
+        variables.put("taskDocument", "Kermit".getBytes(StandardCharsets.UTF_8));
+        taskService.setVariablesLocal(taskId, variables);
+
+        corruptSerializedValue(caseInstanceId, "order");
+        corruptSerializedValue(caseInstanceId, "localOrder");
+        corruptSerializedValue(caseInstanceId, "taskOrder");
+        String variableInstanceId = runtimeService.createVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName("order")
+                .excludeVariableInitialization().singleResult().getId();
+        String historicVariableInstanceId = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).variableName("order")
+                .excludeVariableInitialization().singleResult().getId();
+
+        // The binary value of a variable whose value cannot be resolved cannot be returned
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, planItemInstanceId, "localOrder"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, taskId, "order"), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, taskId, "taskOrder"), HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCE_DATA, variableInstanceId),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, historicVariableInstanceId),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, "order"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, taskId, "taskOrder"),
+                HttpStatus.SC_INTERNAL_SERVER_ERROR);
+
+        // The binary value of another variable is still returned
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, "document"), HttpStatus.SC_OK);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_VARIABLE_DATA, planItemInstanceId, "localDocument"),
+                HttpStatus.SC_OK);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, taskId, "taskDocument"), HttpStatus.SC_OK);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, caseInstanceId, "document"),
+                HttpStatus.SC_OK);
+        assertDataStatus(CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, taskId, "taskDocument"),
+                HttpStatus.SC_OK);
+    }
+
+    protected void assertDataStatus(String url, int expectedStatus) {
+        closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + url), expectedStatus));
+    }
+
     protected JsonNode getJson(String url) throws Exception {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
