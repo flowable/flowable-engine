@@ -16,14 +16,12 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 import java.util.Collections;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,9 +47,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestController
 @Api(tags = { "Plan Item Instance" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PlanItemInstanceVariableResource extends BaseVariableResource {
-
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @ApiOperation(value = "Update a variable on a plan item", tags = { "Plan Item Instances" }, nickname = "updatePlanItemVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"

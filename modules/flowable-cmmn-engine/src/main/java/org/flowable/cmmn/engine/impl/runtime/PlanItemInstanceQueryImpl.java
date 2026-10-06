@@ -28,6 +28,7 @@ import org.flowable.common.engine.api.query.CacheAwareQuery;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Joram Barrez
@@ -99,6 +100,7 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     protected String locale;
     protected boolean withLocalizationFallback;
     protected boolean includeLocalVariables;
+    protected boolean excludeVariableInitialization;
 
     protected List<PlanItemInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected PlanItemInstanceQueryImpl currentOrQueryObject;
@@ -1184,6 +1186,13 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
 
     @Override
+    public PlanItemInstanceQuery includeLocalVariables(boolean excludeVariableInitialization) {
+        includeLocalVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
     public PlanItemInstanceQuery locale(String locale) {
         this.locale = locale;
         return this;
@@ -1206,7 +1215,8 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
         ensureVariablesInitialized();
         List<PlanItemInstance> planItems = null;
         if (includeLocalVariables) {
-            planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findWithVariablesByCriteria(this);
+            planItems = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization,
+                    () -> cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findWithVariablesByCriteria(this));
 
         } else {
             planItems = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findByCriteria(this);
@@ -1415,6 +1425,11 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     public boolean isIncludeLocalVariables() {
         return includeLocalVariables;
     }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
+    }
+
     public List<List<String>> getSafeInvolvedGroups() {
         return safeInvolvedGroups;
     }

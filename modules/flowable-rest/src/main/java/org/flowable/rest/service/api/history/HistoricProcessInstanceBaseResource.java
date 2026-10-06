@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
@@ -59,6 +60,9 @@ public class HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired
     protected RepositoryService repositoryService;
@@ -211,11 +215,11 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
         }
         if (queryRequest.getIncludeProcessVariablesNames() != null) {
-            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames());
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -258,8 +262,9 @@ public class HistoricProcessInstanceBaseResource {
             restApiInterceptor.accessHistoryProcessInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<HistoricProcessInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
-                restResponseFactory::createHistoricProcessInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<HistoricProcessInstanceResponse> responseList = managementService.executeCommand(commandContext -> paginateList(allRequestParams, queryRequest,
+                query, "processInstanceId", allowedSortProperties, restResponseFactory::createHistoricProcessInstanceResponseList));
         
         Set<String> processDefinitionIds = new HashSet<>();
         List<HistoricProcessInstanceResponse> processInstanceList = responseList.getData();

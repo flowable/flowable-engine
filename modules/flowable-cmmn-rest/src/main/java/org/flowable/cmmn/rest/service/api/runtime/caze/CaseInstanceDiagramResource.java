@@ -19,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -47,9 +46,6 @@ public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
-
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @ApiOperation(value = "Get diagram for a case instance", tags = { "Case Instances" })
     @ApiResponses(value = {

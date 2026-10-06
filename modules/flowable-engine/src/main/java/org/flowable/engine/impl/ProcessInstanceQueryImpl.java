@@ -34,6 +34,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryValue;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 
 /**
  * @author Tom Baeyens
@@ -88,6 +89,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected SuspensionState suspensionState;
     protected boolean includeProcessVariables;
     protected Collection<String> variableNamesToInclude;
+    protected boolean excludeVariableInitialization;
     protected boolean withJobException;
     protected String name;
     protected String nameLike;
@@ -668,6 +670,20 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     }
 
     @Override
+    public ProcessInstanceQuery includeProcessVariables(boolean excludeVariableInitialization) {
+        includeProcessVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceQuery includeProcessVariables(Collection<String> variableNames, boolean excludeVariableInitialization) {
+        includeProcessVariables(variableNames);
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
     public ProcessInstanceQuery withJobException() {
         this.withJobException = true;
         return this;
@@ -1091,7 +1107,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
         if (returnIdsOnly) {
             processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceIdsByQueryCriteria(this);
         } else if (includeProcessVariables) {
-            processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceAndVariablesByQueryCriteria(this);
+            processInstances = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization,
+                    () -> processEngineConfiguration.getExecutionEntityManager().findProcessInstanceAndVariablesByQueryCriteria(this));
         } else {
             processInstances = processEngineConfiguration.getExecutionEntityManager().findProcessInstanceByQueryCriteria(this);
         }
@@ -1361,6 +1378,10 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public Collection<String> getVariableNamesToInclude() {
         return variableNamesToInclude;
+    }
+
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
     }
 
     public boolean iswithException() {

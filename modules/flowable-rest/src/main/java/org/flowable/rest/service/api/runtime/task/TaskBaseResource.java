@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.TaskService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -68,6 +69,9 @@ public class TaskBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -270,12 +274,12 @@ public class TaskBaseResource {
 
         if (request.getIncludeTaskLocalVariables() != null) {
             if (request.getIncludeTaskLocalVariables()) {
-                taskQuery.includeTaskLocalVariables();
+                taskQuery.includeTaskLocalVariables(true);
             }
         }
         if (request.getIncludeProcessVariables() != null) {
             if (request.getIncludeProcessVariables()) {
-                taskQuery.includeProcessVariables();
+                taskQuery.includeProcessVariables(true);
             }
         }
 
@@ -378,7 +382,9 @@ public class TaskBaseResource {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }
 
-        return paginateList(requestParams, request, taskQuery, "id", properties, restResponseFactory::createTaskResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return managementService.executeCommand(commandContext -> paginateList(requestParams, request, taskQuery, "id", properties,
+                restResponseFactory::createTaskResponseList));
     }
 
     protected void addTaskvariables(TaskQuery taskQuery, List<QueryVariable> variables) {

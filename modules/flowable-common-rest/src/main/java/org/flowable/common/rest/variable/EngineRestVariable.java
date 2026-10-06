@@ -27,6 +27,7 @@ public class EngineRestVariable {
     private String type;
     private Object value;
     private String valueUrl;
+    private boolean valueUnresolvable;
 
     @ApiModelProperty(example = "myVariable", value = "Name of the variable")
     public String getName() {
@@ -66,4 +67,14 @@ public class EngineRestVariable {
         return valueUrl;
     }
 
+    @ApiModelProperty(example = "false", value = "Whether the value of the variable could not be resolved, e.g. because its serialized value can no longer be read.",
+            notes = "The value of such a variable is null. Only present in a response when true.")
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isValueUnresolvable() {
+        return valueUnresolvable;
+    }
+
+    public void setValueUnresolvable(boolean valueUnresolvable) {
+        this.valueUnresolvable = valueUnresolvable;
+    }
 }

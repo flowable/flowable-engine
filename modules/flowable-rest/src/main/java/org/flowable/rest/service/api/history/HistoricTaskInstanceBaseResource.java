@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -68,6 +69,9 @@ public class HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -239,12 +243,12 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getIncludeTaskLocalVariables() != null) {
             if (queryRequest.getIncludeTaskLocalVariables()) {
-                query.includeTaskLocalVariables();
+                query.includeTaskLocalVariables(true);
             }
         }
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
         }
         if (queryRequest.getTaskVariables() != null) {
@@ -307,8 +311,9 @@ public class HistoricTaskInstanceBaseResource {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
-            restResponseFactory::createHistoricTaskInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return managementService.executeCommand(commandContext -> paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
+                restResponseFactory::createHistoricTaskInstanceResponseList));
     }
     
     /**

@@ -203,8 +203,10 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     // method for that
     @Override
     protected void addLocalVariables(Execution execution, Map<String, RestVariable> variableMap) {
-        Map<String, Object> rawVariables = runtimeService.getVariables(execution.getId());
-        List<RestVariable> globalVariables = restResponseFactory.createRestVariables(rawVariables, execution.getId(), variableType, RestVariableScope.LOCAL);
+        // The variable values are resolved in one command. A variable whose value cannot be resolved is returned with a null value
+        // and is marked as having an unresolvable value.
+        List<RestVariable> globalVariables = managementService.executeCommand(commandContext -> restResponseFactory.createRestVariables(
+                runtimeService.getVariableInstances(execution.getId()).values(), execution.getId(), variableType, RestVariableScope.LOCAL));
 
         // Overlay global variables over local ones. In case they are present
         // the values are not overridden,

@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -58,6 +59,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
@@ -204,11 +208,11 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                query.includeCaseVariables();
+                query.includeCaseVariables(true);
             }
         }
         if (queryRequest.getIncludeCaseVariablesNames() != null) {
-            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames());
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -242,7 +246,9 @@ public class BaseCaseInstanceResource {
             restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<CaseInstanceResponse> responseList = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(requestParams,
+                queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList));
 
         Set<String> caseDefinitionIds = new HashSet<>();
         List<CaseInstanceResponse> caseInstanceList = responseList.getData();

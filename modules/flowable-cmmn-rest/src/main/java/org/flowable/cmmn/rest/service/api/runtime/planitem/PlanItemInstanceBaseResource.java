@@ -22,6 +22,7 @@ import java.util.Map;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -52,6 +53,9 @@ public class PlanItemInstanceBaseResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
@@ -120,7 +124,7 @@ public class PlanItemInstanceBaseResource {
             }
         }
         if (queryRequest.getIncludeLocalVariables() != null && queryRequest.getIncludeLocalVariables()) {
-            query.includeLocalVariables();
+            query.includeLocalVariables(true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables(), false);
@@ -142,7 +146,9 @@ public class PlanItemInstanceBaseResource {
             restApiInterceptor.accessPlanItemInstanceInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(requestParams, queryRequest, query, "createTime", allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(requestParams, queryRequest, query, "createTime",
+                allowedSortProperties, restResponseFactory::createPlanItemInstanceResponseList));
     }
 
     protected void addVariables(PlanItemInstanceQuery planItemInstanceQuery, List<QueryVariable> variables, boolean isCase) {
