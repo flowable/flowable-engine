@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.parser.handler;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
@@ -27,6 +28,11 @@ import org.flowable.cmmn.model.Case;
  */
 public class CaseParseHandler extends AbstractCmmnParseHandler<Case> {
 
+    /**
+     * Max length of the database field ACT_CMMN_CASEDEF.DESCRIPTION_
+     */
+    protected static final int DESCRIPTION_MAX_LENGTH = 4000;
+
     @Override
     public Collection<Class<? extends BaseElement>> getHandledTypes() {
         return Collections.singletonList(Case.class);
@@ -38,7 +44,7 @@ public class CaseParseHandler extends AbstractCmmnParseHandler<Case> {
         CaseDefinitionEntity caseDefinitionEntity = CommandContextUtil.getCaseDefinitionEntityManager().create();
         caseDefinitionEntity.setKey(caze.getId());
         caseDefinitionEntity.setName(caze.getName());
-        caseDefinitionEntity.setDescription(caze.getDocumentation());
+        caseDefinitionEntity.setDescription(StringUtils.truncate(caze.getDocumentation(), DESCRIPTION_MAX_LENGTH));
         caseDefinitionEntity.setCategory(cmmnParseResult.getCmmnModel().getTargetNamespace());
         caseDefinitionEntity.setDeploymentId(cmmnParseResult.getResourceEntity().getDeploymentId());
 

@@ -36,11 +36,13 @@ import jakarta.mail.PasswordAuthentication;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.ContentDisposition;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.internet.MimeUtility;
+import jakarta.mail.internet.ParameterList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -323,18 +325,28 @@ public class JakartaMailFlowableMailClient implements FlowableMailClient {
         if (attachmentsExists) {
             for (DataSource attachment : attachments) {
                 BodyPart bodyPart = new MimeBodyPart();
-                bodyPart.setDisposition(Part.ATTACHMENT);
-                try {
-                    bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), charset, null));
-                } catch (UnsupportedEncodingException e) {
-                    throw new FlowableMailException("Could not encode attachment file name", e);
-                }
+                setAttachmentFileName(bodyPart, attachment.getName(), charset);
                 bodyPart.setDataHandler(new DataHandler(attachment));
                 rootContainer.addBodyPart(bodyPart);
             }
         }
 
         return rootContainer;
+    }
+
+    protected void setAttachmentFileName(BodyPart bodyPart, String fileName, String charset) throws MessagingException {
+        // Build the Content-Disposition header ourselves instead of using BodyPart.setFileName(): that method
+        // ignores the charset argument entirely and RFC 2231 encodes with MimeUtility.getDefaultMIMECharset()
+        // (the JVM's file.encoding, unless mail.mime.charset is set), so it silently diverges from the charset
+        // used for the rest of the message. ParameterList.set(name, value, charset) does the same RFC 2231
+        // encoding and continuation folding, but with the charset we actually pass it, and leaves ASCII names
+        // untouched. When no charset is configured, fall back to the same default MimeBodyPart.setText() falls
+        // back to for the message body, so the file name and body stay consistent with each other.
+        String mimeCharset = charset != null ? charset : MimeUtility.mimeCharset(MimeUtility.getDefaultJavaCharset());
+        ParameterList parameters = new ParameterList();
+        parameters.set("filename", fileName, mimeCharset);
+        ContentDisposition disposition = new ContentDisposition(Part.ATTACHMENT, parameters);
+        bodyPart.setHeader("Content-Disposition", disposition.toString());
     }
 
     protected Session createSession() {

@@ -612,6 +612,52 @@ class DeploymentTest extends BaseFlowableDmnTest {
         deleteDeployments();
     }
 
+    @Test
+    void deployDecisionTableWithDescriptionLongerThanColumnSize() {
+        String description = "a".repeat(2500) + "b".repeat(2500);
+        repositoryService.createDeployment()
+                .addString("longDescription.dmn", "<definitions xmlns=\"http://www.omg.org/spec/DMN/20151101\" id=\"longDescription\" name=\"Long description\""
+                        + " namespace=\"http://www.flowable.org/dmn\">"
+                        + "<decision id=\"longDescriptionDecision\" name=\"Long description decision\">"
+                        + "<description>" + description + "</description>"
+                        + "<decisionTable id=\"decisionTable\" hitPolicy=\"FIRST\">"
+                        + "<input><inputExpression id=\"inputExpression1\" typeRef=\"string\"><text>input1</text></inputExpression></input>"
+                        + "<output id=\"output1\" name=\"output1\" typeRef=\"string\"></output>"
+                        + "</decisionTable>"
+                        + "</decision>"
+                        + "</definitions>")
+                .deploy();
+
+        try {
+            DmnDecision decision = repositoryService.createDecisionQuery().decisionKey("longDescriptionDecision").singleResult();
+            assertThat(decision.getDescription()).isEqualTo(description.substring(0, 4000));
+        } finally {
+            deleteDeployments();
+        }
+    }
+
+    @Test
+    void deployDecisionServiceWithDescriptionLongerThanColumnSize() {
+        String description = "a".repeat(2500) + "b".repeat(2500);
+        repositoryService.createDeployment()
+                .addString("longDescriptionService.dmn", "<definitions xmlns=\"http://www.omg.org/spec/DMN/20180521/MODEL/\" id=\"longDescriptionService\""
+                        + " name=\"Long description service\" namespace=\"http://www.flowable.org/dmn\">"
+                        + "<decision id=\"decisionOne\" name=\"Decision One\"></decision>"
+                        + "<decisionService id=\"longDescriptionDecisionService\" name=\"Long description decision service\">"
+                        + "<description>" + description + "</description>"
+                        + "<outputDecision href=\"#decisionOne\"></outputDecision>"
+                        + "</decisionService>"
+                        + "</definitions>")
+                .deploy();
+
+        try {
+            DmnDecision decision = repositoryService.createDecisionQuery().decisionKey("longDescriptionDecisionService").singleResult();
+            assertThat(decision.getDescription()).isEqualTo(description.substring(0, 4000));
+        } finally {
+            deleteDeployments();
+        }
+    }
+
     protected void deleteDeployments() {
         List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
         for (org.flowable.dmn.api.DmnDeployment deployment : deployments) {
