@@ -12,7 +12,9 @@
  */
 package org.flowable.rest.app.properties;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,6 +33,10 @@ public class RestAppProperties {
      * Configures the way user credentials are verified when doing a REST API call:
      * 'any-user' : the user needs to exist and the password need to match. Any user is allowed to do the call (this is the pre 6.3.0 behavior)
      * 'verify-privilege' : the user needs to exist, the password needs to match and the user needs to have the 'rest-api' privilege
+     * 'pre-auth' : the request is trusted to have been authenticated by a reverse proxy in front of the app, and the user id is
+     *              read from a request header (see {@link PreAuth}) instead of HTTP Basic. The password is not checked; privileges
+     *              are still loaded from the IDM engine so authorization behaves as with 'verify-privilege'. Only use this when the
+     *              app cannot be reached except through a trusted proxy that strips any client-supplied copy of the header.
      * If nothing set, defaults to 'verify-privilege'
      */
     private String authenticationMode = "verify-privilege";
@@ -50,6 +56,9 @@ public class RestAppProperties {
 
     @NestedConfigurationProperty
     private final Admin admin = new Admin();
+
+    @NestedConfigurationProperty
+    private final PreAuth preAuth = new PreAuth();
 
     /**
      * The default role prefix that needs to be used by Spring Security.
@@ -86,6 +95,10 @@ public class RestAppProperties {
 
     public Admin getAdmin() {
         return admin;
+    }
+
+    public PreAuth getPreAuth() {
+        return preAuth;
     }
 
     public String getRolePrefix() {
@@ -136,6 +149,53 @@ public class RestAppProperties {
 
         public void setLastName(String lastName) {
             this.lastName = lastName;
+        }
+    }
+
+    /**
+     * Settings for the 'pre-auth' authentication mode, where a trusted reverse proxy has already
+     * authenticated the caller and passes the user id in a request header.
+     */
+    public static class PreAuth {
+
+        /**
+         * The request header that carries the already-authenticated user id. Defaults to
+         * {@code X-Forwarded-User}, which is what most authenticating reverse proxies emit
+         * (oauth2-proxy, and Databricks Apps also forwards {@code X-Forwarded-Email} /
+         * {@code X-Forwarded-Preferred-Username}).
+         */
+        private String principalHeader = "X-Forwarded-User";
+
+        /**
+         * Optional defence-in-depth allowlist of trusted proxy source addresses, as IPs or CIDR
+         * ranges (e.g. {@code 10.0.0.0/8}, {@code 192.168.1.5}). Empty by default, which keeps
+         * the behaviour of trusting the principal header on every request.
+         *
+         * <p>When set, the principal header is only honoured if the request's <em>transport
+         * peer</em> ({@code ServletRequest#getRemoteAddr()}, not an {@code X-Forwarded-For}
+         * value) matches one of these entries; otherwise the request is treated as if it carried
+         * no header and is denied. This binds the trusted identity to the proxy it came from
+         * rather than to the header alone, so a single misconfiguration (the app becoming
+         * reachable off the proxy, or a proxy that forwards an inbound {@code X-Forwarded-*}
+         * header) cannot be exploited from an arbitrary source. It complements, and does not
+         * replace, the requirement that the proxy strip client-supplied copies of the header.
+         */
+        private List<String> trustedProxies = new ArrayList<>();
+
+        public String getPrincipalHeader() {
+            return principalHeader;
+        }
+
+        public void setPrincipalHeader(String principalHeader) {
+            this.principalHeader = principalHeader;
+        }
+
+        public List<String> getTrustedProxies() {
+            return trustedProxies;
+        }
+
+        public void setTrustedProxies(List<String> trustedProxies) {
+            this.trustedProxies = trustedProxies;
         }
     }
 
