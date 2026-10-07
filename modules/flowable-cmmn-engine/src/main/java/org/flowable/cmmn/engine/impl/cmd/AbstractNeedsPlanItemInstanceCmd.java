@@ -76,9 +76,17 @@ public abstract class AbstractNeedsPlanItemInstanceCmd implements Command<Void>,
                 throw new FlowableIllegalStateException("Form engine is not initialized");
             }
 
-            Map<String, Object> variablesFromFormSubmission = formService.getVariablesFromFormSubmission(planItemInstanceEntity.getPlanItemDefinitionId(), 
-                    planItemInstanceEntity.getPlanItemDefinitionType(), planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getCaseDefinitionId(), 
-                    ScopeTypes.CMMN, formInfo, formVariables, formOutcome);
+            Map<String, Object> variablesFromFormSubmission = formService.createFormSubmissionBuilder()
+                    .elementId(planItemInstanceEntity.getPlanItemDefinitionId())
+                    .elementType(planItemInstanceEntity.getPlanItemDefinitionType())
+                    .scopeId(planItemInstanceEntity.getCaseInstanceId())
+                    .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
+                    .subScopeId(planItemInstanceEntity.getId())
+                    .scopeType(ScopeTypes.CMMN)
+                    .formInfo(formInfo)
+                    .values(formVariables)
+                    .outcome(formOutcome)
+                    .extractVariables();
 
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
             formFieldHandler.handleFormFieldsOnSubmit(formInfo, null, null, planItemInstanceEntity.getCaseInstanceId(), ScopeTypes.CMMN, variablesFromFormSubmission,

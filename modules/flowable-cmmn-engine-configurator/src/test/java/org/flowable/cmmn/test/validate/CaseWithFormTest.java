@@ -15,9 +15,11 @@ package org.flowable.cmmn.test.validate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -36,12 +38,14 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskLogEntryType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -87,6 +91,9 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
     @Mock
     protected FormFieldHandler formFieldHandler;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     protected FormFieldHandler originalFormFieldHandler;
 
@@ -138,10 +145,10 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
 
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("Validation failed"))
-                .when(formService)
-                .validateFormFields(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, 
-                        formInfo, Collections.singletonMap("variable", "VariableValue"));
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
@@ -149,6 +156,19 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .startWithForm())
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Validation failed");
+
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("variable", "VariableValue"));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -177,14 +197,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("doNotThrowException", "");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", caseInstance.getId(), 
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, completeVariables, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
-
-        doNothing()
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caseInstance.getId(), 
-                        caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, completeVariables);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
@@ -210,6 +224,20 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                         .count()).isEqualTo(2);
         assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().taskId(task.getId()).type(HistoricTaskLogEntryType.USER_TASK_COMPLETED.name()).count())
                 .isEqualTo(1);
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(completeVariables);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -224,10 +252,10 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
 
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("Validation failed"))
-                .when(formService)
-                .validateFormFields(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN,
-                        formInfo, Collections.singletonMap("variable", "VariableValue"));
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
@@ -235,6 +263,19 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .startWithForm())
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Validation failed");
+
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("variable", "VariableValue"));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -249,9 +290,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN,
-                formInfo, Collections.singletonMap("variable", "VariableValue"), null))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         cmmnEngineConfiguration.setFormFieldValidationEnabled(false);
         try {
@@ -264,6 +304,19 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             assertThat(caseInstance.getCaseVariables())
                     .containsOnly(entry("completeVar2", "Testing"));
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
+
+            verify(formSubmissionBuilder).elementType("planModel");
+            verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+            verify(formSubmissionBuilder, never()).scopeId(any());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder, never()).taskId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(Collections.singletonMap("variable", "VariableValue"));
+            verify(formSubmissionBuilder).outcome(null);
+            verify(formSubmissionBuilder, never()).validate();
+            verify(formSubmissionBuilder).extractVariables();
+            verifyNoMoreInteractions(formSubmissionBuilder);
         } finally {
             cmmnEngineConfiguration.setFormFieldValidationEnabled(true);
         }
@@ -280,15 +333,29 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("Validation failed"))
-                .when(formService)
-                .validateFormFields(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, formInfo, null);
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
                 .startWithForm())
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Validation failed");
+
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -310,9 +377,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
             SideEffectTaskListener.reset();
             
-            when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                    caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, completeVariables, "__COMPLETE"))
-                    .thenReturn(Collections.singletonMap("var2", "value2"));
+            when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("var2", "value2"));
 
             cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
             assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
@@ -322,6 +388,20 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
             verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), null, caze.getId(), ScopeTypes.CMMN,
                     Collections.singletonMap("var2", "value2"), caze.getTenantId());
+
+            verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+            verify(formSubmissionBuilder).elementType("humanTask");
+            verify(formSubmissionBuilder).scopeId(caze.getId());
+            verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+            verify(formSubmissionBuilder).taskId(task.getId());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(completeVariables);
+            verify(formSubmissionBuilder).outcome("__COMPLETE");
+            verify(formSubmissionBuilder, never()).validate();
+            verify(formSubmissionBuilder).extractVariables();
+            verifyNoMoreInteractions(formSubmissionBuilder);
         } finally {
             cmmnEngineConfiguration.setFormFieldValidationEnabled(true);
         }
@@ -341,15 +421,29 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                        caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("var", "value"));
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(
                 () -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", Collections.singletonMap("var", "value")))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caze.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("var", "value"));
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -367,14 +461,28 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                        caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caze.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -399,9 +507,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, completeVariables, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
@@ -411,10 +518,26 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), null, caze.getId(), ScopeTypes.CMMN,
                 Collections.singletonMap("completeVar2", "Testing"), caze.getTenantId());
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caze.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(completeVariables);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
-    public void completeTaskWithoutValidationOnModelLevelExpression() {
+    public void completeTaskWithoutValidationOnModelLevelExpression(
+            @Mock(answer = Answers.RETURNS_SELF) FormSubmissionBuilder taskFormSubmissionBuilder
+    ) {
         CmmnDeployment deployment = cmmnEngineConfiguration.getCmmnRepositoryService().createDeployment()
                 .addString("org/flowable/cmmn/test/oneTasksCaseWithForm.cmmn", ONE_TASK_CASE
                         .replace("CASE_VALIDATE_VALUE", "${true}")
@@ -430,10 +553,10 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", deployment.getParentDeploymentId()))
                 .thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, 
-                        formInfo, Collections.singletonMap("allowValidation", true));
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCaseWithForm")
@@ -441,6 +564,19 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
                 .startWithForm())
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("allowValidation", true));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
 
         CaseInstance caze = cmmnRuntimeService.createCaseInstanceBuilder()
@@ -453,14 +589,28 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caze.getId()).singleResult();
 
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(taskFormSubmissionBuilder);
         doThrow(new RuntimeException("validation failed for task"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                        caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+                .when(taskFormSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed for task");
+
+        verify(taskFormSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(taskFormSubmissionBuilder).elementType("humanTask");
+        verify(taskFormSubmissionBuilder).scopeId(caze.getId());
+        verify(taskFormSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(taskFormSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(taskFormSubmissionBuilder).taskId(task.getId());
+        verify(taskFormSubmissionBuilder, never()).subScopeId(any());
+        verify(taskFormSubmissionBuilder).formInfo(formInfo);
+        verify(taskFormSubmissionBuilder).values(null);
+        verify(taskFormSubmissionBuilder).outcome("__COMPLETE");
+        verify(taskFormSubmissionBuilder).validate();
+        verify(taskFormSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(taskFormSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -489,6 +639,8 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageStartingWith("Unknown property used in expression: ${BAD_EXPRESSION}");
+
+        verify(formService, never()).createFormSubmissionBuilder();
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -514,14 +666,28 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         assertThat(SideEffectTaskListener.getSideEffect()).isEqualTo(1);
         SideEffectTaskListener.reset();
 
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                        caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caze.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 
@@ -546,14 +712,28 @@ public class CaseWithFormTest extends AbstractProcessEngineIntegrationTest {
         
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "humanTask", caze.getId(), 
-                        caze.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> cmmnTaskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", null))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caze.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caze.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder, never()).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
         assertThat(SideEffectTaskListener.getSideEffect()).isZero();
     }
 

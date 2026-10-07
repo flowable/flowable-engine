@@ -17,6 +17,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -49,9 +52,11 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -79,6 +84,9 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
     @Mock
     protected FormService formEngineFormService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     @AfterEach
     void tearDown() {
@@ -753,9 +761,8 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
         when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-        when(formEngineFormService.getVariablesFromFormSubmission(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, formInfo,
-                Map.of("user", "simple string value", "number", 1234), null))
-                .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+        when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -766,6 +773,18 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
         assertThat(runtimeService.getVariable(caseInstance.getId(), "user")).isEqualTo("simple string value return");
         assertThat(runtimeService.getVariable(caseInstance.getId(), "number")).isEqualTo(1234L);
+
+        verify(formSubmissionBuilder, never()).elementId(any());
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Map.of("user", "simple string value", "number", 1234));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).extractVariables();
     }
 
     @Test
@@ -1263,9 +1282,8 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("testFormKey", caseDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
         when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-        when(formEngineFormService.getVariablesFromFormSubmission(null, "planModel", null, caseDefinition.getId(), ScopeTypes.CMMN, formInfo,
-                Map.of("user", "simple string value", "number", 1234), null))
-                .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+        when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -1279,5 +1297,17 @@ public class CaseInstanceCollectionResourceTest extends BaseSpringRestTestCase {
                 tuple("userVariable", "simple string value"),
                 tuple("userTransient", "simple transient value")
         );
+
+        verify(formSubmissionBuilder, never()).elementId(any());
+        verify(formSubmissionBuilder).elementType("planModel");
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseDefinition.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Map.of("user", "simple string value", "number", 1234));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).extractVariables();
     }
 }

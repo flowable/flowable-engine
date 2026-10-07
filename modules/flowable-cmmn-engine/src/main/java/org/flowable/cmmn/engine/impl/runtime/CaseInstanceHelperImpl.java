@@ -67,6 +67,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -400,14 +401,20 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
                     if (formInfo != null) {
                         FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
+                        boolean validateForm = isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel);
+                        FormSubmissionBuilder formSubmissionBuilder = formService.createFormSubmissionBuilder()
+                                .elementType("planModel")
+                                .scopeDefinitionId(caseDefinition.getId())
+                                .scopeType(ScopeTypes.CMMN)
+                                .formInfo(formInfo)
+                                .values(startFormVariables)
+                                .outcome(caseInstanceBuilder.getOutcome());
                         // validate input before anything else
-                        if (isFormFieldValidationEnabled(cmmnEngineConfiguration, planModel)) {
-                            formService.validateFormFields(null, "planModel", null, caseDefinition.getId(), 
-                                    ScopeTypes.CMMN, formInfo, startFormVariables);
+                        if (validateForm) {
+                            formSubmissionBuilder.validate();
                         }
                         // Extract the caseVariables from the form submission variables and pass them to the case
-                        Map<String, Object> caseVariables = formService.getVariablesFromFormSubmission(null, "planModel", null, 
-                                caseDefinition.getId(), ScopeTypes.CMMN, formInfo, startFormVariables, caseInstanceBuilder.getOutcome());
+                        Map<String, Object> caseVariables = formSubmissionBuilder.extractVariables();
 
                         if (caseVariables != null) {
 	                        for (String variableName : caseVariables.keySet()) {

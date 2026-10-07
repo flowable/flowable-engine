@@ -33,6 +33,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.service.delegate.TaskListener;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -125,13 +126,22 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         if (formInfo != null) {
             // validate input at first
             FormFieldHandler formFieldHandler = cmmnEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(task)) {
-                formService.validateFormFields(task.getTaskDefinitionKey(), "humanTask", task.getScopeId(), 
-                        task.getScopeDefinitionId(), ScopeTypes.CMMN, formInfo, variables);
+            boolean validateForm = isFormFieldValidationEnabled(task);
+            FormSubmissionBuilder formSubmissionBuilder = formService.createFormSubmissionBuilder()
+                    .elementId(task.getTaskDefinitionKey())
+                    .elementType("humanTask")
+                    .scopeId(task.getScopeId())
+                    .scopeDefinitionId(task.getScopeDefinitionId())
+                    .scopeType(ScopeTypes.CMMN)
+                    .taskId(task.getId())
+                    .formInfo(formInfo)
+                    .values(variables)
+                    .outcome(outcome);
+            if (validateForm) {
+                formSubmissionBuilder.validate();
             }
             // Extract raw variables and complete the task
-            Map<String, Object> taskVariables = formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humanTask", task.getScopeId(), 
-                    task.getScopeDefinitionId(), ScopeTypes.CMMN, formInfo, variables, outcome);
+            Map<String, Object> taskVariables = formSubmissionBuilder.extractVariables();
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances

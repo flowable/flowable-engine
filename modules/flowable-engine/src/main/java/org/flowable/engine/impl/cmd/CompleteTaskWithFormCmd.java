@@ -28,6 +28,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -130,14 +131,23 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (formInfo != null) {
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
-            if (isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey())) {
-                formService.validateFormFields(task.getTaskDefinitionKey(), "userTask", task.getProcessInstanceId(), 
-                        task.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, formVariables);
+            boolean validateForm = isFormFieldValidationEnabled(task, processEngineConfiguration, task.getProcessDefinitionId(), task.getTaskDefinitionKey());
+            FormSubmissionBuilder formSubmissionBuilder = formService.createFormSubmissionBuilder()
+                    .elementId(task.getTaskDefinitionKey())
+                    .elementType("userTask")
+                    .scopeId(task.getProcessInstanceId())
+                    .scopeDefinitionId(task.getProcessDefinitionId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .taskId(task.getId())
+                    .formInfo(formInfo)
+                    .values(formVariables)
+                    .outcome(outcome);
+            if (validateForm) {
+                formSubmissionBuilder.validate();
             }
 
             // Extract raw variables and complete the task
-            taskVariables = formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", task.getProcessInstanceId(), 
-                    task.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, formVariables, outcome);
+            taskVariables = formSubmissionBuilder.extractVariables();
 
             // The taskVariables are the variables that should be used when completing the task
             // the actual variables should instead be used when saving the form instances
