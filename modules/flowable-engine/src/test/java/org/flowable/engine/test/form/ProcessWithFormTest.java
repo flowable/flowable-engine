@@ -15,8 +15,8 @@ package org.flowable.engine.test.form;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -40,6 +40,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -62,6 +63,9 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
     @Mock
     protected FormRepositoryService formRepositoryService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     protected boolean originalFormFieldValidationEnabled;
     protected FormFieldHandler originalFormFieldHandler;
@@ -89,9 +93,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         FormInfo formInfo = new FormInfo();
         Map<String, Object> formVariables = Collections.singletonMap("intVar", 42);
-        when(formService.getVariablesFromFormSubmission("theStart", "startEvent", null, processDefinition.getId(), 
-                ScopeTypes.BPMN, formInfo, formVariables, "simple"))
-                .thenReturn(Collections.singletonMap("otherIntVar", 150));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("otherIntVar", 150));
 
         String procId = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("oneTaskProcess")
@@ -103,6 +106,16 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
                 .containsOnly(
                         entry("otherIntVar", 150)
                 );
+
+        verify(formSubmissionBuilder).elementId("theStart");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(formVariables);
+        verify(formSubmissionBuilder).outcome("simple");
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -160,14 +173,22 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("test", processDefinition.getDeploymentId())).thenReturn(formInfo);
 
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
-                        ScopeTypes.BPMN, formInfo, startFormVariables);
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test"))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId("start");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(startFormVariables);
+        verify(formSubmissionBuilder, never()).extractVariables();
     }
 
     @Test
@@ -184,14 +205,18 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("test", processDefinition.getDeploymentId())).thenReturn(formInfo);
 
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
-                        ScopeTypes.BPMN, formInfo, Collections.emptyMap());
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", Collections.emptyMap(), "test"))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId("start");
+        verify(formSubmissionBuilder).values(Collections.emptyMap());
+        verify(formSubmissionBuilder, never()).extractVariables();
     }
 
     @Test
@@ -209,18 +234,24 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("test", processDefinition.getDeploymentId())).thenReturn(formInfo);
 
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
-        doNothing().when(formService)
-                .validateFormFields("start", "startEvent", null, processDefinition.getId(), 
-                        ScopeTypes.BPMN, formInfo, startFormVariables);
-
-        when(formService.getVariablesFromFormSubmission("start", "startEvent", null, processDefinition.getId(), 
-                ScopeTypes.BPMN, formInfo, startFormVariables, "COMPLETE"))
-                .thenReturn(Collections.singletonMap("nameVar", "Test name"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("nameVar", "Test name"));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test");
 
         assertThat(processInstance.getProcessVariables())
                 .containsOnly(entry("nameVar", "Test name"));
+
+        verify(formSubmissionBuilder).elementId("start");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(startFormVariables);
+        verify(formSubmissionBuilder).outcome("COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -237,14 +268,17 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("test", processDefinition.getDeploymentId())).thenReturn(formInfo);
 
         Map<String, Object> startFormVariables = Collections.singletonMap("name", "nameValue");
-        when(formService.getVariablesFromFormSubmission("start", "startEvent", null, processDefinition.getId(), 
-                ScopeTypes.BPMN, formInfo, startFormVariables, "COMPLETE"))
-                .thenReturn(Collections.singletonMap("nameVar", "Test name"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("nameVar", "Test name"));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(processDefinition.getId(), "COMPLETE", startFormVariables, "test");
 
         assertThat(processInstance.getProcessVariables())
                 .containsOnly(entry("nameVar", "Test name"));
+
+        verify(formSubmissionBuilder).values(startFormVariables);
+        verify(formSubmissionBuilder).outcome("COMPLETE");
+        verify(formSubmissionBuilder, never()).validate();
     }
 
     @Test
@@ -261,14 +295,24 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         FormInfo formInfo = new FormInfo();
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
         doThrow(new RuntimeException("validation failed"))
-                .when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
-                        ScopeTypes.BPMN, formInfo, Collections.emptyMap());
+                .when(formSubmissionBuilder)
+                .validate();
 
         assertThatThrownBy(() -> taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", Collections.emptyMap()))
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("validation failed");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("userTask");
+        verify(formSubmissionBuilder).scopeId(processInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.emptyMap());
+        verify(formSubmissionBuilder, never()).extractVariables();
 
         Task taskAfterComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(taskAfterComplete).isNotNull();
@@ -292,9 +336,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
-                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
@@ -306,6 +349,18 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), processInstance.getId(), null, null,
                 Collections.singletonMap("completeVar2", "Testing"), "flowable");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("userTask");
+        verify(formSubmissionBuilder).scopeId(processInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(completeVariables);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -331,9 +386,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
-                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
@@ -345,6 +399,18 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), processInstance.getId(), null, null,
                 Collections.singletonMap("completeVar2", "Testing"), "flowable");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("userTask");
+        verify(formSubmissionBuilder).scopeId(processInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(completeVariables);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -370,12 +436,8 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
         FormInfo formInfo = new FormInfo();
         Map<String, Object> completeVariables = Collections.singletonMap("completeVar", "test");
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
-                ScopeTypes.BPMN, formInfo, completeVariables, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
-        doNothing().when(formService)
-                .validateFormFields(task.getTaskDefinitionKey(), "userTask", processInstance.getId(), processInstance.getProcessDefinitionId(), 
-                        ScopeTypes.BPMN, formInfo, completeVariables);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         taskService.completeTaskWithForm(task.getId(), "formDefId", "__COMPLETE", completeVariables);
 
@@ -387,6 +449,19 @@ class ProcessWithFormTest extends PluggableFlowableTestCase {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, task.getId(), processInstance.getId(), null, null,
                 Collections.singletonMap("completeVar2", "Testing"), "flowable");
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("userTask");
+        verify(formSubmissionBuilder).scopeId(processInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).taskId(task.getId());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(completeVariables);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
 }

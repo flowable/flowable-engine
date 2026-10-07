@@ -110,9 +110,17 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                     throw new FlowableIllegalStateException("Form engine is not initialized");
                 }
 
-                variablesFromFormSubmission = formService.getVariablesFromFormSubmission(planItemInstanceEntity.getPlanItemDefinitionId(), "caseTask", 
-                        planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getCaseDefinitionId(), ScopeTypes.CMMN, 
-                        variableInfo.formInfo, variableInfo.formVariables, variableInfo.formOutcome);
+                variablesFromFormSubmission = formService.createFormSubmissionBuilder()
+                        .elementId(planItemInstanceEntity.getPlanItemDefinitionId())
+                        .elementType("caseTask")
+                        .scopeId(planItemInstanceEntity.getCaseInstanceId())
+                        .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
+                        .subScopeId(planItemInstanceEntity.getId())
+                        .scopeType(ScopeTypes.CMMN)
+                        .formInfo(variableInfo.formInfo)
+                        .values(variableInfo.formVariables)
+                        .outcome(variableInfo.formOutcome)
+                        .extractVariables();
 
                 finalVariableMap.putAll(variablesFromFormSubmission);
             }

@@ -20,6 +20,11 @@ import java.util.Map;
 public interface FormService {
 
     /**
+     * Create a builder for validating a form submission and extracting the variables from it.
+     */
+    FormSubmissionBuilder createFormSubmissionBuilder();
+
+    /**
      * Apply validation restrictions on the submitted variables
      *
      * @param formInfo
@@ -27,9 +32,21 @@ public interface FormService {
      * @param values
      *     submitted variables
      * @throws org.flowable.common.engine.api.FlowableException in the case when validation failed
+     * @deprecated use {@link #createFormSubmissionBuilder()} and {@link FormSubmissionBuilder#validate()} instead
      */
-    void validateFormFields(String elementId, String elementType, String scopeId, String scopeDefinitionId, 
-            String scopeType, FormInfo formInfo, Map<String, Object> values);
+    @Deprecated
+    default void validateFormFields(String elementId, String elementType, String scopeId, String scopeDefinitionId,
+            String scopeType, FormInfo formInfo, Map<String, Object> values) {
+        createFormSubmissionBuilder()
+                .elementId(elementId)
+                .elementType(elementType)
+                .scopeId(scopeId)
+                .scopeDefinitionId(scopeDefinitionId)
+                .scopeType(scopeType)
+                .formInfo(formInfo)
+                .values(values)
+                .validate();
+    }
 
     /**
      * @param formInfo
@@ -40,9 +57,22 @@ public interface FormService {
      *            outcome selected by the user. If null, no outcome is used and any outcome definitions are ignored.
      *
      * @return raw variables that can be used in the process engine, based on the filled in values and selected outcome.
+     * @deprecated use {@link #createFormSubmissionBuilder()} and {@link FormSubmissionBuilder#extractVariables()} instead
      */
-    Map<String, Object> getVariablesFromFormSubmission(String elementId, String elementType, String scopeId, 
-            String scopeDefinitionId, String scopeType, FormInfo formInfo, Map<String, Object> values, String outcome);
+    @Deprecated
+    default Map<String, Object> getVariablesFromFormSubmission(String elementId, String elementType, String scopeId,
+            String scopeDefinitionId, String scopeType, FormInfo formInfo, Map<String, Object> values, String outcome) {
+        return createFormSubmissionBuilder()
+                .elementId(elementId)
+                .elementType(elementType)
+                .scopeId(scopeId)
+                .scopeDefinitionId(scopeDefinitionId)
+                .scopeType(scopeType)
+                .formInfo(formInfo)
+                .values(values)
+                .outcome(outcome)
+                .extractVariables();
+    }
 
     /**
      * Store the submitted form values.

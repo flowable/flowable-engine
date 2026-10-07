@@ -17,6 +17,9 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -47,12 +50,14 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -80,6 +85,9 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
     @Mock
     protected FormService formEngineFormService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     @BeforeEach
     public void initializeMocks() {
@@ -789,9 +797,8 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", processDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
         when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-        when(formEngineFormService.getVariablesFromFormSubmission("theStart", "startEvent", null,
-                processDefinition.getId(), ScopeTypes.BPMN, formInfo, Map.of("user", "simple string value", "number", 1234), null))
-                .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+        when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -808,6 +815,18 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         String processInstanceId = responseNode.get("id").asString();
         assertThat(runtimeService.getVariable(processInstanceId, "user")).isEqualTo("simple string value return");
         assertThat(runtimeService.getVariable(processInstanceId, "number")).isEqualTo(1234L);
+
+        verify(formSubmissionBuilder).elementId("theStart");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Map.of("user", "simple string value", "number", 1234));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).extractVariables();
     }
 
     @Test
@@ -1255,9 +1274,8 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         when(formRepositoryService.getFormModelByKeyAndParentDeploymentId("form1", processDefinition.getDeploymentId()))
                 .thenReturn(formInfo);
         when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
-        when(formEngineFormService.getVariablesFromFormSubmission("theStart", "startEvent", null,
-                processDefinition.getId(), ScopeTypes.BPMN, formInfo, Map.of("user", "simple string value", "number", 1234), null))
-                .thenReturn(Map.of("user", "simple string value return", "number", 1234L));
+        when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of("user", "simple string value return", "number", 1234L));
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -1278,5 +1296,17 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
                 tuple("userVariable", "simple string value"),
                 tuple("userTransient", "simple transient value")
         );
+
+        verify(formSubmissionBuilder).elementId("theStart");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Map.of("user", "simple string value", "number", 1234));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).extractVariables();
     }
 }
