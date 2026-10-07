@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:activiti="http://activiti.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="multipleTokensJoin">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="fork" />
+
+    <parallelGateway id="fork" />
+    <!-- Push 2 tokens down the waitTask1 sequenceFlow -->
+    <sequenceFlow sourceRef="fork" targetRef="waitTask1" />
+    <sequenceFlow sourceRef="fork" targetRef="waitTask1" />
+    <sequenceFlow sourceRef="fork" targetRef="waitTask2" />
+
+    <userTask id="waitTask1" name="Wait Task 1" />
+    <sequenceFlow sourceRef="waitTask1" targetRef="join" />
+
+    <userTask id="waitTask2" name="Wait Task 2" />
+    <!-- ensure that gateway logic works when sequenceFlow has id set -->
+    <sequenceFlow id="waitTask2ToJoinGateway" sourceRef="waitTask2" targetRef="join" />
+
+    <parallelGateway id="join" />
+    <sequenceFlow sourceRef="join" targetRef="finalTask" />
+
+    <userTask id="finalTask" name="Final Task" />
+    <sequenceFlow sourceRef="finalTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
