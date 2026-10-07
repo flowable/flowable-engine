@@ -17,6 +17,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -53,10 +55,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -1432,7 +1436,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @MockitoSettings
     public void testStartProcessInstanceByProcessInstanceBuilderWithFormVariables(
             @Mock FormEngineConfigurationApi formEngineConfiguration,
-            @Mock FormService formService
+            @Mock FormService formService,
+            @Mock(answer = Answers.RETURNS_SELF) FormSubmissionBuilder formSubmissionBuilder
     ) {
         try {
             Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
@@ -1444,9 +1449,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
             FormInfo formInfo = new FormInfo();
             when(formEngineConfiguration.getFormService()).thenReturn(formService);
             Map<String, Object> formVariables = Collections.singletonMap("intVar", 42);
-            when(formService.getVariablesFromFormSubmission("theStart", "startEvent", null, processDefinition.getId(), ScopeTypes.BPMN, 
-                    formInfo, formVariables, "simple"))
-                    .thenReturn(Collections.singletonMap("otherIntVar", 150));
+            when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("otherIntVar", 150));
 
             String procId = runtimeService.createProcessInstanceBuilder()
                     .processDefinitionKey("oneTaskProcess")
@@ -1458,6 +1462,16 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
                     .containsOnly(
                             entry("otherIntVar", 150)
                     );
+
+            verify(formSubmissionBuilder).elementId("theStart");
+            verify(formSubmissionBuilder).elementType("startEvent");
+            verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(formVariables);
+            verify(formSubmissionBuilder).outcome("simple");
+            verify(formSubmissionBuilder).extractVariables();
+            verifyNoMoreInteractions(formSubmissionBuilder);
         } finally {
             processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
         }

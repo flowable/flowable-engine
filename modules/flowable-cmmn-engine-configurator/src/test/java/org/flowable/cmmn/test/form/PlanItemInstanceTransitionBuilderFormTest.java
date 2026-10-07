@@ -14,7 +14,10 @@ package org.flowable.cmmn.test.form;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -33,10 +36,12 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -56,6 +61,9 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
     @Mock
     protected FormFieldHandler formFieldHandler;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     protected FormFieldHandler originalFormFieldHandler;
 
@@ -87,12 +95,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humantask", caseInstance.getId(), 
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "50"), "testOutcome"))
-                .thenReturn(Map.of(
-                        "intVar", 50L,
-                        "form_transitionForm_outcome", "testOutcome"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 50L,
+                "form_transitionForm_outcome", "testOutcome"
+        ));
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceA.getId())
@@ -113,6 +120,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, null, null, caseInstance.getId(), ScopeTypes.CMMN,
                 Map.of("intVar", 50L, "form_transitionForm_outcome", "testOutcome"),
                 caseInstance.getTenantId());
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humantask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstanceA.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "50"));
+        verify(formSubmissionBuilder).outcome("testOutcome");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -125,12 +146,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("taskB", "humantask", caseInstance.getId(), 
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "100"), "test"))
-                .thenReturn(Map.of(
-                        "intVar", 100L,
-                        "form_transitionForm_outcome", "test"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 100L,
+                "form_transitionForm_outcome", "test"
+        ));
 
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstanceB.getId())
@@ -149,6 +169,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("intVar", 100L),
                         entry("form_transitionForm_outcome", "test")
                 );
+
+        verify(formSubmissionBuilder).elementId("taskB");
+        verify(formSubmissionBuilder).elementType("humantask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstanceB.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "100"));
+        verify(formSubmissionBuilder).outcome("test");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -161,12 +195,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("taskB", "humantask", caseInstance.getId(), 
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "150"), "transition"))
-                .thenReturn(Map.of(
-                        "intVar", 150L,
-                        "form_transitionForm_outcome", "transition"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 150L,
+                "form_transitionForm_outcome", "transition"
+        ));
 
         // Need to enable before disabling
         PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
@@ -188,6 +221,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("intVar", 150L),
                         entry("form_transitionForm_outcome", "transition")
                 );
+
+        verify(formSubmissionBuilder).elementId("taskB");
+        verify(formSubmissionBuilder).elementType("humantask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstanceB.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "150"));
+        verify(formSubmissionBuilder).outcome("transition");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -200,12 +247,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "humantask", caseInstance.getId(), 
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "15"), "anotherTest"))
-                .thenReturn(Map.of(
-                        "intVar", 15L,
-                        "form_transitionForm_outcome", "anotherTest"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 15L,
+                "form_transitionForm_outcome", "anotherTest"
+        ));
 
         PlanItemInstance planItemInstanceA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("A").singleResult();
         assertThat(planItemInstanceA.getState()).isEqualTo(PlanItemInstanceState.ACTIVE);
@@ -225,6 +271,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                 entry("intVar", 15L),
                 entry("form_transitionForm_outcome", "anotherTest")
         );
+
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humantask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstanceA.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "15"));
+        verify(formSubmissionBuilder).outcome("anotherTest");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -240,12 +300,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("caseTask1", "casetask", parentCaseInstance.getId(), 
-                parentCaseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "135"), "child"))
-                .thenReturn(Map.of(
-                        "intVar", 135L,
-                        "form_transitionForm_outcome", "child"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 135L,
+                "form_transitionForm_outcome", "child"
+        ));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -267,6 +326,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("form_transitionForm_outcome", "child")
                 );
         assertThat(cmmnRuntimeService.getVariables(childCaseInstance.getId())).isEmpty();
+
+        verify(formSubmissionBuilder).elementId("caseTask1");
+        verify(formSubmissionBuilder).elementType("casetask");
+        verify(formSubmissionBuilder).scopeId(parentCaseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(parentCaseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstance.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "135"));
+        verify(formSubmissionBuilder).outcome("child");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -282,12 +355,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("caseTask1", "caseTask", parentCaseInstance.getId(), 
-                parentCaseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "500"), "childForm"))
-                .thenReturn(Map.of(
-                        "intVar", 500L,
-                        "form_transitionForm_outcome", "childForm"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 500L,
+                "form_transitionForm_outcome", "childForm"
+        ));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -313,6 +385,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("intVar", 500L),
                         entry("form_transitionForm_outcome", "childForm")
                 );
+
+        verify(formSubmissionBuilder).elementId("caseTask1");
+        verify(formSubmissionBuilder).elementType("caseTask");
+        verify(formSubmissionBuilder).scopeId(parentCaseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(parentCaseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstance.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "500"));
+        verify(formSubmissionBuilder).outcome("childForm");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -324,12 +410,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
 
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("theProcess", "processtask", parentCaseInstance.getId(), 
-                parentCaseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, Collections.singletonMap("intVar", "77"), "childProcess"))
-                .thenReturn(Map.of(
-                        "intVar", 77L,
-                        "form_transitionForm_outcome", "childProcess"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 77L,
+                "form_transitionForm_outcome", "childProcess"
+        ));
 
         processDeploymentId = processEngineRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/oneTaskProcess.bpmn20.xml")
@@ -356,6 +441,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("form_transitionForm_outcome", "childProcess")
                 );
         assertThat(processEngineRuntimeService.getVariables(childProcessInstance.getId())).isEmpty();
+
+        verify(formSubmissionBuilder).elementId("theProcess");
+        verify(formSubmissionBuilder).elementType("processtask");
+        verify(formSubmissionBuilder).scopeId(parentCaseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(parentCaseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).subScopeId(planItemInstance.getId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "77"));
+        verify(formSubmissionBuilder).outcome("childProcess");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -375,12 +474,11 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
         
         FormInfo formInfo = new FormInfo();
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
-        when(formService.getVariablesFromFormSubmission("theStart", "startEvent", null, 
-                processDefinition.getId(), ScopeTypes.BPMN, formInfo, Collections.singletonMap("intVar", "42"), "childProcessForm"))
-                .thenReturn(Map.of(
-                        "intVar", 42L,
-                        "form_transitionForm_outcome", "childProcessForm"
-                ));
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of(
+                "intVar", 42L,
+                "form_transitionForm_outcome", "childProcessForm"
+        ));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(parentCaseInstance.getId()).singleResult();
         assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
@@ -406,6 +504,20 @@ public class PlanItemInstanceTransitionBuilderFormTest extends AbstractProcessEn
                         entry("intVar", 42L),
                         entry("form_transitionForm_outcome", "childProcessForm")
                 );
+
+        verify(formSubmissionBuilder).elementId("theStart");
+        verify(formSubmissionBuilder).elementType("startEvent");
+        verify(formSubmissionBuilder, never()).scopeId(any());
+        verify(formSubmissionBuilder).scopeDefinitionId(processDefinition.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder, never()).taskId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Collections.singletonMap("intVar", "42"));
+        verify(formSubmissionBuilder).outcome("childProcessForm");
+        verify(formSubmissionBuilder, never()).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
 }

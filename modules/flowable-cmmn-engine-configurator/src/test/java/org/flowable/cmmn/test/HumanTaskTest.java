@@ -14,8 +14,10 @@ package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -34,11 +36,13 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -60,6 +64,9 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
 
     @Mock
     protected FormFieldHandler formFieldHandler;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     protected FormFieldHandler originalFormFieldHandler;
 
@@ -92,12 +99,8 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
         when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
-        doNothing().when(formService)
-                .validateFormFields(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
-                        caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         cmmnTaskService
                 .completeTaskWithForm(caseTask.getId(), "formDefId",
@@ -108,6 +111,20 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, caseTask.getId(), null, caseInstance.getId(), ScopeTypes.CMMN,
                 Collections.singletonMap("completeVar2", "Testing"), caseInstance.getTenantId());
+
+        verify(formSubmissionBuilder).elementId(caseTask.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(caseTask.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test
@@ -133,12 +150,8 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
         when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
         when(formEngineConfiguration.getFormService()).thenReturn(formService);
         when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-        when(formService.getVariablesFromFormSubmission(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
-                caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null, "__COMPLETE"))
-                .thenReturn(Collections.singletonMap("completeVar2", "Testing"));
-        doNothing().when(formService)
-                .validateFormFields(caseTask.getTaskDefinitionKey(), "humanTask", caseInstance.getId(),
-                        caseInstance.getCaseDefinitionId(), ScopeTypes.CMMN, formInfo, null);
+        when(formService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.singletonMap("completeVar2", "Testing"));
 
         cmmnTaskService.completeTaskWithForm(caseTask.getId(), "formDefId", "__COMPLETE", null);
 
@@ -147,6 +160,20 @@ public class HumanTaskTest extends AbstractProcessEngineIntegrationTest {
 
         verify(formFieldHandler).handleFormFieldsOnSubmit(formInfo, caseTask.getId(), null, caseInstance.getId(), ScopeTypes.CMMN,
                 Collections.singletonMap("completeVar2", "Testing"), caseInstance.getTenantId());
+
+        verify(formSubmissionBuilder).elementId(caseTask.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("humanTask");
+        verify(formSubmissionBuilder).scopeId(caseInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(caseInstance.getCaseDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.CMMN);
+        verify(formSubmissionBuilder).taskId(caseTask.getId());
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(null);
+        verify(formSubmissionBuilder).outcome("__COMPLETE");
+        verify(formSubmissionBuilder).validate();
+        verify(formSubmissionBuilder).extractVariables();
+        verifyNoMoreInteractions(formSubmissionBuilder);
     }
 
     @Test

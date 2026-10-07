@@ -14,6 +14,9 @@ package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
@@ -51,12 +54,14 @@ import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoSettings;
 
@@ -78,6 +83,9 @@ public class ProcessTest {
 
     @Mock
     protected FormRepositoryService formRepositoryService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
 
     @BeforeEach
     void setUp(AppEngine appEngine) {
@@ -162,11 +170,22 @@ public class ProcessTest {
             when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
             FormInfo formInfo = new FormInfo();
             when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-            when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(),
-                    processInstance.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, variables, null))
-                    .thenReturn(Collections.emptyMap());
+            when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.emptyMap());
 
             taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
+
+            verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+            verify(formSubmissionBuilder).elementType("userTask");
+            verify(formSubmissionBuilder).scopeId(processInstance.getId());
+            verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+            verify(formSubmissionBuilder).taskId(task.getId());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(variables);
+            verify(formSubmissionBuilder).outcome(null);
+            verify(formSubmissionBuilder).extractVariables();
 
             assertThatThrownBy(() -> runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
                     .isInstanceOf(FlowableObjectNotFoundException.class);
@@ -214,11 +233,22 @@ public class ProcessTest {
             when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
             FormInfo formInfo = new FormInfo();
             when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
-            when(formEngineFormService.getVariablesFromFormSubmission(task.getTaskDefinitionKey(), "userTask", processInstance.getId(),
-                    processInstance.getProcessDefinitionId(), ScopeTypes.BPMN, formInfo, variables, null))
-                    .thenReturn(Collections.emptyMap());
+            when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.emptyMap());
 
             taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
+
+            verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+            verify(formSubmissionBuilder).elementType("userTask");
+            verify(formSubmissionBuilder).scopeId(processInstance.getId());
+            verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+            verify(formSubmissionBuilder).taskId(task.getId());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(variables);
+            verify(formSubmissionBuilder).outcome(null);
+            verify(formSubmissionBuilder).extractVariables();
 
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 

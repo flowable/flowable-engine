@@ -43,6 +43,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
@@ -159,14 +160,21 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                     formInfo = resolveFormInfo(startEvent, processDefinition, formRepositoryService, processEngineConfiguration);
 
                     if (formInfo != null) {
-                        if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
-                            formService.validateFormFields(startEvent.getId(), "startEvent", null, processDefinition.getId(), 
-                                    ScopeTypes.BPMN, formInfo, startFormVariables);
+                        boolean validateForm = isFormFieldValidationEnabled(processEngineConfiguration, startEvent);
+                        FormSubmissionBuilder formSubmissionBuilder = formService.createFormSubmissionBuilder()
+                                .elementId(startEvent.getId())
+                                .elementType("startEvent")
+                                .scopeDefinitionId(processDefinition.getId())
+                                .scopeType(ScopeTypes.BPMN)
+                                .formInfo(formInfo)
+                                .values(startFormVariables)
+                                .outcome(outcome);
+                        if (validateForm) {
+                            formSubmissionBuilder.validate();
                         }
                         // The processVariables are the variables that should be used when starting the process
                         // the actual variables should instead be used when saving the form instances
-                        processVariables = formService.getVariablesFromFormSubmission(startElement.getId(), "startEvent", 
-                                null, processDefinition.getId(), ScopeTypes.BPMN, formInfo, startFormVariables, outcome);
+                        processVariables = formSubmissionBuilder.extractVariables();
                         if (processVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();
@@ -186,8 +194,15 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 startEventId = startElement.getId();
             }
             
-            extraFormVariables = formService.getVariablesFromFormSubmission(startEventId, "startEvent", null, processDefinition.getId(), 
-                    ScopeTypes.BPMN, this.extraFormInfo, this.extraFormVariables, this.extraFormOutcome);
+            extraFormVariables = formService.createFormSubmissionBuilder()
+                    .elementId(startEventId)
+                    .elementType("startEvent")
+                    .scopeDefinitionId(processDefinition.getId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .formInfo(this.extraFormInfo)
+                    .values(this.extraFormVariables)
+                    .outcome(this.extraFormOutcome)
+                    .extractVariables();
 
             if (extraFormVariables != null) {
                 if (variables == null) {
