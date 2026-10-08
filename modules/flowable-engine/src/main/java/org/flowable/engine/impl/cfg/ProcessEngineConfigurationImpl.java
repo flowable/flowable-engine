@@ -354,6 +354,7 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.impl.variable.ParallelMultiInstanceLoopVariableType;
+import org.flowable.engine.interceptor.ChildInstanceParametersInterceptor;
 import org.flowable.engine.interceptor.CreateExternalWorkerJobInterceptor;
 import org.flowable.engine.interceptor.CreateUserTaskInterceptor;
 import org.flowable.engine.interceptor.EndProcessInstanceInterceptor;
@@ -776,6 +777,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BusinessCalendarManager businessCalendarManager;
 
     protected StartProcessInstanceInterceptor startProcessInstanceInterceptor;
+    protected ChildInstanceParametersInterceptor childInstanceParametersInterceptor;
     protected ProcessInstanceStateInterceptor processInstanceStateInterceptor;
     protected EndProcessInstanceInterceptor endProcessInstanceInterceptor;
 
@@ -3406,6 +3408,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setStartProcessInstanceInterceptor(StartProcessInstanceInterceptor startProcessInstanceInterceptor) {
         this.startProcessInstanceInterceptor = startProcessInstanceInterceptor;
+        return this;
+    }
+
+    public ChildInstanceParametersInterceptor getChildInstanceParametersInterceptor() {
+        return childInstanceParametersInterceptor;
+    }
+
+    public ProcessEngineConfigurationImpl setChildInstanceParametersInterceptor(ChildInstanceParametersInterceptor childInstanceParametersInterceptor) {
+        this.childInstanceParametersInterceptor = childInstanceParametersInterceptor;
         return this;
     }
 

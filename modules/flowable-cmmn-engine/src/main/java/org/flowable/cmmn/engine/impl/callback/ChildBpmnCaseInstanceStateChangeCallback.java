@@ -98,7 +98,7 @@ public class ChildBpmnCaseInstanceStateChangeCallback implements RuntimeInstance
                 variables.put(variableName, value);
             }
 
-            processInstanceService.triggerCaseTask(callbackData.getCallbackId(), variables);
+            processInstanceService.triggerCaseTask(callbackData.getCallbackId(), variables, caseInstance);
         }
     }
 

@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
@@ -37,8 +38,13 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
     
     protected String executionId;
     protected Map<String, Object> variables;
+    protected transient VariableContainer childCaseInstance;
 
     public TriggerCaseTaskCmd(String executionId, Map<String, Object> variables) {
+        this(executionId, variables, null);
+    }
+
+    public TriggerCaseTaskCmd(String executionId, Map<String, Object> variables, VariableContainer childCaseInstance) {
         this.executionId = executionId;
 
         if (executionId == null) {
@@ -46,6 +52,7 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         }
         
         this.variables = variables;
+        this.childCaseInstance = childCaseInstance;
     }
 
     @Override
@@ -63,11 +70,11 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
 
         Object behavior = caseServiceTask.getBehavior();
         if (behavior instanceof CaseTaskActivityBehavior) {
-            ((CaseTaskActivityBehavior) behavior).triggerCaseTaskAndLeave(execution, variables);
+            ((CaseTaskActivityBehavior) behavior).triggerCaseTaskAndLeave(execution, variables, childCaseInstance);
         } else if (behavior instanceof MultiInstanceActivityBehavior) {
             AbstractBpmnActivityBehavior innerActivityBehavior = ((MultiInstanceActivityBehavior) behavior).getInnerActivityBehavior();
             if (innerActivityBehavior instanceof CaseTaskActivityBehavior) {
-                ((CaseTaskActivityBehavior) innerActivityBehavior).triggerCaseTask(execution, variables);
+                ((CaseTaskActivityBehavior) innerActivityBehavior).triggerCaseTask(execution, variables, childCaseInstance);
             } else {
                 throw new FlowableException("Multi instance inner behavior " + innerActivityBehavior + " is not supported for " + execution);
             }

@@ -200,6 +200,7 @@ import org.flowable.cmmn.engine.impl.scripting.CmmnVariableScopeResolverFactory;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.cmmn.engine.impl.variable.CmmnAggregatedVariableType;
 import org.flowable.cmmn.engine.interceptor.CaseInstanceStateInterceptor;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCasePageTaskInterceptor;
 import org.flowable.cmmn.engine.interceptor.CreateCmmnExternalWorkerJobInterceptor;
@@ -399,6 +400,7 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
     protected List<CaseInstanceLifecycleListener> caseInstanceLifecycleListeners;
     protected Map<String, List<PlanItemInstanceLifecycleListener>> planItemInstanceLifecycleListeners;
     protected StartCaseInstanceInterceptor startCaseInstanceInterceptor;
+    protected CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor;
     protected CaseInstanceStateInterceptor caseInstanceStateInterceptor;
     protected EndCaseInstanceInterceptor endCaseInstanceInterceptor;
 
@@ -2569,6 +2571,15 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setStartCaseInstanceInterceptor(StartCaseInstanceInterceptor startCaseInstanceInterceptor) {
         this.startCaseInstanceInterceptor = startCaseInstanceInterceptor;
+        return this;
+    }
+
+    public CmmnChildInstanceParametersInterceptor getChildInstanceParametersInterceptor() {
+        return childInstanceParametersInterceptor;
+    }
+
+    public CmmnEngineConfiguration setChildInstanceParametersInterceptor(CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor) {
+        this.childInstanceParametersInterceptor = childInstanceParametersInterceptor;
         return this;
     }
 

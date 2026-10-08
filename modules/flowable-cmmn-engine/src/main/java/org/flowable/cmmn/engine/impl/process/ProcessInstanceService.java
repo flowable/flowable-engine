@@ -14,9 +14,11 @@ package org.flowable.cmmn.engine.impl.process;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.delegate.BusinessError;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.form.api.FormInfo;
 
 /**
@@ -61,6 +63,45 @@ public interface ProcessInstanceService {
     Map<String, Object> getVariables(String executionId);
 
     /**
+     * The variables of the given execution, read on demand. By default a read only view on {@link #getVariable(String, String)}
+     * and {@link #getVariables(String)}.
+     */
+    default VariableContainer getVariableContainer(String executionId) {
+        return new VariableContainer() {
+
+            @Override
+            public boolean hasVariable(String variableName) {
+                return getVariables(executionId).containsKey(variableName);
+            }
+
+            @Override
+            public Object getVariable(String variableName) {
+                return ProcessInstanceService.this.getVariable(executionId, variableName);
+            }
+
+            @Override
+            public void setVariable(String variableName, Object variableValue) {
+                throw new UnsupportedOperationException("The variables of execution " + executionId + " are read only here");
+            }
+
+            @Override
+            public void setTransientVariable(String variableName, Object variableValue) {
+                throw new UnsupportedOperationException("The variables of execution " + executionId + " are read only here");
+            }
+
+            @Override
+            public String getTenantId() {
+                return null;
+            }
+
+            @Override
+            public Set<String> getVariableNames() {
+                return getVariables(executionId).keySet();
+            }
+        };
+    }
+
+    /**
      * Resolves the given expression within the context of the passed execution.
      */
     Object resolveExpression(String executionId, String expression);
@@ -69,6 +110,14 @@ public interface ProcessInstanceService {
      * Triggers a case instance that was started by a process instance.
      */
     void triggerCaseTask(String executionId, Map<String, Object> variables);
+
+    /**
+     * Triggers a case instance that was started by a process instance, passing the completed child case instance, so the
+     * process engine can hand it to its child instance parameters interceptor.
+     */
+    default void triggerCaseTask(String executionId, Map<String, Object> variables, VariableContainer childCaseInstance) {
+        triggerCaseTask(executionId, variables);
+    }
 
     /**
      * Propagates an uncaught business error from a child case instance to the parent BPMN execution.

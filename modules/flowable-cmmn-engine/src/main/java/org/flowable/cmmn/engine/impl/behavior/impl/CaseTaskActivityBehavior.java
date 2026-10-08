@@ -31,6 +31,8 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
@@ -98,6 +100,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         Map<String, Object> finalVariableMap = new HashMap<>();
         Map<String, Object> transientVariablesMap = new HashMap<>();
         handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
+        afterInParameters(cmmnEngineConfiguration, planItemInstanceEntity, caseTask, finalVariableMap, transientVariablesMap);
 
         // Needed for the form field handler later
         Map<String, Object> variablesFromFormSubmission = null;
@@ -268,14 +271,18 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     }
 
     protected void handleOutParameters(DelegatePlanItemInstance planItemInstance, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        if (outParameters == null) {
-            return;
-        }
-
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
         CaseInstanceEntity referenceCase = caseInstanceEntityManager.findById(planItemInstance.getReferenceId());
 
-        IOParameterUtil.processOutParameters(outParameters, referenceCase, planItemInstance, cmmnEngineConfiguration.getExpressionManager());
+        if (outParameters != null) {
+            IOParameterUtil.processOutParameters(outParameters, referenceCase, planItemInstance, cmmnEngineConfiguration.getExpressionManager());
+        }
+
+        // A child case that completed was handed to the interceptor by ChildCaseInstanceStateChangeCallback already
+        CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = cmmnEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null && referenceCase != null && !CaseInstanceState.COMPLETED.equals(referenceCase.getState())) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(planItemInstance, caseTask, referenceCase));
+        }
     }
 
 

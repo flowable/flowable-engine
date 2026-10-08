@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.impl.cmd.HandleCaseTaskErrorCmd;
@@ -115,6 +116,11 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     @Override
     public void triggerCaseTask(String executionId, Map<String, Object> variables) {
         processEngineConfiguration.getCommandExecutor().execute(new TriggerCaseTaskCmd(executionId, variables));
+    }
+
+    @Override
+    public void triggerCaseTask(String executionId, Map<String, Object> variables, VariableContainer childCaseInstance) {
+        processEngineConfiguration.getCommandExecutor().execute(new TriggerCaseTaskCmd(executionId, variables, childCaseInstance));
     }
 
     @Override
@@ -210,6 +216,11 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     @Override
     public Map<String, Object> getVariables(String executionId){
        return processEngineConfiguration.getRuntimeService().getVariables(executionId);
+    }
+
+    @Override
+    public VariableContainer getVariableContainer(String executionId) {
+        return processEngineConfiguration.getExecutionEntityManager().findById(executionId);
     }
 
     @Override

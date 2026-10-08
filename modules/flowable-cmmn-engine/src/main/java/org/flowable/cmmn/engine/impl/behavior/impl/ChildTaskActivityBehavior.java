@@ -25,6 +25,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceInParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.ChildTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -85,6 +87,20 @@ public abstract class ChildTaskActivityBehavior extends CoreCmmnTriggerableActiv
             throw new FlowableIllegalStateException("Can only trigger a plan item that is in the ACTIVE state");
         }
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
+    }
+
+    /**
+     * Hands the start variables of the child instance to the {@link CmmnChildInstanceParametersInterceptor}, after the in
+     * parameters were evaluated into them.
+     */
+    protected void afterInParameters(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceEntity planItemInstanceEntity,
+            ChildTask childTask, Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = cmmnEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterInParameters(new ChildInstanceInParametersContext(planItemInstanceEntity, childTask,
+                    variables, transientVariables));
+        }
     }
 
     protected void handleInParameters(PlanItemInstanceEntity planItemInstanceEntity,
