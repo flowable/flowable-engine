@@ -20,6 +20,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -90,15 +92,23 @@ public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStat
     protected void handleOutParameters(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, CallbackData callbackData) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
         if (planItemDefinition instanceof CaseTask caseTask) {
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            CaseInstanceEntity childCaseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
+                    .findById(callbackData.getInstanceId());
+            if (childCaseInstance == null) {
+                return;
+            }
+
             List<IOParameter> outParameters = caseTask.getOutParameters();
             if (outParameters != null && !outParameters.isEmpty()) {
-                CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-                CaseInstanceEntity childCaseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
-                        .findById(callbackData.getInstanceId());
-                if (childCaseInstance != null) {
-                    IOParameterUtil.processOutParameters(outParameters, childCaseInstance, planItemInstanceEntity,
-                            cmmnEngineConfiguration.getExpressionManager());
-                }
+                IOParameterUtil.processOutParameters(outParameters, childCaseInstance, planItemInstanceEntity,
+                        cmmnEngineConfiguration.getExpressionManager());
+            }
+
+            CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = cmmnEngineConfiguration.getChildInstanceParametersInterceptor();
+            if (childInstanceParametersInterceptor != null) {
+                childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(planItemInstanceEntity, caseTask,
+                        childCaseInstance));
             }
         }
     }

@@ -53,6 +53,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.interceptor.ChildInstanceInParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceParametersInterceptor;
 import org.flowable.engine.interceptor.StartSubProcessInstanceAfterContext;
 import org.flowable.engine.interceptor.StartSubProcessInstanceBeforeContext;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -181,6 +184,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             IOParameterUtil.processInParameters(inParameters, execution, variables::put, variables::put, expressionManager);
         }
 
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = processEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterInParameters(new ChildInstanceInParametersContext(execution, callActivity,
+                    instanceBeforeContext.getVariables(), instanceBeforeContext.getTransientVariables()));
+        }
+
         if (!instanceBeforeContext.getVariables().isEmpty()) {
             initializeVariables(subProcessInstance, instanceBeforeContext.getVariables());
         }
@@ -255,9 +264,9 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
         // only data. no control flow available on this execution.
 
-        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
-
         // copy process variables
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
 
@@ -272,6 +281,11 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             };
 
             IOParameterUtil.processOutParameters(outParameters, subProcessInstance, variableConsumer, variableConsumer, expressionManager);
+        }
+
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = processEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(execution, callActivity, subProcessInstance));
         }
     }
 

@@ -38,6 +38,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
 import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.interceptor.ChildInstanceInParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceParametersInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +112,12 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         // copy process variables
         IOParameterUtil.processInParameters(caseServiceTask.getInParameters(), execution, inParameters::put, inParameters::put, expressionManager);
 
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = processEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterInParameters(new ChildInstanceInParametersContext(execution, caseServiceTask, inParameters,
+                    transientVariables));
+        }
+
         String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
 
         if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {
@@ -172,16 +181,36 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
     }
     
     public void triggerCaseTaskAndLeave(DelegateExecution execution, Map<String, Object> variables) {
-        triggerCaseTask(execution, variables);
+        triggerCaseTaskAndLeave(execution, variables, null);
+    }
+
+    public void triggerCaseTaskAndLeave(DelegateExecution execution, Map<String, Object> variables, VariableContainer childCaseInstance) {
+        triggerCaseTask(execution, variables, childCaseInstance);
         leave(execution);
     }
 
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
+        triggerCaseTask(execution, variables, null);
+    }
+
+    /**
+     * @param variables the values of the out parameters, already evaluated against the child case instance
+     * @param childCaseInstance the completed child case instance, passed to the {@link ChildInstanceParametersInterceptor};
+     *         the interceptor is not called when it is null
+     */
+    public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables, VariableContainer childCaseInstance) {
         execution.setVariables(variables);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
             throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity + " is suspended");
+        }
+
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = CommandContextUtil.getProcessEngineConfiguration()
+                .getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null && childCaseInstance != null) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(execution,
+                    executionEntity.getCurrentFlowElement(), childCaseInstance));
         }
 
         // Set the reference id and type to null since the execution could be reused

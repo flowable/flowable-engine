@@ -26,6 +26,8 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
@@ -90,6 +92,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         Map<String, Object> inParametersMap = new HashMap<>();
         Map<String, Object> transientVariablesMap = new HashMap<>();
         handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
+        afterInParameters(cmmnEngineConfiguration, planItemInstanceEntity, processTask, inParametersMap, transientVariablesMap);
 
         FormInfo variableFormInfo = null;
         Map<String, Object> variableFormVariables = null;
@@ -223,9 +226,21 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                                        CaseInstanceEntity caseInstance,
                                        ProcessInstanceService processInstanceService) {
 
-        if (outParameters == null) {
-            return;
+        if (outParameters != null) {
+            processOutParameters(planItemInstance, caseInstance, processInstanceService);
         }
+
+        CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = CommandContextUtil.getCmmnEngineConfiguration()
+                .getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(planItemInstance, processTask,
+                    processInstanceService.getVariableContainer(planItemInstance.getReferenceId())));
+        }
+    }
+
+    protected void processOutParameters(DelegatePlanItemInstance planItemInstance,
+                                        CaseInstanceEntity caseInstance,
+                                        ProcessInstanceService processInstanceService) {
 
         for (IOParameter outParameter : outParameters) {
 
