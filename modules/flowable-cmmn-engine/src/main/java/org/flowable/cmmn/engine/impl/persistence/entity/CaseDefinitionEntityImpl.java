@@ -41,6 +41,9 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
     protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<>();
     protected String localizedName;
     protected String localizedDescription;
+
+    // Not persisted, set by the deployer
+    protected String parentDeploymentId;
     
     @Override
     public Object getPersistentState() {
@@ -197,5 +200,15 @@ public class CaseDefinitionEntityImpl extends AbstractCmmnEngineEntity implement
     @Override
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
+    }
+
+    @Override
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    @Override
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 }
