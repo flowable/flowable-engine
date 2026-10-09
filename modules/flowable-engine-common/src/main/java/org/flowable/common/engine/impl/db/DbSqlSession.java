@@ -64,6 +64,7 @@ public class DbSqlSession implements Session {
         this.dbSqlSessionFactory = dbSqlSessionFactory;
         this.entityCache = entityCache;
         this.sqlSession = dbSqlSessionFactory.getSqlSessionFactory().openSession();
+        this.connectionMetadataDefaultCatalog = this.sqlSession.getConnection().getCatalog();
     }
 
     public DbSqlSession(DbSqlSessionFactory dbSqlSessionFactory, EntityCache entityCache, Connection connection, String catalog, String schema) {
