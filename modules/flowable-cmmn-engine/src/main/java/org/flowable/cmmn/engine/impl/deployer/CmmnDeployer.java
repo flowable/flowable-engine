@@ -275,12 +275,14 @@ public class CmmnDeployer implements EngineDeployer {
     protected void copyDeploymentValuesToCaseDefinitions(EngineDeployment deployment, List<CaseDefinitionEntity> caseDefinitionEntities) {
         String tenantId = deployment.getTenantId();
         String deploymentId = deployment.getId();
+        String parentDeploymentId = ((CmmnDeploymentEntity) deployment).getParentDeploymentId();
 
         for (CaseDefinitionEntity caseDefinitionEntity : caseDefinitionEntities) {
             if (tenantId != null) {
                 caseDefinitionEntity.setTenantId(tenantId);
             }
             caseDefinitionEntity.setDeploymentId(deploymentId);
+            caseDefinitionEntity.setParentDeploymentId(parentDeploymentId);
         }
     }
 

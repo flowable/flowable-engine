@@ -74,13 +74,14 @@ public class BpmnDeploymentHelper {
     }
 
     /**
-     * Updates all the process definition entities to match the deployment's values for tenant, engine version, and deployment id.
+     * Updates all the process definition entities to match the deployment's values for tenant, engine version, deployment id and parent deployment id.
      */
     public void copyDeploymentValuesToProcessDefinitions(DeploymentEntity deployment,
             List<ProcessDefinitionEntity> processDefinitions) {
         String engineVersion = deployment.getEngineVersion();
         String tenantId = deployment.getTenantId();
         String deploymentId = deployment.getId();
+        String parentDeploymentId = deployment.getParentDeploymentId();
 
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
 
@@ -95,6 +96,7 @@ public class BpmnDeploymentHelper {
             }
 
             processDefinition.setDeploymentId(deploymentId);
+            processDefinition.setParentDeploymentId(parentDeploymentId);
         }
     }
 

@@ -43,5 +43,13 @@ public interface CaseDefinitionEntity extends Entity, CaseDefinition {
     
     void setTenantId(String tenantId);
 
+    /**
+     * The parent deployment id of the deployment of this case definition.
+     * This is not persisted, it is only set on the case definitions that are put in the case definition cache.
+     */
+    String getParentDeploymentId();
+
+    void setParentDeploymentId(String parentDeploymentId);
+
     List<IdentityLinkEntity> getIdentityLinks();
 }

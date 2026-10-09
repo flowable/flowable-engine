@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
@@ -96,16 +95,11 @@ public class GetDecisionsForCaseDefinitionCmd implements Command<List<DmnDecisio
 
     protected void addDecisionToCollection(List<DmnDecision> decisions, String decisionKey, CaseDefinition caseDefinition) {
         DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionKey);
-        CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
-        if (deployment.getParentDeploymentId() != null) {
-            List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
-            
-            if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                definitionQuery.deploymentId(dmnDeployments.get(0).getId());
-            } else {
-                definitionQuery.latestVersion();
-            }
-            
+        String parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(caseDefinition, CommandContextUtil.getCmmnEngineConfiguration());
+        List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(parentDeploymentId).list();
+
+        if (!dmnDeployments.isEmpty()) {
+            definitionQuery.deploymentId(dmnDeployments.get(0).getId());
         } else {
             definitionQuery.latestVersion();
         }

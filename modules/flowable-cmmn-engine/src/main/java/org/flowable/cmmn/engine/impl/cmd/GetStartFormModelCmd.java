@@ -16,7 +16,6 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -62,8 +61,8 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
         Stage planModel = caseModel.getPlanModel();
 
         if (StringUtils.isNotEmpty(planModel.getFormKey())) {
-            CmmnDeployment deployment = CommandContextUtil.getCmmnDeploymentEntityManager(commandContext).findById(caseDefinition.getDeploymentId());
-            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(planModel.getFormKey(), deployment.getParentDeploymentId(), 
+            String parentDeploymentId = CaseDefinitionUtil.getDefinitionDeploymentId(caseDefinition, cmmnEngineConfiguration);
+            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentIdAndScopeId(planModel.getFormKey(), parentDeploymentId,
                             caseInstanceId, ScopeTypes.CMMN, null, caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
         }
 

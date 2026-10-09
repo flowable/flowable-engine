@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -46,11 +47,32 @@ public class CaseDefinitionUtil {
 
     public static String getDefinitionDeploymentId(CaseDefinition caseDefinition, CmmnEngineConfiguration cmmnEngineConfiguration) {
         CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
+        String parentDeploymentId = getParentDeploymentId(caseDefinition);
+        if (parentDeploymentId == null) {
+            // A case definition loaded from the database does not have the parent deployment id, the cached one has it
+            CaseDefinitionCacheEntry cacheEntry = deploymentManager.getCaseDefinitionCache().get(caseDefinition.getId());
+            if (cacheEntry != null) {
+                parentDeploymentId = getParentDeploymentId(cacheEntry.getCaseDefinition());
+            }
+        }
+
+        if (parentDeploymentId != null) {
+            return parentDeploymentId;
+        }
+
         CmmnDeploymentEntity caseDeployment = deploymentManager.getDeploymentEntityManager().findById(caseDefinition.getDeploymentId());
         if (StringUtils.isEmpty(caseDeployment.getParentDeploymentId())) {
             return caseDefinition.getDeploymentId();
         }
         return caseDeployment.getParentDeploymentId();
+    }
+
+    protected static String getParentDeploymentId(CaseDefinition caseDefinition) {
+        if (caseDefinition instanceof CaseDefinitionEntity caseDefinitionEntity
+                && StringUtils.isNotEmpty(caseDefinitionEntity.getParentDeploymentId())) {
+            return caseDefinitionEntity.getParentDeploymentId();
+        }
+        return null;
     }
     
     protected static CaseDefinition getCaseDefinition(String caseDefinitionId, CmmnDeploymentManager deploymentManager, CaseDefinitionCacheEntry cacheEntry) {
