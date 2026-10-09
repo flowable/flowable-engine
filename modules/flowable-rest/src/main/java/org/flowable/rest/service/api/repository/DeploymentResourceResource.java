@@ -83,8 +83,8 @@ public class DeploymentResourceResource {
             restApiInterceptor.accessDeploymentById(deployment);
         }
 
-        String pathInfo = request.getPathInfo();
-        String resourceName = pathInfo.replace("/repository/deployments/" + deploymentId + "/resources/", "");
+        String ressourceURI = request.getRequestURI();
+        String resourceName = ressourceURI.replace(request.getContextPath()+"/repository/deployments/" + deploymentId + "/resources/", "");
 
         List<String> resourceList = repositoryService.getDeploymentResourceNames(deploymentId);
 
