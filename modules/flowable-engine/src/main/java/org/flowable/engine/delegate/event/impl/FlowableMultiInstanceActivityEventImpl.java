@@ -34,7 +34,7 @@ public class FlowableMultiInstanceActivityEventImpl extends FlowableActivityEven
 
     @Override
     public boolean isSequential() {
-        return false;
+        return sequential;
     }
 
 }
