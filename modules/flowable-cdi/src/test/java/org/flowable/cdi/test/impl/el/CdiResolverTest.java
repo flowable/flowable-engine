@@ -54,6 +54,26 @@ public class CdiResolverTest {
         assertThat(seenContexts).hasSize(2);
     }
 
+    @Test
+    public void testElContextIsStoredOnTheFlowableContext() {
+        Set<jakarta.el.ELContext> seenContexts = ConcurrentHashMap.newKeySet();
+        CdiResolver resolver = new CdiResolver() {
+
+            @Override
+            protected jakarta.el.ELResolver getWrappedResolver() {
+                return new RecordingResolver(seenContexts, null);
+            }
+        };
+
+        SimpleContext flowableContext = new SimpleContext();
+        resolver.getValue(flowableContext, null, "bean");
+        resolver.getValue(flowableContext, null, "bean");
+        assertThat(seenContexts).hasSize(1);
+
+        resolver.getValue(new SimpleContext(), null, "bean");
+        assertThat(seenContexts).hasSize(2);
+    }
+
     protected static class RecordingResolver extends jakarta.el.ELResolver {
 
         protected final Set<jakarta.el.ELContext> seenContexts;
@@ -67,11 +87,13 @@ public class CdiResolverTest {
         @Override
         public Object getValue(jakarta.el.ELContext context, Object base, Object property) {
             seenContexts.add(context);
-            try {
-                // Both calls are inside the resolver at the same time before either of them returns
-                bothCallsAreInside.await(10, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
+            if (bothCallsAreInside != null) {
+                try {
+                    // Both calls are inside the resolver at the same time before either of them returns
+                    bothCallsAreInside.await(10, TimeUnit.SECONDS);
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
             }
             return null;
         }
