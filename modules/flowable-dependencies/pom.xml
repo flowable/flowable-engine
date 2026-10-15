@@ -48,7 +48,7 @@
         <nashorn-core.version>15.7</nashorn-core.version>
         <osgi-core.version>8.0.0</osgi-core.version>
         <org.apache.felix.fileinstall.version>3.7.4</org.apache.felix.fileinstall.version>
-        <reactor-netty.version>1.3.5</reactor-netty.version>
+        <reactor-netty.version>1.3.6</reactor-netty.version>
         <slf4j.version>2.0.17</slf4j.version>
         <!-- When updating one spring version, make sure that all of them are updated to their latest compatible versions -->
         <spring.amqp.version>4.1.0-RC1</spring.amqp.version>
