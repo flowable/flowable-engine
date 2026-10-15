@@ -103,8 +103,15 @@ public class MybatisHistoricTaskInstanceDataManager extends AbstractDataManager<
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
+        final String query;
+        if (historicTaskInstanceQuery.isIncludeTaskLocalVariables() || historicTaskInstanceQuery.isIncludeProcessVariables()
+                || historicTaskInstanceQuery.isIncludeCaseVariables()) {
+            query = "selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria";
+        } else {
+            query = "selectHistoricTaskInstancesWithIdentityLinksByQueryCriteria";
+        }
         setSafeInValueLists(historicTaskInstanceQuery);
-        return getDbSqlSession().selectList("selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria", historicTaskInstanceQuery, getManagedEntityClass());
+        return getDbSqlSession().selectList(query, historicTaskInstanceQuery, getManagedEntityClass());
     }
 
     @Override

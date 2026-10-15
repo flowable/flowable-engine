@@ -409,6 +409,44 @@ public class VariablesTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void testHistoricVariableCreatedAndUpdatedFromRuntimeVariable() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            HistoricVariableInstance createdVariable = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "customer", "Kermit");
+                return getHistoricVariableInstance(cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "customer").getId());
+            });
+            assertThat(createdVariable)
+                    .extracting(HistoricVariableInstance::getValue, HistoricVariableInstance::getScopeDefinitionId)
+                    .containsExactly("Kermit", caseInstance.getCaseDefinitionId());
+
+            HistoricVariableInstance updatedVariable = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+                cmmnRuntimeService.setVariable(caseInstance.getId(), "customer", "Gonzo");
+                return getHistoricVariableInstance(cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "customer").getId());
+            });
+            assertThat(updatedVariable)
+                    .extracting(HistoricVariableInstance::getValue, HistoricVariableInstance::getScopeDefinitionId)
+                    .containsExactly("Gonzo", caseInstance.getCaseDefinitionId());
+
+            String taskId = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult().getId();
+            HistoricVariableInstance createdTaskVariable = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+                cmmnTaskService.setVariableLocal(taskId, "taskCustomer", "Kermit");
+                return getHistoricVariableInstance(cmmnTaskService.getVariableInstanceLocal(taskId, "taskCustomer").getId());
+            });
+            assertThat(createdTaskVariable)
+                    .extracting(HistoricVariableInstance::getValue, HistoricVariableInstance::getScopeDefinitionId)
+                    .containsExactly("Kermit", caseInstance.getCaseDefinitionId());
+        }
+    }
+
+    protected HistoricVariableInstance getHistoricVariableInstance(String variableId) {
+        // Called in the command that created or updated the variable, so the historic variable is the one from the entity cache
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().getHistoricVariableInstance(variableId);
+    }
+
+    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testVariableInstanceQueryByCaseInstanceIds() {
         CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()

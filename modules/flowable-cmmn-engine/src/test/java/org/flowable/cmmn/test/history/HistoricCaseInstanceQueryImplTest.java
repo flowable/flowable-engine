@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CaseLocalizationManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -39,6 +40,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -1954,6 +1956,17 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar", "test")
             );
+            assertThat(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables())
+                    .extracting(HistoricVariableInstance::getScopeDefinitionId)
+                    .containsExactly(historicCaseInstance.getCaseDefinitionId());
+
+            String caseInstanceWithoutVariablesId = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start().getId();
+            historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstanceWithoutVariablesId)
+                    .includeCaseVariables()
+                    .singleResult();
+            assertThat(historicCaseInstance.getCaseVariables()).isEmpty();
+            assertThat(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables()).isEmpty();
         }
     }
 

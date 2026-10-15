@@ -218,7 +218,7 @@
     <resultMap id="historicCaseInstanceResultMapWithVariables"
                type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl"
                extends="historicCaseInstanceResultMap">
-        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList" notNullColumn="VAR_ID_"
                     ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
             <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
             <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR"/>
@@ -230,6 +230,7 @@
             <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
             <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
             <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+            <result property="scopeDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
             <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
             <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
             <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
