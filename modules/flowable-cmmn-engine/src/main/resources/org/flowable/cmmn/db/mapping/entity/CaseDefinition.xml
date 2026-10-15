@@ -276,29 +276,27 @@
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="includeAuthorization">
-          AND
+          <!-- The user and groups are combined in a single EXISTS, so databases can turn it into a semi-join -->
+          AND exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and
           <trim prefix="(" prefixOverrides="OR" suffix=")">
-             <if test="authorizationUserId != null">
-                 exists (select ID_  from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and IDN.USER_ID_ = #{authorizationUserId, jdbcType=NVARCHAR})
-             </if>
-              <if test="authorizationGroups != null &amp;&amp; !authorizationGroups.empty">
-                  OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK  IDN where IDN.SCOPE_DEFINITION_ID_ = RES.ID_ and IDN.SCOPE_TYPE_ = 'cmmn' and 
-                    (
-                    <foreach item="authorizationGroupListItem" index="groupIndex" collection="safeAuthorizationGroups">
-                        <if test="groupIndex &gt; 0">
-                        or
-                        </if>
-                        IDN.GROUP_ID_ IN
-                        <foreach item="authorizationGroup" index="index" collection="authorizationGroupListItem"
-                              open="(" separator="," close=")">
-                          #{authorizationGroup, jdbcType=NVARCHAR}
-                        </foreach>
-                    </foreach>
-                    )
-                  )
+              <if test="authorizationUserId != null">
+                  IDN.USER_ID_ = #{authorizationUserId, jdbcType=NVARCHAR}
               </if>
-
+              <if test="safeAuthorizationGroups != null &amp;&amp; !safeAuthorizationGroups.empty">
+                  OR
+                  <foreach item="authorizationGroupListItem" index="groupIndex" collection="safeAuthorizationGroups">
+                      <if test="groupIndex &gt; 0">
+                      or
+                      </if>
+                      IDN.GROUP_ID_ IN
+                      <foreach item="authorizationGroup" index="index" collection="authorizationGroupListItem"
+                            open="(" separator="," close=")">
+                        #{authorizationGroup, jdbcType=NVARCHAR}
+                      </foreach>
+                  </foreach>
+              </if>
           </trim>
+          )
       </if>
     </where>
   </sql>

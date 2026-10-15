@@ -1143,33 +1143,31 @@
         </foreach>
         and A.END_TIME_ is null)
       </if>
-      <if test="orQueryObject.involvedUser != null">
-        or (exists(select LINK.USER_ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR} and LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_))
-      </if>
-      <if test="orQueryObject.involvedUserIdentityLink != null">
-          or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.PROC_INST_ID_ = ${queryTablePrefix}ID_ and 
-          I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
-      </if>
-      <if test="orQueryObject.involvedGroups != null">
+      <!-- The involvement checks are combined in a single EXISTS, so databases can turn it into a semi-join when the OR has no other criteria -->
+      <if test="orQueryObject.involvedUser != null || orQueryObject.involvedUserIdentityLink != null || orQueryObject.involvedGroups != null || orQueryObject.involvedGroupIdentityLink != null">
         or EXISTS(
-              select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and 
-                (
-                <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
-                    <if test="groupIndex &gt; 0">
-                    or
+              select ID_ from ${prefix}ACT_HI_IDENTITYLINK LINK where LINK.PROC_INST_ID_ = ${queryTablePrefix}ID_ and
+                <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <if test="orQueryObject.involvedUser != null">
+                        or LINK.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
                     </if>
-                    LINK.GROUP_ID_ IN
-                    <foreach item="group" index="index" collection="involvedGroupListItem"
-                          open="(" separator="," close=")">
-                      #{group, jdbcType=NVARCHAR}
-                    </foreach>
-                </foreach>
-                )
+                    <if test="orQueryObject.involvedUserIdentityLink != null">
+                        or (LINK.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and LINK.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
+                    </if>
+                    <if test="orQueryObject.involvedGroups != null">
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                            or LINK.GROUP_ID_ IN
+                            <foreach item="group" index="index" collection="involvedGroupListItem"
+                                  open="(" separator="," close=")">
+                              #{group, jdbcType=NVARCHAR}
+                            </foreach>
+                        </foreach>
+                    </if>
+                    <if test="orQueryObject.involvedGroupIdentityLink != null">
+                        or (LINK.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and LINK.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
+                    </if>
+                </trim>
         )
-      </if>
-      <if test="orQueryObject.involvedGroupIdentityLink != null">
-          or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.PROC_INST_ID_ = ${queryTablePrefix}ID_ and 
-          I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
       </if>
       <if test="orQueryObject.startedBy != null">
         or ${queryTablePrefix}START_USER_ID_ = #{orQueryObject.startedBy, jdbcType=NVARCHAR}

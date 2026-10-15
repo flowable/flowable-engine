@@ -1498,30 +1498,34 @@
                 )
               )
             </if>
-            <if test="orQueryObject.involvedUser != null">
-              or (
-                exists(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR} and LINK.TASK_ID_ = RES.ID_)
-                or RES.ASSIGNEE_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
-                or RES.OWNER_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
-                )
-            </if>
-            <if test="orQueryObject.involvedGroups != null">
-              or (
-                EXISTS(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and
+            <!-- The involved user and groups are combined in a single EXISTS, so the identity links are only checked once per task -->
+            <if test="orQueryObject.involvedUser != null || orQueryObject.involvedGroups != null">
+              or EXISTS(select LINK.ID_ from ${prefix}ACT_RU_IDENTITYLINK LINK where LINK.TASK_ID_ = RES.ID_ and
                     (
-                    <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
-                        <if test="groupIndex &gt; 0">
+                    <if test="orQueryObject.involvedUser != null">
+                        LINK.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.involvedUser != null &amp;&amp; orQueryObject.involvedGroups != null">
                         or
-                        </if>
-                        LINK.GROUP_ID_ IN
-                        <foreach item="groupId" index="index" collection="involvedGroupListItem"
-                              open="(" separator="," close=")">
-                          #{groupId, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="orQueryObject.involvedGroups != null">
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                            <if test="groupIndex &gt; 0">
+                            or
+                            </if>
+                            LINK.GROUP_ID_ IN
+                            <foreach item="groupId" index="index" collection="involvedGroupListItem"
+                                  open="(" separator="," close=")">
+                              #{groupId, jdbcType=NVARCHAR}
+                            </foreach>
                         </foreach>
-                    </foreach>
+                    </if>
                     )
-                 )
               )
+            </if>
+            <if test="orQueryObject.involvedUser != null">
+              or RES.ASSIGNEE_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
+              or RES.OWNER_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
             </if>
             <if test="orQueryObject.parentScopeId != null">
                 or EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where

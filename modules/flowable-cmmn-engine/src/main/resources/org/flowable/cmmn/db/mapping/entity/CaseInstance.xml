@@ -910,35 +910,32 @@
 		                </foreach>
 		                and P.STATE_ = 'active')
 		            </if>
-                    <if test="orQueryObject.involvedUser != null">
-                        or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-                        #{orQueryObject.involvedUser, jdbcType=NVARCHAR})
-                    </if>
-                    <if test="orQueryObject.involvedUserIdentityLink != null">
-			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
-			            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
-			        </if>
-                    <if test="orQueryObject.involvedGroups != null">
+                    <!-- The involvement checks are combined in a single EXISTS, so databases can turn it into a semi-join when the OR has no other criteria -->
+                    <if test="orQueryObject.involvedUser != null || orQueryObject.involvedUserIdentityLink != null || orQueryObject.involvedGroups != null || orQueryObject.involvedGroupIdentityLink != null">
                         or EXISTS(
                           select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and
-                            (
-                            <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
-                                <if test="groupIndex &gt; 0">
-                                or
+                            <trim prefix="(" prefixOverrides="OR" suffix=")">
+                                <if test="orQueryObject.involvedUser != null">
+                                    or I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
                                 </if>
-                                I.GROUP_ID_ IN
-                                <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
-                                      open="(" separator="," close=")">
-                                  #{involvedGroup, jdbcType=NVARCHAR}
-                                </foreach>
-                            </foreach>
-                            )
+                                <if test="orQueryObject.involvedUserIdentityLink != null">
+                                    or (I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
+                                </if>
+                                <if test="orQueryObject.involvedGroups != null">
+                                    <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                                        or I.GROUP_ID_ IN
+                                        <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
+                                              open="(" separator="," close=")">
+                                          #{involvedGroup, jdbcType=NVARCHAR}
+                                        </foreach>
+                                    </foreach>
+                                </if>
+                                <if test="orQueryObject.involvedGroupIdentityLink != null">
+                                    or (I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
+                                </if>
+                            </trim>
                         )
                     </if>
-					<if test="orQueryObject.involvedGroupIdentityLink != null">
-			            or EXISTS(select ID_ from ${prefix}ACT_RU_IDENTITYLINK I where I.SCOPE_ID_ = RES.ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
-			            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
-			        </if>
                     <if test="orQueryObject.parentScopeId != null">
                         or EXISTS(select 1 from ${prefix}ACT_RU_ENTITYLINK LINK where
                             LINK.SCOPE_ID_ = #{orQueryObject.parentScopeId, jdbcType=NVARCHAR}
