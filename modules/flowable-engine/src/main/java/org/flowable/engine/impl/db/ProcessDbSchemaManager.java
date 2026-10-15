@@ -88,7 +88,8 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
         if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = processEngineConfiguration.getManagementService().getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME);
+            // Reuse the current command context/connection (see the equivalent comment in #schemaUpdate() below for details).
+            LockManager lockManager = processEngineConfiguration.getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME, true);
             lockManager.waitForLockRunAndRelease(processEngineConfiguration.getSchemaLockWaitTime(), () -> {
                 schemaCreateInLock();
                 return null;
@@ -162,7 +163,24 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         ProcessEngineConfigurationImpl processEngineConfiguration = getProcessEngineConfiguration();
         LockManager lockManager;
         if (processEngineConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            lockManager = processEngineConfiguration.getManagementService().getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME);
+            // IMPORTANT: this method (schemaUpdate) runs as part of SchemaOperationsEngineBuild, which is itself a single
+            // Command executed within one CommandContext/connection for its entire duration. By the time we get here,
+            // the CommonDbSchemaManager (run earlier in that same command, see SchemaOperationsEngineBuild) may already
+            // have executed unlocked DDL against ACT_GE_PROPERTY on that connection - e.g. creating the table for the
+            // very first time on a fresh schema.
+            //
+            // On databases with transactional DDL (SQL Server, PostgreSQL, ...) that DDL's schema-modification lock is
+            // held until the *outer* transaction commits, which cannot happen until this whole command returns. If the
+            // lock below were acquired on a separate, newly opened connection/transaction (the historical default -
+            // see LockManagerImpl), it would try to read from that same table and block forever waiting for a lock that
+            // can only be released by this very call returning: a self-deadlock that no database deadlock detector can
+            // catch, because the "blocking" session is simply idle rather than genuinely waiting on the other one.
+            //
+            // Passing reuseCurrentCommandContext=true makes the lock acquire/release run on the SAME connection as the
+            // rest of this schema build, so it sees the outer transaction's own uncommitted DDL instead of blocking on
+            // it. Other nodes/processes acquiring this lock on their own connections are still correctly blocked until
+            // this transaction commits, so the cross-process mutual exclusion guarantee is preserved.
+            lockManager = processEngineConfiguration.getLockManager(PROCESS_DB_SCHEMA_LOCK_NAME, true);
             lockManager.waitForLock(processEngineConfiguration.getSchemaLockWaitTime());
         } else {
             lockManager = null;
