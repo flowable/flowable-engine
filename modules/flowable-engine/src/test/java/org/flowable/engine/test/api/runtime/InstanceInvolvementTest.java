@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -399,6 +400,162 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
 
         assertThat(runtimeService.createProcessInstanceQuery().or().
             involvedUser("kermit").involvedGroups(Collections.singleton("testGroup")).endOr().count()).isEqualTo(1);
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrInvolvedUserOrGroupsInMultiple() {
+        ProcessInstance userInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(userInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        ProcessInstance groupInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(groupInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        ProcessInstance otherInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(otherInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(otherInstance.getId(), "otherGroup", IdentityLinkType.PARTICIPANT);
+
+        Set<String> groups = Set.of("testGroup", "testGroup2");
+        assertThat(runtimeService.createProcessInstanceQuery().or().involvedUser("kermit").involvedGroups(groups).endOr().list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(userInstance.getId(), groupInstance.getId());
+        assertThat(runtimeService.createProcessInstanceQuery().or().involvedUser("kermit").involvedGroups(groups).endOr().count())
+                .isEqualTo(2);
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or().involvedUser("kermit").involvedGroups(groups).processInstanceId(otherInstance.getId()).endOr()
+                .list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(userInstance.getId(), groupInstance.getId(), otherInstance.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .processInstanceId(groupInstance.getId())
+                .or().involvedUser("kermit").involvedGroups(groups).endOr()
+                .list())
+                .extracting(ProcessInstance::getId)
+                .containsExactly(groupInstance.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery().or().involvedUser("fozzie").involvedGroups(Set.of("unknownGroup")).endOr().count())
+                .isZero();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testHistoryOrInvolvedUserOrGroupsInMultiple() {
+        ProcessInstance userInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(userInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
+        ProcessInstance groupInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(groupInstance.getId(), "testGroup2", IdentityLinkType.CANDIDATE);
+        ProcessInstance otherInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(otherInstance.getId(), "gonzo", IdentityLinkType.PARTICIPANT);
+        runtimeService.addGroupIdentityLink(otherInstance.getId(), "otherGroup", IdentityLinkType.PARTICIPANT);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(groupInstance.getId()).singleResult().getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            Set<String> groups = Set.of("testGroup", "testGroup2");
+            assertThat(historyService.createHistoricProcessInstanceQuery().or().involvedUser("kermit").involvedGroups(groups).endOr().list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactlyInAnyOrder(userInstance.getId(), groupInstance.getId());
+            assertThat(historyService.createHistoricProcessInstanceQuery().or().involvedUser("kermit").involvedGroups(groups).endOr().count())
+                    .isEqualTo(2);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().involvedUser("kermit").involvedGroups(groups).processInstanceId(otherInstance.getId()).endOr()
+                    .list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactlyInAnyOrder(userInstance.getId(), groupInstance.getId(), otherInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .finished()
+                    .or().involvedUser("kermit").involvedGroups(groups).endOr()
+                    .list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactly(groupInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().or().involvedUser("fozzie").involvedGroups(Set.of("unknownGroup")).endOr().count())
+                    .isZero();
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    public void testOrInvolvedUsersAndGroupsWithIdentityLinkTypes() {
+        ProcessInstance userTypeInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(userTypeInstance.getId(), "kermit", "specialLink");
+        ProcessInstance userOtherTypeInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addUserIdentityLink(userOtherTypeInstance.getId(), "kermit", "otherLink");
+        ProcessInstance groupTypeInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(groupTypeInstance.getId(), "sales", "specialLink");
+        ProcessInstance groupOtherTypeInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(groupOtherTypeInstance.getId(), "sales", "otherLink");
+        ProcessInstance groupsInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        runtimeService.addGroupIdentityLink(groupsInstance.getId(), "testGroup", "otherLink");
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroup("sales", "specialLink").endOr()
+                .list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupTypeInstance.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupsInstance.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or().involvedUser("kermit").involvedGroup("sales", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(ProcessInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), userOtherTypeInstance.getId(), groupTypeInstance.getId(), groupsInstance.getId());
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .involvedGroup("sales", "specialLink")
+                .involvedGroups(Set.of("testGroup"))
+                .processInstanceId(groupOtherTypeInstance.getId())
+                .endOr()
+                .count())
+                .isEqualTo(4);
+
+        assertThat(runtimeService.createProcessInstanceQuery()
+                .or().involvedUser("kermit", "wrongType").involvedGroup("sales", "wrongType").endOr()
+                .count())
+                .isZero();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().involvedUser("kermit", "specialLink").involvedGroup("sales", "specialLink").endOr()
+                    .list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactlyInAnyOrder(userTypeInstance.getId(), groupTypeInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().involvedUser("kermit", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                    .list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactlyInAnyOrder(userTypeInstance.getId(), groupsInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().involvedUser("kermit").involvedGroup("sales", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                    .list())
+                    .extracting(HistoricProcessInstance::getId)
+                    .containsExactlyInAnyOrder(userTypeInstance.getId(), userOtherTypeInstance.getId(), groupTypeInstance.getId(), groupsInstance.getId());
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or()
+                    .involvedUser("kermit", "specialLink")
+                    .involvedGroup("sales", "specialLink")
+                    .involvedGroups(Set.of("testGroup"))
+                    .processInstanceId(groupOtherTypeInstance.getId())
+                    .endOr()
+                    .count())
+                    .isEqualTo(4);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery()
+                    .or().involvedUser("kermit", "wrongType").involvedGroup("sales", "wrongType").endOr()
+                    .count())
+                    .isZero();
+        }
     }
 
     @Test
