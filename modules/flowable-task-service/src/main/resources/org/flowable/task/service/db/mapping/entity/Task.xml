@@ -370,7 +370,7 @@
     <result property="subTaskCount" column="SUB_TASK_COUNT_" jdbcType="INTEGER" />
   </resultMap>
 
-  <resultMap id="taskAndRelatedEntitiesResultMap" type="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
+  <resultMap id="taskAndIdentityLinksResultMap" type="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
     <id property="id" column="ID_" jdbcType="NVARCHAR"/>
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="NVARCHAR"/>
@@ -409,12 +409,27 @@
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
     <result property="subTaskCount" column="SUB_TASK_COUNT_" jdbcType="INTEGER" />
-    <collection property="queryVariables" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
+    <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
+      <id property="id" column="ILINK_ID_" jdbcType="NVARCHAR"/>
+      <result property="type" column="ILINK_TYPE_" jdbcType="NVARCHAR" />
+      <result property="userId" column="ILINK_USER_ID_" jdbcType="NVARCHAR" />
+      <result property="groupId" column="ILINK_GROUP_ID_" jdbcType="NVARCHAR" />
+      <result property="taskId" column="ILINK_TASK_ID_" jdbcType="NVARCHAR" />
+      <result property="processInstanceId" column="ILINK_PROC_INST_ID_" jdbcType="NVARCHAR" />
+      <result property="processDefId" column="ILINK_PROC_DEF_ID_" jdbcType="NVARCHAR" />
+    </collection>
+  </resultMap>
+
+  <!-- Only used when the query includes variables, the VAR_ columns are not selected otherwise -->
+  <resultMap id="taskAndRelatedEntitiesResultMap" type="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl" extends="taskAndIdentityLinksResultMap">
+    <collection property="queryVariables" column="TASK_ID_" javaType="ArrayList" notNullColumn="VAR_ID_" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR" />
       <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.api.types.VariableType" jdbcType="NVARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="NVARCHAR" />
+      <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR" />
+      <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="NVARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="NVARCHAR" />
       <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
@@ -426,15 +441,6 @@
       <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
       <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
       <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
-    </collection>
-    <collection property="queryIdentityLinks" column="TASK_ID_" javaType="ArrayList" ofType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
-      <id property="id" column="ILINK_ID_" jdbcType="NVARCHAR"/>
-      <result property="type" column="ILINK_TYPE_" jdbcType="NVARCHAR" />
-      <result property="userId" column="ILINK_USER_ID_" jdbcType="NVARCHAR" />
-      <result property="groupId" column="ILINK_GROUP_ID_" jdbcType="NVARCHAR" />
-      <result property="taskId" column="ILINK_TASK_ID_" jdbcType="NVARCHAR" />
-      <result property="processInstanceId" column="ILINK_PROC_INST_ID_" jdbcType="NVARCHAR" />
-      <result property="processDefId" column="ILINK_PROC_DEF_ID_" jdbcType="NVARCHAR" />
     </collection>
   </resultMap>
 
@@ -490,8 +496,16 @@
     <include refid="commonSelectTaskByQueryCriteriaSql"/>
   </sql>
 
-    <!-- The ordering and the querying is done within a sub select, and then we do a join on the related entities -->
   <select id="selectTasksWithRelatedEntitiesByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskQueryImpl" resultMap="taskAndRelatedEntitiesResultMap">
+      <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaSql"/>
+  </select>
+
+  <select id="selectTasksWithIdentityLinksByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskQueryImpl" resultMap="taskAndIdentityLinksResultMap">
+      <include refid="selectTasksWithRelatedEntitiesByQueryCriteriaSql"/>
+  </select>
+
+    <!-- The ordering and the querying is done within a sub select, and then we do a join on the related entities -->
+  <sql id="selectTasksWithRelatedEntitiesByQueryCriteriaSql">
       SELECT RES.*,
       <if test="includeTaskLocalVariables or includeProcessVariables or includeCaseVariables">
           VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
@@ -530,7 +544,7 @@
           left outer join ${prefix}ACT_RU_IDENTITYLINK ILINK on RES.ID_ = ILINK.TASK_ID_
       </if>
       ${outerJoinOrderBy}
-  </select>
+  </sql>
 
   <sql id="commonSelectTaskByQueryCriteriaSql">
     <where>

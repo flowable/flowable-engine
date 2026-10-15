@@ -62,6 +62,7 @@ public class HistoricVariableInstanceEntityManagerImpl
     @Override
     public void copyVariableFields(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance, Date updateTime) {
         historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
+        historicVariableInstance.setProcessDefinitionId(variableInstance.getProcessDefinitionId());
         historicVariableInstance.setExecutionId(variableInstance.getExecutionId());
         historicVariableInstance.setTaskId(variableInstance.getTaskId());
         historicVariableInstance.setName(variableInstance.getName());
@@ -69,6 +70,7 @@ public class HistoricVariableInstanceEntityManagerImpl
         historicVariableInstance.setScopeId(variableInstance.getScopeId());
         historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
         historicVariableInstance.setScopeType(variableInstance.getScopeType());
+        historicVariableInstance.setScopeDefinitionId(variableInstance.getScopeDefinitionId());
         historicVariableInstance.setMetaInfo(variableInstance.getMetaInfo());
 
         copyVariableValue(historicVariableInstance, variableInstance, updateTime);

@@ -50,6 +50,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -1968,6 +1969,17 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar","test")
         );
+        assertThat(((CaseInstanceEntity) caseInstance).getQueryVariables())
+                .extracting(VariableInstance::getScopeDefinitionId)
+                .containsExactly(caseInstance.getCaseDefinitionId());
+
+        String caseInstanceWithoutVariablesId = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start().getId();
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstanceWithoutVariablesId)
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(caseInstance.getCaseVariables()).isEmpty();
+        assertThat(((CaseInstanceEntity) caseInstance).getQueryVariables()).isEmpty();
     }
 
 

@@ -32,6 +32,11 @@ public interface VariableInstance extends ValueFields {
     void setProcessInstanceId(String processInstanceId);
     
     void setProcessDefinitionId(String processDefinitionId);
+
+    /**
+     * The process definition reference. This is not persisted, it is only available when the variable is fetched by a query of process instances
+     * or tasks that includes variables, or in the transaction that creates, updates or deletes the variable.
+     */
     String getProcessDefinitionId();
 
     Object getValue();
@@ -56,6 +61,10 @@ public interface VariableInstance extends ValueFields {
 
     void setScopeDefinitionId(String scopeDefinitionId);
 
+    /**
+     * The scope definition reference. This is not persisted, it is only available when the variable is fetched by a query of case instances,
+     * plan item instances or tasks that includes variables, or in the transaction that creates, updates or deletes the variable.
+     */
     String getScopeDefinitionId();
 
     String getMetaInfo();
