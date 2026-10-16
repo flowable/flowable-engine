@@ -12,6 +12,9 @@
  */
 package org.flowable.bpmn.converter;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -19,11 +22,17 @@ import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExclusiveGateway;
+import org.flowable.bpmn.model.ExtensionAttribute;
 
 /**
  * @author Tijs Rademakers
+ * @author Dominik Simmen
  */
 public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
+
+    /** default attributes taken from bpmn spec and from extension namespace */
+    protected static final List<ExtensionAttribute> defaultExclusiveGatewayAttributes = Arrays.asList(
+            new ExtensionAttribute(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE));
 
     @Override
     public Class<? extends BaseElement> getBpmnElementType() {
@@ -41,7 +50,12 @@ public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
         ExclusiveGateway gateway = new ExclusiveGateway();
         BpmnXMLUtil.addXMLLocation(gateway, xtr);
         
-        BpmnXMLUtil.addCustomAttributes(xtr, gateway, defaultElementAttributes, defaultActivityAttributes);
+        String isMarkerVisibleAttribute = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, xtr);
+        if (ATTRIBUTE_VALUE_FALSE.equalsIgnoreCase(isMarkerVisibleAttribute)) {
+            gateway.setMarkerVisible(false);
+        }
+
+        BpmnXMLUtil.addCustomAttributes(xtr, gateway, defaultElementAttributes, defaultActivityAttributes, defaultExclusiveGatewayAttributes);
         
         parseChildElements(getXMLElementName(), gateway, model, xtr);
         return gateway;
@@ -49,6 +63,11 @@ public class ExclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
 
     @Override
     protected void writeAdditionalAttributes(BaseElement element, BpmnModel model, XMLStreamWriter xtw) throws Exception {
+        ExclusiveGateway gateway = (ExclusiveGateway) element;
+        if (!gateway.isMarkerVisible()) {
+            // default value is true
+            writeQualifiedAttribute(ATTRIBUTE_GATEWAY_EXCLUSIVE_ISMARKERVISIBLE, "false", xtw);
+        }
     }
 
     @Override
