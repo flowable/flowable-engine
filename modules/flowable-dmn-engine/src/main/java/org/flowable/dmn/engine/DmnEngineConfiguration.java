@@ -89,6 +89,7 @@ import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
+import org.flowable.dmn.engine.impl.persistence.deploy.SameDeploymentDecisionLookup;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DefinitionEntityManagerImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
@@ -179,6 +180,7 @@ public class DmnEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     protected int decisionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<DecisionCacheEntry> definitionCache;
+    protected DeploymentCache<String> sameDeploymentDefinitionCache;
 
     // HIT POLICIES
     protected Map<String, AbstractHitPolicy> hitPolicyBehaviors;
@@ -494,10 +496,19 @@ public class DmnEngineConfiguration extends AbstractBuildableEngineConfiguration
             }
         }
 
+        if (sameDeploymentDefinitionCache == null) {
+            if (decisionCacheLimit <= 0) {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>();
+            } else {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>(decisionCacheLimit);
+            }
+        }
+
         deploymentManager = new DeploymentManager(definitionCache, this);
         deploymentManager.setDeployers(deployers);
         deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
         deploymentManager.setDecisionEntityManager(decisionEntityManager);
+        deploymentManager.setSameDeploymentDecisionLookup(new SameDeploymentDecisionLookup(sameDeploymentDefinitionCache, this));
     }
 
     public Collection<? extends Deployer> getDefaultDeployers() {
@@ -937,6 +948,15 @@ public class DmnEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     public DmnEngineConfiguration setDefinitionCache(DeploymentCache<DecisionCacheEntry> definitionCache) {
         this.definitionCache = definitionCache;
+        return this;
+    }
+
+    public DeploymentCache<String> getSameDeploymentDefinitionCache() {
+        return sameDeploymentDefinitionCache;
+    }
+
+    public DmnEngineConfiguration setSameDeploymentDefinitionCache(DeploymentCache<String> sameDeploymentDefinitionCache) {
+        this.sameDeploymentDefinitionCache = sameDeploymentDefinitionCache;
         return this;
     }
 
