@@ -13,9 +13,12 @@
 
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -23,7 +26,9 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.persistence.deploy.AbstractSameDeploymentDefinitionLookup;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
@@ -47,6 +52,7 @@ public class DeploymentManager {
     protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
     protected DeploymentCache<Object> appResourceCache;
     protected DeploymentCache<Object> knowledgeBaseCache; // Needs to be object to avoid an import to Drools in this core class
+    protected SameDeploymentProcessDefinitionLookup sameDeploymentProcessDefinitionLookup;
     protected List<EngineDeployer> deployers;
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
@@ -177,6 +183,46 @@ public class DeploymentManager {
         return (AppModel) appResourceObject;
     }
 
+    /**
+     * Returns the process definition with the given key in the deployments of the given parent deployment, or null when
+     * there is none.
+     */
+    public ProcessDefinition findProcessDefinitionByParentDeploymentAndKey(String parentDeploymentId, String processDefinitionKey, String tenantId) {
+        String cacheKey = AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, processDefinitionKey);
+        return sameDeploymentProcessDefinitionLookup.find(cacheKey, tenantId, sameDeploymentProcessDefinitionLookup.isCacheMisses(), () -> {
+            if (tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                return processDefinitionEntityManager.findProcessDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, processDefinitionKey, tenantId);
+            }
+            return processDefinitionEntityManager.findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey);
+        });
+    }
+
+    /**
+     * Returns the process definition with the given key in the given deployment, or null when there is none. A
+     * deployment never changes, so a miss is always cached.
+     */
+    public ProcessDefinition findProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey, String tenantId) {
+        String cacheKey = AbstractSameDeploymentDefinitionLookup.deploymentKey(deploymentId, processDefinitionKey);
+        return sameDeploymentProcessDefinitionLookup.find(cacheKey, tenantId, true, () -> {
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                return processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+            }
+            return processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
+        });
+    }
+
+    /**
+     * Removes the cached lookups of the given process definition keys in the given parent deployment.
+     */
+    public void evictSameDeploymentProcessDefinitions(String parentDeploymentId, Collection<String> processDefinitionKeys) {
+        if (StringUtils.isEmpty(parentDeploymentId)) {
+            return;
+        }
+        for (String processDefinitionKey : processDefinitionKeys) {
+            sameDeploymentProcessDefinitionLookup.evict(AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, processDefinitionKey));
+        }
+    }
+
     public void removeDeployment(String deploymentId, boolean cascade) {
 
         DeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
@@ -218,9 +264,15 @@ public class DeploymentManager {
                     processEngineConfiguration.getEngineCfgKey());
         }
 
+        List<String> processDefinitionKeys = new ArrayList<>(processDefinitions.size());
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionCache.remove(processDefinition.getId());
             processDefinitionInfoCache.remove(processDefinition.getId());
+            processDefinitionKeys.add(processDefinition.getKey());
+        }
+        evictSameDeploymentProcessDefinitions(deployment.getParentDeploymentId(), processDefinitionKeys);
+        for (String processDefinitionKey : processDefinitionKeys) {
+            sameDeploymentProcessDefinitionLookup.evict(AbstractSameDeploymentDefinitionLookup.deploymentKey(deploymentId, processDefinitionKey));
         }
 
         appResourceCache.remove(deploymentId);
@@ -244,6 +296,14 @@ public class DeploymentManager {
 
     public void setProcessDefinitionCache(DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache) {
         this.processDefinitionCache = processDefinitionCache;
+    }
+
+    public SameDeploymentProcessDefinitionLookup getSameDeploymentProcessDefinitionLookup() {
+        return sameDeploymentProcessDefinitionLookup;
+    }
+
+    public void setSameDeploymentProcessDefinitionLookup(SameDeploymentProcessDefinitionLookup sameDeploymentProcessDefinitionLookup) {
+        this.sameDeploymentProcessDefinitionLookup = sameDeploymentProcessDefinitionLookup;
     }
 
     public DeploymentCache<ProcessDefinitionInfoCacheObject> getProcessDefinitionInfoCache() {

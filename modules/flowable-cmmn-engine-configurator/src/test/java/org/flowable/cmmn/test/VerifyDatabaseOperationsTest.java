@@ -86,6 +86,21 @@ public class VerifyDatabaseOperationsTest extends AbstractProcessEngineIntegrati
                 entry("selectEntityLinksByQuery", 2L)
         );
         assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isOne();
+
+        Map<String, Long> secondSelects = profileDatabaseSelects(cmmnEngineConfiguration.getCommandExecutor(), "org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd",
+                () -> cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("oneProcessTaskCase")
+                        .start());
+
+        // The process definition comes from the same deployment cache, only the suspension check selects it by id
+        assertThat(secondSelects).containsOnly(
+                entry("selectEntityLinksByQuery", 2L),
+                entry("selectLatestCaseDefinitionByKey", 1L),
+                entry("selectPlanItemInstancesByCaseInstanceIdAndPlanItemId", 1L),
+                entry("selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L),
+                entry("selectProcessDefinitionInfoByProcessDefinitionId", 1L)
+        );
+        assertThat(processEngineRuntimeService.createProcessInstanceQuery().count()).isEqualTo(2);
     }
 
     @Test

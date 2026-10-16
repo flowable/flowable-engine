@@ -13,6 +13,7 @@
 package org.flowable.engine.test.cfg.executioncount;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.flowable.common.engine.impl.persistence.deploy.AbstractSameDeploymentDefinitionLookup.parentDeploymentKey;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +26,13 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.profiler.CommandStats;
 import org.flowable.engine.test.profiler.ConsoleLogger;
 import org.flowable.engine.test.profiler.FlowableProfiler;
@@ -765,6 +770,430 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         return vars;
     }
 
+    @Test
+    public void testStartWithParentDeploymentIdTwice() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Deployment deployment = deployResource("process01.bpmn20.xml");
+            assertThat(deployment.getParentDeploymentId()).isEqualTo(deployment.getId());
+
+            // First start
+            ProcessInstance first = startWithParentAndProfile("process01", deployment.getId(), null, false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(first)).isEqualTo(deployment.getId());
+
+            // Second start
+            ProcessInstance second = startWithParentAndProfile("process01", deployment.getId(), null, false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(second)).isEqualTo(deployment.getId());
+        }
+    }
+
+    @Test
+    public void testCallActivityWithSameDeploymentTwice() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(false);
+
+            deployMultiple("process10.bpmn20.xml", "process01.bpmn20.xml");
+
+            // First start
+            startProcessInstanceAndProfile("process10");
+            stopProfiling();
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByDeploymentAndKey", 1L,
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectVariablesByQuery", 2L,
+                    "selectEntityLinksByQuery", 2L,
+                    "selectExecutionsByParentExecutionId", 4L,
+                    "selectChildExecutionsByProcessInstanceId", 2L);
+
+            // Second start
+            startProcessInstanceAndProfile("process10");
+            stopProfiling();
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L,
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectVariablesByQuery", 2L,
+                    "selectEntityLinksByQuery", 2L,
+                    "selectExecutionsByParentExecutionId", 4L,
+                    "selectChildExecutionsByProcessInstanceId", 2L);
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissTwice() {
+        assertStartWithParentDeploymentIdMissTwice(false);
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissTwiceWithCachedMisses() {
+        assertStartWithParentDeploymentIdMissTwice(true);
+    }
+
+    protected void assertStartWithParentDeploymentIdMissTwice(boolean cacheMisses) {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            setCacheSameDeploymentDefinitionMisses(cacheMisses);
+            try {
+                Deployment parent = deployResource("process02.bpmn20.xml");
+                Deployment latest = deployResource("process01.bpmn20.xml");
+
+                // First start, the parent has no process01 so it falls back to the latest
+                ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), null, false);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                        "selectLatestProcessDefinitionByKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(first)).isEqualTo(latest.getId());
+
+                // Second start
+                ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+                if (cacheMisses) {
+                    assertDatabaseSelects("StartProcessInstanceCmd",
+                            "selectLatestProcessDefinitionByKey", 1L,
+                            "selectVariablesByQuery", 1L,
+                            "selectEntityLinksByQuery", 1L);
+                } else {
+                    assertDatabaseSelects("StartProcessInstanceCmd",
+                            "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                            "selectLatestProcessDefinitionByKey", 1L,
+                            "selectVariablesByQuery", 1L,
+                            "selectEntityLinksByQuery", 1L);
+                }
+                assertThat(deploymentIdOf(second)).isEqualTo(latest.getId());
+            } finally {
+                setCacheSameDeploymentDefinitionMisses(false);
+            }
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissThenChildDeployed() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            setCacheSameDeploymentDefinitionMisses(true);
+            try {
+                Deployment parent = deployResource("process02.bpmn20.xml");
+                Deployment latest = deployResource("process01.bpmn20.xml");
+
+                // First start, the miss is (expected to be) cached
+                ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), null, false);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                        "selectLatestProcessDefinitionByKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(first)).isEqualTo(latest.getId());
+
+                Deployment child = repositoryService.createDeployment()
+                        .addClasspathResource("org/flowable/engine/test/cfg/executioncount/process01.bpmn20.xml")
+                        .parentDeploymentId(parent.getId())
+                        .deploy();
+
+                // Second start, after the child was deployed
+                ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(second)).isEqualTo(child.getId());
+            } finally {
+                setCacheSameDeploymentDefinitionMisses(false);
+            }
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissPicksUpNewVersion() {
+        assertStartWithParentDeploymentIdMissPicksUpNewVersion(false);
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissPicksUpNewVersionWithCachedMisses() {
+        assertStartWithParentDeploymentIdMissPicksUpNewVersion(true);
+    }
+
+    protected void assertStartWithParentDeploymentIdMissPicksUpNewVersion(boolean cacheMisses) {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            setCacheSameDeploymentDefinitionMisses(cacheMisses);
+            try {
+                Deployment parent = deployResource("process02.bpmn20.xml");
+                Deployment latest1 = deployResource("process01.bpmn20.xml");
+
+                ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), null, false);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                        "selectLatestProcessDefinitionByKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(first)).isEqualTo(latest1.getId());
+
+                Deployment latest2 = deployResource("process01.bpmn20.xml");
+
+                // Second start, after a new version was deployed
+                ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+                if (cacheMisses) {
+                    assertDatabaseSelects("StartProcessInstanceCmd",
+                            "selectLatestProcessDefinitionByKey", 1L,
+                            "selectVariablesByQuery", 1L,
+                            "selectEntityLinksByQuery", 1L);
+                } else {
+                    assertDatabaseSelects("StartProcessInstanceCmd",
+                            "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                            "selectLatestProcessDefinitionByKey", 1L,
+                            "selectVariablesByQuery", 1L,
+                            "selectEntityLinksByQuery", 1L);
+                }
+                assertThat(deploymentIdOf(second)).isEqualTo(latest2.getId());
+            } finally {
+                setCacheSameDeploymentDefinitionMisses(false);
+            }
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdAfterChildUndeployed() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Deployment parent = deployResource("process02.bpmn20.xml");
+            Deployment child = repositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/engine/test/cfg/executioncount/process01.bpmn20.xml")
+                    .parentDeploymentId(parent.getId())
+                    .deploy();
+            Deployment latest = deployResource("process01.bpmn20.xml");
+
+            ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), null, false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(first)).isEqualTo(child.getId());
+
+            repositoryService.deleteDeployment(child.getId(), true);
+
+            // Second start, after the child was undeployed
+            ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(second)).isEqualTo(latest.getId());
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdWithStaleCachedDefinition() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Deployment parent = deployResource("process02.bpmn20.xml");
+            Deployment child1 = repositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/engine/test/cfg/executioncount/process01.bpmn20.xml")
+                    .parentDeploymentId(parent.getId())
+                    .deploy();
+
+            ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), null, false);
+            assertThat(deploymentIdOf(first)).isEqualTo(child1.getId());
+            String cacheKey = parentDeploymentKey(parent.getId(), "process01");
+            String staleProcessDefinitionId = first.getProcessDefinitionId();
+            assertThat(processEngineConfiguration.getSameDeploymentDefinitionCache().get(cacheKey)).isEqualTo(staleProcessDefinitionId);
+
+            repositoryService.deleteDeployment(child1.getId(), true);
+            Deployment child2 = repositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/engine/test/cfg/executioncount/process01.bpmn20.xml")
+                    .parentDeploymentId(parent.getId())
+                    .deploy();
+
+            // Simulate a node that did not see the undeploy and the deploy
+            processEngineConfiguration.getSameDeploymentDefinitionCache().add(cacheKey, staleProcessDefinitionId);
+
+            ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L,
+                    "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(second)).isEqualTo(child2.getId());
+            assertThat(processEngineConfiguration.getSameDeploymentDefinitionCache().get(cacheKey)).isEqualTo(second.getProcessDefinitionId());
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdOtherTenant() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Deployment parent = deployResourceForTenant("process01.bpmn20.xml", "tenantA");
+            Deployment other = deployResourceForTenant("process01.bpmn20.xml", "tenantB");
+
+            // Start in the tenant of the parent
+            ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), "tenantA", false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(first)).isEqualTo(parent.getId());
+
+            // First start in another tenant
+            ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), "tenantB", false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L,
+                    "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                    "selectLatestProcessDefinitionByKeyAndTenantId", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(second)).isEqualTo(other.getId());
+
+            // Second start in another tenant
+            ProcessInstance third = startWithParentAndProfile("process01", parent.getId(), "tenantB", false);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectById org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl", 1L,
+                    "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                    "selectLatestProcessDefinitionByKeyAndTenantId", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(third)).isEqualTo(other.getId());
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdDefaultTenantFallback() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            Deployment parent = deployResourceForTenant("process02.bpmn20.xml", "tenantA");
+            Deployment noTenant = deployResource("process01.bpmn20.xml");
+
+            // First start
+            ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), "tenantA", true);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectLatestProcessDefinitionByKeyAndTenantId", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(first)).isEqualTo(noTenant.getId());
+
+            // Second start
+            ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), "tenantA", true);
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                    "selectLatestProcessDefinitionByKey", 1L,
+                    "selectLatestProcessDefinitionByKeyAndTenantId", 1L,
+                    "selectVariablesByQuery", 1L,
+                    "selectEntityLinksByQuery", 1L);
+            assertThat(deploymentIdOf(second)).isEqualTo(noTenant.getId());
+        }
+    }
+
+    @Test
+    public void testCallActivityWithSameDeploymentMissTwice() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(false);
+
+            deployResource("process10.bpmn20.xml");
+            deployResource("process01.bpmn20.xml");
+
+            // First start, the called process is not in the deployment of the caller
+            startProcessInstanceAndProfile("process10");
+            stopProfiling();
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectProcessDefinitionByDeploymentAndKey", 1L,
+                    "selectLatestProcessDefinitionByKey", 2L,
+                    "selectVariablesByQuery", 2L,
+                    "selectEntityLinksByQuery", 2L,
+                    "selectExecutionsByParentExecutionId", 4L,
+                    "selectChildExecutionsByProcessInstanceId", 2L);
+
+            // Second start
+            startProcessInstanceAndProfile("process10");
+            stopProfiling();
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                    "selectLatestProcessDefinitionByKey", 2L,
+                    "selectVariablesByQuery", 2L,
+                    "selectEntityLinksByQuery", 2L,
+                    "selectExecutionsByParentExecutionId", 4L,
+                    "selectChildExecutionsByProcessInstanceId", 2L);
+        }
+    }
+
+    @Test
+    public void testStartWithParentDeploymentIdMissForOtherTenantDoesNotHideDefinition() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            setCacheSameDeploymentDefinitionMisses(true);
+            try {
+                Deployment parent = deployResource("process01.bpmn20.xml");
+
+                // Start for tenant X, the parent has no definition for that tenant and the fallback finds the one without tenant
+                ProcessInstance first = startWithParentAndProfile("process01", parent.getId(), "X", true);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKeyAndTenantId", 1L,
+                        "selectLatestProcessDefinitionByKeyAndTenantId", 1L,
+                        "selectLatestProcessDefinitionByKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(first)).isEqualTo(parent.getId());
+
+                // Start without tenant, the miss for tenant X must not hide the definition
+                ProcessInstance second = startWithParentAndProfile("process01", parent.getId(), null, false);
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByParentDeploymentAndKey", 1L,
+                        "selectVariablesByQuery", 1L,
+                        "selectEntityLinksByQuery", 1L);
+                assertThat(deploymentIdOf(second)).isEqualTo(parent.getId());
+            } finally {
+                setCacheSameDeploymentDefinitionMisses(false);
+            }
+        }
+    }
+
+    @Test
+    public void testCallActivityWithSameDeploymentMissForOtherTenantDoesNotHideDefinition() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            boolean oldFallbackToDefaultTenant = processEngineConfiguration.isFallbackToDefaultTenant();
+            processEngineConfiguration.setFallbackToDefaultTenant(true);
+            try {
+                processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(false);
+
+                Deployment deployment = deployMultiple("process10.bpmn20.xml", "process01.bpmn20.xml");
+                Deployment latest = deployResource("process01.bpmn20.xml");
+
+                // Start for tenant X, the call activity looks up in the deployment for tenant X and misses
+                restartProfiling("Profiling session");
+                ProcessInstance first = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("process10")
+                        .tenantId("X")
+                        .fallbackToDefaultTenant()
+                        .start();
+                stopProfiling();
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByDeploymentAndKeyAndTenantId", 1L,
+                        "selectLatestProcessDefinitionByKeyAndTenantId", 2L,
+                        "selectLatestProcessDefinitionByKey", 2L,
+                        "selectVariablesByQuery", 2L,
+                        "selectEntityLinksByQuery", 2L,
+                        "selectExecutionsByParentExecutionId", 4L,
+                        "selectChildExecutionsByProcessInstanceId", 2L);
+                assertThat(calledDeploymentIdOf(first)).isEqualTo(latest.getId());
+
+                // Start without tenant, the miss for tenant X must not hide the definition in the deployment
+                restartProfiling("Profiling session");
+                ProcessInstance second = runtimeService.createProcessInstanceBuilder()
+                        .processDefinitionKey("process10")
+                        .start();
+                stopProfiling();
+                assertDatabaseSelects("StartProcessInstanceCmd",
+                        "selectProcessDefinitionByDeploymentAndKey", 1L,
+                        "selectLatestProcessDefinitionByKey", 1L,
+                        "selectVariablesByQuery", 2L,
+                        "selectEntityLinksByQuery", 2L,
+                        "selectExecutionsByParentExecutionId", 4L,
+                        "selectChildExecutionsByProcessInstanceId", 2L);
+                assertThat(calledDeploymentIdOf(second)).isEqualTo(deployment.getId());
+            } finally {
+                processEngineConfiguration.setFallbackToDefaultTenant(oldFallbackToDefaultTenant);
+            }
+        }
+    }
+
     // ---------------------------------
     // HELPERS
     // ---------------------------------
@@ -890,6 +1319,56 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     }
 
     // HELPERS
+
+    protected void setCacheSameDeploymentDefinitionMisses(boolean cacheSameDeploymentDefinitionMisses) {
+        processEngineConfiguration.setCacheSameDeploymentDefinitionMisses(cacheSameDeploymentDefinitionMisses);
+    }
+
+    protected Deployment deployResource(String path) {
+        return repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/cfg/executioncount/" + path).deploy();
+    }
+
+    protected Deployment deployResourceForTenant(String path, String tenantId) {
+        return repositoryService.createDeployment()
+                .addClasspathResource("org/flowable/engine/test/cfg/executioncount/" + path)
+                .tenantId(tenantId)
+                .deploy();
+    }
+
+    protected Deployment deployMultiple(String... paths) {
+        DeploymentBuilder deploymentBuilder = repositoryService.createDeployment();
+        for (String path : paths) {
+            deploymentBuilder.addClasspathResource("org/flowable/engine/test/cfg/executioncount/" + path);
+        }
+        return deploymentBuilder.deploy();
+    }
+
+    protected ProcessInstance startWithParentAndProfile(String processDefinitionKey, String parentDeploymentId, String tenantId, boolean fallbackToDefaultTenant) {
+        ProcessInstanceBuilder builder = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey(processDefinitionKey)
+                .processDefinitionParentDeploymentId(parentDeploymentId);
+        if (tenantId != null) {
+            builder.tenantId(tenantId);
+        }
+        if (fallbackToDefaultTenant) {
+            builder.fallbackToDefaultTenant();
+        }
+        restartProfiling("Profiling session");
+        ProcessInstance processInstance = builder.start();
+        stopProfiling();
+        return processInstance;
+    }
+
+    protected String calledDeploymentIdOf(ProcessInstance processInstance) {
+        HistoricProcessInstance calledProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                .superProcessInstanceId(processInstance.getId())
+                .singleResult();
+        return repositoryService.getProcessDefinition(calledProcessInstance.getProcessDefinitionId()).getDeploymentId();
+    }
+
+    protected String deploymentIdOf(ProcessInstance processInstance) {
+        return repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId()).getDeploymentId();
+    }
 
     protected FlowableProfiler deployStartProcessInstanceAndProfile(String path, String processDefinitionKey) {
         return deployStartProcessInstanceAndProfile(path, processDefinitionKey, true);
