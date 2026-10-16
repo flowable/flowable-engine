@@ -1077,6 +1077,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED);
         assertThat(activityEvent.getActivityId()).isEqualTo("usertask1");
+        assertThat(((FlowableMultiInstanceActivityEvent) activityEvent).isSequential()).isTrue();
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertThat(activityEvent.getType()).isEqualTo(FlowableEngineEventType.ACTIVITY_STARTED);
