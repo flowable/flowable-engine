@@ -228,7 +228,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             // Aggregation of all variables will be done in MultiInstanceActivityBehavior#leave()
             aggregateVariablesForChildExecution(execution, miRootExecution);
 
-            boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution.getParent());
+            boolean isCompletionConditionSatisfied = completionConditionSatisfied(execution);
             if (nrOfCompletedInstances >= nrOfInstances || isCompletionConditionSatisfied) {
                 leave(executionEntity, nrOfInstances, nrOfCompletedInstances, isCompletionConditionSatisfied);
 
