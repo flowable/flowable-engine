@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  targetNamespace="test">
+
+  <message id="eventMessage" name="eventMessage"/>
+  <process id="oneTaskProcessWithBoundaryEvent">
+    <startEvent id="theStart" />
+    <sequenceFlow id="theStart-theTask" sourceRef="theStart" targetRef="theTask" />
+    <userTask id="theTask"/>
+    <boundaryEvent id="messageBoundary" attachedToRef="theTask">
+      <messageEventDefinition messageRef="eventMessage"/>
+    </boundaryEvent>
+    <sequenceFlow id="theTask-theEnd" sourceRef="theTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+  </process>
+
+</definitions>
