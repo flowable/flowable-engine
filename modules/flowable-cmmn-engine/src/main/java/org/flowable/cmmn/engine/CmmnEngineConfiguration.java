@@ -84,6 +84,7 @@ import org.flowable.cmmn.engine.impl.delete.DeleteHistoricCaseInstancesSequentia
 import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
+import org.flowable.cmmn.engine.impl.deployer.SameDeploymentCaseDefinitionLookup;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandlerImpl;
@@ -424,6 +425,17 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+    protected DeploymentCache<String> sameDeploymentDefinitionCache;
+
+    /**
+     * Set to true (the default) to read a cached definition id from the database on every hit (one select by id), so that
+     * a definition that was undeployed on another node is detected and the lookup falls back to the query.
+     * <p>
+     * When false, the cached definition is taken from the definition cache without a select, and a definition that was
+     * undeployed on another cluster node is still returned on this node until it is evicted or the node is restarted.
+     * This can only happen when a single child deployment is deleted while its parent deployment stays.
+     */
+    protected boolean verifyCachedSameDeploymentDefinitions = true;
 
     protected CmmnParser cmmnParser;
     protected List<CmmnParseHandler> preCmmnParseHandlers;
@@ -1161,6 +1173,14 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
                 caseDefinitionCache = new DefaultDeploymentCache<>(caseDefinitionCacheLimit);
             }
         }
+
+        if (sameDeploymentDefinitionCache == null) {
+            if (caseDefinitionCacheLimit <= 0) {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>();
+            } else {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>(caseDefinitionCacheLimit);
+            }
+        }
     }
 
     protected void initDeploymentManager() {
@@ -1171,6 +1191,10 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
             deploymentManager.setDeployers(deployers);
             deploymentManager.setCaseDefinitionEntityManager(caseDefinitionEntityManager);
             deploymentManager.setDeploymentEntityManager(cmmnDeploymentEntityManager);
+        }
+
+        if (deploymentManager.getSameDeploymentCaseDefinitionLookup() == null) {
+            deploymentManager.setSameDeploymentCaseDefinitionLookup(new SameDeploymentCaseDefinitionLookup(sameDeploymentDefinitionCache, this));
         }
     }
 
@@ -2526,6 +2550,24 @@ public class CmmnEngineConfiguration extends AbstractBuildableEngineConfiguratio
 
     public CmmnEngineConfiguration setCaseDefinitionCache(DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache) {
         this.caseDefinitionCache = caseDefinitionCache;
+        return this;
+    }
+
+    public DeploymentCache<String> getSameDeploymentDefinitionCache() {
+        return sameDeploymentDefinitionCache;
+    }
+
+    public CmmnEngineConfiguration setSameDeploymentDefinitionCache(DeploymentCache<String> sameDeploymentDefinitionCache) {
+        this.sameDeploymentDefinitionCache = sameDeploymentDefinitionCache;
+        return this;
+    }
+
+    public boolean isVerifyCachedSameDeploymentDefinitions() {
+        return verifyCachedSameDeploymentDefinitions;
+    }
+
+    public CmmnEngineConfiguration setVerifyCachedSameDeploymentDefinitions(boolean verifyCachedSameDeploymentDefinitions) {
+        this.verifyCachedSameDeploymentDefinitions = verifyCachedSameDeploymentDefinitions;
         return this;
     }
 

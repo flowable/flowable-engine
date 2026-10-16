@@ -121,8 +121,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
 
         if (tenantId != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             if (parentDeploymentId != null) {
-                caseDefinition = caseDefinitionEntityManager
-                        .findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+                caseDefinition = cmmnEngineConfiguration.getDeploymentManager()
+                        .findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey, tenantId);
             }
             if (caseDefinition == null) {
                 caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKeyAndTenantId(caseDefinitionKey, tenantId);
@@ -137,7 +137,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
             }
         } else {
             if (parentDeploymentId != null) {
-                caseDefinition = caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+                caseDefinition = cmmnEngineConfiguration.getDeploymentManager()
+                        .findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey, tenantId);
             }
             if (caseDefinition == null) {
                 caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
