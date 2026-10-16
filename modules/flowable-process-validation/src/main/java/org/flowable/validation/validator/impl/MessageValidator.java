@@ -18,6 +18,7 @@ import org.flowable.bpmn.model.Message;
 import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ValidatorImpl;
+import static org.flowable.bpmn.model.BpmnModel.*;
 
 /**
  * @author jbarrez
@@ -31,7 +32,7 @@ public class MessageValidator extends ValidatorImpl {
 
                 // Item ref
                 if (StringUtils.isNotEmpty(message.getItemRef())) {
-                    if (!bpmnModel.getItemDefinitions().containsKey(message.getItemRef())) {
+                    if (!bpmnModel.getItemDefinitions().containsKey(normalizeIdValue(message.getItemRef(), bpmnModel))) {
                         validationContext.addError(Problems.MESSAGE_INVALID_ITEM_REF, message, "Item reference is invalid: not found");
                     }
                 }

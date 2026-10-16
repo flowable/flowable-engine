@@ -186,6 +186,8 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
 
         if (!databaseConfiguration.isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
+        } else {
+            tableName = databaseConfiguration.getDatabaseSchema() + "." + tableName;
         }
         try (PreparedStatement statement = databaseConfiguration.getConnection()
                 .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?")) {
