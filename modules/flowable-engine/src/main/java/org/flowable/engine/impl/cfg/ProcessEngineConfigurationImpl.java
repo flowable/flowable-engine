@@ -293,6 +293,7 @@ import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
+import org.flowable.engine.impl.persistence.deploy.SameDeploymentProcessDefinitionLookup;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
@@ -574,6 +575,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected int processDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
+    protected DeploymentCache<String> sameDeploymentDefinitionCache;
 
     protected int processDefinitionInfoCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
@@ -1683,6 +1685,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 processDefinitionCache = new DefaultDeploymentCache<>(processDefinitionCacheLimit);
             }
         }
+        if (sameDeploymentDefinitionCache == null) {
+            if (processDefinitionCacheLimit <= 0) {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>();
+            } else {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>(processDefinitionCacheLimit);
+            }
+        }
     }
 
     public void initProcessDefinitionInfoCache() {
@@ -1738,6 +1747,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             deploymentManager.setProcessEngineConfiguration(this);
             deploymentManager.setProcessDefinitionEntityManager(processDefinitionEntityManager);
             deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
+        }
+
+        if (deploymentManager.getSameDeploymentProcessDefinitionLookup() == null) {
+            deploymentManager.setSameDeploymentProcessDefinitionLookup(new SameDeploymentProcessDefinitionLookup(sameDeploymentDefinitionCache, this));
         }
 
         if (appResourceConverter == null) {
@@ -3921,6 +3934,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionCacheLimit(int processDefinitionCacheLimit) {
         this.processDefinitionCacheLimit = processDefinitionCacheLimit;
+        return this;
+    }
+
+    public DeploymentCache<String> getSameDeploymentDefinitionCache() {
+        return sameDeploymentDefinitionCache;
+    }
+
+    public ProcessEngineConfigurationImpl setSameDeploymentDefinitionCache(DeploymentCache<String> sameDeploymentDefinitionCache) {
+        this.sameDeploymentDefinitionCache = sameDeploymentDefinitionCache;
         return this;
     }
 

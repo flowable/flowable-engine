@@ -389,8 +389,8 @@ public class ProcessInstanceHelper {
 
         if (tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             if (parentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, processDefinitionKey, tenantId);
+                processDefinition = processEngineConfiguration.getDeploymentManager()
+                        .findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey, tenantId);
             }
             if (processDefinition == null) {
                 processDefinition = processDefinitionEntityManager
@@ -409,8 +409,8 @@ public class ProcessInstanceHelper {
             }
         } else {
             if (parentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey);
+                processDefinition = processEngineConfiguration.getDeploymentManager()
+                        .findProcessDefinitionByParentDeploymentAndKey(parentDeploymentId, processDefinitionKey, tenantId);
             }
             if (processDefinition == null) {
                 processDefinition = processDefinitionEntityManager
