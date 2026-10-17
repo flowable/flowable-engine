@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joram Barrez
  */
-public class ClosingDataSource implements DataSource, EngineLifecycleListener {
+public class ClosingDataSource implements DataSource, EngineLifecycleListener, AutoCloseable {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ClosingDataSource.class);
 
@@ -49,15 +49,20 @@ public class ClosingDataSource implements DataSource, EngineLifecycleListener {
 
     @Override
     public void onEngineClosed(Engine engine) {
-        if (dataSource instanceof Closeable) {
+        if (dataSource instanceof AutoCloseable) {
             try {
                 LOGGER.info("About to close dataSource");
-                ((Closeable) dataSource).close();
+                ((AutoCloseable) dataSource).close();
                 LOGGER.info("DataSource closed");
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LOGGER.warn("Exception while closing dataSource", e);
             }
         }
+    }
+
+    @Override
+    public void close() {
+        onEngineClosed(null);
     }
 
     @Override
