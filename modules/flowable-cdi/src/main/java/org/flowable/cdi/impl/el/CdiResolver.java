@@ -41,10 +41,12 @@ import org.flowable.common.engine.impl.javax.el.ELResolver;
  */
 public class CdiResolver extends ELResolver {
 
-    protected jakarta.el.ELContext context;
-
-    public CdiResolver() {
-        context = new jakarta.el.ELContext() {
+    /**
+     * Creates a new context for the wrapped resolver. A {@link jakarta.el.ELContext} must not be shared between threads and the wrapped resolver
+     * keeps state in it (Weld keeps its stack of creational contexts there).
+     */
+    protected jakarta.el.ELContext createELContext() {
+        return new jakarta.el.ELContext() {
 
             @Override
             public VariableMapper getVariableMapper() {
@@ -63,6 +65,19 @@ public class CdiResolver extends ELResolver {
         };
     }
 
+    /**
+     * Returns the context for the wrapped resolver that belongs to the given Flowable context. It is created on first use and stored on the
+     * Flowable context, which is created for an evaluation, so the wrapped resolver does not see the context of another evaluation.
+     */
+    protected jakarta.el.ELContext getELContext(ELContext context) {
+        jakarta.el.ELContext elContext = (jakarta.el.ELContext) context.getContext(jakarta.el.ELContext.class);
+        if (elContext == null) {
+            elContext = createELContext();
+            context.putContext(jakarta.el.ELContext.class, elContext);
+        }
+        return elContext;
+    }
+
     protected BeanManager getBeanManager() {
         return BeanManagerLookup.getBeanManager();
     }
@@ -75,18 +90,18 @@ public class CdiResolver extends ELResolver {
 
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
-        return getWrappedResolver().getCommonPropertyType(this.context, base);
+        return getWrappedResolver().getCommonPropertyType(getELContext(context), base);
     }
 
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
-        return getWrappedResolver().getType(this.context, base, property);
+        return getWrappedResolver().getType(getELContext(context), base, property);
     }
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         try {
-            Object result = getWrappedResolver().getValue(this.context, base, property);
+            Object result = getWrappedResolver().getValue(getELContext(context), base, property);
             context.setPropertyResolved(result != null);
             return result;
         } catch (IllegalStateException e) {
@@ -99,17 +114,17 @@ public class CdiResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
-        return getWrappedResolver().isReadOnly(this.context, base, property);
+        return getWrappedResolver().isReadOnly(getELContext(context), base, property);
     }
 
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
-        getWrappedResolver().setValue(this.context, base, property, value);
+        getWrappedResolver().setValue(getELContext(context), base, property, value);
     }
 
     @Override
     public Object invoke(ELContext context, Object base, Object method, java.lang.Class<?>[] paramTypes, Object[] params) {
-        Object result = getWrappedResolver().invoke(this.context, base, method, paramTypes, params);
+        Object result = getWrappedResolver().invoke(getELContext(context), base, method, paramTypes, params);
         context.setPropertyResolved(result != null);
         return result;
     }
