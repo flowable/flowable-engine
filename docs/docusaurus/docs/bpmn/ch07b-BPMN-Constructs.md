@@ -4469,15 +4469,11 @@ It’s also possible to retrieve all identity links that are defined as potentia
 
 The following example shows how to get list of users who can initiate the given process:
 
-    List<User> authorizedUsers = identityService().createUserQuery()
-        .potentialStarter("processDefinitionId")
-        .list();
+    List<User> authorizedUsers = identityService.getPotentialStarterUsers("processDefinitionId");
 
 In exactly the same way, the list of groups that is configured as a potential starter to a given process definition can be retrieved:
 
-    List<Group> authorizedGroups = identityService().createGroupQuery()
-        .potentialStarter("processDefinitionId")
-        .list();
+    List<Group> authorizedGroups = identityService.getPotentialStarterGroups("processDefinitionId");
 
 ## Data objects
 
