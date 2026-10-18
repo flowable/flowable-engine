@@ -82,7 +82,11 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     public void schemaCreate() {
 
         if (lockConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName());
+            // Reuse the current command context/connection: schemaCreateInLock() may run DDL on the same connection.
+            // Acquiring the lock on a separate, newly opened connection/transaction would self-deadlock on databases
+            // with transactional DDL (e.g. SQL Server, PostgreSQL) once an earlier schema manager in this same build
+            // has already executed uncommitted DDL on this connection.
+            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName(), true);
             lockManager.waitForLockRunAndRelease(lockConfiguration.getSchemaLockWaitTime(), () -> {
                 schemaCreateInLock();
                 return null;
@@ -123,7 +127,8 @@ public abstract class EngineSqlScriptBasedDbSchemaManager extends AbstractSqlScr
     @Override
     public String schemaUpdate() {
         if (lockConfiguration.isUseLockForDatabaseSchemaUpdate()) {
-            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName());
+            // See the comment in schemaCreate() above for why the current command context/connection is reused here.
+            LockManager lockManager = lockConfiguration.getLockManager(getDbSchemaLockName(), true);
             return lockManager.waitForLockRunAndRelease(lockConfiguration.getSchemaLockWaitTime(), this::schemaUpdateInLock);
         } else {
             return schemaUpdateInLock();
