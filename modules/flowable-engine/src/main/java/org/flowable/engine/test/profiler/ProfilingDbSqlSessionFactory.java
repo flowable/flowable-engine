@@ -12,9 +12,11 @@
  */
 package org.flowable.engine.test.profiler;
 
+import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.Session;
+import org.flowable.engine.impl.cmd.GetNextIdBlockCmd;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -28,6 +30,11 @@ public class ProfilingDbSqlSessionFactory extends DbSqlSessionFactory {
 
     @Override
     public Session openSession(CommandContext commandContext) {
+        if (commandContext.getCommand() instanceof GetNextIdBlockCmd) {
+            // The id block can be fetched through a command executor that is not profiled,
+            // its operations should not be attributed to the profiled command that needed the id
+            return new DbSqlSession(this, CommandContextUtil.getEntityCache(commandContext));
+        }
         return new ProfilingDbSqlSession(this, CommandContextUtil.getEntityCache(commandContext));
     }
 }

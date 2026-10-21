@@ -317,6 +317,17 @@ public abstract class AbstractEngineConfiguration {
      * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
      */
     protected boolean alwaysLookupLatestDefinitionVersion;
+
+    /**
+     * Set to true to cache that a parent deployment has no definition with a given key, so that later lookups skip the
+     * parent deployment query and go straight to the latest definition fallback. Found definitions are always cached.
+     * <p>
+     * In a cluster, a node that did not perform the deployment keeps such a cached miss when a new child deployment
+     * with that key is added under an existing parent deployment, until the entry is evicted from the cache or the node
+     * is restarted. Cached definitions recover by themselves, cached misses do not. Only enable this when new child
+     * deployments are not added under existing parent deployments.
+     */
+    protected boolean cacheSameDeploymentDefinitionMisses;
     
     /**
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
@@ -1753,6 +1764,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setAlwaysLookupLatestDefinitionVersion(boolean alwaysLookupLatestDefinitionVersion) {
         this.alwaysLookupLatestDefinitionVersion = alwaysLookupLatestDefinitionVersion;
+        return this;
+    }
+
+    public boolean isCacheSameDeploymentDefinitionMisses() {
+        return cacheSameDeploymentDefinitionMisses;
+    }
+
+    public AbstractEngineConfiguration setCacheSameDeploymentDefinitionMisses(boolean cacheSameDeploymentDefinitionMisses) {
+        this.cacheSameDeploymentDefinitionMisses = cacheSameDeploymentDefinitionMisses;
         return this;
     }
 
