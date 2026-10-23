@@ -15,6 +15,7 @@ package org.activiti.engine.impl.variable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputFilter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -37,6 +38,9 @@ import org.flowable.variable.service.impl.types.JPAEntityMappings;
 public class JPAEntityListVariableType implements VariableType, CacheableVariable {
 
     public static final String TYPE_NAME = "jpa-entity-list";
+
+    // The ids are stored as a serialized String[], make sure that only strings can be deserialized
+    protected static final ObjectInputFilter STRING_ONLY_FILTER = ObjectInputFilter.Config.createFilter("java.lang.String;!*");
 
     protected JPAEntityMappings mappings;
 
@@ -159,6 +163,7 @@ public class JPAEntityListVariableType implements VariableType, CacheableVariabl
         try {
             ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             ObjectInputStream in = new ObjectInputStream(bais);
+            in.setObjectInputFilter(STRING_ONLY_FILTER);
 
             Object read = in.readObject();
             if (!(read instanceof String[])) {

@@ -23,7 +23,9 @@ import org.kie.api.KieBase;
 
 /**
  * @author Tom Baeyens
+ * @deprecated the Drools based business rule task is deprecated, use a DMN decision task instead
  */
+@Deprecated
 public class RulesHelper {
 
     public static KieBase findKnowledgeBaseByDeploymentId(String deploymentId) {

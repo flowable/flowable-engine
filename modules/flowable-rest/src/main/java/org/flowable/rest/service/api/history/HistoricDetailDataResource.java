@@ -21,13 +21,17 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,13 +49,23 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricDetailDataResource extends HistoricDetailBaseResource {
+public class HistoricDetailDataResource extends HistoricDetailBaseResource implements InitializingBean {
+
+    @Autowired
+    protected Environment env;
+
+    protected boolean isSerializableVariableAllowed;
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
 
     @Autowired
     protected HistoryService historyService;
+
+    @Override
+    public void afterPropertiesSet() {
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
+    }
 
     @ApiOperation(value = "Get the binary data for a historic detail variable", tags = {"History" }, nickname = "getHistoricDetailVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
@@ -69,6 +83,9 @@ public class HistoricDetailDataResource extends HistoricDetailBaseResource {
                 response.setContentType("application/octet-stream");
 
             } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

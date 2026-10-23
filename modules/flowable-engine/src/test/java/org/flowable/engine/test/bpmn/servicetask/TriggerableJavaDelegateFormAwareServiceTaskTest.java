@@ -80,10 +80,13 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
     @Test
     @Deployment
     public void testDelegateExpression() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("triggerableServiceTask", new TriggerableJavaDelegateServiceTask());
-
-        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        // The delegate expression is resolved when executing and when triggering the service task,
+        // so the delegate is passed as a transient variable in both cases
+        String processId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", new TriggerableJavaDelegateServiceTask())
+                .start()
+                .getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertThat(execution).isNotNull();
@@ -92,7 +95,7 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
 
         Map<String,Object> processVariables = new HashMap<>();
         processVariables.put("count", ++count);
-        runtimeService.trigger(execution.getId(), processVariables, null);
+        runtimeService.trigger(execution.getId(), processVariables, Collections.singletonMap("triggerableServiceTask", new TriggerableJavaDelegateServiceTask()));
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
         assertThat(execution).isNotNull();
@@ -102,12 +105,15 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableJavaDelegateServiceTaskTest.testDelegateExpression.bpmn20.xml")
     public void delegateExpressionTriggerBmnError() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask());
-
-        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        // The delegate expression is resolved when executing and when triggering the service task,
+        // so the delegate is passed as a transient variable in both cases
+        String processId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask())
+                .start()
+                .getProcessInstanceId();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
-        runtimeService.trigger(execution.getId());
+        runtimeService.trigger(execution.getId(), Collections.emptyMap(), Collections.singletonMap("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask()));
 
         assertThatBpmnSubProcessActive(processId);
     }
@@ -146,14 +152,17 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
     @Test
     @Deployment
     public void throwBpmnErrorInTrigger() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask());
-
-        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        // The delegate expression is resolved when executing and when triggering the service task,
+        // so the delegate is passed as a transient variable in both cases
+        String processId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask())
+                .start()
+                .getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertThat(execution).isNotNull();
-        runtimeService.trigger(execution.getId(), Collections.emptyMap(), null);
+        runtimeService.trigger(execution.getId(), Collections.emptyMap(), Collections.singletonMap("triggerableServiceTask", new ThrowBpmnErrorTriggerableJavaDelegateServiceTask()));
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("taskAfterErrorCatch").singleResult();
         assertThat(execution).isNotNull();
@@ -162,14 +171,17 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableJavaDelegateServiceTaskTest.testDelegateExpression.bpmn20.xml")
     public void testActivityIsNotLeaving() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("triggerableServiceTask", new TriggerableJavaDelegateServiceTask(true));
-
-        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        // The delegate expression is resolved when executing and when triggering the service task,
+        // so the delegate is passed as a transient variable in both cases
+        String processId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", new TriggerableJavaDelegateServiceTask(true))
+                .start()
+                .getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertThat(execution).isNotNull();
-        runtimeService.trigger(execution.getId(), Collections.emptyMap(), null);
+        runtimeService.trigger(execution.getId(), Collections.emptyMap(), Collections.singletonMap("triggerableServiceTask", new TriggerableJavaDelegateServiceTask(true)));
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertThat(execution).isNotNull();
@@ -178,14 +190,17 @@ public class TriggerableJavaDelegateFormAwareServiceTaskTest extends PluggableFl
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/TriggerableJavaDelegateServiceTaskTest.testDelegateExpression.bpmn20.xml")
     public void testActivityIsLeaving() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("triggerableServiceTask", new TriggerableJavaDelegateServiceTask());
-
-        String processId = runtimeService.startProcessInstanceByKey("process", varMap).getProcessInstanceId();
+        // The delegate expression is resolved when executing and when triggering the service task,
+        // so the delegate is passed as a transient variable in both cases
+        String processId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("triggerableServiceTask", new TriggerableJavaDelegateServiceTask())
+                .start()
+                .getProcessInstanceId();
 
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("service1").singleResult();
         assertThat(execution).isNotNull();
-        runtimeService.trigger(execution.getId(), Collections.emptyMap(), null);
+        runtimeService.trigger(execution.getId(), Collections.emptyMap(), Collections.singletonMap("triggerableServiceTask", new TriggerableJavaDelegateServiceTask()));
 
         execution = runtimeService.createExecutionQuery().processInstanceId(processId).activityId("usertask1").singleResult();
         assertThat(execution).isNotNull();

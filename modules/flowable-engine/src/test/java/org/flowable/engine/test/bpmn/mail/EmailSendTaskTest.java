@@ -226,9 +226,10 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Test
     @Deployment
     public void testTextMailWithFileAttachment() throws Exception {
-        HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
-        runtimeService.startProcessInstanceByKey("textMailWithFileAttachment", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("textMailWithFileAttachment")
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
@@ -242,9 +243,10 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Test
     @Deployment
     public void testTextMailWithFileAttachments() throws Exception {
-        HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
-        runtimeService.startProcessInstanceByKey("textMailWithFileAttachments", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("textMailWithFileAttachments")
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
@@ -261,9 +263,10 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Test
     @Deployment
     public void testTextMailWithFileAttachmentsByPath() throws Exception {
-        HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
-        runtimeService.startProcessInstanceByKey("textMailWithFileAttachmentsByPath", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("textMailWithFileAttachmentsByPath")
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
@@ -283,10 +286,13 @@ public class EmailSendTaskTest extends EmailTestCase {
         String fileName = "file-name-to-be-displayed";
         String fileContent = "This is the file content";
         HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
         vars.put("fileContent", fileContent);
         vars.put("fileName", fileName);
-        runtimeService.startProcessInstanceByKey("textMailWithDataSourceAttachment", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("textMailWithDataSourceAttachment")
+                .variables(vars)
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
@@ -300,9 +306,10 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Test
     @Deployment
     public void testTextMailWithNotExistingFileAttachment() throws Exception {
-        HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
-        runtimeService.startProcessInstanceByKey("textMailWithNotExistingFileAttachment", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("textMailWithNotExistingFileAttachment")
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);
@@ -314,9 +321,12 @@ public class EmailSendTaskTest extends EmailTestCase {
     @Deployment
     public void testHtmlMailWithFileAttachment() throws Exception {
         HashMap<String, Object> vars = new HashMap<>();
-        vars.put("attachmentsBean", new AttachmentsBean());
         vars.put("gender", "male");
-        runtimeService.startProcessInstanceByKey("htmlMailWithFileAttachment", vars);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("htmlMailWithFileAttachment")
+                .variables(vars)
+                .transientVariable("attachmentsBean", new AttachmentsBean())
+                .start();
 
         List<WiserMessage> messages = wiser.getMessages();
         assertThat(messages).hasSize(1);

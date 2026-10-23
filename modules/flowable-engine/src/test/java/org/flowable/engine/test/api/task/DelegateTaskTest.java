@@ -14,11 +14,9 @@ package org.flowable.engine.test.api.task;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -26,6 +24,9 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskCompletionBuilder;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Falko Menge
@@ -43,14 +44,14 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateUsers = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
+        ArrayNode candidateUsers = (ArrayNode) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
         assertThat(candidateUsers)
+                .extracting(JsonNode::asString)
                 .containsOnly("kermit", "gonzo");
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateGroups = (Set<String>) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
+        ArrayNode candidateGroups = (ArrayNode) taskService.getVariable(task.getId(), DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
         assertThat(candidateGroups)
+                .extracting(JsonNode::asString)
                 .containsOnly("management", "accountancy");
     }
 
@@ -60,7 +61,7 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
 
         // Start process instance
         Map<String, Object> variables = new HashMap<>();
-        variables.put("approvers", Collections.singletonList("kermit")); // , "gonzo", "mispiggy"));
+        variables.put("approvers", processEngineConfiguration.getObjectMapper().createArrayNode().add("kermit")); // , "gonzo", "mispiggy"));
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("delegateTaskTest", variables);
 
         // Assert there are three tasks with the default category

@@ -26,6 +26,8 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.node.ArrayNode;
+
 /**
  * Tests combinations of repetition with a collection variable.
  *
@@ -48,9 +50,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
-        // complete Task A by providing the collection used for repetition
+        // complete Task A by providing the collection used for repetition (as a transient variable, since it is only needed when completing Task A)
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-                .variable("taskOutputList", taskOutputList)
+                .transientVariable("taskOutputList", taskOutputList)
                 .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
@@ -103,9 +105,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
-        // complete Task A by providing the collection used for repetition
+        // complete Task A by providing the collection used for repetition (as a transient variable, since it is only needed when completing Task A)
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-                .variable("taskOutputList", taskOutputList)
+                .transientVariable("taskOutputList", taskOutputList)
                 .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
@@ -129,7 +131,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         // complete Task A again by providing a different collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-                .variable("taskOutputList", taskOutputList)
+                .transientVariable("taskOutputList", taskOutputList)
                 .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -171,9 +173,9 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         List<String> taskOutputList = Arrays.asList("A", "B", "C", "D");
 
-        // complete Task A by providing the collection used for repetition
+        // complete Task A by providing the collection used for repetition (as a transient variable, since it is only needed when completing Task A)
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-                .variable("taskOutputList", taskOutputList)
+                .transientVariable("taskOutputList", taskOutputList)
                 .trigger();
 
         // now we need to have 4 instances of Task B with adequate local variables
@@ -197,7 +199,7 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         // complete Task A again by providing a different collection used for repetition
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(getPlanItemInstanceIdByNameAndState(planItemInstances, "Task A", ACTIVE))
-                .variable("taskOutputList", taskOutputList)
+                .transientVariable("taskOutputList", taskOutputList)
                 .trigger();
 
         planItemInstances = getPlanItemInstances(caseInstance.getId());
@@ -237,7 +239,8 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertSamePlanItemState(caseInstance);
 
-        List<String> myCollection = Arrays.asList("A", "B", "C", "D");
+        // the collection is stored as a JSON array, since it needs to be persisted as a case variable
+        ArrayNode myCollection = createJsonArray("A", "B", "C", "D");
 
         // set the collection variable to kick-off the creation of the Task C repetition
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", myCollection);
@@ -251,13 +254,13 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         assertSamePlanItemState(caseInstance);
 
-        assertPlanItemLocalVariables(caseInstance.getId(), "Task C", myCollection, Arrays.asList(0, 1, 2, 3));
+        assertPlanItemLocalVariables(caseInstance.getId(), "Task C", Arrays.asList("A", "B", "C", "D"), Arrays.asList(0, 1, 2, 3));
 
         // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
         assertSamePlanItemState(caseInstance);
 
         // if we change the collection variable, nothing else must happen
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", Arrays.asList("foo"));
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "myCollection", createJsonArray("foo"));
         planItemInstances = getPlanItemInstances(caseInstance.getId());
         assertThat(planItemInstances).hasSize(6);
         assertPlanItemInstanceState(planItemInstances, "Task A", ACTIVE);
@@ -300,5 +303,13 @@ public class PlanItemRepetitionWithCollectionVariableTest extends FlowableCmmnTe
 
         // make sure we have synced the runtime and historic plan items, even with the collection of created plan items
         assertSamePlanItemState(caseInstance);
+    }
+
+    protected ArrayNode createJsonArray(String... values) {
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
+        for (String value : values) {
+            arrayNode.add(value);
+        }
+        return arrayNode;
     }
 }

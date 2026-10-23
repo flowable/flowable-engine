@@ -15,7 +15,6 @@ package org.flowable.examples.groovy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -30,7 +29,10 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
     @Deployment
     public void testGroovyStaticScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("staticScriptEngine", CollectionUtil.singletonMap("inputArray", inputArray));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("staticScriptEngine")
+                .transientVariable("inputArray", inputArray)
+                .start();
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");
@@ -42,7 +44,10 @@ public class GroovyStaticScriptTest extends PluggableFlowableTestCase {
     @Deployment
     public void testGroovyScriptEngine() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("groovyScriptEngine", CollectionUtil.singletonMap("inputArray", inputArray));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("groovyScriptEngine")
+                .transientVariable("inputArray", inputArray)
+                .start();
 
         String result = (String) runtimeService.getVariable(pi.getId(), "a");
         Integer sum = (Integer) runtimeService.getVariable(pi.getId(), "sum");

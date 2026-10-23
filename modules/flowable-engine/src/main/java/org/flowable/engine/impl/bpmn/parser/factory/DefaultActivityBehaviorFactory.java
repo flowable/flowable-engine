@@ -382,6 +382,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask) {
         BusinessRuleTaskDelegate ruleActivity = null;
         if (StringUtils.isNotEmpty(businessRuleTask.getClassName())) {

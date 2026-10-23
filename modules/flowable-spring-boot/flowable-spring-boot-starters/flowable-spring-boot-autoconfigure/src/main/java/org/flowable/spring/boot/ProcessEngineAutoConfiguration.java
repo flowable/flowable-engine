@@ -51,6 +51,7 @@ import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -225,6 +226,7 @@ public class ProcessEngineAutoConfiguration extends AbstractSpringEngineAutoConf
 
         objectMapperProvider.ifAvailable(conf::setObjectMapper);
         variableJsonMapperProvider.ifAvailable(conf::setVariableJsonMapper);
+        conf.setSerializableVariableTypeMode(SerializableVariableTypeMode.valueOf(flowableProperties.getSerializableVariableTypeMode().name()));
         configureSpringEngine(conf, platformTransactionManager);
         configureEngine(conf, dataSource);
 

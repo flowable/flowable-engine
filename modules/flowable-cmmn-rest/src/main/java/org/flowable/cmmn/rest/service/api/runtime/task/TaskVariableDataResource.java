@@ -23,6 +23,7 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,6 +68,9 @@ public class TaskVariableDataResource extends TaskVariableBaseResource {
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

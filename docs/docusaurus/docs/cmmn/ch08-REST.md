@@ -451,6 +451,8 @@ When working with variables (execute decision), the REST API uses some common pr
 
 It’s possible to support additional variable-types with a custom JSON representation (either simple value or complex/nested JSON object). By extending the initializeVariableConverters() method on org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory, you can add additional org.flowable.rest.variable.RestVariableConverter classes to support converting your POJOs to a format suitable for transferring through REST and converting the REST-value back to your POJO. The actual transformation to JSON is done by Jackson.
 
+Variables of type *serializable* (Java serialized objects) are disabled by default. Uploading a serialized object (`application/x-java-serialized-object`) or downloading the data of a *serializable* variable returns a `415` response. To allow it, set the `rest.variables.allow.serializable` property to `true`. The `serializableVariableTypeMode` of the engine needs to allow it as well, see [Serializable variables](bpmn/ch04-API.md#serializable-variables). Only enable this when the REST API is used by fully trusted clients, since deserializing Java objects from a request is a security risk.
+
 ## Deployment
 
 **When using Tomcat, please read [Usage in Tomcat](#usage-in-tomcat).**

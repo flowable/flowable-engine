@@ -107,7 +107,10 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testDecideBasedOnBeanProperty() {
-        runtimeService.startProcessInstanceByKey("decisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(150)));
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("decisionBasedOnBeanProperty")
+                .transientVariable("order", new ExclusiveGatewayTestOrder(150))
+                .start();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
@@ -122,7 +125,10 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         orders.add(new ExclusiveGatewayTestOrder(300));
         orders.add(new ExclusiveGatewayTestOrder(175));
 
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("decisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("decisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -131,7 +137,10 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         // Arrays are usable in exactly the same way
         ExclusiveGatewayTestOrder[] orderArray = orders.toArray(new ExclusiveGatewayTestOrder[orders.size()]);
         orderArray[1].setPrice(10);
-        pi = runtimeService.startProcessInstanceByKey("decisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orderArray));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("decisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orderArray)
+                .start();
 
         task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -141,7 +150,10 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testDecideBasedOnBeanMethod() {
-        runtimeService.startProcessInstanceByKey("decisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(300)));
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("decisionBasedOnBeanMethod")
+                .transientVariable("order", new ExclusiveGatewayTestOrder(300))
+                .start();
 
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
@@ -151,7 +163,10 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testInvalidMethodExpression() {
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("invalidMethodExpression", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(50))))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("invalidMethodExpression")
+                .transientVariable("order", new ExclusiveGatewayTestOrder(50))
+                .start())
                 .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("Unknown method used in expression");
     }

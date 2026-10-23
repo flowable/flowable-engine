@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -50,7 +51,6 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
-import org.flowable.cmmn.test.itemcontrol.RepetitionVariableAggregationTest;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
@@ -98,7 +98,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
             assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
@@ -106,7 +106,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-        cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+        cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
         cmmnTaskService.complete(task.getId());
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -136,7 +136,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -148,7 +148,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -190,7 +190,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.NONE, cmmnEngineConfiguration)) {
@@ -202,7 +202,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -223,7 +223,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
         cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue");
         cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", 43);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
 
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
 
@@ -257,7 +257,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -269,7 +269,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -369,7 +369,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -379,7 +379,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -468,7 +468,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -480,7 +480,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 5; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -563,7 +563,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -575,7 +575,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 5; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -621,7 +621,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -631,7 +631,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -736,7 +736,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -748,7 +748,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 
@@ -1155,7 +1155,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             caseInstanceIds.add(caseInstance.getId());
             cmmnRuntimeService.setVariable(caseInstance.getId(), "testVar", "testValue" + (i + 1));
             cmmnRuntimeService.setVariable(caseInstance.getId(), "numVar", (i + 1));
-            cmmnRuntimeService.setVariable(caseInstance.getId(), "serializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnRuntimeService.setVariable(caseInstance.getId(), "byteArrayVar", "testValue".getBytes(StandardCharsets.UTF_8));
         }
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
@@ -1167,7 +1167,7 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
         for (int i = 0; i < 10; i++) {
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstanceIds.get(i)).singleResult();
             cmmnTaskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-            cmmnTaskService.setVariableLocal(task.getId(), "taskSerializableVar", new RepetitionVariableAggregationTest.TestSerializableVariable());
+            cmmnTaskService.setVariableLocal(task.getId(), "taskByteArrayVar", "taskValue".getBytes(StandardCharsets.UTF_8));
             cmmnTaskService.complete(task.getId());
         }
 

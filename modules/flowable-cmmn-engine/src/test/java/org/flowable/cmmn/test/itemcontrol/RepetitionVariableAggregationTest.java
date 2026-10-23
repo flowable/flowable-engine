@@ -14,13 +14,10 @@ package org.flowable.cmmn.test.itemcontrol;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +33,6 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
@@ -539,7 +535,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingTask")
             .variable("otherVariable", "Hello World")
-            .variable("myCollection", Arrays.asList("a", "b", "c", "d"))
+            .variable("myCollection", createJsonArray("a", "b", "c", "d"))
             .start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
@@ -659,7 +655,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("repeatingTask")
                 .variable("otherVariable", "Hello World")
-                .variable("myCollection", Arrays.asList("a", "b", "c", "d"))
+                .variable("myCollection", createJsonArray("a", "b", "c", "d"))
                 .start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
@@ -776,43 +772,12 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     }
 
     @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testParallelRepeatingUserTaskVariableTypes.cmmn")
-    public void testParallelRepeatingUserTaskVariableTypesUnsupportedVariableTypes() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("repeatingTask")
-                .variable("otherVariable", "Hello World")
-                .variable("myCollection", Arrays.asList("a", "b"))
-                .start();
-
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
-        cmmnTaskService.complete(task.getId());
-
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task B")
-                .orderByTaskPriority().asc()
-                .list();
-        assertThat(tasks).hasSize(2);
-
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("description", "Description for task with LocalDate");
-        variables.put("score", 10);
-        variables.put("passed", true);
-        variables.put("location", "Springfield");
-        variables.put("startTime", new TestSerializableVariable());
-
-        assertThatThrownBy(() -> cmmnTaskService.complete(tasks.get(0).getId(), variables))
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Cannot aggregate variable: ")
-                .hasMessageContaining("startTime");
-    }
-
-
-    @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/RepetitionVariableAggregationTest.testStageWithParallelRepeatingUserTask.cmmn")
     public void testTerminateStageWithParallelRepeatingUserTask() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingTask")
             .variable("otherVariable", "Hello World")
-            .variable("myCollection", Arrays.asList("a", "b", "c"))
+            .variable("myCollection", createJsonArray("a", "b", "c"))
             .start();
 
         ArrayNode reviews = (ArrayNode) cmmnRuntimeService.getVariable(caseInstance.getId(), "reviews");
@@ -996,7 +961,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
     public void testParallelRepeatingStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("repeatingStage")
-            .variable("myCollection", Arrays.asList("one", "two", "three", "four"))
+            .variable("myCollection", createJsonArray("one", "two", "three", "four"))
             .variable("otherVariable", "Hello World")
             .start();
 
@@ -1128,7 +1093,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("repeatingStage")
-                .variable("myCollection", Arrays.asList("one", "two"))
+                .variable("myCollection", createJsonArray("one", "two"))
                 .variable("otherVariable", "Hello World")
                 .start();
 
@@ -1306,7 +1271,7 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("repeatingStage")
-                .variable("myCollection", Arrays.asList("one", "two"))
+                .variable("myCollection", createJsonArray("one", "two"))
                 .variable("otherVariable", "Hello World")
                 .start();
 
@@ -1407,6 +1372,14 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
         assertThat(variableInstanceEntities).isEmpty();
     }
 
+    protected ArrayNode createJsonArray(String... values) {
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
+        for (String value : values) {
+            arrayNode.add(value);
+        }
+        return arrayNode;
+    }
+
     public static class CustomVariableAggregator implements PlanItemVariableAggregator {
 
         @Override
@@ -1443,21 +1416,6 @@ public class RepetitionVariableAggregationTest extends FlowableCmmnTestCase {
             }
 
             return arrayNode;
-        }
-    }
-
-    public static class TestSerializableVariable implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        private String someField;
-
-        public String getSomeField() {
-            return someField;
-        }
-
-        public void setSomeField(String someField) {
-            this.someField = someField;
         }
     }
 

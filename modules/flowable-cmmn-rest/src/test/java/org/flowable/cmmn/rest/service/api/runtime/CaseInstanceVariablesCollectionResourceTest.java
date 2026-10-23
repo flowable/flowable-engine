@@ -18,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -158,55 +156,6 @@ public class CaseInstanceVariablesCollectionResourceTest extends BaseSpringRestT
         Object variableValue = runtimeService.getVariable(caseInstance.getId(), "binaryVariable");
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
-    }
-
-    /**
-     * Test creating a single process variable using a binary stream containing a serializable. POST runtime/process-instances/{processInstanceId}/variables
-     */
-    @Test
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testCreateSingleSerializableCaseVariable() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-
-        TestSerializableVariable serializable = new TestSerializableVariable();
-        serializable.setSomeField("some value");
-
-        // Serialize object to readable stream for representation
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream output = new ObjectOutputStream(buffer);
-        output.writeObject(serializable);
-        output.close();
-
-        InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
-
-        // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<>();
-        additionalFields.put("name", "serializableVariable");
-        additionalFields.put("type", "serializable");
-
-        // Upload a valid BPMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(
-                SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_COLLECTION, caseInstance.getId()));
-        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
-        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
-        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-        assertThat(responseNode).isNotNull();
-        assertThatJson(responseNode)
-                .when(Option.IGNORING_EXTRA_FIELDS)
-                .isEqualTo("{"
-                        + "  name: 'serializableVariable',"
-                        + "  value: null,"
-                        + "  scope: 'global',"
-                        + "  type: 'serializable',"
-                        + "  valueUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
-                        .createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "serializableVariable") + "'"
-                        + "}");
-
-        // Check actual value of variable in engine
-        Object variableValue = runtimeService.getVariable(caseInstance.getId(), "serializableVariable");
-        assertThat(variableValue).isInstanceOf(TestSerializableVariable.class);
-        assertThat(((TestSerializableVariable) variableValue).getSomeField()).isEqualTo("some value");
     }
 
     /**

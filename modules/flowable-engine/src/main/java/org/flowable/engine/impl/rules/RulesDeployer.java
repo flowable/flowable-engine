@@ -31,7 +31,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author Tom Baeyens
+ * @deprecated the Drools based business rule task is deprecated, use a DMN decision task instead
  */
+@Deprecated
 public class RulesDeployer implements EngineDeployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RulesDeployer.class);

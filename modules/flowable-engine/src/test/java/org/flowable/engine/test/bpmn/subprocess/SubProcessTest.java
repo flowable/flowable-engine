@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -457,7 +456,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testAsyncMiSequentialSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testAsyncMiSubProcess")
-                .variable("myList", Arrays.asList("one", "two", "three"))
+                .variable("myList", processEngineConfiguration.getObjectMapper().createArrayNode().add("one").add("two").add("three"))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -495,7 +494,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testAsyncMiParallelSubProcess() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testAsyncMiSubProcess")
-                .variable("myList", Arrays.asList("one", "two", "three"))
+                .variable("myList", processEngineConfiguration.getObjectMapper().createArrayNode().add("one").add("two").add("three"))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isZero();
 

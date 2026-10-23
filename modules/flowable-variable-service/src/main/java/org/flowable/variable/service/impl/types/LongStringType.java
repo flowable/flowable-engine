@@ -12,6 +12,11 @@
  */
 package org.flowable.variable.service.impl.types;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputFilter;
+import java.io.ObjectInputStream;
+
 import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
 import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.variable.api.types.ValueFields;
@@ -22,6 +27,10 @@ import org.flowable.variable.api.types.ValueFields;
 public class LongStringType extends SerializableType {
 
     public static final String TYPE_NAME = "longString";
+
+    // Long strings are stored using Java serialization, make sure that only strings can be deserialized
+    protected static final ObjectInputFilter STRING_ONLY_FILTER = ObjectInputFilter.Config.createFilter("java.lang.String;!*");
+
     private final int minLength;
 
     public LongStringType(int minLength) {
@@ -62,5 +71,12 @@ public class LongStringType extends SerializableType {
             return stringValue.length() >= minLength;
         }
         return false;
+    }
+
+    @Override
+    protected ObjectInputStream createObjectInputStream(InputStream is) throws IOException {
+        ObjectInputStream objectInputStream = new ObjectInputStream(is);
+        objectInputStream.setObjectInputFilter(STRING_ONLY_FILTER);
+        return objectInputStream;
     }
 }

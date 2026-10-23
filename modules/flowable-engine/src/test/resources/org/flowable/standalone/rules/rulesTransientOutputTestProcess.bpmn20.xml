@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  <process id="rulesTransientOutput">
+    <startEvent id="start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="ruleTask" />
+    <businessRuleTask id="ruleTask" flowable:ruleVariablesInput="${order}" flowable:resultVariable="rulesOutput"/>
+    <sequenceFlow id="flow2" sourceRef="ruleTask" targetRef="receiveTask">
+      <extensionElements>
+        <flowable:executionListener event="take" expression="${execution.setVariable('rulesOutputSize', rulesOutput.size())}" />
+      </extensionElements>
+    </sequenceFlow>
+    <receiveTask id="receiveTask" />
+    <sequenceFlow id="flow3" sourceRef="receiveTask" targetRef="end" />
+    <endEvent id="end" />
+  </process>
+</definitions>

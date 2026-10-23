@@ -212,11 +212,11 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Date startTime = new Date();
         processEngineConfiguration.getClock().setCurrentTime(startTime);
 
-        HashMap<String, Object> variables = new HashMap<>();
-        variables.put("duration", Duration.ofHours(1));
-
         // After process start, there should be a timer created
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testExpressionOnTimer", variables);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExpressionOnTimer")
+                .transientVariable("duration", Duration.ofHours(1))
+                .start();
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();

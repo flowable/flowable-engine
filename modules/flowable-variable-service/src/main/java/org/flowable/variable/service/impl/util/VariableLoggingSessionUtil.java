@@ -26,6 +26,7 @@ import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.FloatType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
@@ -88,6 +89,8 @@ public class VariableLoggingSessionUtil {
             loggingNode.put(variableRawValueName, (Integer) variableValue);
         } else if (DoubleType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Double) variableValue);
+        } else if (FloatType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, (Float) variableValue);
         } else if (BigDecimalType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (BigDecimal) variableValue);
         } else if (BigIntegerType.TYPE_NAME.equals(variableTypeName)) {

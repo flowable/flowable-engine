@@ -30,8 +30,9 @@ import org.slf4j.LoggerFactory;
  * Implementation of the BusinessProcessContext-scope.
  * 
  * @author Daniel Meyer
+ * @deprecated {@link BusinessProcessScoped} is deprecated, since it relies on serializable variables
  */
-@SuppressWarnings("unchecked")
+@Deprecated
 public class BusinessProcessContext implements Context {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BusinessProcessContext.class);

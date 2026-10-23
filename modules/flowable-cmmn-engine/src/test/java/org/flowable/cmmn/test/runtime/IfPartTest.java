@@ -14,14 +14,16 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.junit.jupiter.api.Test;
 
@@ -123,16 +125,27 @@ public class IfPartTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testManualEvaluateCriteria() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("testManualEvaluateCriteria")
-                .variable("someBean", new TestBean())
-                .start();
+        // The bean is exposed through the expression manager (and not as a case variable),
+        // since it needs to be available in the criteria evaluation after the case instance start
+        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+        Map<Object, Object> originalBeans = expressionManager.getBeans();
+        try {
+            expressionManager.setBeans(Collections.singletonMap("someBean", new TestBean()));
+            TestBean.RETURN_VALUE = false;
 
-        // Triggering the evaluation twice will satisfy the entry criterion for B
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
-        TestBean.RETURN_VALUE = true;
-        cmmnRuntimeService.evaluateCriteria(caseInstance.getId());
-        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testManualEvaluateCriteria")
+                    .start();
+
+            // Triggering the evaluation twice will satisfy the entry criterion for B
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
+            TestBean.RETURN_VALUE = true;
+            cmmnRuntimeService.evaluateCriteria(caseInstance.getId());
+            assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
+        } finally {
+            expressionManager.setBeans(originalBeans);
+            TestBean.RETURN_VALUE = false;
+        }
     }
 
     @Test
@@ -283,7 +296,7 @@ public class IfPartTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
 
-    public static class TestBean implements Serializable {
+    public static class TestBean {
 
         public static boolean RETURN_VALUE;
 

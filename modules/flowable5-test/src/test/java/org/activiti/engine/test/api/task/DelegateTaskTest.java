@@ -12,16 +12,20 @@
  */
 package org.activiti.engine.test.api.task;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.history.HistoricTaskInstance;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Falko Menge
@@ -38,28 +42,30 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateUsers = (Set<String>) taskService.getVariable(task.getId(),
+        ArrayNode candidateUsers = (ArrayNode) taskService.getVariable(task.getId(),
                 DelegateTaskTestTaskListener.VARNAME_CANDIDATE_USERS);
-        assertEquals(2, candidateUsers.size());
-        assertTrue(candidateUsers.contains("kermit"));
-        assertTrue(candidateUsers.contains("gonzo"));
+        assertThat(candidateUsers)
+                .extracting(JsonNode::asString)
+                .containsOnly("kermit", "gonzo");
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateGroups = (Set<String>) taskService.getVariable(task.getId(),
+        ArrayNode candidateGroups = (ArrayNode) taskService.getVariable(task.getId(),
                 DelegateTaskTestTaskListener.VARNAME_CANDIDATE_GROUPS);
-        assertEquals(2, candidateGroups.size());
-        assertTrue(candidateGroups.contains("management"));
-        assertTrue(candidateGroups.contains("accountancy"));
+        assertThat(candidateGroups)
+                .extracting(JsonNode::asString)
+                .containsOnly("management", "accountancy");
     }
 
     @Deployment
     public void testChangeCategoryInDelegateTask() {
 
         // Start process instance
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("approvers", Collections.singletonList("kermit")); // , "gonzo", "mispiggy"));
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("delegateTaskTest", variables);
+        // The collection is only needed to create the parallel multi instance tasks, so it can be passed as a transient variable
+        Map<String, Object> transientVariables = new HashMap<String, Object>();
+        transientVariables.put("approvers", Collections.singletonList("kermit")); // , "gonzo", "mispiggy"));
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("delegateTaskTest")
+                .transientVariables(transientVariables)
+                .start();
 
         // Assert there are three tasks with the default category
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();

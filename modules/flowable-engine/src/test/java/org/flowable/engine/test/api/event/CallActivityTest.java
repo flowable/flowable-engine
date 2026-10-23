@@ -25,7 +25,6 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
@@ -617,8 +616,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/api/event/CallActivityTest.testCalledActivity.bpmn20.xml"
     })
     public void testCallActivityProcessInstanceName() {
-        runtimeService.startProcessInstanceByKey("testCallActivityProcessInstanceName",
-                CollectionUtil.singletonMap("theCollection", Arrays.asList("A", "B", "C", "D")));
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCallActivityProcessInstanceName")
+                .transientVariable("theCollection", Arrays.asList("A", "B", "C", "D"))
+                .start();
 
         List<ProcessInstance> childProcessInstances = runtimeService.createProcessInstanceQuery().list().stream()
                 .filter(processInstance -> (processInstance.getSuperExecutionId() != null))

@@ -55,6 +55,7 @@ import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
 import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -194,6 +195,7 @@ public class CmmnEngineAutoConfiguration extends AbstractSpringEngineAutoConfigu
         configureEngine(configuration, dataSource);
         objectMapperProvider.ifAvailable(configuration::setObjectMapper);
         variableJsonMapperProvider.ifAvailable(configuration::setVariableJsonMapper);
+        configuration.setSerializableVariableTypeMode(SerializableVariableTypeMode.valueOf(flowableProperties.getSerializableVariableTypeMode().name()));
 
         configuration.setDeploymentName(defaultText(cmmnProperties.getDeploymentName(), configuration.getDeploymentName()));
 

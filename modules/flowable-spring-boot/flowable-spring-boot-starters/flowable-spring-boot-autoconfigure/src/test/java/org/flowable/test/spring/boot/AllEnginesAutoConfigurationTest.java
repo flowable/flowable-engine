@@ -72,6 +72,8 @@ import org.flowable.spring.boot.idm.IdmEngineAutoConfiguration;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.task.api.Task;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
@@ -205,6 +207,30 @@ public class AllEnginesAutoConfigurationTest {
             deleteDeployments(context.getBean(ProcessEngine.class));
         });
 
+    }
+
+    @Test
+    public void serializableVariableTypeModeIsDisabledByDefault() {
+        contextRunner.run(context -> {
+            assertThat(context.getBean(SpringAppEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.DISABLED);
+            assertThat(context.getBean(SpringCmmnEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.DISABLED);
+            assertThat(context.getBean(SpringProcessEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.DISABLED);
+            assertThat(context.getBean(SpringAppEngineConfiguration.class).getVariableTypes().getVariableType(SerializableType.TYPE_NAME))
+                    .isInstanceOfSatisfying(SerializableType.class, type -> assertThat(type.getMode()).isEqualTo(SerializableVariableTypeMode.DISABLED));
+        });
+    }
+
+    @Test
+    public void serializableVariableTypeModeCanBeConfigured() {
+        contextRunner
+                .withPropertyValues("flowable.serializable-variable-type-mode=read-only")
+                .run(context -> {
+                    assertThat(context.getBean(SpringAppEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY);
+                    assertThat(context.getBean(SpringCmmnEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY);
+                    assertThat(context.getBean(SpringProcessEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY);
+                    assertThat(context.getBean(SpringAppEngineConfiguration.class).getVariableTypes().getVariableType(SerializableType.TYPE_NAME))
+                            .isInstanceOfSatisfying(SerializableType.class, type -> assertThat(type.getMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY));
+                });
     }
 
     @Test

@@ -12,12 +12,15 @@
  */
 package org.flowable.engine.test.api.task;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.service.delegate.DelegateTask;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 public class DeleteCandidateTaskListener implements TaskListener {
     public static final String VARNAME_CANDIDATE_USERS = "candidateUsers";
@@ -29,8 +32,9 @@ public class DeleteCandidateTaskListener implements TaskListener {
         delegateTask.deleteCandidateGroup("admins");
 
         Set<IdentityLink> candidates = delegateTask.getCandidates();
-        Set<String> candidateUsers = new HashSet<>();
-        Set<String> candidateGroups = new HashSet<>();
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
+        ArrayNode candidateUsers = objectMapper.createArrayNode();
+        ArrayNode candidateGroups = objectMapper.createArrayNode();
         for (IdentityLink candidate : candidates) {
             if (candidate.getUserId() != null) {
                 candidateUsers.add(candidate.getUserId());

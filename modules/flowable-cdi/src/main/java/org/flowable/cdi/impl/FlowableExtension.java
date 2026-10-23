@@ -50,10 +50,12 @@ public class FlowableExtension implements Extension {
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableExtension.class);
     private ProcessEngineLookup processEngineLookup;
 
+    @SuppressWarnings("deprecation")
     public void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
         event.addScope(BusinessProcessScoped.class, true, true);
     }
 
+    @SuppressWarnings("deprecation")
     public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
         BeanManagerLookup.localInstance = manager;
         event.addContext(new BusinessProcessContext(manager));

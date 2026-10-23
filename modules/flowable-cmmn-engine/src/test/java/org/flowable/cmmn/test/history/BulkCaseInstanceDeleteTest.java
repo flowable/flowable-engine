@@ -54,7 +54,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
     
             cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
@@ -67,7 +67,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
 
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(3);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("serializableVar").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("byteArrayVar").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
@@ -91,14 +91,14 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             CaseInstance caseInstance3 = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
 
             waitForAsyncHistoryExecutorToProcessAllJobs();
@@ -140,7 +140,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("myCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -155,7 +155,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).list()).hasSize(3);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).variableName("localSerializable").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).variableName("localByteArray").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
@@ -180,7 +180,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("myCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task mainTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
@@ -192,7 +192,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("myCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             mainTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
@@ -241,13 +241,13 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
             
             cmmnTaskService.setVariableLocal(task.getId(), "testNumber", 123);
-            cmmnTaskService.setVariableLocal(task.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            cmmnTaskService.setVariableLocal(task.getId(), "testByteArray", "value".getBytes(StandardCharsets.UTF_8));
             
             cmmnTaskService.addUserIdentityLink(task.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
             cmmnTaskService.addGroupIdentityLink(task.getId(), "sales", IdentityLinkType.PARTICIPANT);
@@ -258,7 +258,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             
             assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).list()).hasSize(2);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testSerializable").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testByteArray").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
@@ -280,13 +280,13 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task2 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
             
             cmmnTaskService.setVariableLocal(task2.getId(), "testNumber", 123);
-            cmmnTaskService.setVariableLocal(task2.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            cmmnTaskService.setVariableLocal(task2.getId(), "testByteArray", "value".getBytes(StandardCharsets.UTF_8));
             
             cmmnTaskService.addUserIdentityLink(task2.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
             cmmnTaskService.addGroupIdentityLink(task2.getId(), "sales", IdentityLinkType.PARTICIPANT);
@@ -295,13 +295,13 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
                     .caseDefinitionKey("oneTaskCase")
                     .variable("testVar", "testValue")
                     .variable("numVar", 43)
-                    .variable("serializableVar", Collections.singletonMap("key", "value"))
+                    .variable("byteArrayVar", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task3 = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance3.getId()).singleResult();
             
             cmmnTaskService.setVariableLocal(task3.getId(), "testNumber", 123);
-            cmmnTaskService.setVariableLocal(task3.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            cmmnTaskService.setVariableLocal(task3.getId(), "testByteArray", "value".getBytes(StandardCharsets.UTF_8));
             
             cmmnTaskService.addUserIdentityLink(task3.getId(), "johndoe", IdentityLinkType.PARTICIPANT);
             cmmnTaskService.addGroupIdentityLink(task3.getId(), "sales", IdentityLinkType.PARTICIPANT);

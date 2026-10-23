@@ -15,7 +15,6 @@ package org.flowable.engine.test.bpmn;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -69,23 +68,6 @@ public class StartToEndTest extends PluggableFlowableTestCase {
                 );
     }
 
-    @Test
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/StartToEndTest.testStartWithSerializableVariables.bpmn20.xml" })
-    public void testStartProcessInstanceWithSerializableVariables() {
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("test", "hello");
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd", varMap);
-        assertProcessEnded(processInstance.getId());
-        Map<String, Object> returnVarMap = ((ExecutionEntity) processInstance).getVariables();
-        assertThat(returnVarMap).containsEntry("test", "hello");
-        Person person1 = (Person) returnVarMap.get("person1");
-        assertThat(person1.getId()).isEqualTo("1");
-        assertThat(person1.getName()).isEqualTo("John");
-        Person person2 = (Person) returnVarMap.get("person2");
-        assertThat(person2.getId()).isEqualTo("2");
-        assertThat(person2.getName()).isEqualTo("Paul");
-    }
-
     public static class PrimitiveServiceTaskDelegate implements JavaDelegate {
 
         @Override
@@ -96,44 +78,6 @@ public class StartToEndTest extends PluggableFlowableTestCase {
             execution.setVariable("long", 10L);
         }
 
-    }
-
-    public static class SerializableServiceTaskDelegate implements JavaDelegate {
-
-        @Override
-        public void execute(DelegateExecution execution) {
-            execution.setVariable("person1", new Person("1", "John"));
-            execution.setVariable("person2", new Person("2", "Paul"));
-        }
-
-    }
-
-    public static class Person implements Serializable {
-        private static final long serialVersionUID = 1L;
-
-        protected String id;
-        protected String name;
-
-        public Person(String id, String name) {
-            this.id = id;
-            this.name = name;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
     }
 
 }

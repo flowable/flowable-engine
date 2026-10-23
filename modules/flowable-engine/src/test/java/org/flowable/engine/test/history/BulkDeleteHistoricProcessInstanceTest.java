@@ -56,7 +56,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("startToEnd")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             runtimeService.addParticipantUser(processInstance.getId(), "johndoe");
@@ -71,7 +71,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).list()).hasSize(3);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(3);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("testSerializable").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).variableName("testPayload").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
@@ -109,14 +109,14 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("startToEnd")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             ProcessInstance processInstance3 = runtimeService.createProcessInstanceBuilder()
                     .processDefinitionKey("startToEnd")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             List<String> processInstanceIds = new ArrayList<>();
@@ -166,7 +166,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("callActivity")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -183,7 +183,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             assertThat(historyService.createHistoricDetailQuery().processInstanceId(subProcessInstance.getId()).list()).hasSize(3);
             assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(subProcessInstance.getId()).list()).hasSize(3);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(subProcessInstance.getId()).variableName("localSerializable").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().processInstanceId(subProcessInstance.getId()).variableName("localPayload").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
@@ -222,7 +222,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("callActivity")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task mainTask = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
@@ -234,7 +234,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("callActivity")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             mainTask = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
@@ -295,7 +295,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             
             taskService.setVariableLocal(task.getId(), "testNumber", 123);
-            taskService.setVariableLocal(task.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            taskService.setVariableLocal(task.getId(), "testPayload", "value".getBytes(StandardCharsets.UTF_8));
             
             taskService.addCandidateUser(task.getId(), "johndoe");
             taskService.addCandidateGroup(task.getId(), "sales");
@@ -309,7 +309,7 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
             assertThat(historyService.createHistoricDetailQuery().taskId(task.getId()).list()).hasSize(2);
             assertThat(historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).list()).hasSize(2);
             
-            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testSerializable").singleResult();
+            HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) historyService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testPayload").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
             ByteArrayEntity byteArrayEntity = managementService.executeCommand(new Command<>() {
@@ -346,13 +346,13 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("startToEnd")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
             
             taskService.setVariableLocal(task2.getId(), "testNumber", 123);
-            taskService.setVariableLocal(task2.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            taskService.setVariableLocal(task2.getId(), "testPayload", "value".getBytes(StandardCharsets.UTF_8));
             
             taskService.addCandidateUser(task2.getId(), "johndoe");
             taskService.addCandidateGroup(task2.getId(), "sales");
@@ -365,13 +365,13 @@ public class BulkDeleteHistoricProcessInstanceTest extends PluggableFlowableTest
                     .processDefinitionKey("startToEnd")
                     .variable("testString", "test")
                     .variable("testNumber", 123)
-                    .variable("testSerializable", Collections.singletonMap("key", "value"))
+                    .variable("testPayload", "value".getBytes(StandardCharsets.UTF_8))
                     .start();
             
             Task task3 = taskService.createTaskQuery().processInstanceId(processInstance3.getId()).singleResult();
             
             taskService.setVariableLocal(task3.getId(), "testNumber", 123);
-            taskService.setVariableLocal(task3.getId(), "testSerializable", Collections.singletonMap("key", "value"));
+            taskService.setVariableLocal(task3.getId(), "testPayload", "value".getBytes(StandardCharsets.UTF_8));
             
             taskService.addCandidateUser(task3.getId(), "johndoe");
             taskService.addCandidateGroup(task3.getId(), "sales");

@@ -13,7 +13,7 @@
                     <flowable:field name="script">
                         <string><![CDATA[
                         c = a.getValue() + b;
-                        var IntValueHolder = Java.type("org.flowable.cmmn.test.task.CmmnScriptTaskTest$IntValueHolder");
+                        var IntValueHolder = Java.type("org.flowable.cmmn.test.task.CmmnScriptTaskSerializableVariablesTest$IntValueHolder");
                         var result = new IntValueHolder(c);
                         result;
                         ]]></string>

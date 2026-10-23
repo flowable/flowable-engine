@@ -30,6 +30,8 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 
+import tools.jackson.databind.node.ArrayNode;
+
 /**
  * @author Tom Baeyens
  */
@@ -44,10 +46,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
         activiti5ProcessEngineConfig.getVariableTypes().addType(CustomVariableType.instance);
 
         Date now = new Date();
-        List<String> serializable = new ArrayList<String>();
-        serializable.add("one");
-        serializable.add("two");
-        serializable.add("three");
+        ArrayNode jsonArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        jsonArray.add("one");
+        jsonArray.add("two");
+        jsonArray.add("three");
         byte[] bytes1 = "somebytes1".getBytes();
         byte[] bytes2 = "somebytes2".getBytes();
 
@@ -82,7 +84,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variables.put("stringVar", "coca-cola");
         variables.put("dateVar", now);
         variables.put("nullVar", null);
-        variables.put("serializableVar", serializable);
+        variables.put("jsonVar", jsonArray);
         variables.put("bytesVar", bytes1);
         variables.put("customVar1", new CustomType(bytes2));
         variables.put("customVar2", null);
@@ -96,7 +98,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(long2000StringBuilder.toString(), variables.get("longString2000chars"));
         assertEquals(now, variables.get("dateVar"));
         assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
+        assertEquals(jsonArray, variables.get("jsonVar"));
         assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
         assertEquals(new CustomType(bytes2), variables.get("customVar1"));
         assertNull(variables.get("customVar2"));
@@ -111,7 +113,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "longString4000chars", null);
         runtimeService.setVariable(processInstance.getId(), "dateVar", null);
         runtimeService.setVariable(processInstance.getId(), "nullVar", null);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", null);
+        runtimeService.setVariable(processInstance.getId(), "jsonVar", null);
         runtimeService.setVariable(processInstance.getId(), "bytesVar", null);
         runtimeService.setVariable(processInstance.getId(), "customVar1", null);
         runtimeService.setVariable(processInstance.getId(), "customVar2", null);
@@ -125,7 +127,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertNull(variables.get("longString4000chars"));
         assertNull(variables.get("dateVar"));
         assertNull(variables.get("nullVar"));
-        assertNull(variables.get("serializableVar"));
+        assertNull(variables.get("jsonVar"));
         assertNull(variables.get("bytesVar"));
         assertNull(variables.get("customVar1"));
         assertNull(variables.get("customVar2"));
@@ -140,7 +142,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "longString2000chars", long2001StringBuilder.toString());
         runtimeService.setVariable(processInstance.getId(), "longString4000chars", long4001StringBuilder.toString());
         runtimeService.setVariable(processInstance.getId(), "dateVar", now);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", serializable);
+        runtimeService.setVariable(processInstance.getId(), "jsonVar", jsonArray);
         runtimeService.setVariable(processInstance.getId(), "bytesVar", bytes1);
         runtimeService.setVariable(processInstance.getId(), "customVar1", new CustomType(bytes2));
         runtimeService.setVariable(processInstance.getId(), "customVar2", new CustomType(bytes1));
@@ -155,7 +157,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(long4001StringBuilder.toString(), variables.get("longString4000chars"));
         assertEquals(now, variables.get("dateVar"));
         assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
+        assertEquals(jsonArray, variables.get("jsonVar"));
         assertTrue(Arrays.equals(bytes1, (byte[]) variables.get("bytesVar")));
         assertEquals(new CustomType(bytes2), variables.get("customVar1"));
         assertEquals(new CustomType(bytes1), variables.get("customVar2"));
@@ -227,17 +229,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("coca-cola", variableInstance.getValue());
     }
 
-    // Test case for ACT-1839
-    @Deployment(resources = { "org/activiti/examples/variables/VariablesTest.testChangeTypeSerializable.bpmn20.xml" })
-    public void testChangeTypeSerializable() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variable-type-change-test");
-        assertNotNull(processInstance);
-        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("Activiti is awesome!", task.getName());
-        SomeSerializable myVar = (SomeSerializable) runtimeService.getVariable(processInstance.getId(), "myVar");
-        assertEquals("someValue", myVar.getValue());
-    }
-
     public String getVariableInstanceId(String executionId, String name) {
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().processInstanceId(executionId).variableName(name).singleResult();
         return variable.getId();
@@ -248,10 +239,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testChangeVariableType() {
 
         Date now = new Date();
-        List<String> serializable = new ArrayList<String>();
-        serializable.add("one");
-        serializable.add("two");
-        serializable.add("three");
+        ArrayNode jsonArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        jsonArray.add("one");
+        jsonArray.add("two");
+        jsonArray.add("three");
         byte[] bytes = "somebytes".getBytes();
 
         // Start process instance with different types of variables
@@ -262,7 +253,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variables.put("stringVar", "coca-cola");
         variables.put("dateVar", now);
         variables.put("nullVar", null);
-        variables.put("serializableVar", serializable);
+        variables.put("jsonVar", jsonArray);
         variables.put("bytesVar", bytes);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
@@ -273,26 +264,26 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals("coca-cola", variables.get("stringVar"));
         assertEquals(now, variables.get("dateVar"));
         assertNull(variables.get("nullVar"));
-        assertEquals(serializable, variables.get("serializableVar"));
+        assertEquals(jsonArray, variables.get("jsonVar"));
         assertTrue(Arrays.equals(bytes, (byte[]) variables.get("bytesVar")));
         assertEquals(8, variables.size());
 
         // check if the id of the variable is the same or not
 
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            String oldSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
+            String oldJsonVarId = getVariableInstanceId(processInstance.getId(), "jsonVar");
             String oldLongVar = getVariableInstanceId(processInstance.getId(), "longVar");
 
-            // Change type of serializableVar from serializable to Short
+            // Change type of jsonVar from json to Short
             Map<String, Object> newVariables = new HashMap<String, Object>();
-            newVariables.put("serializableVar", (short) 222);
+            newVariables.put("jsonVar", (short) 222);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
-            assertEquals((short) 222, variables.get("serializableVar"));
+            assertEquals((short) 222, variables.get("jsonVar"));
 
-            String newSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
+            String newJsonVarId = getVariableInstanceId(processInstance.getId(), "jsonVar");
 
-            assertEquals(oldSerializableVarId, newSerializableVarId);
+            assertEquals(oldJsonVarId, newJsonVarId);
 
             // Change type of a longVar from Long to Short
             newVariables = new HashMap<String, Object>();

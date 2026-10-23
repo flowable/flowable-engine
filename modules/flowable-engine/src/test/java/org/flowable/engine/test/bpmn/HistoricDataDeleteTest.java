@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
@@ -57,7 +58,6 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.history.SerializableVariable;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
@@ -120,7 +120,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         runtimeService.setVariable(processInstance.getId(), "testVar", "testValue");
         runtimeService.setVariable(processInstance.getId(), "numVar", 43);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test"));
+        runtimeService.setVariable(processInstance.getId(), "byteArrayVar", "test".getBytes(StandardCharsets.UTF_8));
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
@@ -144,7 +144,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-            taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test"));
+            taskService.setVariableLocal(task.getId(), "taskByteArrayVar", "test".getBytes(StandardCharsets.UTF_8));
             taskService.complete(task.getId());
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                 waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
@@ -196,14 +196,14 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         runtimeService.setVariable(processInstance.getId(), "testVar", "testValue");
         runtimeService.setVariable(processInstance.getId(), "numVar", 43);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test"));
+        runtimeService.setVariable(processInstance.getId(), "byteArrayVar", "test".getBytes(StandardCharsets.UTF_8));
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
             
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.setVariableLocal(task.getId(), "taskVar", "taskValue");
-            taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("testTask"));
+            taskService.setVariableLocal(task.getId(), "taskByteArrayVar", "testTask".getBytes(StandardCharsets.UTF_8));
             taskService.complete(task.getId());
 
             if (processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -236,7 +236,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
         
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -246,7 +246,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -294,7 +294,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -304,7 +304,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -408,7 +408,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -418,7 +418,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -509,7 +509,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -519,7 +519,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 5; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -607,7 +607,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -617,7 +617,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 3; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -670,7 +670,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -680,7 +680,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -795,7 +795,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -805,7 +805,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 
@@ -963,7 +963,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 processInstanceIds.add(processInstance.getId());
                 runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
                 runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-                runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i + 1)));
+                runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
             }
             
             if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -973,7 +973,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 for (int i = 0; i < 10; i++) {
                     Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                     taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                    taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                    taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                     taskService.complete(task.getId());
                 }
 
@@ -1078,7 +1078,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
         runtimeService.setVariable(processInstance.getId(), "testVar", "testValue");
         runtimeService.setVariable(processInstance.getId(), "numVar", 43);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test"));
+        runtimeService.setVariable(processInstance.getId(), "byteArrayVar", "test".getBytes(StandardCharsets.UTF_8));
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).list()).hasSize(1);
@@ -1470,7 +1470,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             processInstanceIds.add(processInstance.getId());
             runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
             runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
-            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+            runtimeService.setVariable(processInstance.getId(), "byteArrayVar", ("test" + (i+1)).getBytes(StandardCharsets.UTF_8));
         }
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
@@ -1480,7 +1480,7 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             for (int i = 0; i < 10; i++) {
                 Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
                 taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
-                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.setVariableLocal(task.getId(), "taskByteArrayVar", ("test" + (i + 1)).getBytes(StandardCharsets.UTF_8));
                 taskService.complete(task.getId());
             }
 

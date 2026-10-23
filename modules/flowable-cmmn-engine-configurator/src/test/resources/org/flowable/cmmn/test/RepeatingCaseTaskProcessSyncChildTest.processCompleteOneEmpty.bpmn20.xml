@@ -11,7 +11,8 @@
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="initVariables"/>
         <scriptTask id="initVariables" name="Initialize variables" scriptFormat="groovy">
             <script>
-                execution.setVariable("caseList", [])
+                // Java collections cannot be stored as variables (serializable variables are disabled), use a JSON array
+                execution.setVariable("caseList", tools.jackson.databind.json.JsonMapper.shared().readTree('[]'))
                 execution.setVariable("processOne", true)
             </script>
         </scriptTask>

@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.sentry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,9 +83,10 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
 
         // This tests verifies that the ifPart of an onEvent triggered sentry doesn't get called unless the event happens
 
+        // The condition is passed as a transient variable in every transaction that might evaluate the ifPart
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIfPartTriggeredOnce")
-                .variable("var", new TestCondition())
+                .transientVariable("var", new TestCondition())
                 .start();
         assertThat(TestCondition.COUNTER.get()).isZero();
 
@@ -95,7 +95,10 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
                 .extracting(Task::getName)
                 .containsExactly("Guarded task", "The task");
 
-        cmmnTaskService.complete(tasks.get(1).getId());
+        cmmnTaskService.createTaskCompletionBuilder()
+                .taskId(tasks.get(1).getId())
+                .transientVariable("var", new TestCondition())
+                .complete();
         assertThat(TestCondition.COUNTER.get()).isEqualTo(1);
         tasks = cmmnTaskService.createTaskQuery().orderByTaskName().asc().list();
         assertThat(tasks).isEmpty();
@@ -135,7 +138,7 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
     }
 
     // Just for testing purposes using a serialized variable
-    public static class TestCondition implements Serializable {
+    public static class TestCondition {
 
         public static AtomicInteger COUNTER = new AtomicInteger(0);
 

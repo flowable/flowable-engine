@@ -81,12 +81,12 @@ public class DurationTimeTimerEventTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testVariableExpressionBoundaryTimerEvent() {
-        HashMap<String, Object> variables = new HashMap<>();
-        variables.put("duration", Duration.ofSeconds(100));
-
         Instant yesterday = Instant.now().minus(1, ChronoUnit.DAYS);
         processEngineConfiguration.getClock().setCurrentTime(Date.from(yesterday));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testDurationExpressionOnBoundaryTimer", variables);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testDurationExpressionOnBoundaryTimer")
+                .transientVariable("duration", Duration.ofSeconds(100))
+                .start();
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
         List<Job> jobs = jobQuery.list();

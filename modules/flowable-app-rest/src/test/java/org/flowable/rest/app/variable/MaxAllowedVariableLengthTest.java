@@ -37,6 +37,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -306,6 +307,8 @@ public class MaxAllowedVariableLengthTest {
         public EngineConfigurationConfigurer<SpringAppEngineConfiguration> customAppEngineConfigurationConfigurer() {
             return appEngineConfiguration -> {
                 appEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(5000));
+                // Serializable variables are needed for verifying the max length of serializable variables
+                appEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
             };
         }
     }

@@ -232,11 +232,13 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.FloatType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
@@ -479,6 +481,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
     protected VariableTypes variableTypes;
+
+    /**
+     * Determines how variables of the type 'serializable' (Java serialization) are handled.
+     * By default {@link SerializableVariableTypeMode#DISABLED}, since deserializing Java objects is a security risk.
+     */
+    protected SerializableVariableTypeMode serializableVariableTypeMode = SerializableVariableTypeMode.DISABLED;
 
     protected ExpressionManager expressionManager;
     protected List<String> customScriptingEngineClasses;
@@ -1392,12 +1400,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new LongType());
             variableTypes.addType(new DateType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new FloatType());
             variableTypes.addType(new UUIDType());
             variableTypes.addType(new JsonType(maxLengthStringVariableType, variableJsonMapper, false));
             // longJsonType only needed for reading purposes
             variableTypes.addType(JsonType.longJsonType(maxLengthStringVariableType, variableJsonMapper, false));
             variableTypes.addType(new ByteArrayType());
-            variableTypes.addType(new SerializableType());
+            variableTypes.addType(new SerializableType(serializableVariableTypeMode));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -2060,6 +2069,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setCustomPostVariableTypes(List<VariableType> customPostVariableTypes) {
         this.customPostVariableTypes = customPostVariableTypes;
+        return this;
+    }
+
+    public SerializableVariableTypeMode getSerializableVariableTypeMode() {
+        return serializableVariableTypeMode;
+    }
+
+    public ProcessEngineConfigurationImpl setSerializableVariableTypeMode(SerializableVariableTypeMode serializableVariableTypeMode) {
+        this.serializableVariableTypeMode = serializableVariableTypeMode;
         return this;
     }
 

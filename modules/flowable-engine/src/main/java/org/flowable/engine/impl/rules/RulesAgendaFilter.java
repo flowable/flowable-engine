@@ -21,7 +21,9 @@ import org.kie.api.runtime.rule.Match;
 
 /**
  * @author Tijs Rademakers
+ * @deprecated the Drools based business rule task is deprecated, use a DMN decision task instead
  */
+@Deprecated
 public class RulesAgendaFilter implements AgendaFilter {
 
     protected List<String> suffixList = new ArrayList<>();

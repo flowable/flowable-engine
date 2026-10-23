@@ -106,6 +106,8 @@ Variables can also be retrieved, as shown below. Note that similar methods exist
 
 Variables are often used in Java service tasks, expressions, scripts, and so on.
 
+Values that are not supported by one of the built-in variable types (for example Java collections like `ArrayList`, `HashSet` or `HashMap`, arrays or your own Java classes) would require Java serialization. The *serializable* variable type is **disabled by default**, since deserializing Java objects is a security risk. Store such data as JSON or as one of the other supported types, or use a [transient variable](cmmn/ch03-API.md#transient-variables) when the value is not needed after the next wait state. The `serializableVariableTypeMode` property of the `CmmnEngineConfiguration` can be set to `READ_ONLY` (existing serializable variables can be read, but no new ones can be stored) or `ENABLED` (previous behavior). See [Serializable variables](bpmn/ch04-API.md#serializable-variables) for more details.
+
 ## Transient variables
 
 Transient variables are variables that behave like regular variables but are not persisted. Typically, transient variables are used for advanced use cases. When in doubt, use a regular case variable.

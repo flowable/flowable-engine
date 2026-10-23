@@ -56,9 +56,12 @@ public class PingPongTest extends SpringFlowableTestCase {
 
         variables.put("input", "Hello");
         Map<String, String> outputMap = new HashMap<>();
-        variables.put("outputMap", outputMap);
 
-        runtimeService.startProcessInstanceByKey("PingPongProcess", variables);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("PingPongProcess")
+                .variables(variables)
+                .transientVariable("outputMap", outputMap)
+                .start();
         assertThat(outputMap)
                 .containsExactly(entry("outputValue", "Hello World"));
     }

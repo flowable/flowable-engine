@@ -12,12 +12,15 @@
  */
 package org.activiti.engine.test.api.task;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import org.activiti.engine.impl.context.Context;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.service.delegate.DelegateTask;
+
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
 
 public class DelegateTaskTestTaskListener implements TaskListener {
 
@@ -26,8 +29,9 @@ public class DelegateTaskTestTaskListener implements TaskListener {
 
     public void notify(DelegateTask delegateTask) {
         Set<IdentityLink> candidates = delegateTask.getCandidates();
-        Set<String> candidateUsers = new HashSet<String>();
-        Set<String> candidateGroups = new HashSet<String>();
+        ObjectMapper objectMapper = Context.getProcessEngineConfiguration().getObjectMapper();
+        ArrayNode candidateUsers = objectMapper.createArrayNode();
+        ArrayNode candidateGroups = objectMapper.createArrayNode();
         for (IdentityLink candidate : candidates) {
             if (candidate.getUserId() != null) {
                 candidateUsers.add(candidate.getUserId());

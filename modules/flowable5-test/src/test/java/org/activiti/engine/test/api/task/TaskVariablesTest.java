@@ -13,7 +13,6 @@
 
 package org.activiti.engine.test.api.task;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -91,25 +90,6 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         expectedVariables.put("instrument", "trumpet");
         assertEquals(expectedVariables, runtimeService.getVariables(processInstanceId));
         assertEquals(expectedVariables, runtimeService.getVariablesLocal(processInstanceId));
-    }
-
-    public void testSerializableTaskVariable() {
-        org.flowable.task.api.Task task = taskService.newTask();
-        task.setName("MyTask");
-        taskService.saveTask(task);
-
-        // Set variable
-        Map<String, Object> vars = new HashMap<String, Object>();
-        MyVariable myVariable = new MyVariable("Hello world");
-        vars.put("theVar", myVariable);
-        taskService.setVariables(task.getId(), vars);
-
-        // Fetch variable
-        MyVariable variable = (MyVariable) taskService.getVariable(task.getId(), "theVar");
-        assertEquals("Hello world", variable.getValue());
-
-        // Cleanup
-        taskService.deleteTask(task.getId(), true);
     }
 
     @Deployment
@@ -233,24 +213,6 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         assertEquals("taskVar", variableInstances.get(0).getValue());
         assertEquals("taskVar", variableInstances.get(1).getName());
         assertEquals("taskVar", variableInstances.get(1).getValue());
-    }
-
-    public static class MyVariable implements Serializable {
-
-        private String value;
-
-        public MyVariable(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
     }
 
 }

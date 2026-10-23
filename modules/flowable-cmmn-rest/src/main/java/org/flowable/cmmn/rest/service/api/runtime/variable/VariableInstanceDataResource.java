@@ -23,6 +23,11 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,7 +45,17 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "Runtime" }, authorizations = { @Authorization(value = "basicAuth") })
-public class VariableInstanceDataResource extends VariableInstanceBaseResource {
+public class VariableInstanceDataResource extends VariableInstanceBaseResource implements InitializingBean {
+
+    @Autowired
+    protected Environment env;
+
+    protected boolean isSerializableVariableAllowed;
+
+    @Override
+    public void afterPropertiesSet() {
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
+    }
 
     @GetMapping(value = "/cmmn-runtime/variable-instances/{varInstanceId}/data")
     @ApiResponses(value = {
@@ -58,6 +73,9 @@ public class VariableInstanceDataResource extends VariableInstanceBaseResource {
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

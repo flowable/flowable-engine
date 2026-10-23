@@ -163,6 +163,52 @@ When using *true* for the parameter *fetchAllVariables*, the behavior will be ex
 
 However, when using *false* as value, a specific query will be used and no other variables will be fetched or cached. Only the value of the variable in question here will be cached for subsequent use.
 
+### Variable types
+
+When a variable is set, the engine picks a variable type based on the value. The following values are supported out of the box:
+
+-   `null`
+
+-   `String` (longer strings are stored in a byte array)
+
+-   `Boolean`, `Short`, `Integer`, `Long`, `Float`, `Double`, `BigDecimal` and `BigInteger`
+
+-   `java.util.Date`, `java.time.Instant`, `java.time.LocalDate`, `java.time.LocalDateTime`, `org.joda.time.LocalDate` and `org.joda.time.DateTime`
+
+-   `java.util.UUID`
+
+-   JSON (Jackson `JsonNode`)
+
+-   `byte[]`
+
+-   empty collections
+
+### Serializable variables
+
+Values that are not supported by any of the types above (for example Java collections like `ArrayList`, `HashSet` or `HashMap`, arrays or your own Java classes) used to be stored using Java serialization (the *serializable* variable type). Deserializing Java objects is a security risk, therefore the *serializable* variable type is **disabled by default**. Setting such a value fails with an exception.
+
+Instead of using Java serialization:
+
+-   Store the data as JSON (for example an `ObjectNode` or `ArrayNode`), or as one of the other supported types.
+
+-   Use a [transient variable](bpmn/ch04-API.md#transient-variables) when the value is only needed until the next wait state (for example a collection for a parallel multi-instance or a bean used in an expression).
+
+-   Register a custom `VariableType` (through `customPreVariableTypes`) for your own classes.
+
+The behavior of the *serializable* variable type can be configured through the `serializableVariableTypeMode` property of the engine configuration:
+
+-   `DISABLED` (default): serializable variables can neither be written nor read. Existing serializable variables can still be deleted, but reading their value fails.
+
+-   `READ_ONLY`: existing serializable variables can be read (and overwritten with a value of another type), but no new serializable values can be stored. Use this mode to migrate existing data away from Java serialization.
+
+-   `ENABLED`: serializable variables can be read and written (the behavior of previous versions). Only use this when the data in the database and the classes on the classpath are fully trusted.
+
+    <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+        <property name="serializableVariableTypeMode" value="READ_ONLY" />
+    </bean>
+
+When using Spring Boot, the mode can be configured for all engines through the `flowable.serializable-variable-type-mode` property.
+
 ## Transient variables
 
 Transient variables are variables that behave like regular variables, but are not persisted. Typically, transient variables are used for advanced use cases. When in doubt, use a regular process variable.

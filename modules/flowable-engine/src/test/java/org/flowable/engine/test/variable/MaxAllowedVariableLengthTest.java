@@ -28,6 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 import tools.jackson.databind.node.ObjectNode;
@@ -44,6 +45,8 @@ public class MaxAllowedVariableLengthTest extends CustomConfigurationFlowableTes
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
         processEngineConfiguration.setVariableLengthVerifier(new MaxAllowedLengthVariableVerifier(5000));
+        // Serializable variables are needed for verifying the max allowed length of serializable values
+        processEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
     }
 
     @Test

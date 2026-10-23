@@ -33,6 +33,7 @@ import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
 import org.flowable.spring.boot.eventregistry.FlowableEventRegistryProperties;
 import org.flowable.spring.boot.idm.FlowableIdmProperties;
 import org.flowable.spring.boot.json.FlowableVariableJackson2JsonMapperConfiguration;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -100,6 +101,7 @@ public class AppEngineAutoConfiguration extends AbstractSpringEngineAutoConfigur
         configureEngine(conf, dataSource);
         objectMapperProvider.ifAvailable(conf::setObjectMapper);
         variableJsonMapperProvider.ifAvailable(conf::setVariableJsonMapper);
+        conf.setSerializableVariableTypeMode(SerializableVariableTypeMode.valueOf(flowableProperties.getSerializableVariableTypeMode().name()));
 
         conf.setIdGenerator(new StrongUuidGenerator());
 
