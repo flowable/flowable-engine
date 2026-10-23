@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +33,14 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Frederik Heremans
@@ -382,13 +385,15 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         // Test using mixed JPA-entities which are not serializable, should not
         // be picked up by JPA list type and therefore fail due to serialization error
+        // (or due to serializable variables being disabled)
         assertThatThrownBy(() ->
         {
             Map<String, Object> variables = new HashMap<>();
             variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityPropertyAccess));
             runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
         })
-                .isExactlyInstanceOf(FlowableException.class);
+                .isExactlyInstanceOf(FlowableUnrecoverableJobException.class)
+                .hasMessageContaining("serializable variables are disabled");
 
         // Test updating value to an empty list and back
         Map<String, Object> variables = new HashMap<>();
@@ -396,17 +401,17 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
 
-        runtimeService.setVariable(processInstance.getId(), "list", new ArrayList<String>());
+        runtimeService.setVariable(processInstance.getId(), "list", Collections.emptyList());
         assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).isEmpty();
 
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
         assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
         assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(FieldAccessJPAEntity.class);
 
-        // Test updating to list of Strings
-        runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList("TEST", "TESTING"));
-        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
-        assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0)).isInstanceOf(String.class);
+        // Test updating to a JSON array of Strings (a list of Strings can only be stored as a serializable variable)
+        runtimeService.setVariable(processInstance.getId(), "list", processEngineConfiguration.getObjectMapper().createArrayNode().add("TEST").add("TESTING"));
+        assertThat(((ArrayNode) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);
+        assertThat(((ArrayNode) runtimeService.getVariable(processInstance.getId(), "list")).get(0).asString()).isEqualTo("TEST");
 
         runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
         assertThat(((List<?>) runtimeService.getVariable(processInstance.getId(), "list"))).hasSize(2);

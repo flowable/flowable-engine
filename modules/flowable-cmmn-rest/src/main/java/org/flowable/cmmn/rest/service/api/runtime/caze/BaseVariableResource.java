@@ -35,6 +35,7 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +69,7 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
 
     @Override
     public void afterPropertiesSet() {
-        isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
     protected PlanItemInstance getPlanItemInstanceFromRequest(String planItemInstanceId) {
@@ -180,6 +181,9 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

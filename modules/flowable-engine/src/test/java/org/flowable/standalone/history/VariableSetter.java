@@ -20,7 +20,6 @@ import java.util.Date;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.test.history.SerializableVariable;
 
 /**
  * @author Tom Baeyens
@@ -56,7 +55,7 @@ public class VariableSetter implements JavaDelegate {
         }
         execution.setVariable("fVariable", theDate);
 
-        execution.setVariable("gVariable", new SerializableVariable("hello hello"));
+        execution.setVariable("gVariable", CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createObjectNode().put("value", "hello hello"));
         execution.setVariable("hVariable", ";-)".getBytes());
     }
 

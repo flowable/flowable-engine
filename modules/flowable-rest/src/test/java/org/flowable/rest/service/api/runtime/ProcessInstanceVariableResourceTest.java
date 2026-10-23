@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -273,32 +272,6 @@ public class ProcessInstanceVariableResourceTest extends BaseSpringRestTestCase 
         closeResponse(response);
         assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
-    }
-
-    /**
-     * Test getting a process instance variable data. GET runtime/process-instances/{processInstanceId}/variables/{variableName}
-     */
-    @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariableResourceTest.testProcess.bpmn20.xml" })
-    public void testGetProcessInstanceVariableDataSerializable() throws Exception {
-
-        TestSerializableVariable originalSerializable = new TestSerializableVariable();
-        originalSerializable.setSomeField("This is some field");
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        runtimeService.setVariableLocal(processInstance.getId(), "var", originalSerializable);
-
-        CloseableHttpResponse response = executeRequest(new HttpGet(
-                        SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "var")),
-                HttpStatus.SC_OK);
-
-        // Read the serializable from the stream
-        ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
-        Object readSerializable = stream.readObject();
-        assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
-        assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
-        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
-        closeResponse(response);
     }
 
     /**

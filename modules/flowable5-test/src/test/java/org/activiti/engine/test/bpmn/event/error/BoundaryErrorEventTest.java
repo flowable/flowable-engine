@@ -465,25 +465,31 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testCatchErrorThrownByExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
-        variables.put("bpmnErrorBean", new BpmnErrorBean());
-        String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByExpressionOnServiceTask", variables).getId();
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCatchErrorThrownByExpressionOnServiceTask")
+                .transientVariable("bpmnErrorBean", new BpmnErrorBean())
+                .start()
+                .getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
     @Deployment
     public void testCatchErrorThrownByDelegateExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
-        variables.put("bpmnErrorBean", new BpmnErrorBean());
-        String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByDelegateExpressionOnServiceTask", variables).getId();
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCatchErrorThrownByDelegateExpressionOnServiceTask")
+                .transientVariable("bpmnErrorBean", new BpmnErrorBean())
+                .start()
+                .getId();
         assertThatErrorHasBeenCaught(procId);
     }
 
     @Deployment
     public void testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask() {
-        HashMap<String, Object> variables = new HashMap<String, Object>();
-        variables.put("bpmnErrorBean", new BpmnErrorBean());
-        String procId = runtimeService.startProcessInstanceByKey("testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask", variables).getId();
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testCatchErrorThrownByJavaDelegateProvidedByDelegateExpressionOnServiceTask")
+                .transientVariable("bpmnErrorBean", new BpmnErrorBean())
+                .start()
+                .getId();
         assertThatErrorHasBeenCaught(procId);
     }
 

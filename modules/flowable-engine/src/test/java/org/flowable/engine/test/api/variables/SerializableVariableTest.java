@@ -22,21 +22,33 @@ import java.util.Map;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
+import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  * @author Filip Hrisafov
  */
-public class SerializableVariableTest extends PluggableFlowableTestCase {
+public class SerializableVariableTest extends CustomConfigurationFlowableTestCase {
+
+    public SerializableVariableTest() {
+        super(SerializableVariableTest.class.getSimpleName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        processEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
+    }
 
     @Test
     @Deployment
@@ -140,6 +152,25 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
             assertThat(historicVariableInstance.getValue()).isNull();
             assertThat(((HistoricVariableInstanceEntity) historicVariableInstance).getByteArrayRef()).isNull();
         }
+    }
+
+    @Test
+    public void testSerializableTaskVariable() {
+        Task task = taskService.newTask();
+        task.setName("MyTask");
+        taskService.saveTask(task);
+
+        // Set variable
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("theVar", new TestSerializableVariable(10));
+        taskService.setVariables(task.getId(), vars);
+
+        // Fetch variable
+        TestSerializableVariable variable = (TestSerializableVariable) taskService.getVariable(task.getId(), "theVar");
+        assertThat(variable.getNumber()).isEqualTo(10);
+
+        // Cleanup
+        taskService.deleteTask(task.getId(), true);
     }
 
     public static class TestUpdateSerializableVariableDelegate implements JavaDelegate {

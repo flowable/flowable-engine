@@ -336,8 +336,8 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .variable("assigneeValue", "johndoe")
                 .variable("ownerValue", "janedoe")
-                .variable("users1", users1)
-                .variable("users2", users2)
+                .transientVariable("users1", users1)
+                .transientVariable("users2", users2)
                 .caseDefinitionKey("myCase")
                 .start();
 

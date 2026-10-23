@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -291,7 +290,7 @@ public class RepetitionVariableAggregationJackson2Test extends CustomCmmnConfigu
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("repeatingTask")
                 .variable("otherVariable", "Hello World")
-                .variable("myCollection", Arrays.asList("a", "b", "c", "d"))
+                .variable("myCollection", createJsonArray("a", "b", "c", "d"))
                 .start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
@@ -427,7 +426,7 @@ public class RepetitionVariableAggregationJackson2Test extends CustomCmmnConfigu
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("repeatingTask")
                 .variable("otherVariable", "Hello World")
-                .variable("myCollection", Arrays.asList("a", "b", "c", "d"))
+                .variable("myCollection", createJsonArray("a", "b", "c", "d"))
                 .start();
 
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult();
@@ -565,6 +564,14 @@ public class RepetitionVariableAggregationJackson2Test extends CustomCmmnConfigu
             assertThat(cmmnRuntimeService.getLocalVariable(planItemInstance.getId(), "description")).isNull();
         }
 
+    }
+
+    protected ArrayNode createJsonArray(String... values) {
+        ArrayNode arrayNode = new ObjectMapper().createArrayNode();
+        for (String value : values) {
+            arrayNode.add(value);
+        }
+        return arrayNode;
     }
 
     protected void assertNoAggregatedVariables() {

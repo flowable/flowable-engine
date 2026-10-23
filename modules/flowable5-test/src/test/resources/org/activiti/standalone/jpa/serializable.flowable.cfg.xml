@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:JpaSerializableVariableTest;DB_CLOSE_DELAY=1000" />
+    
+    <property name="flowable5CompatibilityEnabled" value="true" />
+    
+    <property name="jpaPersistenceUnitName" value="flowable5-jpa-pu" />
+    <property name="jpaHandleTransaction" value="true" />
+    <property name="jpaCloseEntityManager" value="true" />
+
+    <!-- Lists that cannot be stored as a JPA entity list are stored as serializable variables, which are disabled by default -->
+    <property name="serializableVariableTypeMode" value="ENABLED" />
+    
+    <!-- job executor configurations -->
+    <property name="asyncExecutorActivate" value="false" />
+    
+  </bean>
+
+</beans>

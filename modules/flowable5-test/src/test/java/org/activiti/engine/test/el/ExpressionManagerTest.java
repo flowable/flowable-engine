@@ -45,10 +45,10 @@ public class ExpressionManagerTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testExecutionAvailable() {
-        Map<String, Object> vars = new HashMap<String, Object>();
-
-        vars.put("myVar", new ExecutionTestVariable());
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testExecutionAvailableProcess", vars);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testExecutionAvailableProcess")
+                .transientVariable("myVar", new ExecutionTestVariable())
+                .start();
 
         // Check of the testMethod has been called with the current execution
         String value = (String) runtimeService.getVariable(processInstance.getId(), "testVar");

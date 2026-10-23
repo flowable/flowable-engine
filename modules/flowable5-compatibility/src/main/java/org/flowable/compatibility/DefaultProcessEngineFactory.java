@@ -229,6 +229,7 @@ public class DefaultProcessEngineFactory {
     protected void copyCustomVariableTypes(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {
         flowable5Configuration.setCustomPreVariableTypes(flowable6Configuration.getCustomPreVariableTypes());
         flowable5Configuration.setCustomPostVariableTypes(flowable6Configuration.getCustomPostVariableTypes());
+        flowable5Configuration.setSerializableVariableTypeMode(flowable6Configuration.getSerializableVariableTypeMode());
     }
 
     protected void convertParseHandlers(ProcessEngineConfigurationImpl flowable6Configuration, org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl flowable5Configuration) {

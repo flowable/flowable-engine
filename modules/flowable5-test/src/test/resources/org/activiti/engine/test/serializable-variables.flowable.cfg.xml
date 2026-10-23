@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Engine configuration for tests that need to store Java serializable variables, which are disabled by default -->
+	<bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+		<property name="jdbcUrl" value="${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}" />
+		<property name="jdbcDriver" value="${jdbc.driver:org.h2.Driver}" />
+		<property name="jdbcUsername" value="${jdbc.username:sa}" />
+		<property name="jdbcPassword" value="${jdbc.password:}" />
+
+		<!-- Database configurations -->
+		<property name="databaseSchemaUpdate" value="true" />
+
+		<property name="flowable5CompatibilityEnabled" value="true" />
+
+		<!-- The serializable variable type mode is also applied to the embedded Flowable 5 engine -->
+		<property name="serializableVariableTypeMode" value="ENABLED" />
+
+		<!-- job executor configurations -->
+		<property name="asyncExecutor" ref="asyncExecutor" />
+		<property name="asyncExecutorActivate" value="false" />
+
+		<property name="defaultFailedJobWaitTime" value="1" />
+		<property name="asyncFailedJobWaitTime" value="1" />
+
+		<property name="history" value="full" />
+	</bean>
+
+	<bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+		<property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+		<property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+	</bean>
+
+</beans>

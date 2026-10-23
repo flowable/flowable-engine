@@ -23,13 +23,14 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.variables.SerializableVariableTest.TestSerializableVariable;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
@@ -39,16 +40,27 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 /**
  * A variable whose value cannot be resolved fails the queries that resolve the variable values. A query that includes variables can exclude
  * the variable initialization, the value of a variable is then only resolved when it is read.
  */
-class UnresolvableVariableValueTest extends PluggableFlowableTestCase {
+class UnresolvableVariableValueTest extends CustomConfigurationFlowableTestCase {
 
     // The variables of a query that includes variables are initialized while the query result is mapped, the failure is wrapped by MyBatis
     protected static final String UNRESOLVABLE_VALUE_MESSAGE = "Couldn't deserialize object in variable 'order'";
+
+    UnresolvableVariableValueTest() {
+        super(UnresolvableVariableValueTest.class.getSimpleName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        // The unresolvable values are corrupted serialized values, so serializable variables need to be enabled
+        processEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
+    }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")

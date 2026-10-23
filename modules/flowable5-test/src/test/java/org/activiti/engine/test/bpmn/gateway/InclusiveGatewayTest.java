@@ -164,7 +164,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testDecideBasedOnBeanProperty() {
-        runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanProperty")
+                .transientVariable("order", new InclusiveGatewayTestOrder(150))
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
         Map<String, String> expectedNames = new HashMap<String, String>();
@@ -184,20 +187,29 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         orders.add(new InclusiveGatewayTestOrder(175));
 
         try {
-            runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                    .transientVariable("orders", orders)
+                    .start();
             fail();
         } catch (FlowableException e) {
             // expect an exception to be thrown here
         }
 
         orders.set(1, new InclusiveGatewayTestOrder(175));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(task);
         assertEquals(BEAN_TASK3_NAME, task.getName());
 
         orders.set(1, new InclusiveGatewayTestOrder(125));
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertNotNull(tasks);
         assertEquals(2, tasks.size());
@@ -212,7 +224,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         // Arrays are usable in exactly the same way
         InclusiveGatewayTestOrder[] orderArray = orders.toArray(new InclusiveGatewayTestOrder[orders.size()]);
         orderArray[1].setPrice(10);
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orderArray));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orderArray)
+                .start();
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertNotNull(tasks);
         assertEquals(3, tasks.size());
@@ -228,14 +243,18 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testDecideBasedOnBeanMethod() {
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod",
-                CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(200)));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                .transientVariable("order", new InclusiveGatewayTestOrder(200))
+                .start();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(task);
         assertEquals(BEAN_TASK3_NAME, task.getName());
 
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod",
-                CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                .transientVariable("order", new InclusiveGatewayTestOrder(125))
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(2, tasks.size());
         List<String> expectedNames = new ArrayList<String>();
@@ -247,7 +266,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         assertEquals(0, expectedNames.size());
 
         try {
-            runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(300)));
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                    .transientVariable("order", new InclusiveGatewayTestOrder(300))
+                    .start();
             fail();
         } catch (FlowableException e) {
             // Should get an exception indicating that no path could be taken
@@ -258,7 +280,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testInvalidMethodExpression() {
         try {
-            runtimeService.startProcessInstanceByKey("inclusiveInvalidMethodExpression", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(50)));
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("inclusiveInvalidMethodExpression")
+                    .transientVariable("order", new InclusiveGatewayTestOrder(50))
+                    .start();
             fail();
         } catch (FlowableException e) {
             assertTextPresent("Unknown method used in expression", e.getMessage());

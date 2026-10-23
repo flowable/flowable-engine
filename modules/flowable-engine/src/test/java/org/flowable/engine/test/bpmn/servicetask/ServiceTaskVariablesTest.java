@@ -19,19 +19,31 @@ import java.io.Serializable;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.Job;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 /**
  * 
  * @author Daniel Meyer
  */
-public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
+public class ServiceTaskVariablesTest extends CustomConfigurationFlowableTestCase {
 
     static boolean isOkInDelegate2;
     static boolean isOkInDelegate3;
+
+    public ServiceTaskVariablesTest() {
+        super(ServiceTaskVariablesTest.class.getSimpleName());
+    }
+
+    @Override
+    protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        // The tests verify that changes to serialized variables are tracked between service tasks
+        processEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
+    }
 
     public static class Variable implements Serializable {
         private static final long serialVersionUID = 1L;

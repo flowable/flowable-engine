@@ -23,17 +23,26 @@ import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.rules.RulesAgendaFilter;
 import org.flowable.engine.impl.rules.RulesHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.service.impl.types.SerializableType;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 
 /**
  * Activity implementation of the BPMN 2.0 business rule task.
+ * <p>
+ * The rule output objects are stored in the result variable using Java serialization.
+ * When serializable variables are not enabled (see the serializableVariableTypeMode of the process engine configuration),
+ * the rule output objects are only stored as a transient variable.
  * 
  * @author Tijs Rademakers
  * @author Joram Barrez
+ * @deprecated the Drools based business rule task is deprecated, use a DMN decision task instead
  */
+@Deprecated
 public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior implements BusinessRuleTaskDelegate {
 
     private static final long serialVersionUID = 1L;
@@ -79,10 +88,20 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         Collection<? extends Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
             Collection<Object> outputVariables = new ArrayList<>(ruleOutputObjects);
-            execution.setVariable(resultVariable, outputVariables);
+            if (isSerializableVariableWritable()) {
+                execution.setVariable(resultVariable, outputVariables);
+            } else {
+                // The rule output objects can only be stored using Java serialization
+                execution.setTransientVariable(resultVariable, outputVariables);
+            }
         }
         ksession.dispose();
         leave(execution);
+    }
+
+    protected boolean isSerializableVariableWritable() {
+        VariableType serializableType = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes().getVariableType(SerializableType.TYPE_NAME);
+        return serializableType instanceof SerializableType type && type.getMode().isWritable();
     }
 
     @Override

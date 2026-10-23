@@ -41,6 +41,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.DeploymentId;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.node.ObjectNode;
+
 /**
  * @author Joram Barrez
  * @author Frederik Heremans
@@ -175,8 +177,8 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         assertThat(variables).isEqualTo(expectedVariables);
 
-        Address address = new Address();
-        address.setStreet("broadway");
+        ObjectNode address = processEngineConfiguration.getObjectMapper().createObjectNode();
+        address.put("street", "broadway");
         runtimeService.setVariable(processInstanceId, "address", address);
 
         runtimeService.trigger(runtimeService.createExecutionQuery().processInstanceId(processInstanceId).onlyChildExecutions().singleResult().getId());
@@ -235,8 +237,8 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         expectedVariables.put("double", 45.5d);
 
         variables = runtimeService.getVariables(processInstanceId);
-        address = (Address) variables.remove("address");
-        assertThat(address.getStreet()).isEqualTo("rubensstraat");
+        address = (ObjectNode) variables.remove("address");
+        assertThat(address.path("street").asString()).isEqualTo("rubensstraat");
         assertThat(variables).isEqualTo(expectedVariables);
     }
 
@@ -262,7 +264,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     public void testFormPropertyExpression() {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("speaker", "Mike"); // variable name mapping
-        Address address = new Address();
+        ObjectNode address = processEngineConfiguration.getObjectMapper().createObjectNode();
         varMap.put("address", address);
 
         String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
@@ -282,8 +284,8 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         properties.put("street", "Broadway");
         formService.submitTaskFormData(taskId, properties);
 
-        address = (Address) runtimeService.getVariable(processInstance.getId(), "address");
-        assertThat(address.getStreet()).isEqualTo("Broadway");
+        address = (ObjectNode) runtimeService.getVariable(processInstance.getId(), "address");
+        assertThat(address.path("street").asString()).isEqualTo("Broadway");
     }
 
     @SuppressWarnings("unchecked")

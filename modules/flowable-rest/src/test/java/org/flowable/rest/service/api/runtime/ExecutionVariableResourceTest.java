@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -148,34 +147,6 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
-    }
-
-    /**
-     * Test getting an execution variable data.
-     */
-    @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
-    public void testGetExecutionVariableDataSerializable() throws Exception {
-
-        TestSerializableVariable originalSerializable = new TestSerializableVariable();
-        originalSerializable.setSomeField("This is some field");
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
-        runtimeService.setVariableLocal(processInstance.getId(), "var", originalSerializable);
-
-        CloseableHttpResponse response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstance.getId(), "var")),
-                HttpStatus.SC_OK);
-
-        // Read the serializable from the stream
-        ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
-        Object readSerializable = stream.readObject();
-
-        closeResponse(response);
-
-        assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
-        assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
-        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
     }
 
     /**

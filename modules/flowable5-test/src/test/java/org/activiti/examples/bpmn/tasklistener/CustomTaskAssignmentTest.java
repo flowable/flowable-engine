@@ -85,11 +85,11 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
         Map<String, String> assigneeMappingTable = new HashMap<String, String>();
         assigneeMappingTable.put("fozzie", "gonzo");
 
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("assigneeMappingTable", assigneeMappingTable);
-
         // start process instance
-        runtimeService.startProcessInstanceByKey("customTaskAssignment", variables);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("customTaskAssignment")
+                .transientVariable("assigneeMappingTable", assigneeMappingTable)
+                .start();
 
         // check task lists
         assertNotNull(taskService.createTaskQuery().taskAssignee("gonzo").singleResult());

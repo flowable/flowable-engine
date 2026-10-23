@@ -17,10 +17,11 @@ import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -35,6 +36,7 @@ import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.junit.jupiter.api.Test;
 
@@ -181,26 +183,37 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
     @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/testManualEvaluateCriteria.cmmn" })
     public void testEvaluateCriteria() throws Exception {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("testManualEvaluateCriteria")
-                .variable("someBean", new TestBean())
-                .start();
+        // The bean is exposed through the expression manager (and not as a case variable),
+        // since it needs to be available in the criteria evaluation after the case instance start
+        ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
+        Map<Object, Object> originalBeans = expressionManager.getBeans();
+        try {
+            expressionManager.setBeans(Collections.singletonMap("someBean", new TestBean()));
+            TestBean.RETURN_VALUE = false;
 
-        // Triggering the evaluation twice will satisfy the entry criterion for B
-        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
+            CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("testManualEvaluateCriteria")
+                    .start();
 
-        String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
-        HttpPut httpPut = new HttpPut(url);
+            // Triggering the evaluation twice will satisfy the entry criterion for B
+            assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
 
-        httpPut.setEntity(new StringEntity("{\"action\": \"evaluateCriteria\"}"));
-        executeRequest(httpPut, HttpStatus.SC_OK);
+            String url = buildUrl(CmmnRestUrls.URL_CASE_INSTANCE, caseInstance.getId());
+            HttpPut httpPut = new HttpPut(url);
 
-        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
+            httpPut.setEntity(new StringEntity("{\"action\": \"evaluateCriteria\"}"));
+            executeRequest(httpPut, HttpStatus.SC_OK);
 
-        TestBean.RETURN_VALUE = true;
-        executeRequest(httpPut, HttpStatus.SC_OK);
+            assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(1);
 
-        assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
+            TestBean.RETURN_VALUE = true;
+            executeRequest(httpPut, HttpStatus.SC_OK);
+
+            assertThat(runtimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count()).isEqualTo(2);
+        } finally {
+            expressionManager.setBeans(originalBeans);
+            TestBean.RETURN_VALUE = false;
+        }
     }
 
     @Test
@@ -703,7 +716,7 @@ public class CaseInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(jsonNode.get("current").asBoolean()).as("'current' boolean is wrong").isEqualTo(isCurrent);
     }
 
-    public static class TestBean implements Serializable {
+    public static class TestBean {
 
         public static boolean RETURN_VALUE;
 

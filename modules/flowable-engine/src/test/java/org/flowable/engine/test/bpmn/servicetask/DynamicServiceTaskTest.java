@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.servicetask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,12 +81,11 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
     public void testChangeExpression() {
         // first test without changing the class name
         DummyTestBean testBean = new DummyTestBean();
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("bean", testBean);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask");
 
+        // The bean is only used by the service task after the user task, so it is passed as a transient variable when completing the task
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.emptyMap(), Collections.singletonMap("bean", testBean));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -100,16 +100,14 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
 
         // now test with changing the class name
         testBean = new DummyTestBean();
-        varMap = new HashMap<>();
-        varMap.put("bean2", testBean);
-        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask");
 
         String processDefinitionId = processInstance.getProcessDefinitionId();
         ObjectNode infoNode = dynamicBpmnService.changeServiceTaskExpression("service", "${bean2.test(execution)}");
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.emptyMap(), Collections.singletonMap("bean2", testBean));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -128,12 +126,11 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
     public void testChangeDelegateExpression() {
         // first test without changing the class name
         DummyTestDelegateBean testBean = new DummyTestDelegateBean();
-        Map<String, Object> varMap = new HashMap<>();
-        varMap.put("bean", testBean);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask");
 
+        // The bean is only used by the service task after the user task, so it is passed as a transient variable when completing the task
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.emptyMap(), Collections.singletonMap("bean", testBean));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()
@@ -148,16 +145,14 @@ public class DynamicServiceTaskTest extends PluggableFlowableTestCase {
 
         // now test with changing the class name
         testBean = new DummyTestDelegateBean();
-        varMap = new HashMap<>();
-        varMap.put("bean2", testBean);
-        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask", varMap);
+        processInstance = runtimeService.startProcessInstanceByKey("dynamicServiceTask");
 
         String processDefinitionId = processInstance.getProcessDefinitionId();
         ObjectNode infoNode = dynamicBpmnService.changeServiceTaskDelegateExpression("service", "${bean2}");
         dynamicBpmnService.saveProcessDefinitionInfo(processDefinitionId, infoNode);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.emptyMap(), Collections.singletonMap("bean2", testBean));
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery()

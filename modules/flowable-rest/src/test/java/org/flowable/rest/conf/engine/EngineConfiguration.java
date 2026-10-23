@@ -35,6 +35,7 @@ import org.flowable.rest.conf.MockFormHandlerRestApiInterceptor;
 import org.flowable.rest.service.api.FormHandlerRestApiInterceptor;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,6 +60,9 @@ public class EngineConfiguration {
 
     @Value("${jdbc.password:}")
     protected String jdbcPassword;
+
+    @Value("${engine.serializable-variable-type-mode:DISABLED}")
+    protected SerializableVariableTypeMode serializableVariableTypeMode;
 
     @Bean
     public DataSource dataSource() {
@@ -95,6 +99,7 @@ public class EngineConfiguration {
         processEngineConfiguration.setAsyncExecutorActivate(false);
         processEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         processEngineConfiguration.setEnableEntityLinks(true);
+        processEngineConfiguration.setSerializableVariableTypeMode(serializableVariableTypeMode);
 
         configureProcessEngine(processEngineConfiguration);
 

@@ -13,9 +13,7 @@
 package org.activiti.examples.bpmn.usertask.taskcandidate;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -194,10 +192,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     // test if candidate group works with expression, when there is a function with one parameter
     @Deployment
     public void testCandidateExpressionOneParam() {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("testBean", new TestBean());
-
-        runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateWithExpression")
+                .transientVariable("testBean", new TestBean())
+                .start();
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
 
     }
@@ -205,10 +203,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     // test if candidate group works with expression, when there is a function with two parameters
     @Deployment
     public void testCandidateExpressionTwoParams() {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("testBean", new TestBean());
-
-        runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateWithExpression")
+                .transientVariable("testBean", new TestBean())
+                .start();
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).count());
         assertEquals(1, taskService.createTaskQuery().taskCandidateGroup("sales").count());
     }

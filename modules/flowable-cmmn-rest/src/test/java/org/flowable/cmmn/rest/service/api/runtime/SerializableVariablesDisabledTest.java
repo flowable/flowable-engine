@@ -28,6 +28,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -108,6 +109,40 @@ public class SerializableVariablesDisabledTest extends BaseSpringRestTestCase {
 
         // We have serializable object disabled, we should get a 415.
         assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+    public void testGetSerializableVariableData() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        TestSerializableVariable serializable = new TestSerializableVariable();
+        serializable.setSomeField("some value");
+        runtimeService.setVariable(caseInstance.getId(), "serializableVariable", serializable);
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        // We have serializable objects disabled in the REST API, we should get a 415.
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "serializableVariable") + "?scope=global"),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+
+        String variableInstanceId = runtimeService.createVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .variableName("serializableVariable").singleResult().getId();
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_VARIABLE_INSTANCE_DATA, variableInstanceId)),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+
+        String historicVariableInstanceId = historyService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId())
+                .variableName("serializableVariable").singleResult().getId();
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, historicVariableInstanceId)),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 
     public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {

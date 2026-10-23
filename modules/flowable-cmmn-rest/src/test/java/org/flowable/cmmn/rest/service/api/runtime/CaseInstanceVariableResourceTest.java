@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -263,32 +262,6 @@ public class CaseInstanceVariableResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
         assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
         assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
-    }
-
-    /**
-     * Test getting a case instance variable data. GET cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}
-     */
-    @Test
-    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
-    public void testGetCaseInstanceVariableDataSerializable() throws Exception {
-
-        TestSerializableVariable originalSerializable = new TestSerializableVariable();
-        originalSerializable.setSomeField("This is some field");
-
-        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-        runtimeService.setVariable(caseInstance.getId(), "var", originalSerializable);
-
-        CloseableHttpResponse response = executeRequest(
-                new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_DATA,
-                        caseInstance.getId(), "var")), HttpStatus.SC_OK);
-
-        // Read the serializable from the stream
-        ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
-        Object readSerializable = stream.readObject();
-        assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
-        assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
-        assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
-        closeResponse(response);
     }
 
     /**

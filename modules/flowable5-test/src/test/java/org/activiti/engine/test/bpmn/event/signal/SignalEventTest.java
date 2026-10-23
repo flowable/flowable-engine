@@ -287,7 +287,11 @@ public class SignalEventTest extends PluggableFlowableTestCase {
         // First task should be to select the developers
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Enter developers", task.getName());
-        taskService.complete(task.getId(), CollectionUtil.singletonMap("developers", Arrays.asList("developerOne", "developerTwo", "developerThree")));
+        // The collection is only needed to create the parallel multi instance tasks, so it can be passed as a transient variable
+        taskService.createTaskCompletionBuilder()
+                .taskId(task.getId())
+                .transientVariable("developers", Arrays.asList("developerOne", "developerTwo", "developerThree"))
+                .complete();
 
         // Should be three distinct tasks for each developer
         assertEquals("Develop specifications", taskService.createTaskQuery().taskAssignee("developerOne").singleResult().getName());

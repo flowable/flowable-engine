@@ -27,18 +27,21 @@ import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.rest.conf.ObjectVariableSerializationEnabledApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import tools.jackson.databind.JsonNode;
 
 /**
  * A variable whose value cannot be resolved is returned without a value and with a valueUnresolvable marker, instead of failing the whole response.
  */
+@SpringJUnitWebConfig(ObjectVariableSerializationEnabledApplicationConfiguration.class)
 public class UnresolvableVariableValueResourceTest extends BaseSpringRestTestCase {
 
     @Test

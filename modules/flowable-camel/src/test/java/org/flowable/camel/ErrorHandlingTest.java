@@ -47,7 +47,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testCamelRouteWorksAsIntended() throws Exception {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("routing", Routing.DEFAULT);
+        variables.put("routing", Routing.DEFAULT.name());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 
@@ -67,7 +67,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testRollbackOnException() throws Exception {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("routing", Routing.PROVOKE_ERROR);
+        variables.put("routing", Routing.PROVOKE_ERROR.name());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 
@@ -83,7 +83,7 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
     @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testErrorHandledByCamel() throws Exception {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("routing", Routing.HANDLE_ERROR);
+        variables.put("routing", Routing.HANDLE_ERROR.name());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
 

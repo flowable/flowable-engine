@@ -1993,7 +1993,6 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     public void testQueryInvalidTypes() throws Exception {
         Map<String, Object> vars = new HashMap<>();
         vars.put("bytesVar", "test".getBytes());
-        vars.put("serializableVar", new DummySerializable());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 

@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
-import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -37,7 +36,10 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
     @Deployment
     public void testScriptExecution() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("scriptExecution")
+                .transientVariable("inputArray", inputArray)
+                .start();
 
         Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
         assertThat(result.intValue()).isEqualTo(15);

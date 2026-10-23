@@ -74,10 +74,10 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithVariables() {
         Map<String, Object> vars = new HashMap<>();
-        vars.put("basicType", new DummySerializable());
+        vars.put("basicType", "basicValue");
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
         org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
-        assertThat(task.getProcessVariables()).isNotNull();
+        assertThat(task.getProcessVariables()).containsOnly(entry("basicType", "basicValue"));
     }
 
     @Test

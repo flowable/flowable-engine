@@ -13,6 +13,8 @@
 		<property name="jdbcPassword" value="${jdbc.password:}" />
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="mailServerPort" value="5025" />
+		<!-- @BusinessProcessScoped beans are stored as process variables, which requires serializable variables -->
+		<property name="serializableVariableTypeMode" value="ENABLED" />
 		
 		<property name="postBpmnParseHandlers">
 			<list>

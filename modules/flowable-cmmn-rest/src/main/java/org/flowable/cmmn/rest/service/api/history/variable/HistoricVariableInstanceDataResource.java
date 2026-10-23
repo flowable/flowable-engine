@@ -24,7 +24,11 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -42,13 +46,23 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricVariableInstanceDataResource extends HistoricVariableInstanceBaseResource {
+public class HistoricVariableInstanceDataResource extends HistoricVariableInstanceBaseResource implements InitializingBean {
+
+    @Autowired
+    protected Environment env;
+
+    protected boolean isSerializableVariableAllowed;
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Override
+    public void afterPropertiesSet() {
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
+    }
 
     @GetMapping(value = "/cmmn-history/historic-variable-instances/{varInstanceId}/data")
     @ApiResponses(value = {
@@ -66,6 +80,9 @@ public class HistoricVariableInstanceDataResource extends HistoricVariableInstan
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

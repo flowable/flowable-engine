@@ -26,12 +26,14 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.EngineConfigurer;
+import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.task.api.Task;
@@ -41,13 +43,20 @@ import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 /**
  * A variable whose value cannot be resolved fails the queries that resolve the variable values. A query that includes variables can exclude
  * the variable initialization, the value of a variable is then only resolved when it is read.
  */
-public class UnresolvableVariableValueTest extends FlowableCmmnTestCase {
+public class UnresolvableVariableValueTest extends CustomCmmnConfigurationFlowableTestCase {
+
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        // The unresolvable variable values are serializable variables whose class cannot be resolved
+        cmmnEngineConfiguration.setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
+    }
 
     // The variables of a query that includes variables are initialized while the query result is mapped, the failure is wrapped by MyBatis
     protected static final String UNRESOLVABLE_VALUE_MESSAGE = "Couldn't deserialize object in variable 'order'";

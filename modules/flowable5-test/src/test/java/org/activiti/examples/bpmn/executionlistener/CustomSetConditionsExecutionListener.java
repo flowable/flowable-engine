@@ -15,8 +15,11 @@ package org.activiti.examples.bpmn.executionlistener;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.engine.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+
+import tools.jackson.databind.node.ArrayNode;
 
 public class CustomSetConditionsExecutionListener implements ExecutionListener {
 
@@ -27,7 +30,11 @@ public class CustomSetConditionsExecutionListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) {
-        execution.setVariable(flowId + "_activiti_conditions", conditions);
+        ArrayNode conditionsNode = Context.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
+        for (String condition : conditions) {
+            conditionsNode.add(condition);
+        }
+        execution.setVariable(flowId + "_activiti_conditions", conditionsNode);
     }
 
     public List<String> getConditions() {

@@ -20,10 +20,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -1178,13 +1176,13 @@ public class JsonJackson2Test extends ResourceFlowableTestCase {
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-    void testUpdateSerializableVariableWithJackson3JsonNode() {
+    void testUpdateStringVariableWithJackson3JsonNode() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("oneTaskProcess")
-                .variable("customer", new HashSet<>(Set.of("Kermit")))
+                .variable("customer", "Kermit")
                 .start();
 
-        assertThat(runtimeService.getVariableInstance(processInstance.getId(), "customer").getTypeName()).isEqualTo("serializable");
+        assertThat(runtimeService.getVariableInstance(processInstance.getId(), "customer").getTypeName()).isEqualTo("string");
 
         runtimeService.setVariable(processInstance.getId(), "customer",
                 tools.jackson.databind.json.JsonMapper.shared().createObjectNode().put("name", "Gonzo"));

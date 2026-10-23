@@ -61,9 +61,12 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("name", "kermit");
         vars.put("gender", "male");
-        vars.put("genderBean", new GenderBean());
 
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionFieldInjection", vars);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("expressionFieldInjection")
+                .variables(vars)
+                .transientVariable("genderBean", new GenderBean())
+                .start();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState").singleResult();
 
         assertThat(runtimeService.getVariable(execution.getId(), "var2")).isEqualTo("timrek .rM olleH");
@@ -113,11 +116,14 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         Map<String, Object> vars = new HashMap<>();
         vars.put("name", "kermit");
         vars.put("gender", "male");
-        vars.put("genderBean", new GenderBean());
         vars.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         vars.put("skip", false);
 
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("expressionFieldInjectionWithSkipExpression")
+                .variables(vars)
+                .transientVariable("genderBean", new GenderBean())
+                .start();
         Execution execution = runtimeService.createExecutionQuery().processInstanceId(pi.getId()).activityId("waitState").singleResult();
 
         assertThat(execution).isNotNull();
@@ -128,11 +134,14 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         Map<String, Object> vars2 = new HashMap<>();
         vars2.put("name", "kermit");
         vars2.put("gender", "male");
-        vars2.put("genderBean", new GenderBean());
         vars2.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
         vars2.put("skip", true);
 
-        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("expressionFieldInjectionWithSkipExpression", vars2);
+        ProcessInstance pi2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("expressionFieldInjectionWithSkipExpression")
+                .variables(vars2)
+                .transientVariable("genderBean", new GenderBean())
+                .start();
         Execution execution2 = runtimeService.createExecutionQuery().processInstanceId(pi2.getId()).activityId("waitState").singleResult();
 
         assertThat(execution2).isNotNull();

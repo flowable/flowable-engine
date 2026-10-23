@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +45,7 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -59,10 +59,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getVariableTypes().addType(CustomVariableType.instance);
 
         Date now = new Date();
-        List<String> serializable = new ArrayList<>();
-        serializable.add("one");
-        serializable.add("two");
-        serializable.add("three");
+        ArrayNode jsonArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        jsonArray.add("one");
+        jsonArray.add("two");
+        jsonArray.add("three");
         byte[] bytes1 = "somebytes1".getBytes();
         byte[] bytes2 = "somebytes2".getBytes();
 
@@ -97,7 +97,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variables.put("stringVar", "coca-cola");
         variables.put("dateVar", now);
         variables.put("nullVar", null);
-        variables.put("serializableVar", serializable);
+        variables.put("jsonVar", jsonArray);
         variables.put("bytesVar", bytes1);
         variables.put("customVar1", new CustomType(bytes2));
         variables.put("customVar2", null);
@@ -113,7 +113,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
                         entry("longString2000chars", long2000StringBuilder.toString()),
                         entry("dateVar", now),
                         entry("nullVar", null),
-                        entry("serializableVar", serializable),
+                        entry("jsonVar", jsonArray),
                         entry("bytesVar", bytes1),
                         entry("customVar1", new CustomType(bytes2)),
                         entry("customVar2", null)
@@ -128,7 +128,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "longString4000chars", null);
         runtimeService.setVariable(processInstance.getId(), "dateVar", null);
         runtimeService.setVariable(processInstance.getId(), "nullVar", null);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", null);
+        runtimeService.setVariable(processInstance.getId(), "jsonVar", null);
         runtimeService.setVariable(processInstance.getId(), "bytesVar", null);
         runtimeService.setVariable(processInstance.getId(), "customVar1", null);
         runtimeService.setVariable(processInstance.getId(), "customVar2", null);
@@ -144,7 +144,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
                         entry("longString4000chars", null),
                         entry("dateVar", null),
                         entry("nullVar", null),
-                        entry("serializableVar", null),
+                        entry("jsonVar", null),
                         entry("bytesVar", null),
                         entry("customVar1", null),
                         entry("customVar2", null)
@@ -159,7 +159,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstance.getId(), "longString2000chars", long2001StringBuilder.toString());
         runtimeService.setVariable(processInstance.getId(), "longString4000chars", long4001StringBuilder.toString());
         runtimeService.setVariable(processInstance.getId(), "dateVar", now);
-        runtimeService.setVariable(processInstance.getId(), "serializableVar", serializable);
+        runtimeService.setVariable(processInstance.getId(), "jsonVar", jsonArray);
         runtimeService.setVariable(processInstance.getId(), "bytesVar", bytes1);
         runtimeService.setVariable(processInstance.getId(), "customVar1", new CustomType(bytes2));
         runtimeService.setVariable(processInstance.getId(), "customVar2", new CustomType(bytes1));
@@ -176,7 +176,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
                         entry("longString4000chars", long4001StringBuilder.toString()),
                         entry("dateVar", now),
                         entry("nullVar", null),
-                        entry("serializableVar", serializable),
+                        entry("jsonVar", jsonArray),
                         entry("bytesVar", bytes1),
                         entry("customVar1", new CustomType(bytes2)),
                         entry("customVar2", new CustomType(bytes1))
@@ -1850,18 +1850,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(dataObject.getId()).isNotNull();
     }
 
-    // Test case for ACT-1839
-    @Test
-    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testChangeTypeSerializable.bpmn20.xml" })
-    public void testChangeTypeSerializable() {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variable-type-change-test");
-        assertThat(processInstance).isNotNull();
-        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
-        assertThat(task.getName()).isEqualTo("Activiti is awesome!");
-        SomeSerializable myVar = (SomeSerializable) runtimeService.getVariable(processInstance.getId(), "myVar");
-        assertThat(myVar.getValue()).isEqualTo("someValue");
-    }
-
     public String getVariableInstanceId(String executionId, String name) {
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().processInstanceId(executionId).variableName(name).singleResult();
         return variable.getId();
@@ -1873,10 +1861,10 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testChangeVariableType() {
 
         Date now = new Date();
-        List<String> serializable = new ArrayList<>();
-        serializable.add("one");
-        serializable.add("two");
-        serializable.add("three");
+        ArrayNode jsonArray = processEngineConfiguration.getObjectMapper().createArrayNode();
+        jsonArray.add("one");
+        jsonArray.add("two");
+        jsonArray.add("three");
         byte[] bytes = "somebytes".getBytes();
 
         // Start process instance with different types of variables
@@ -1887,7 +1875,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variables.put("stringVar", "coca-cola");
         variables.put("dateVar", now);
         variables.put("nullVar", null);
-        variables.put("serializableVar", serializable);
+        variables.put("jsonVar", jsonArray);
         variables.put("bytesVar", bytes);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeProcess", variables);
 
@@ -1900,27 +1888,27 @@ public class VariablesTest extends PluggableFlowableTestCase {
                         entry("stringVar", "coca-cola"),
                         entry("dateVar", now),
                         entry("nullVar", null),
-                        entry("serializableVar", serializable),
+                        entry("jsonVar", jsonArray),
                         entry("bytesVar", bytes)
                 );
 
         // check if the id of the variable is the same or not
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            String oldSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
+            String oldJsonVarId = getVariableInstanceId(processInstance.getId(), "jsonVar");
             String oldLongVar = getVariableInstanceId(processInstance.getId(), "longVar");
 
-            // Change type of serializableVar from serializable to Short
+            // Change type of jsonVar from json to Short
             Map<String, Object> newVariables = new HashMap<>();
-            newVariables.put("serializableVar", (short) 222);
+            newVariables.put("jsonVar", (short) 222);
             runtimeService.setVariables(processInstance.getId(), newVariables);
             variables = runtimeService.getVariables(processInstance.getId());
             assertThat(variables)
-                    .containsEntry("serializableVar", (short) 222);
+                    .containsEntry("jsonVar", (short) 222);
 
-            String newSerializableVarId = getVariableInstanceId(processInstance.getId(), "serializableVar");
+            String newJsonVarId = getVariableInstanceId(processInstance.getId(), "jsonVar");
 
-            assertThat(newSerializableVarId).isEqualTo(oldSerializableVarId);
+            assertThat(newJsonVarId).isEqualTo(oldJsonVarId);
 
             // Change type of a longVar from Long to Short
             newVariables = new HashMap<>();
@@ -2226,27 +2214,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue())
-                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
-    }
-
-    @Test
-    @Deployment(resources = { "org/flowable/examples/variables/VariablesTest.testBasicVariableOperations.bpmn20.xml" })
-    public void testEmptyCollectionVariable() {
-        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
-                .processDefinitionKey("taskAssigneeProcess")
-                .variable("listVar", new ArrayList<>())
-                .variable("setVar", new HashSet<>())
-                .start();
-
-        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
-
-        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
-
-        variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
-
-        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
         assertThat(variableInstance.getValue())
                 .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
     }

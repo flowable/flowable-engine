@@ -16,7 +16,6 @@ package org.flowable.engine.test.api.runtime.migration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +28,8 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Verifies that the variable aggregation overview variable keeps working after a parent process instance with
@@ -79,9 +80,12 @@ public class ProcessInstanceMigrationVariableAggregationTest extends AbstractPro
         // Start the parent with a collection of two 'decideurs'. The call activity is a multi-instance that
         // starts an 'avisChild' instance per element, whose 'Sub task' user task is now waiting (one iteration
         // for the sequential variant, both iterations for the parallel variant). The multi-instance is
-        // therefore in-flight (not yet completed).
-        ProcessInstance parentInstance = runtimeService.startProcessInstanceByKey(processKey,
-                Map.of("decideurs", Arrays.asList("respEU", "DGA")));
+        // therefore in-flight (not yet completed). The collection is stored as JSON, since it needs to be persisted
+        // and Java collections can only be stored as serializable variables.
+        ArrayNode decideurs = processEngineConfiguration.getObjectMapper().createArrayNode()
+                .add("respEU")
+                .add("DGA");
+        ProcessInstance parentInstance = runtimeService.startProcessInstanceByKey(processKey, Map.of("decideurs", decideurs));
 
         // Sanity: at least one child 'Sub task' is waiting and the multi-instance is active
         assertThat(taskService.createTaskQuery().taskName("Sub task").list()).isNotEmpty();

@@ -18,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -314,63 +312,6 @@ public class TaskVariablesCollectionResourceTest extends BaseSpringRestTestCase 
             assertThat(variableValue).isInstanceOf(byte[].class);
             assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
 
-        } finally {
-            // Clean adhoc-tasks even if test fails
-            List<Task> tasks = taskService.createTaskQuery().list();
-            for (Task task : tasks) {
-                taskService.deleteTask(task.getId(), true);
-            }
-        }
-    }
-
-    /**
-     * Test creating a single task variable using a binary stream. POST runtime/tasks/{taskId}/variables
-     */
-    @Test
-    public void testCreateSingleSerializableTaskVariable() throws Exception {
-        try {
-            Task task = taskService.newTask();
-            taskService.saveTask(task);
-            TestSerializableVariable serializable = new TestSerializableVariable();
-            serializable.setSomeField("some value");
-
-            // Serialize object to readable stream for representation
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-            ObjectOutputStream output = new ObjectOutputStream(buffer);
-            output.writeObject(serializable);
-            output.close();
-
-            InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
-
-            // Add name, type and scope
-            Map<String, String> additionalFields = new HashMap<>();
-            additionalFields.put("name", "serializableVariable");
-            additionalFields.put("type", "serializable");
-            additionalFields.put("scope", "local");
-
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
-            httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
-            CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
-
-            // Check "CREATED" status
-            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThat(responseNode).isNotNull();
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + "name : 'serializableVariable',"
-                            + "value: null,"
-                            + "scope: 'local',"
-                            + "type: 'serializable',"
-                            + "valueUrl: '" + SERVER_URL_PREFIX + RestUrls
-                            .createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "serializableVariable") + "'"
-                            + "}");
-
-            // Check actual value of variable in engine
-            Object variableValue = taskService.getVariableLocal(task.getId(), "serializableVariable");
-            assertThat(variableValue).isInstanceOf(TestSerializableVariable.class);
-            assertThat(((TestSerializableVariable) variableValue).getSomeField()).isEqualTo("some value");
         } finally {
             // Clean adhoc-tasks even if test fails
             List<Task> tasks = taskService.createTaskQuery().list();

@@ -25,9 +25,13 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,7 +49,12 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstanceBaseResource {
+public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstanceBaseResource implements InitializingBean {
+
+    @Autowired
+    protected Environment env;
+
+    protected boolean isSerializableVariableAllowed;
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
@@ -56,6 +65,11 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variable data is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
+    @Override
+    public void afterPropertiesSet() {
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
+    }
+
     @ApiOperation(value = "Get the binary data for a historic case instance variable", tags = {"History Process" }, nickname = "getHistoricCaseInstanceVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/variables/{variableName}/data")
@@ -70,6 +84,9 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());

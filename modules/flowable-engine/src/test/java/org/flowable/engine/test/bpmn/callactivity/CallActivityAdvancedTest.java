@@ -1404,7 +1404,7 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
     public void testAsyncSequentialMiCallActivity() {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testAsyncMiCallActivity")
-                .variable("myList", Arrays.asList("one", "two", "three"))
+                .variable("myList", processEngineConfiguration.getObjectMapper().createArrayNode().add("one").add("two").add("three"))
                 .start();
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();

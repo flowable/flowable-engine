@@ -29,6 +29,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -111,6 +112,43 @@ public class SerializableVariablesDiabledTest extends BaseSpringRestTestCase {
 
         // We have serializeable object disabled, we should get a 415.
         assertResponseStatus(httpPost, HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml")
+    public void testGetSerializableVariableData() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        TestSerializableVariable serializable = new TestSerializableVariable();
+        serializable.setSomeField("some value");
+        runtimeService.setVariable(processInstance.getId(), "serializableVariable", serializable);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+
+        // We have serializable objects disabled in the REST API, we should get a 415.
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION_VARIABLE_DATA, processInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "serializableVariable") + "?scope=global"),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+
+        String variableInstanceId = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("serializableVariable").singleResult().getId();
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCE_DATA, variableInstanceId)),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+
+        String historicVariableInstanceId = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                .variableName("serializableVariable").singleResult().getId();
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_VARIABLE_INSTANCE_DATA, historicVariableInstanceId)),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 
     public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {

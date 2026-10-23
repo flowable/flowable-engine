@@ -14,7 +14,6 @@ package org.flowable.examples.bpmn.servicetask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.node.ArrayNode;
+
 /**
  * @author Christian Stettler
  */
@@ -36,9 +37,10 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testSetServiceResultToProcessVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("bean", new ValueBean("ok"));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariables", variables);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("setServiceResultToProcessVariables")
+                .transientVariable("bean", new ValueBean("ok"))
+                .start();
         assertThat(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("ok");
     }
 
@@ -46,17 +48,23 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSetServiceResultToProcessVariablesWithSkipExpression() {
         Map<String, Object> variables = new HashMap<>();
-        variables.put("bean", new ValueBean("ok"));
         variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip", false);
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("setServiceResultToProcessVariablesWithSkipExpression")
+                .variables(variables)
+                .transientVariable("bean", new ValueBean("ok"))
+                .start();
         assertThat(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("ok");
 
         Map<String, Object> variables2 = new HashMap<>();
-        variables2.put("bean", new ValueBean("ok"));
         variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", true);
-        ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables2);
+        ProcessInstance pi2 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("setServiceResultToProcessVariablesWithSkipExpression")
+                .variables(variables2)
+                .transientVariable("bean", new ValueBean("ok"))
+                .start();
         assertThat(runtimeService.getVariable(pi2.getId(), "result")).isNull();
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
@@ -70,9 +78,12 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
         }
 
         Map<String, Object> variables3 = new HashMap<>();
-        variables3.put("bean", new ValueBean("okBean"));
         variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", false);
-        ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("setServiceResultToProcessVariablesWithSkipExpression", variables3);
+        ProcessInstance pi3 = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("setServiceResultToProcessVariablesWithSkipExpression")
+                .variables(variables3)
+                .transientVariable("bean", new ValueBean("okBean"))
+                .start();
         assertThat(runtimeService.getVariable(pi3.getId(), "result")).isEqualTo("okBean");
     }
 
@@ -88,8 +99,11 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testSetServiceResultWithParallelMultiInstance() {
+        // The beans are stored as JSON, since they need to be persisted (they are also the element variables of the multi instance)
         Map<String, Object> variables = new HashMap<>();
-        List<ValueBean> beans = Arrays.asList(new ValueBean("OK"), new ValueBean("NOT_OK"));
+        ArrayNode beans = processEngineConfiguration.getObjectMapper().createArrayNode();
+        beans.addObject().put("value", "OK");
+        beans.addObject().put("value", "NOT_OK");
         variables.put("beans", beans);
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceResultToWithParallelMultiInstance", variables);
@@ -107,8 +121,11 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testSetServiceLocalScopedResultWithParallelMultiInstance() {
+        // The beans are stored as JSON, since they need to be persisted (they are also the element variables of the multi instance)
         Map<String, Object> variables = new HashMap<>();
-        List<ValueBean> beans = Arrays.asList(new ValueBean("OK"), new ValueBean("NOT_OK"));
+        ArrayNode beans = processEngineConfiguration.getObjectMapper().createArrayNode();
+        beans.addObject().put("value", "OK");
+        beans.addObject().put("value", "NOT_OK");
         variables.put("beans", beans);
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("setServiceLocalScopedResultWithParallelMultiInstance", variables);
@@ -128,9 +145,10 @@ public class ExpressionServiceTaskTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testVarargs() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("bean", new TestVarargsBean());
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testVarargsInExpression", variables);
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testVarargsInExpression")
+                .transientVariable("bean", new TestVarargsBean())
+                .start();
         assertThat(runtimeService.getVariable(pi.getId(), "result")).isEqualTo("ABC");
     }
 }

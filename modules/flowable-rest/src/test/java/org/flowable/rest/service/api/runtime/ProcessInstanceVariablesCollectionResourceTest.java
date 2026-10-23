@@ -18,9 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +38,7 @@ import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.jupiter.api.Test;
 
+import net.javacrumbs.jsonunit.core.Option;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -156,54 +155,6 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "binaryVariable");
         assertThat(variableValue).isInstanceOf(byte[].class);
         assertThat(new String((byte[]) variableValue)).isEqualTo("This is binary content");
-    }
-
-    /**
-     * Test creating a single process variable using a binary stream containing a serializable. POST runtime/process-instances/{processInstanceId}/variables
-     */
-    @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
-    public void testCreateSingleSerializableProcessVariable() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-
-        TestSerializableVariable serializable = new TestSerializableVariable();
-        serializable.setSomeField("some value");
-
-        // Serialize object to readable stream for representation
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        ObjectOutputStream output = new ObjectOutputStream(buffer);
-        output.writeObject(serializable);
-        output.close();
-
-        InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
-
-        // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<>();
-        additionalFields.put("name", "serializableVariable");
-        additionalFields.put("type", "serializable");
-
-        // Upload a valid BPMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(
-                SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
-        httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
-        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
-        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        closeResponse(response);
-        assertThat(responseNode).isNotNull();
-        assertThatJson(responseNode)
-                .isEqualTo("{"
-                        + "name: 'serializableVariable',"
-                        + "value: null,"
-                        + "scope: 'local',"
-                        + "type: 'serializable',"
-                        + "valueUrl: '" + SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable") + "'"
-                        + "}");
-
-        // Check actual value of variable in engine
-        Object variableValue = runtimeService.getVariableLocal(processInstance.getId(), "serializableVariable");
-        assertThat(variableValue).isInstanceOf(TestSerializableVariable.class);
-        assertThat(((TestSerializableVariable) variableValue).getSomeField()).isEqualTo("some value");
     }
 
     /**
@@ -340,6 +291,12 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         doubleVarNode.put("value", 123.456);
         doubleVarNode.put("type", "double");
 
+        // Float
+        ObjectNode floatVarNode = requestNode.addObject();
+        floatVarNode.put("name", "floatVariable");
+        floatVarNode.put("value", 12.5f);
+        floatVarNode.put("type", "float");
+
         // Boolean
         ObjectNode booleanVarNode = requestNode.addObject();
         booleanVarNode.put("name", "booleanVariable");
@@ -364,7 +321,10 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.isArray()).isTrue();
-        assertThat(responseNode).hasSize(7);
+        assertThat(responseNode).hasSize(8);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("[ { name: 'floatVariable', type: 'float', value: 12.5 } ]");
 
         // Check if engine has correct variables set
         Map<String, Object> variables = runtimeService.getVariablesLocal(processInstance.getId());
@@ -375,6 +335,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
                         entry("shortVariable", (short) 123),
                         entry("longVariable", 4567890L),
                         entry("doubleVariable", 123.456),
+                        entry("floatVariable", 12.5f),
                         entry("booleanVariable", true),
                         entry("dateVariable", getDateFromISOString(isoString))
                 );

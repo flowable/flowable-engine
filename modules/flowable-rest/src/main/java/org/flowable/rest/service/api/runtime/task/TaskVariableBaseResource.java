@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -51,7 +52,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
 
     @Override
     public void afterPropertiesSet() {
-        isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {

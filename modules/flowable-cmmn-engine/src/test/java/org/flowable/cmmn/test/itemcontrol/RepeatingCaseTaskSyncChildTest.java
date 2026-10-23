@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.ACTIVE;
 import static org.flowable.cmmn.api.runtime.PlanItemInstanceState.WAITING_FOR_REPETITION;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -51,7 +50,8 @@ public class RepeatingCaseTaskSyncChildTest extends FlowableCmmnTestCase {
         for (int i = 0; i < REPEAT; i++) {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("repeatingCaseTaskSyncChild")
-                    .variable("taskOutputList", Collections.singletonList("single"))
+                    // the collection is stored as a JSON array, since it needs to be persisted until Task A is completed
+                    .variable("taskOutputList", cmmnEngineConfiguration.getObjectMapper().createArrayNode().add("single"))
                     .start();
 
             PlanItemInstance taskA = getSinglePlanItemInstance(caseInstance, "Task A", ACTIVE);
@@ -86,7 +86,8 @@ public class RepeatingCaseTaskSyncChildTest extends FlowableCmmnTestCase {
         for (int i = 0; i < REPEAT; i++) {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("repeatingCaseTaskSyncChildStage")
-                    .variable("taskOutputList", Collections.singletonList("single"))
+                    // the collection is stored as a JSON array, since it needs to be persisted until Task A is completed
+                    .variable("taskOutputList", cmmnEngineConfiguration.getObjectMapper().createArrayNode().add("single"))
                     .start();
 
             PlanItemInstance taskA = getSinglePlanItemInstance(caseInstance, "Task A", ACTIVE);

@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -179,41 +178,6 @@ public class TaskVariableResourceTest extends BaseSpringRestTestCase {
             closeResponse(response);
             assertThat(actualResponseBytesAsText).isEqualTo("This is a binary piece of text");
             assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/octet-stream");
-
-        } finally {
-            // Clean adhoc-tasks even if test fails
-            List<Task> tasks = taskService.createTaskQuery().list();
-            for (Task task : tasks) {
-                taskService.deleteTask(task.getId(), true);
-            }
-        }
-    }
-
-    /**
-     * Test getting a task variable. GET runtime/tasks/{taskId}/variables/{variableName}/data
-     */
-    @Test
-    public void testGetTaskVariableDataSerializable() throws Exception {
-        try {
-            TestSerializableVariable originalSerializable = new TestSerializableVariable();
-            originalSerializable.setSomeField("This is some field");
-
-            // Test variable behaviour on standalone tasks
-            Task task = taskService.newTask();
-            taskService.saveTask(task);
-            taskService.setVariableLocal(task.getId(), "localTaskVariable", originalSerializable);
-
-            CloseableHttpResponse response = executeRequest(
-                    new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_VARIABLE_DATA, task.getId(), "localTaskVariable")),
-                    HttpStatus.SC_OK);
-
-            // Read the serializable from the stream
-            ObjectInputStream stream = new ObjectInputStream(response.getEntity().getContent());
-            Object readSerializable = stream.readObject();
-            assertThat(readSerializable).isInstanceOf(TestSerializableVariable.class);
-            assertThat(((TestSerializableVariable) readSerializable).getSomeField()).isEqualTo("This is some field");
-            assertThat(response.getEntity().getContentType().getValue()).isEqualTo("application/x-java-serialized-object");
-            closeResponse(response);
 
         } finally {
             // Clean adhoc-tasks even if test fails

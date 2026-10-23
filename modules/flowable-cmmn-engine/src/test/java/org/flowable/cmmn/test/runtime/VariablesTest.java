@@ -20,10 +20,8 @@ import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,8 +49,6 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -286,29 +282,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testSerializableVariable() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("myVariable", new MyVariable("Hello World"));
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
-
-        MyVariable myVariable = (MyVariable) cmmnRuntimeService.getVariable(caseInstance.getId(), "myVariable");
-        assertThat(myVariable.value).isEqualTo("Hello World");
-
-        cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-
-            @Override
-            public Void execute(CommandContext commandContext) {
-                VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "myVariable");
-                MyVariable myVariable = (MyVariable) variableInstance.getValue();
-                assertThat(myVariable.value).isEqualTo("Hello World");
-
-                return null;
-            }
-        });
-    }
-
-    @Test
-    @CmmnDeployment
     public void testResolveMilestoneNameAsExpression() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("myVariable", "Hello from test");
@@ -490,7 +463,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("transientStartVar", "Hello from test");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase").transientVariables(variables).start();
-
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
             HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
@@ -674,24 +646,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 includeCaseVariables().
                 singleResult();
         assertThat(updatedCaseInstance.getCaseVariables()).isEqualTo(variables);
-    }
-
-    @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void testIncludeVariablesWithSerializableVariable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneHumanTaskCase")
-                .variable("myVar", new CustomTestVariable("test", 123))
-                .start();
-
-        CaseInstance caseInstanceWithVariables = cmmnRuntimeService.createCaseInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .includeCaseVariables()
-                .singleResult();
-
-        CustomTestVariable customTestVariable = (CustomTestVariable) caseInstanceWithVariables.getCaseVariables().get("myVar");
-        assertThat(customTestVariable.someValue).isEqualTo("test");
-        assertThat(customTestVariable.someInt).isEqualTo(123);
     }
 
     @Test
@@ -911,27 +865,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue())
-                .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
-    }
-
-    @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void testEmptyCollectionVariable() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("oneHumanTaskCase")
-                .variable("listVar", new ArrayList<>())
-                .variable("setVar", new HashSet<>())
-                .start();
-
-        VariableInstance variableInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "listVar");
-
-        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
-
-        variableInstance = cmmnRuntimeService   .getVariableInstance(caseInstance.getId(), "setVar");
-
-        assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
         assertThat(variableInstance.getValue())
                 .isInstanceOfSatisfying(Set.class, set -> assertThat(set).isEmpty());
     }
@@ -1184,18 +1117,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
         }
     }
 
-    public static class MyVariable implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-
-        private String value;
-
-        public MyVariable(String value) {
-            this.value = value;
-        }
-
-    }
-
     public static class SetVariableDelegate implements PlanItemJavaDelegate {
 
         @Override
@@ -1214,17 +1135,6 @@ public class VariablesTest extends FlowableCmmnTestCase {
             planItemInstance.setTransientVariable("transientVar", variableValue + " and delegate");
         }
 
-    }
-
-    public static class CustomTestVariable implements Serializable {
-
-        private String someValue;
-        private int someInt;
-
-        public CustomTestVariable(String someValue, int someInt) {
-            this.someValue = someValue;
-            this.someInt = someInt;
-        }
     }
 
     public static class TestSetGetVariablesDelegate implements PlanItemJavaDelegate {

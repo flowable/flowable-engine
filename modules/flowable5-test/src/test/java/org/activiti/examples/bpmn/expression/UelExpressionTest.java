@@ -14,7 +14,6 @@
 package org.activiti.examples.bpmn.expression;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -27,15 +26,19 @@ public class UelExpressionTest extends PluggableFlowableTestCase {
     public void testValueAndMethodExpression() {
         // An order of price 150 is a standard order (goes through an UEL value expression)
         UelExpressionTestOrder order = new UelExpressionTestOrder(150);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
-                CollectionUtil.singletonMap("order", order));
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("uelExpressions")
+                .transientVariable("order", order)
+                .start();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Standard service", task.getName());
 
         // While an order of 300, gives us a premium service (goes through an UEL method expression)
         order = new UelExpressionTestOrder(300);
-        processInstance = runtimeService.startProcessInstanceByKey("uelExpressions",
-                CollectionUtil.singletonMap("order", order));
+        processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("uelExpressions")
+                .transientVariable("order", order)
+                .start();
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Premium service", task.getName());
 

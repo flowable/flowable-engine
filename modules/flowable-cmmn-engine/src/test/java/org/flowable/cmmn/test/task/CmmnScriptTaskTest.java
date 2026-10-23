@@ -15,7 +15,6 @@ package org.flowable.cmmn.test.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -209,55 +208,11 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment
-    public void testObjectVariables() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("scriptCase")
-                .variable("a", new IntValueHolder(3))
-                .variable("b", 7)
-                .start();
-        assertThat(caseInstance).isNotNull();
-
-        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
-        Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result).isInstanceOf(Number.class);
-        assertThat(((Number) result).intValue()).isEqualTo(12);
-
-        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "a")).isTrue();
-        Object a = cmmnRuntimeService.getVariable(caseInstance.getId(), "a");
-        assertThat(a).isInstanceOf(IntValueHolder.class);
-        assertThat(((IntValueHolder) a).getValue()).isEqualTo(5);
-
-        assertCaseInstanceNotEnded(caseInstance);
-        endTestCase();
-        assertCaseInstanceEnded(caseInstance);
-    }
-
-    @Test
-    @CmmnDeployment
-    public void testReturnJavaObject() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                .caseDefinitionKey("scriptCase")
-                .variable("a", new IntValueHolder(3))
-                .variable("b", 7)
-                .start();
-        assertThat(caseInstance).isNotNull();
-
-        assertThat(cmmnRuntimeService.hasVariable(caseInstance.getId(), "scriptResult")).isTrue();
-        Object result = cmmnRuntimeService.getVariable(caseInstance.getId(), "scriptResult");
-        assertThat(result).isInstanceOf(IntValueHolder.class);
-        assertThat(((IntValueHolder) result).getValue()).isEqualTo(10);
-
-        assertCaseInstanceNotEnded(caseInstance);
-        endTestCase();
-        assertCaseInstanceEnded(caseInstance);
-    }
-
-    @Test
-    @CmmnDeployment
     public void testGroovyAutoStoreVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
-                .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
+                // A byte array is used, since it is an array that can be stored as a variable without serialization
+                .variable("inputArray", new byte[] { 1, 2, 3, 4, 5 })
                 .start();
         assertThat(caseInstance).isNotNull();
 
@@ -279,7 +234,8 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
     public void testGroovyNoAutoStoreVariables() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("scriptCase")
-                .variable("inputArray", new int[] { 1, 2, 3, 4, 5 })
+                // A byte array is used, since it is an array that can be stored as a variable without serialization
+                .variable("inputArray", new byte[] { 1, 2, 3, 4, 5 })
                 .start();
         assertThat(caseInstance).isNotNull();
 
@@ -373,34 +329,9 @@ public class CmmnScriptTaskTest extends FlowableCmmnTestCase {
         }
     }
 
-
     private void endTestCase() {
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceElementId("blockerPlanItem").singleResult();
         assertThat(planItemInstance).isNotNull();
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
-    }
-
-    public static class IntValueHolder implements Serializable {
-
-        private int value;
-
-        public IntValueHolder(int value) {
-            this.value = value;
-        }
-
-        public int getValue() {
-            return value;
-        }
-
-        public void setValue(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public String toString() {
-            return "IntValueHolder{" +
-                    "value=" + value +
-                    '}';
-        }
     }
 }

@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,17 +71,16 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         assertThat(varSetInExecutionListener).isEqualTo("secondValue");
 
+        // The pojo is only needed when completing the task, so it is passed as a transient variable
         ExampleExecutionListenerPojo myPojo = new ExampleExecutionListenerPojo();
-        runtimeService.setVariable(processInstance.getId(), "myPojo", myPojo);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.emptyMap(), Collections.singletonMap("myPojo", myPojo));
 
         // First usertask uses a method-expression as executionListener:
         // ${myPojo.myMethod(execution.eventName)}
-        ExampleExecutionListenerPojo pojoVariable = (ExampleExecutionListenerPojo) runtimeService.getVariable(processInstance.getId(), "myPojo");
-        assertThat(pojoVariable.getReceivedEventName()).isEqualTo("end");
+        assertThat(myPojo.getReceivedEventName()).isEqualTo("end");
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -672,7 +672,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // SubProcess Activity ExecutionListener
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                 .variable("throwErrorSubProcessTaskStartListener", "EXECUTION_LISTENER_BPMN_ERROR")
-                .variable("elements", Arrays.asList("1", "2", "3"))
+                .variable("elements", processEngineConfiguration.getObjectMapper().createArrayNode().add("1").add("2").add("3"))
                 .transientVariable("direction", "subprocess")
                 .start();
         List<Job> jobQuery = managementService.createJobQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
@@ -705,7 +705,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
             // SubProcess ExecutionListener
             ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                     .variable("throwErrorSubProcessEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
-                    .variable("elements", Arrays.asList("1", "2", "3"))
+                    .variable("elements", processEngineConfiguration.getObjectMapper().createArrayNode().add("1").add("2").add("3"))
                     .transientVariable("direction", "subprocess")
                     .start();
 
@@ -732,7 +732,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         // SubProcess Activity ExecutionListener
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().processDefinitionKey("subProcessErrorHandling")
                 .variable("throwErrorSubProcessTaskEndListener", "EXECUTION_LISTENER_BPMN_ERROR")
-                .variable("elements", Arrays.asList("1", "2", "3"))
+                .variable("elements", processEngineConfiguration.getObjectMapper().createArrayNode().add("1").add("2").add("3"))
                 .transientVariable("direction", "subprocess")
                 .start();
         List<Job> jobQuery = managementService.createJobQuery().processInstanceId(processInstance.getProcessInstanceId()).list();

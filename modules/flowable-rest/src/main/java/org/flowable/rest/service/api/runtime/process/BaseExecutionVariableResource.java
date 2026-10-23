@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
@@ -76,7 +77,7 @@ public class BaseExecutionVariableResource implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
     protected byte[] getVariableDataByteArray(Execution execution, String variableName, String scope,
@@ -91,6 +92,9 @@ public class BaseExecutionVariableResource implements InitializingBean {
                 response.setContentType("application/octet-stream");
 
             } else if (RestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 try (ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                      ObjectOutputStream outputStream = new ObjectOutputStream(buffer)) {
                     outputStream.writeObject(variable.getValue());

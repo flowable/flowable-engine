@@ -302,7 +302,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testDecideBasedOnBeanProperty() {
-        runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(150)));
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanProperty")
+                .transientVariable("order", new InclusiveGatewayTestOrder(150))
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertThat(tasks)
                 .extracting(Task::getName)
@@ -317,17 +320,26 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         orders.add(new InclusiveGatewayTestOrder(300));
         orders.add(new InclusiveGatewayTestOrder(175));
 
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders)))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start())
                 .isInstanceOf(FlowableException.class);
 
         orders.set(1, new InclusiveGatewayTestOrder(175));
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getName()).isEqualTo(BEAN_TASK3_NAME);
 
         orders.set(1, new InclusiveGatewayTestOrder(125));
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orders)
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertThat(tasks).isNotNull();
         assertThat(tasks)
@@ -337,7 +349,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         // Arrays are usable in exactly the same way
         InclusiveGatewayTestOrder[] orderArray = orders.toArray(new InclusiveGatewayTestOrder[orders.size()]);
         orderArray[1].setPrice(10);
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orderArray));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnListOrArrayOfBeans")
+                .transientVariable("orders", orderArray)
+                .start();
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertThat(tasks).isNotNull();
         assertThat(tasks)
@@ -348,25 +363,37 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testDecideBasedOnBeanMethod() {
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(200)));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                .transientVariable("order", new InclusiveGatewayTestOrder(200))
+                .start();
         org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertThat(task).isNotNull();
         assertThat(task.getName()).isEqualTo(BEAN_TASK3_NAME);
 
-        pi = runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(125)));
+        pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                .transientVariable("order", new InclusiveGatewayTestOrder(125))
+                .start();
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertThat(tasks)
                 .extracting(Task::getName)
                 .containsExactlyInAnyOrder(BEAN_TASK2_NAME, BEAN_TASK3_NAME);
 
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("inclusiveDecisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(300))))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveDecisionBasedOnBeanMethod")
+                .transientVariable("order", new InclusiveGatewayTestOrder(300))
+                .start())
                 .isInstanceOf(FlowableException.class);
     }
 
     @Test
     @Deployment
     public void testInvalidMethodExpression() {
-        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("inclusiveInvalidMethodExpression", CollectionUtil.singletonMap("order", new InclusiveGatewayTestOrder(50))))
+        assertThatThrownBy(() -> runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("inclusiveInvalidMethodExpression")
+                .transientVariable("order", new InclusiveGatewayTestOrder(50))
+                .start())
                 .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("Unknown method used in expression");
     }

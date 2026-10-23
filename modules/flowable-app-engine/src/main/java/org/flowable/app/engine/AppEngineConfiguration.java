@@ -90,6 +90,7 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DefaultVariableTypes;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.FloatType;
 import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
@@ -102,6 +103,7 @@ import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
 import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
@@ -146,6 +148,17 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+
+    /**
+     * Determines how variables of the type 'serializable' (Java serialization) are handled:
+     * <ul>
+     *     <li>{@link SerializableVariableTypeMode#ENABLED} - serializable variables can be read and written</li>
+     *     <li>{@link SerializableVariableTypeMode#READ_ONLY} - existing serializable variables can be read, but no new ones can be written</li>
+     *     <li>{@link SerializableVariableTypeMode#DISABLED} - serializable variables can neither be read nor written</li>
+     * </ul>
+     * By default {@link SerializableVariableTypeMode#DISABLED}, since deserializing Java objects is a security risk.
+     */
+    protected SerializableVariableTypeMode serializableVariableTypeMode = SerializableVariableTypeMode.DISABLED;
     /**
      * This flag determines whether variables of the type 'json' and 'longJson' will be tracked.
      * <p>
@@ -417,6 +430,7 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new FloatType());
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
@@ -425,7 +439,12 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
             variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier, serializableVariableTypeMode));
+            if (serializableVariableTypeMode != SerializableVariableTypeMode.DISABLED) {
+                logger.warn("Serializable variables are {} (serializableVariableTypeMode is {}). Deserializing Java objects is a security risk,"
+                        + " only use this when the data in the database and the classes on the classpath are fully trusted.",
+                        serializableVariableTypeMode == SerializableVariableTypeMode.ENABLED ? "enabled" : "readable", serializableVariableTypeMode);
+            }
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -741,6 +760,15 @@ public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration
 
     public AppEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public SerializableVariableTypeMode getSerializableVariableTypeMode() {
+        return serializableVariableTypeMode;
+    }
+
+    public AppEngineConfiguration setSerializableVariableTypeMode(SerializableVariableTypeMode serializableVariableTypeMode) {
+        this.serializableVariableTypeMode = serializableVariableTypeMode;
         return this;
     }
 

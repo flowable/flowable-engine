@@ -143,6 +143,12 @@ public class FlowableProperties {
      */
     private String variableJsonMapper = "jackson";
 
+    /**
+     * How variables of the type 'serializable' (Java serialization) are handled by the engines.
+     * Only enable this when the data in the database and the classes on the classpath are fully trusted.
+     */
+    private SerializableVariableTypeMode serializableVariableTypeMode = SerializableVariableTypeMode.DISABLED;
+
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
     }
@@ -413,5 +419,31 @@ public class FlowableProperties {
 
     public void setVariableJsonMapper(String variableJsonMapper) {
         this.variableJsonMapper = variableJsonMapper;
+    }
+
+    public SerializableVariableTypeMode getSerializableVariableTypeMode() {
+        return serializableVariableTypeMode;
+    }
+
+    public void setSerializableVariableTypeMode(SerializableVariableTypeMode serializableVariableTypeMode) {
+        this.serializableVariableTypeMode = serializableVariableTypeMode;
+    }
+
+    public enum SerializableVariableTypeMode {
+
+        /**
+         * Serializable variables can neither be read nor written.
+         */
+        DISABLED,
+
+        /**
+         * Existing serializable variables can be read, but no new serializable values can be stored.
+         */
+        READ_ONLY,
+
+        /**
+         * Serializable variables can be read and written.
+         */
+        ENABLED
     }
 }
