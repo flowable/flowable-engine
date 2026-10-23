@@ -179,4 +179,37 @@ public class JsonUtil {
 
         return false;
     }
+
+    /**
+     * Unwrap a Jackson (2 or 3) JSON value node into its plain Java value.
+     * A text node becomes a {@link String}, a boolean node a {@link Boolean} and a JSON null {@code null}.
+     * Number nodes become an {@link Integer} (int and short), {@link Long}, {@link Double} (double and float),
+     * {@link java.math.BigDecimal} or {@link java.math.BigInteger}.
+     * Any other value (including object and array nodes) is returned as is.
+     */
+    public static Object unwrapJsonValueNode(Object value) {
+        FlowableJsonNode jsonNode = asFlowableJsonNode(value);
+        if (jsonNode == null || !jsonNode.isValueNode()) {
+            return value;
+        }
+
+        if (jsonNode.isNull()) {
+            return null;
+        } else if (jsonNode.isString()) {
+            return jsonNode.asString();
+        } else if (jsonNode.isBoolean()) {
+            return jsonNode.booleanValue();
+        } else if (jsonNode.isShort() || jsonNode.isInt()) {
+            return jsonNode.intValue();
+        } else if (jsonNode.isLong()) {
+            return jsonNode.longValue();
+        } else if (jsonNode.isDouble() || jsonNode.isFloat()) {
+            return jsonNode.doubleValue();
+        } else if (jsonNode.isBigDecimal() || jsonNode.isBigInteger()) {
+            return jsonNode.numberValue();
+        }
+
+        // Other value nodes (e.g. binary or POJO nodes) are kept as they are
+        return value;
+    }
 }

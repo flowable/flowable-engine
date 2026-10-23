@@ -45,6 +45,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -472,7 +473,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 value = it.next();
                 index++;
             }
-            setLoopVariable(execution, collectionElementVariable, value);
+            // JSON value nodes (e.g. elements of a JSON array) are exposed as plain Java values
+            setLoopVariable(execution, collectionElementVariable, JsonUtil.unwrapJsonValueNode(value));
         }
 
         execution.setCurrentFlowElement(activity);

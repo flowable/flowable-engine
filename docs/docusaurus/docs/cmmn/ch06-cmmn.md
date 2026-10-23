@@ -1113,6 +1113,8 @@ Here is an example of a repetition rule combined with a collection variable:
 The example uses a collection variable named *myCollection* and has an element and even element index variable specified. They both get used for the plan item instance name used in its name expression.
 As there is no entry sentry, the collection gets evaluated in each evaluation cycle and as soon as *myCollection* is no longer null, it is used for repetition.
 
+The collection can also be a JSON array. Elements of a JSON array that are plain values are exposed as plain Java values in the element variable: a JSON string becomes a String, a JSON number becomes a number (e.g. Integer, Long or Double), a JSON boolean becomes a Boolean and a JSON null becomes null. This means that for a *myCollection* JSON array `["A", "B"]` the names in the example above are *Task (A - 0)* and *Task (B - 1)*. JSON objects and arrays are exposed as JSON. For compatibility, the Jackson accessor methods (e.g. `${item.asText()}`, `${item.asString()}`, `${item.textValue()}`, `${item.asInt()}`, `${item.booleanValue()}` or `${item.isTextual()}`) can still be used on such element variables in expressions.
+
 ### Item control: Manual Activation Rule
 
 Plan items on the case model can have a *manual activation rule*: an expression that can be used to indicate a certain plan item needs to be *manually activated by an end-user*.

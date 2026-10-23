@@ -25,6 +25,7 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 public class PlanItemInstanceUtil {
     
@@ -209,7 +210,8 @@ public class PlanItemInstanceUtil {
         // check, if we need to set local variables as the item or item index
         Map<String, Object> localVariables = new HashMap<>(2);
         if (repetitionRule.hasElementVariable()) {
-            localVariables.put(repetitionRule.getElementVariableName(), item);
+            // JSON value nodes (e.g. elements of a JSON array) are exposed as plain Java values
+            localVariables.put(repetitionRule.getElementVariableName(), JsonUtil.unwrapJsonValueNode(item));
         }
         if (repetitionRule.hasElementIndexVariable()) {
             localVariables.put(repetitionRule.getElementIndexVariableName(), index);
