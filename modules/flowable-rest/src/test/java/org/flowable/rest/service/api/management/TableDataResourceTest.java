@@ -21,6 +21,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.rest.conf.TableManagementEnabledApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
@@ -37,6 +38,11 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Frederik Heremans
  */
 public class TableDataResourceTest extends BaseSpringRestTestCase {
+
+    @Override
+    protected Class<?> getConfigurationClass() {
+        return TableManagementEnabledApplicationConfiguration.class;
+    }
 
     /**
      * Test getting a single table's row data. GET management/tables/{tableName}/data

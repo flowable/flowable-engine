@@ -20,6 +20,7 @@ import java.util.Map;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.flowable.rest.conf.TableManagementEnabledApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
@@ -33,6 +34,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Frederik Heremans
  */
 public class TableResourceTest extends BaseSpringRestTestCase {
+
+    @Override
+    protected Class<?> getConfigurationClass() {
+        return TableManagementEnabledApplicationConfiguration.class;
+    }
 
     /**
      * Test getting tables. GET management/tables

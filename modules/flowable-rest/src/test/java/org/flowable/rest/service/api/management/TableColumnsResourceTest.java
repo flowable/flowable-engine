@@ -18,6 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.common.engine.api.management.TableMetaData;
+import org.flowable.rest.conf.TableManagementEnabledApplicationConfiguration;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.Test;
@@ -31,6 +32,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * @author Frederik Heremans
  */
 public class TableColumnsResourceTest extends BaseSpringRestTestCase {
+
+    @Override
+    protected Class<?> getConfigurationClass() {
+        return TableManagementEnabledApplicationConfiguration.class;
+    }
 
     /**
      * Test getting a single table's columns. GET management/tables/{tableName}/columns
