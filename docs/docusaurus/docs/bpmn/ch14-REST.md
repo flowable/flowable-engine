@@ -9467,6 +9467,9 @@ The response body contains the binary value of the variable. When the variable i
 
 ## Database tables
 
+The database table resources expose the raw content of the Flowable database tables and are therefore not available by default.
+They are only registered when the `flowable.rest.table-management.enabled` property is set to `true`.
+
 ### List of tables
 
     GET management/tables
