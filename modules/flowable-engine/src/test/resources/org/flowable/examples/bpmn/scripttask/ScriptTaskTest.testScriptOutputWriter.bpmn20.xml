@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="scriptOutputWriter">
+
+    <startEvent id="theStart" />
+
+    <scriptTask id="juelScriptTask" scriptFormat="juel">
+      <script>${out:print('Hello ')}${out:print(name)}</script>
+    </scriptTask>
+
+    <scriptTask id="groovyScriptTask" scriptFormat="groovy">
+      <script>println " from Groovy"</script>
+    </scriptTask>
+
+    <endEvent id="theEnd" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="juelScriptTask" />
+    <sequenceFlow id="flow2" sourceRef="juelScriptTask" targetRef="groovyScriptTask" />
+    <sequenceFlow id="flow3" sourceRef="groovyScriptTask" targetRef="theEnd" />
+
+  </process>
+
+</definitions>
