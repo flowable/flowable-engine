@@ -15,6 +15,7 @@ package org.flowable.engine.impl.scripting;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.Writer;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -59,11 +60,28 @@ import org.flowable.engine.impl.bpmn.data.ItemInstance;
  */
 public class JuelScriptEngine extends AbstractScriptEngine implements Compilable {
 
+    /**
+     * The script context of the expression that is currently being evaluated on this thread.
+     * EL functions are static methods, so this is how {@link #print(Object)} gets access to the writer of the script context.
+     */
+    protected static final ThreadLocal<ScriptContext> CURRENT_SCRIPT_CONTEXT = new ThreadLocal<>();
+
     private ScriptEngineFactory scriptEngineFactory;
     private ExpressionFactory expressionFactory;
 
+    /**
+     * Whether the {@code lang:import} function is available in scripts.
+     * It allows loading any class and calling any of its public static methods, so it is disabled by default.
+     */
+    protected boolean importFunctionEnabled;
+
     public JuelScriptEngine(ScriptEngineFactory scriptEngineFactory) {
+        this(scriptEngineFactory, false);
+    }
+
+    public JuelScriptEngine(ScriptEngineFactory scriptEngineFactory, boolean importFunctionEnabled) {
         this.scriptEngineFactory = scriptEngineFactory;
+        this.importFunctionEnabled = importFunctionEnabled;
         // Resolve the ExpressionFactory
         expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
     }
@@ -111,10 +129,18 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     private Object evaluateExpression(ValueExpression expr, ScriptContext ctx) throws ScriptException {
+        ScriptContext previousScriptContext = CURRENT_SCRIPT_CONTEXT.get();
+        CURRENT_SCRIPT_CONTEXT.set(ctx);
         try {
             return expr.getValue(createElContext(ctx));
         } catch (ELException elexp) {
             throw new ScriptException(elexp);
+        } finally {
+            if (previousScriptContext != null) {
+                CURRENT_SCRIPT_CONTEXT.set(previousScriptContext);
+            } else {
+                CURRENT_SCRIPT_CONTEXT.remove();
+            }
         }
     }
 
@@ -165,8 +191,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         // Built-in function are added to ScriptCtx
         scriptCtx.setAttribute("out:print", getPrintMethod(), ScriptContext.ENGINE_SCOPE);
 
-        SecurityManager securityManager = System.getSecurityManager();
-        if (securityManager == null) {
+        if (importFunctionEnabled) {
             scriptCtx.setAttribute("lang:import", getImportMethod(), ScriptContext.ENGINE_SCOPE);
         }
 
@@ -206,7 +231,19 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
     }
 
     public static void print(Object object) {
-        System.out.print(object);
+        ScriptContext scriptContext = CURRENT_SCRIPT_CONTEXT.get();
+        Writer writer = scriptContext != null ? scriptContext.getWriter() : null;
+        if (writer == null) {
+            System.out.print(object);
+            return;
+        }
+
+        try {
+            writer.write(String.valueOf(object));
+            writer.flush();
+        } catch (IOException e) {
+            throw new ELException(e);
+        }
     }
 
     private static Method getImportMethod() {
