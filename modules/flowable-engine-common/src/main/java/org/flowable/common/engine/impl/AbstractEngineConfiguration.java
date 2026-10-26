@@ -645,7 +645,7 @@ public abstract class AbstractEngineConfiguration {
 
     public void initVariableValueConversionHandler() {
         if (variableValueConversionHandler == null) {
-            variableValueConversionHandler = new DefaultVariableValueConversionHandler();
+            variableValueConversionHandler = new DefaultVariableValueConversionHandler(clock);
         }
     }
 

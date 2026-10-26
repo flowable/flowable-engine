@@ -24,6 +24,7 @@ import java.util.Date;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.json.FlowableJsonNode;
 import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.runtime.ClockReader;
 import org.flowable.common.engine.impl.util.DateUtil;
 import org.flowable.common.engine.impl.util.JsonUtil;
 
@@ -33,6 +34,12 @@ import org.flowable.common.engine.impl.util.JsonUtil;
  * @author Tijs Rademakers
  */
 public class DefaultVariableValueConversionHandler implements VariableValueConversionHandler {
+
+    protected final ClockReader clockReader;
+
+    public DefaultVariableValueConversionHandler(ClockReader clockReader) {
+        this.clockReader = clockReader;
+    }
 
     @Override
     public Object convertValue(Object value, String type, VariableJsonMapper variableJsonMapper) {
@@ -194,11 +201,11 @@ public class DefaultVariableValueConversionHandler implements VariableValueConve
     }
 
     /**
-     * Parses an ISO 8601 duration/period string (e.g. "P10D", "PT10H", "P1Y2M3DT4H") and adds it to the current time.
+     * Parses an ISO 8601 duration/period string (e.g. "P10D", "PT10H", "P1Y2M3DT4H") and adds it to the current time of the clock.
      * Uses the same parsing logic as {@link org.flowable.common.engine.impl.calendar.DueDateBusinessCalendar}.
      */
     protected ZonedDateTime addDurationToNow(String durationString) {
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.ofInstant(clockReader.getCurrentTime().toInstant(), clockReader.getCurrentTimeZone().toZoneId());
         Period period;
         Duration duration;
         if (durationString.startsWith("PT")) {
