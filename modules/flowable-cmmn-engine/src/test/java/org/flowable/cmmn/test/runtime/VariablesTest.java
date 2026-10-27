@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static java.util.stream.Collectors.toMap;
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
@@ -60,7 +61,11 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -978,6 +983,29 @@ public class VariablesTest extends FlowableCmmnTestCase {
         for (String variableName : variables.keySet()) {
             assertThat(variables.get(variableName)).isNotNull();
         }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testUpdateJsonVariableWithJackson2JsonNode() {
+        com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("customer", JsonMapper.shared().createObjectNode().put("name", "Kermit"))
+                .start();
+
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "customer", jackson2ObjectMapper.createObjectNode().put("name", "Gonzo"));
+
+        VariableInstance customerVarInstance = cmmnRuntimeService.getVariableInstance(caseInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Gonzo'
+                        }
+                        """);
     }
 
     protected void addVariableTypeIfNotExists(VariableType variableType) {

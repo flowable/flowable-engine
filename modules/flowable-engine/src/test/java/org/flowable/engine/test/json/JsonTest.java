@@ -1127,6 +1127,42 @@ public class JsonTest extends PluggableFlowableTestCase {
                         """);
     }
 
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testUpdateJsonVariableWithJackson2JsonNode() {
+        com.fasterxml.jackson.databind.ObjectMapper jackson2ObjectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode().put("name", "Kermit"))
+                .start();
+
+        runtimeService.setVariable(processInstance.getId(), "customer", jackson2ObjectMapper.createObjectNode().put("name", "Gonzo"));
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Gonzo'
+                        }
+                        """);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "customer", jackson2ObjectMapper.createObjectNode().put("name", "Fozzie"));
+
+        customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Fozzie'
+                        }
+                        """);
+    }
+
     protected ObjectNode createBigJsonObject() {
         ObjectNode valueNode = objectMapper.createObjectNode();
         for (int i = 0; i < 1000; i++) {
