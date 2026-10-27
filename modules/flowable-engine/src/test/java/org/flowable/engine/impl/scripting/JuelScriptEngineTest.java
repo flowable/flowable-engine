@@ -16,12 +16,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.StringWriter;
+import java.util.Collections;
+import java.util.Map;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
+import org.flowable.common.engine.impl.de.odysseus.el.util.SimpleResolver;
+import org.flowable.common.engine.impl.javax.el.BeanELResolver;
+import org.flowable.common.engine.impl.javax.el.CompositeELResolver;
+import org.flowable.common.engine.impl.javax.el.ELContext;
+import org.flowable.common.engine.impl.javax.el.ELException;
+import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.javax.el.MapELResolver;
+import org.flowable.common.engine.impl.scripting.FlowableScriptException;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
+import org.flowable.common.engine.impl.scripting.Resolver;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -63,6 +76,81 @@ class JuelScriptEngineTest {
         scriptEngine.eval("${out:print('Hello ')}${out:print(name)}", scriptContext);
 
         assertThat(writer).hasToString("Hello Kermit");
+    }
+
+    @Test
+    void customScriptEngineFactoryCanProvideDifferentElResolver() throws FlowableScriptException {
+        JSR223FlowableScriptEngine scriptEngine = new JSR223FlowableScriptEngine();
+        scriptEngine.addScriptEngineFactory(new NoMethodInvocationJuelScriptEngineFactory());
+        Map<String, Object> variables = Collections.singletonMap("person", Collections.singletonMap("name", "Kermit"));
+
+        assertThat(evaluate(scriptEngine, "${person.name}", variables)).isEqualTo("Kermit");
+        assertThatThrownBy(() -> evaluate(scriptEngine, "${person.name.toUpperCase()}", variables))
+                .isInstanceOf(FlowableScriptException.class)
+                .hasMessageContaining("Method invocation is not allowed");
+
+        assertThat(evaluate(new JSR223FlowableScriptEngine(), "${person.name.toUpperCase()}", variables)).isEqualTo("KERMIT");
+    }
+
+    protected Object evaluate(JSR223FlowableScriptEngine scriptEngine, String script, Map<String, Object> variables) throws FlowableScriptException {
+        return scriptEngine.createEvaluationRequest()
+                .language("juel")
+                .script(script)
+                .resolver(new MapResolver(variables))
+                .scopeContainer(VariableContainer.empty())
+                .inputVariableContainer(VariableContainer.empty())
+                .evaluate()
+                .getResult();
+    }
+
+    protected static class MapResolver implements Resolver {
+
+        protected final Map<String, Object> variables;
+
+        public MapResolver(Map<String, Object> variables) {
+            this.variables = variables;
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            return variables.containsKey(key);
+        }
+
+        @Override
+        public Object get(Object key) {
+            return variables.get(key);
+        }
+    }
+
+    protected static class NoMethodInvocationJuelScriptEngineFactory extends JuelScriptEngineFactory {
+
+        @Override
+        public ScriptEngine getScriptEngine() {
+            return new NoMethodInvocationJuelScriptEngine(this);
+        }
+    }
+
+    protected static class NoMethodInvocationJuelScriptEngine extends JuelScriptEngine {
+
+        public NoMethodInvocationJuelScriptEngine(JuelScriptEngineFactory scriptEngineFactory) {
+            super(scriptEngineFactory, false);
+        }
+
+        @Override
+        protected ELResolver createElResolver() {
+            CompositeELResolver compositeResolver = new CompositeELResolver();
+            compositeResolver.add(new MapELResolver());
+            compositeResolver.add(new NoMethodInvocationBeanELResolver());
+            return new SimpleResolver(compositeResolver);
+        }
+    }
+
+    protected static class NoMethodInvocationBeanELResolver extends BeanELResolver {
+
+        @Override
+        public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
+            throw new ELException("Method invocation is not allowed");
+        }
     }
 
 }
