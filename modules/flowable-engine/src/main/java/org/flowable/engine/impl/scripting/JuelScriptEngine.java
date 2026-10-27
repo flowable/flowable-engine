@@ -145,7 +145,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         }
     }
 
-    private ELResolver createElResolver() {
+    protected ELResolver createElResolver() {
         CompositeELResolver compositeResolver = new CompositeELResolver();
         compositeResolver.add(new ArrayELResolver());
         compositeResolver.add(new ListELResolver());
@@ -181,7 +181,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         }
     }
 
-    private ELContext createElContext(final ScriptContext scriptCtx) {
+    protected ELContext createElContext(final ScriptContext scriptCtx) {
         // Check if the ELContext is already stored on the ScriptContext
         Object existingELCtx = scriptCtx.getAttribute("elcontext");
         if (existingELCtx instanceof ELContext) {
