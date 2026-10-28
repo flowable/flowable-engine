@@ -17,9 +17,6 @@ import java.util.List;
 
 import org.flowable.rest.service.api.RestActionRequest;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 /**
  * @author Tijs Rademakers
  */
@@ -58,7 +55,6 @@ public class SubmitFormRequest extends RestActionRequest {
         this.properties = properties;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestFormProperty.class)
     public List<RestFormProperty> getProperties() {
         return properties;
     }
