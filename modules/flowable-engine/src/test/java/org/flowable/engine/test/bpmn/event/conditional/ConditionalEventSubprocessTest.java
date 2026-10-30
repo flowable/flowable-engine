@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.Collections;
 
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -26,6 +27,7 @@ import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -142,11 +144,17 @@ public class ConditionalEventSubprocessTest extends PluggableFlowableTestCase {
     public void testInterruptingNestedSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+        Task interruptedTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
         assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(5);
 
         assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricTaskInstanceQuery().taskId(interruptedTask.getId()).singleResult().getDeleteReason())
+                .isEqualTo(DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(eventProcessStart)");
+        }
 
         // now let's complete the task in the event subprocess
         Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").singleResult();
@@ -206,6 +214,30 @@ public class ConditionalEventSubprocessTest extends PluggableFlowableTestCase {
         }
 
         assertProcessEnded(processInstance.getId());
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/conditional/ConditionalEventSubprocessTest.testSimpleInterruptingEventSubProcess.bpmn20.xml")
+    public void testInterruptingEventSubProcessSetsDeleteReason() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleConditionalEventSubProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("task").singleResult();
+
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("testVar", true));
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).list())
+            .extracting(Task::getTaskDefinitionKey)
+            .containsExactly("eventSubProcessTask1");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).activityId("task").singleResult()
+                .getDeleteReason()).isEqualTo(DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(eventSubProcessConditionalStart)");
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance historicTask = historyService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTask.getEndTime()).isNotNull();
+            assertThat(historicTask.getDeleteReason()).isEqualTo(DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(eventSubProcessConditionalStart)");
+        }
     }
 
     @Test
