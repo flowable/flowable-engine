@@ -15,7 +15,10 @@ package org.flowable.cmmn.test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,8 +85,10 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
         Date now = new Date();
         Object periodToDate = processEngine.getRuntimeService().getVariable(processInstance.getId(), "periodToDate");
         assertThat(periodToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) periodToDate).toInstant()))
-                .isBetween(Duration.ofDays(9).plusHours(23), Duration.ofDays(10).plusMinutes(1));
+        // A period is added in calendar days, so across a DST change it is not exactly 240 hours
+        Instant expectedPeriodEnd = now.toInstant().atZone(ZoneId.systemDefault()).plus(Period.ofDays(10)).toInstant();
+        assertThat(Duration.between(expectedPeriodEnd, ((Date) periodToDate).toInstant()))
+                .isBetween(Duration.ofMinutes(-1), Duration.ofMinutes(1));
 
         Object durationToLocalDate = processEngine.getRuntimeService().getVariable(processInstance.getId(), "durationToLocalDate");
         assertThat(durationToLocalDate).isInstanceOf(LocalDate.class);
@@ -143,8 +148,10 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
         Date now = new Date();
         Object periodToDate = cmmnRuntimeService.getVariable(childCaseInstance.getId(), "periodToDate");
         assertThat(periodToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) periodToDate).toInstant()))
-                .isBetween(Duration.ofDays(9).plusHours(23), Duration.ofDays(10).plusMinutes(1));
+        // A period is added in calendar days, so across a DST change it is not exactly 240 hours
+        Instant expectedPeriodEnd = now.toInstant().atZone(ZoneId.systemDefault()).plus(Period.ofDays(10)).toInstant();
+        assertThat(Duration.between(expectedPeriodEnd, ((Date) periodToDate).toInstant()))
+                .isBetween(Duration.ofMinutes(-1), Duration.ofMinutes(1));
 
         Object durationToLocalDate = cmmnRuntimeService.getVariable(childCaseInstance.getId(), "durationToLocalDate");
         assertThat(durationToLocalDate).isInstanceOf(LocalDate.class);
