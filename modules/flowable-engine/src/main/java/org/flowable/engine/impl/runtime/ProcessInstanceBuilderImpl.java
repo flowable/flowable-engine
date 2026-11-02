@@ -35,6 +35,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String processDefinitionKey;
     protected String processDefinitionParentDeploymentId;
     protected String messageName;
+    protected String startEventId;
     protected String processInstanceName;
     protected String businessKey;
     protected String businessStatus;
@@ -44,6 +45,8 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String referenceType;
     protected String stageInstanceId;
     protected String tenantId;
+    protected String ownerId;
+    protected String assigneeId;
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
     protected Map<String, Object> variables;
@@ -82,6 +85,12 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder messageName(String messageName) {
         this.messageName = messageName;
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceBuilder startEventId(String startEventId) {
+        this.startEventId = startEventId;
         return this;
     }
 
@@ -148,6 +157,18 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     @Override
     public ProcessInstanceBuilder predefineProcessInstanceId(String processInstanceId) {
         this.predefinedProcessInstanceId = processInstanceId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder owner(String userId) {
+        this.ownerId = userId;
+        return this;
+    }
+
+    @Override
+    public ProcessInstanceBuilder assignee(String userId) {
+        this.assigneeId = userId;
         return this;
     }
 
@@ -328,6 +349,10 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return messageName;
     }
 
+    public String getStartEventId() {
+        return startEventId;
+    }
+
     public String getProcessInstanceName() {
         return processInstanceName;
     }
@@ -370,6 +395,14 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getPredefinedProcessInstanceId() {
         return predefinedProcessInstanceId;
+    }
+
+    public String getOwnerId() {
+        return ownerId;
+    }
+
+    public String getAssigneeId() {
+        return assigneeId;
     }
 
     public Map<String, Object> getVariables() {

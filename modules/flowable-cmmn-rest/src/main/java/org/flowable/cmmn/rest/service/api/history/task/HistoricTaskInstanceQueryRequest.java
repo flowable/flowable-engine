@@ -16,6 +16,7 @@ package org.flowable.cmmn.rest.service.api.history.task;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.common.rest.api.PaginateRequest;
@@ -36,10 +37,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
     protected Collection<String> caseDefinitionKeys;
+    protected String planItemInstanceId;
     protected String propagatedStageInstanceId;
+    protected String scopeId;
+    protected Set<String> scopeIds;
     protected Boolean withoutScopeId;
     protected String taskName;
     protected String taskNameLike;
+    protected String taskNameLikeIgnoreCase;
     protected String taskDescription;
     protected String taskDescriptionLike;
     protected String taskDefinitionKey;
@@ -80,6 +85,8 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected Boolean withoutProcessInstanceId;
     protected String taskCandidateGroup;
     protected boolean ignoreTaskAssignee;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     public String getTaskId() {
         return taskId;
@@ -175,6 +182,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskNameLike(String taskNameLike) {
         this.taskNameLike = taskNameLike;
+    }
+
+    public String getTaskNameLikeIgnoreCase() {
+        return taskNameLikeIgnoreCase;
+    }
+
+    public void setTaskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        this.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase;
     }
 
     public String getTaskDescription() {
@@ -496,5 +511,45 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
         this.ignoreTaskAssignee = ignoreTaskAssignee;
+    }
+
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public void setScopeIds(Set<String> scopeIds) {
+        this.scopeIds = scopeIds;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
     }
 }

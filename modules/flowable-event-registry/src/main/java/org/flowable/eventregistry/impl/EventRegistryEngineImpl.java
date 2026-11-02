@@ -54,12 +54,6 @@ public class EventRegistryEngineImpl implements EventRegistryEngine {
         }
 
         EventRegistryEngines.registerEventRegistryEngine(this);
-
-        if (engineConfiguration.getEngineLifecycleListeners() != null) {
-            for (EngineLifecycleListener engineLifecycleListener : engineConfiguration.getEngineLifecycleListeners()) {
-                engineLifecycleListener.onEngineBuilt(this);
-            }
-        }
     }
     
     @Override

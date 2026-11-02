@@ -15,7 +15,10 @@ package org.flowable.dmn.engine.impl.deployer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
@@ -114,9 +117,14 @@ public class DmnDeployer implements Deployer {
     protected void persistDecisions(ParsedDeployment parsedDeployment) {
         DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         DecisionEntityManager decisionEntityManager = dmnEngineConfiguration.getDecisionEntityManager();
+        FlowableEventDispatcher eventDispatcher = dmnEngineConfiguration.getEventDispatcher();
 
         for (DecisionEntity decision : parsedDeployment.getAllDecisions()) {
             decisionEntityManager.insert(decision);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(decision, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                        dmnEngineConfiguration.getEngineCfgKey());
+            }
         }
     }
 

@@ -34,6 +34,9 @@
         <activiti:formProperty id="new_property_6" name="v101" type="string" variable="v101" readable="false" required="true"></activiti:formProperty>
         <activiti:formProperty id="new_property_7" name="v110" type="string" variable="v110" writable="false" required="true"></activiti:formProperty>
         <activiti:formProperty id="new_property_8" name="v111" type="string" variable="v111" required="true"></activiti:formProperty>
+        <activiti:formProperty id="date_property_default" name="d1" type="date" datePattern="dd/MM/yyyy" variable="d1"></activiti:formProperty>
+        <activiti:formProperty id="date_property_lenient" name="d2" type="date" datePattern="dd/MM/yyyy" lenientDateParsing="true" variable="d2"></activiti:formProperty>
+        <activiti:formProperty id="date_property_strict" name="d3" type="date" datePattern="dd/MM/yyyy" lenientDateParsing="false" variable="d3"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <sequenceFlow id="sid-67E5C57C-B8CB-4B76-AF19-46A3DD03290E" sourceRef="startNode" targetRef="userTask"></sequenceFlow>

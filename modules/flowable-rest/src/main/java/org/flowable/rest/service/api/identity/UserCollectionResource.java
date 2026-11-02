@@ -18,9 +18,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
@@ -37,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -53,7 +51,7 @@ import io.swagger.annotations.Authorization;
  * @author Filip Hrisafov
  */
 @RestController
-@Api(tags = { "Users" }, description = "Manage Users", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Users" }, authorizations = { @Authorization(value = "basicAuth") })
 public class UserCollectionResource {
 
     protected static HashMap<String, QueryProperty> properties = new HashMap<>();
@@ -75,7 +73,7 @@ public class UserCollectionResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
+    @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
@@ -88,14 +86,16 @@ public class UserCollectionResource {
             @ApiImplicitParam(name = "emailLike", dataType = "string", value = "Only return users with an email like the given value. Use % as wildcard-character.", paramType = "query"),
             @ApiImplicitParam(name = "memberOfGroup", dataType = "string", value = "Only return users which are a member of the given group.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return users which are a members of the given tenant.", paramType = "query"),
-            @ApiImplicitParam(name = "potentialStarter", dataType = "string", value = "Only return users  which members are potential starters for a process-definition with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,firstName,lastname,email,displayName", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
     })
     @GetMapping(value = "/identity/users", produces = "application/json")
-    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         UserQuery query = identityService.createUserQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -139,14 +139,15 @@ public class UserCollectionResource {
         return paginateList(allRequestParams, query, "id", properties, restResponseFactory::createUserResponseList);
     }
 
-    @ApiOperation(value = "Create a user", tags = { "Users" })
+    @ApiOperation(value = "Create a user", tags = { "Users" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the user was created."),
             @ApiResponse(code = 400, message = "Indicates the id of the user was missing.")
 
     })
     @PostMapping(value = "/identity/users", produces = "application/json")
-    public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse createUser(@RequestBody UserRequest userRequest) {
         if (userRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");
         }
@@ -168,8 +169,6 @@ public class UserCollectionResource {
         created.setPassword(userRequest.getPassword());
         created.setTenantId(userRequest.getTenantId());
         identityService.saveUser(created);
-
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createUserResponse(created, true);
     }

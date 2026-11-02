@@ -19,7 +19,6 @@ import org.flowable.rest.conf.SecurityConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
@@ -38,7 +37,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
     DevelopmentConfiguration.class
 })
 @SpringBootApplication(proxyBeanMethods = false)
-public class FlowableRestApplication extends SpringBootServletInitializer {
+public class FlowableRestApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FlowableRestApplication.class, args);

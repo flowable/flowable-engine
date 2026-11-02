@@ -26,7 +26,7 @@ import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -52,9 +52,15 @@ public class CommandContext {
     protected boolean useClassForNameClassLoading;
     protected Clock clock;
     protected ObjectMapper objectMapper;
+    /**
+     * The start time when the command context was created.
+     * This is the result of {@link System#currentTimeMillis()} when the command context was created.
+     */
+    protected final long startTime;
     
     public CommandContext(Command<?> command) {
         this.command = command;
+        this.startTime = System.currentTimeMillis();
     }
 
     public void close() {
@@ -65,8 +71,8 @@ public class CommandContext {
         try {
             try {
                 try {
-                    executeCloseListenersClosing();
                     if (exception == null) {
+                        executeCloseListenersClosing();
                         flushSessions();
                     }
                 } catch (Throwable exception) {
@@ -408,5 +414,12 @@ public class CommandContext {
     public void setResult(Object result) {
         resultStack.add(result);
     }
+
+    public int getResultStackSize() {
+        return resultStack.size();
+    }
     
+    public long getStartTime() {
+        return startTime;
+    }
 }

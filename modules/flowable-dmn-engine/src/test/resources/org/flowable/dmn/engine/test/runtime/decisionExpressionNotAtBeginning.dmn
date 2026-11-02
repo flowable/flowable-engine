@@ -1,0 +1,29 @@
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:di="http://www.omg.org/spec/DMN/20180521/DI/" xmlns:flowable="http://flowable.org/dmn" xmlns:design="http://flowable.org/design" id="definition_dMNExample" name="DMN Example" namespace="http://www.flowable.org/dmn">
+  <decision id="dmnExpression" name="DMN Example">
+    <decisionTable id="decisionTable_dMNExample" hitPolicy="FIRST">
+      <input label="typeValue">
+        <inputExpression id="inputExpression_1" typeRef="string">
+          <text>selectedValue</text>
+        </inputExpression>
+      </input>
+      <output id="outputExpression_2" label="outputValue" name="outputValue" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text><![CDATA["type1"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text><![CDATA[${selectedValue} : this works fine]]></text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text><![CDATA["type2"]]></text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text><![CDATA[: this does not work : ${selectedValue}]]></text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI></dmndi:DMNDI>
+</definitions>

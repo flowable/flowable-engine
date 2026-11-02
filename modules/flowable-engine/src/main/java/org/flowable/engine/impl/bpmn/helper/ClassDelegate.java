@@ -13,6 +13,7 @@
 
 package org.flowable.engine.impl.bpmn.helper;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +25,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -41,14 +42,15 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
-import org.flowable.engine.impl.delegate.invocation.ExecutionListenerInvocation;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegate;
+import org.flowable.engine.impl.delegate.TriggerableJavaDelegateContextImpl;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.delegate.TaskListener;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
@@ -59,6 +61,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Falko Menge
  * @author Saeid Mirzaei
  * @author Yvo Swillens
+ * @author martin.grofcik
  */
 public class ClassDelegate extends AbstractClassDelegate implements TaskListener, ExecutionListener, TransactionDependentExecutionListener, TransactionDependentTaskListener, SubProcessActivityBehavior, CustomPropertiesResolver {
 
@@ -66,7 +69,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
     protected ActivityBehavior activityBehaviorInstance;
     protected Expression skipExpression;
-    protected List<MapExceptionEntry> mapExceptions;
+    protected List<MapExceptionEntry> mapExceptions = Collections.emptyList();
     protected CustomPropertiesResolver customPropertiesResolverInstance;
     protected boolean triggerable;
 
@@ -178,7 +181,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asString();
                 if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
                     className = overrideClassName;
                     activityBehaviorInstance = null;
@@ -192,7 +195,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
 
         try {
             activityBehaviorInstance.execute(execution);
-        } catch (BpmnError error) {
+        } catch (BusinessError error) {
             ErrorPropagation.propagateError(error, execution);
         } catch (RuntimeException e) {
             if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
@@ -207,14 +210,35 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance();
         }
-
-        if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
-            ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
-            if (triggerable) {
-                leave(execution);
+        if (activityBehaviorInstance instanceof TriggerableJavaDelegate triggerableJavaDelegate) {
+            try {
+                TriggerableJavaDelegateContextImpl context = new TriggerableJavaDelegateContextImpl(execution, null, null);
+                triggerableJavaDelegate.trigger(context);
+                if (triggerable && context.shouldLeave()) {
+                    leave(execution);
+                }
+            } catch (BusinessError error) {
+                ErrorPropagation.propagateError(error, execution);
+            } catch (RuntimeException e) {
+                if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                    throw e;
+                }
+            }
+        } else if (activityBehaviorInstance instanceof TriggerableActivityBehavior) {
+            try {
+                ((TriggerableActivityBehavior) activityBehaviorInstance).trigger(execution, signalName, signalData);
+                if (triggerable) {
+                    leave(execution);
+                }
+            } catch (BusinessError error) {
+                ErrorPropagation.propagateError(error, execution);
+            } catch (RuntimeException e) {
+                if (!ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                    throw e;
+                }
             }
         } else {
-            throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("signal() can only be called on a " + TriggerableActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 
@@ -229,7 +253,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance instanceof SubProcessActivityBehavior) {
             ((SubProcessActivityBehavior) activityBehaviorInstance).completing(execution, subProcessInstance);
         } else {
-            throw new FlowableException("completing() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("completing() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 
@@ -242,7 +266,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
         if (activityBehaviorInstance instanceof SubProcessActivityBehavior) {
             ((SubProcessActivityBehavior) activityBehaviorInstance).completed(execution);
         } else {
-            throw new FlowableException("completed() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance");
+            throw new FlowableException("completed() can only be called on a " + SubProcessActivityBehavior.class.getName() + " instance for " + execution);
         }
     }
 

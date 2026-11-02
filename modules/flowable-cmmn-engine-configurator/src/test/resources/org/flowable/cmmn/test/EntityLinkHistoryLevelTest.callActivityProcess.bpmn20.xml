@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+    xmlns:flowable="http://flowable.org/bpmn"
+    targetNamespace="http://flowable.org/bpmn">
+    <process id="callActivityProcess">
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callActivity" />
+        <callActivity id="callActivity" calledElement="oneTask" />
+        <sequenceFlow id="flow2" sourceRef="callActivity" targetRef="afterCallActivity" />
+        <userTask id="afterCallActivity" name="After call activity" />
+        <sequenceFlow id="flow3" sourceRef="afterCallActivity" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+    </process>
+</definitions>

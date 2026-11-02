@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" xmlns:design="http://flowable.org/design"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="simpleTestCaseWithCaseTasks" name="simpleTestCaseWithCaseTasks">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+            </extensionElements>
+            <planItem id="planItemcaseTask1" name="Case task" definitionRef="caseTaskOneTaskCase"></planItem>
+            <planItem id="planItemcaseTask2" name="Case task" definitionRef="caseTaskSimpleCaseWithCaseTasks"></planItem>
+            <caseTask id="caseTaskOneTaskCase" name="Case task" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
+                <extensionElements>
+                    <flowable:static-case-key><![CDATA[oneTaskCase]]></flowable:static-case-key>
+                    <design:stencilid><![CDATA[CaseTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+                <caseRefExpression><![CDATA[oneTaskCase]]></caseRefExpression>
+            </caseTask>
+            <caseTask id="caseTaskSimpleCaseWithCaseTasks" name="Case task" flowable:fallbackToDefaultTenant="true" flowable:sameDeployment="true">
+                <extensionElements>
+                    <flowable:static-case-key><![CDATA[simpleCaseWithCaseTasks]]></flowable:static-case-key>
+                    <design:stencilid><![CDATA[CaseTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+                <caseRefExpression><![CDATA[simpleCaseWithCaseTasks]]></caseRefExpression>
+            </caseTask>
+        </casePlanModel>
+    </case>
+</definitions>

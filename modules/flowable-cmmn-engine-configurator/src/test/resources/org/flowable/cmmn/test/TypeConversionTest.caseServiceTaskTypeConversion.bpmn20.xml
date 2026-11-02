@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/bpmn">
+
+    <process id="caseServiceTaskTypeConversion" name="Case Service Task Type Conversion">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="caseTask" />
+        <serviceTask id="caseTask" flowable:type="case" name="Case task"
+                     flowable:caseDefinitionKey="oneHumanTaskCase" flowable:fallbackToDefaultTenant="true">
+            <extensionElements>
+                <flowable:in source="stringIntVar" target="stringToInt" targetType="integer" />
+                <flowable:in source="intVar" target="intToString" targetType="string" />
+                <flowable:in source="stringBooleanVar" target="stringToBoolean" targetType="boolean" />
+                <flowable:out source="childIntVar" target="outStringToInt" sourceType="integer" />
+                <flowable:out source="childStringVar" target="outIntToString" sourceType="string" />
+            </extensionElements>
+        </serviceTask>
+        <sequenceFlow id="flow2" sourceRef="caseTask" targetRef="afterTask" />
+        <userTask id="afterTask" name="After case task" />
+        <sequenceFlow id="flow3" sourceRef="afterTask" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+
+</definitions>

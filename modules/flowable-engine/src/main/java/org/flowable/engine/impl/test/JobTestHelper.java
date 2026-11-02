@@ -21,7 +21,6 @@ import java.util.function.Predicate;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.test.FlowableRule;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
@@ -33,11 +32,6 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 // This helper class helps sharing the same code for jobExecutor test helpers,
 // between Junit3 and junit 4 test support classes
 public class JobTestHelper {
-
-    public static void waitForJobExecutorToProcessAllJobs(FlowableRule rule, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllJobs(rule.getProcessEngine().getProcessEngineConfiguration(),
-            rule.getManagementService(), maxMillisToWait, intervalMillis);
-    }
 
     public static void waitForJobExecutorToProcessAllJobs(ProcessEngineConfiguration processEngineConfiguration,
             ManagementService managementService, long maxMillisToWait, long intervalMillis) {
@@ -73,10 +67,6 @@ public class JobTestHelper {
             maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
-    public static void waitForJobExecutorOnCondition(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
-        waitForJobExecutorOnCondition(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis, condition);
-    }
-
     public static void waitForJobExecutorOnCondition(ProcessEngineConfiguration processEngineConfiguration,
             long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
@@ -109,10 +99,6 @@ public class JobTestHelper {
         }
     }
 
-    public static void executeJobExecutorForTime(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
-        executeJobExecutorForTime(activitiRule.getProcessEngine().getProcessEngineConfiguration(), maxMillisToWait, intervalMillis);
-    }
-
     public static void executeJobExecutorForTime(ProcessEngineConfiguration processEngineConfiguration, long maxMillisToWait, long intervalMillis) {
         AsyncExecutor asyncExecutor = processEngineConfiguration.getAsyncExecutor();
         asyncExecutor.start();
@@ -136,22 +122,20 @@ public class JobTestHelper {
         }
     }
 
-    public static boolean areJobsAvailable(FlowableRule activitiRule) {
-        return areJobsAvailable(activitiRule.getManagementService());
-
-    }
-
     public static boolean areJobsAvailable(ManagementService managementService) {
         return !managementService.createJobQuery().list().isEmpty();
     }
 
     public static boolean areJobsOrExecutableTimersAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
-        if (emptyJobs) {
-            return !managementService.createTimerJobQuery().executable().list().isEmpty();
-        } else {
-            return true;
-        }
+        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
+        return managementService.executeCommand(commandContext -> {
+            boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
+            if (emptyJobs) {
+                return !managementService.createTimerJobQuery().executable().list().isEmpty();
+            } else {
+                return true;
+            }
+        });
     }
 
     /**
@@ -159,12 +143,15 @@ public class JobTestHelper {
      * which only take in account executable timers).
      */
     public static boolean areJobsOrTimersAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().count() == 0L;
-        if (emptyJobs) {
-            return !(managementService.createTimerJobQuery().count() == 0L);
-        } else {
-            return true;
-        }
+        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
+        return managementService.executeCommand(commandContext -> {
+            boolean emptyJobs = managementService.createJobQuery().count() == 0L;
+            if (emptyJobs) {
+                return !(managementService.createTimerJobQuery().count() == 0L);
+            } else {
+                return true;
+            }
+        });
     }
 
     protected static void internalWaitForJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,

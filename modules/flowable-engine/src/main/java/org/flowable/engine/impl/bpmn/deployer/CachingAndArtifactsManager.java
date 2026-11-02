@@ -28,8 +28,8 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Updates caches and artifacts for a deployment, its process definitions, and its process definition infos.
@@ -55,6 +55,7 @@ public class CachingAndArtifactsManager {
 
             // Add to deployment for further usage
             deployment.addDeployedArtifact(processDefinition);
+            deployment.addProcessDefinitionCacheEntry(processDefinition.getId(), cacheEntry);
         }
     }
     

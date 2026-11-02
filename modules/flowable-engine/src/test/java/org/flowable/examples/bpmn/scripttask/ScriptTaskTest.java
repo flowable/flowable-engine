@@ -22,13 +22,15 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import groovy.lang.MissingPropertyException;
 
@@ -79,6 +81,42 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    @Deployment
+    public void testIdentityServiceAvailableInScript() {
+        identityService.saveUser(identityService.newUser("kermit"));
+        try {
+            String id = runtimeService.startProcessInstanceByKey("identityServiceInScript").getId();
+            assertThat(runtimeService.getVariable(id, "userCount")).isEqualTo(1L);
+            // the identity service is still available under its former name
+            assertThat(runtimeService.getVariable(id, "legacyUserCount")).isEqualTo(1L);
+        } finally {
+            identityService.deleteUser("kermit");
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testInputVariables() {
+        // The first script should use the input variables
+        // i.e. when input parameters are defined then doNotIncludeVariables is ignored
+        String id = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testInputVariables")
+                .variable("a", 20)
+                .variable("b", 22)
+                .variable("aVar", 100)
+                .variable("bVar", 10)
+                .start()
+                .getId();
+        assertThat(runtimeService.getVariable(id, "sum"))
+                .isInstanceOfSatisfying(Number.class, number -> assertThat(number.intValue()).isEqualTo(120));
+
+        // The second script should not use the input variables at all
+        assertThatThrownBy(() -> {
+            taskService.complete(taskService.createTaskQuery().singleResult().getId());
+        }).hasMessageContaining("\"a\" is not defined");
+    }
+
+    @Test
     public void testNoScriptProvided() {
         assertThatThrownBy(() ->  deploymentIdsForAutoCleanup.add(
                 repositoryService.createDeployment().addClasspathResource("org/flowable/examples/bpmn/scripttask/ScriptTaskTest.testNoScriptProvided.bpmn20.xml").deploy().getId()
@@ -94,9 +132,29 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
                 .as("Starting process should result in error in script")
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Error evaluating juel script");
+                .hasMessageContainingAll(
+                        "Error evaluating juel script: \"execution.setVariable(\"myVar\", scriptVar)\" for Execution[ id",
+                        " - definition 'testErrorInScript:1:",
+                        " - activity 'theScriptTaskWithJuel'"
+                );
     }
-    
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.behavior.ScriptTaskActivityBehavior}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testErrorInScriptJavaScript() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("testErrorInScript").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testErrorInScript"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'TypeError: foo.substring is not a function in <eval> at line number 2' "
+                        + "Trace: scopeType=bpmn, scopeDefinitionKey=testErrorInScript, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=theScriptTaskWithJavaScript, tenantId=<empty>, type=scriptTask");
+    }
+
     @Test
     @Deployment
     public void testThrowFlowableIllegalArgumentException() {

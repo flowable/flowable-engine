@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.dmn.api.DmnDecision;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Decisions" }, description = "Manage Decisions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Decisions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DecisionResourceDataResource extends BaseDecisionResource {
 
     @ApiOperation(value = "Get a decision resource content", tags = { "Decisions" })

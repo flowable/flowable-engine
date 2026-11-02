@@ -88,7 +88,7 @@ public class StartPlanItemInstanceOperation extends AbstractChangePlanItemInstan
             activityBehavior.execute(planItemInstanceEntity);
 
         } else {
-            throw new FlowableException("PlanItemInstance " + planItemInstanceEntity + " does not have a behavior");
+            throw new FlowableException(planItemInstanceEntity + " does not have a behavior");
 
         }
     }

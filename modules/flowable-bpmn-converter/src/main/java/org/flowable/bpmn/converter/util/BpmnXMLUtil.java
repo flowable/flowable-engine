@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
+import org.flowable.bpmn.converter.CustomEventDefinitionXmlWriter;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
 import org.flowable.bpmn.converter.child.CancelEventDefinitionParser;
 import org.flowable.bpmn.converter.child.CompensateEventDefinitionParser;
@@ -37,6 +38,7 @@ import org.flowable.bpmn.converter.child.DataInputAssociationParser;
 import org.flowable.bpmn.converter.child.DataOutputAssociationParser;
 import org.flowable.bpmn.converter.child.DataStateParser;
 import org.flowable.bpmn.converter.child.DocumentationParser;
+import org.flowable.bpmn.converter.child.ElementNameParser;
 import org.flowable.bpmn.converter.child.ErrorEventDefinitionParser;
 import org.flowable.bpmn.converter.child.EscalationEventDefinitionParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
@@ -63,14 +65,39 @@ import org.flowable.bpmn.converter.child.TimeDurationParser;
 import org.flowable.bpmn.converter.child.TimerEventDefinitionParser;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.CustomBpmnEventDefinition;
+import org.flowable.bpmn.model.Event;
+import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.VariableListenerEventDefinition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BpmnXMLUtil implements BpmnXMLConstants {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(BpmnXMLUtil.class);
+
     private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<>();
+
+    /**
+     * Registry of writers for {@link CustomBpmnEventDefinition} subclasses, looked up by exact class. The
+     * write-side counterpart to {@link #genericChildParserMap}. The Flowable-specific
+     * {@link EventRegistryEventDefinition} and {@link VariableListenerEventDefinition} are pre-registered;
+     * additional types must register their writer at engine init.
+     * <p>
+     * Writers are invoked from {@link #writeCustomEventDefinitionExtensionElements} and write inside the
+     * {@code <extensionElements>} wrapper which is opened lazily by that helper.
+     * <p>
+     * <b>Lifecycle:</b> JVM-wide static. Last-writer-wins.
+     * Tests that build multiple engines should call {@link #removeCustomEventDefinitionWriter(Class)} between
+     * runs.
+     */
+    private static final Map<Class<? extends EventDefinition>, CustomEventDefinitionXmlWriter> CUSTOM_EVENT_DEFINITION_WRITERS = new HashMap<>();
 
     static {
         addGenericParser(new CancelEventDefinitionParser());
@@ -104,10 +131,97 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
         addGenericParser(new FlowNodeRefParser());
         addGenericParser(new FlowableFailedjobRetryParser());
         addGenericParser(new FlowableMapExceptionParser());
+        addGenericParser(new ElementNameParser());
+
+        // Built-in writers for the Flowable-specific (non-BPMN-spec) event definitions.
+        CUSTOM_EVENT_DEFINITION_WRITERS.put(EventRegistryEventDefinition.class, BpmnXMLUtil::writeEventRegistryEventDefinition);
+        CUSTOM_EVENT_DEFINITION_WRITERS.put(VariableListenerEventDefinition.class, BpmnXMLUtil::writeVariableListenerEventDefinition);
     }
 
     private static void addGenericParser(BaseChildElementParser parser) {
         genericChildParserMap.put(parser.getElementName(), parser);
+    }
+
+    private static void writeEventRegistryEventDefinition(Event parentEvent, EventDefinition eventDefinition, XMLStreamWriter xtw) throws Exception {
+        EventRegistryEventDefinition eventRegistry = (EventRegistryEventDefinition) eventDefinition;
+        if (StringUtils.isEmpty(eventRegistry.getEventDefinitionKey())) {
+            LOGGER.warn("EventRegistryEventDefinition on event '{}' has an empty eventDefinitionKey; skipping serialization. "
+                    + "The element will be missing from the written XML and will not round-trip.", parentEvent.getId());
+            return;
+        }
+        // Skip when an <flowable:eventType> extension element is already present on the parent event:
+        // BpmnXMLConverter promotes the legacy XML form into a typed EventRegistryEventDefinition while
+        // leaving the extension element in place, and BaseBpmnXMLConverter's extension-elements writer
+        // already re-emits it. Programmatic models built without the extension element fall through to
+        // the writeStartElement path below.
+        if (parentEvent.getExtensionElements().containsKey(ELEMENT_EVENT_TYPE)) {
+            return;
+        }
+        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_TYPE, FLOWABLE_EXTENSIONS_NAMESPACE);
+        xtw.writeCharacters(eventRegistry.getEventDefinitionKey());
+        xtw.writeEndElement();
+    }
+
+    private static void writeVariableListenerEventDefinition(Event parentEvent, EventDefinition eventDefinition, XMLStreamWriter xtw) throws Exception {
+        VariableListenerEventDefinition variableListener = (VariableListenerEventDefinition) eventDefinition;
+        xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_VARIABLELISTENERDEFINITION, FLOWABLE_EXTENSIONS_NAMESPACE);
+        if (StringUtils.isNotEmpty(variableListener.getVariableName())) {
+            writeDefaultAttribute(ATTRIBUTE_VARIABLE_NAME, variableListener.getVariableName(), xtw);
+        }
+        if (StringUtils.isNotEmpty(variableListener.getVariableChangeType())) {
+            writeDefaultAttribute(ATTRIBUTE_VARIABLE_CHANGE_TYPE, variableListener.getVariableChangeType(), xtw);
+        }
+        xtw.writeEndElement();
+    }
+
+    /**
+     * Registers a {@link BaseChildElementParser} so that the parser is invoked whenever an XML element matching
+     * {@link BaseChildElementParser#getElementName()} is encountered as a child of a BPMN element. Intended for
+     * registering custom BPMN element types (e.g. a custom {@code EventDefinition}).
+     * <p>
+     * <b>Lifecycle:</b> the parser registry is a JVM-wide static map shared by every {@link BpmnXMLConverter}
+     * instance in the process. Registration is last-writer-wins: a second {@code addChildElementParser} call
+     * for the same element name silently overwrites the previous one. Two engines in the same JVM with
+     * different parsers under the same XML element name will collide on the second engine's
+     * {@code initBpmnParser()}. Acceptable for the single-engine deployment scenario; tests that build
+     * multiple engines should call {@link #removeChildElementParser(String)} between runs to keep the
+     * registry clean.
+     */
+    public static void addChildElementParser(BaseChildElementParser parser) {
+        addGenericParser(parser);
+    }
+
+    /**
+     * Removes a previously-registered {@link BaseChildElementParser} by element name. Intended for tests that
+     * tear down between runs to avoid cross-test bleed; not for production use.
+     */
+    public static void removeChildElementParser(String elementName) {
+        genericChildParserMap.remove(elementName);
+    }
+
+    /**
+     * Registers an XML writer for a {@link CustomBpmnEventDefinition} subclass so that the BPMN writer can
+     * serialize instances of {@code eventDefinitionClass} back to XML inside {@code <extensionElements>}.
+     * Combined with {@link #addChildElementParser(BaseChildElementParser)} on the read side, this gives
+     * custom {@link EventDefinition} types end-to-end round-trip support.
+     */
+    public static void addCustomEventDefinitionWriter(Class<? extends EventDefinition> eventDefinitionClass, CustomEventDefinitionXmlWriter writer) {
+        CUSTOM_EVENT_DEFINITION_WRITERS.put(eventDefinitionClass, writer);
+    }
+
+    /**
+     * Removes a previously-registered {@link CustomEventDefinitionXmlWriter}. Intended for tests that tear
+     * down between runs to avoid cross-test bleed; not for production use.
+     */
+    public static void removeCustomEventDefinitionWriter(Class<? extends EventDefinition> eventDefinitionClass) {
+        CUSTOM_EVENT_DEFINITION_WRITERS.remove(eventDefinitionClass);
+    }
+
+    /**
+     * Returns the writer registered for the given {@link EventDefinition} subclass, or {@code null} if none.
+     */
+    public static CustomEventDefinitionXmlWriter findCustomEventDefinitionWriter(Class<? extends EventDefinition> eventDefinitionClass) {
+        return CUSTOM_EVENT_DEFINITION_WRITERS.get(eventDefinitionClass);
     }
 
     public static void addXMLLocation(BaseElement element, XMLStreamReader xtr) {
@@ -141,6 +255,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             if (xtr.isStartElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = true;
+                    
                 } else if (localParserMap.containsKey(xtr.getLocalName())) {
                     BaseChildElementParser childParser = localParserMap.get(xtr.getLocalName());
                     // if we're into an extension element but the current element is not accepted by this parentElement then is read as a custom extension element
@@ -150,6 +265,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                         continue;
                     }
                     localParserMap.get(xtr.getLocalName()).parseChildElement(xtr, parentElement, model);
+                    
                 } else if (inExtensionElements) {
                     ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
                     parentElement.addExtensionElement(extensionElement);
@@ -196,11 +312,17 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             xtr.next();
             if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
                 if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-                    extensionElement.setElementText(xtr.getText().trim());
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
                 }
             } else if (xtr.isStartElement()) {
                 ExtensionElement childExtensionElement = parseExtensionElement(xtr);
                 extensionElement.addChildElement(childExtensionElement);
+                
             } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
                 readyWithExtensionElement = true;
             }
@@ -240,10 +362,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_TARGET_TYPE.equals(attributeName)) {
+                    parameter.setTargetType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -256,10 +383,10 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 parameter.addAttribute(extensionAttribute);
             }
         }
-        
+
         return parameter;
     }
-    
+
     public static IOParameter parseOutIOParameter(XMLStreamReader xtr) {
         IOParameter parameter = null;
         String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
@@ -286,10 +413,15 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 String attributeName = xtr.getAttributeLocalName(i);
                 if (ATTRIBUTE_IOPARAMETER_SOURCE.equals(attributeName) || ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION.equals(attributeName) ||
                                 ATTRIBUTE_IOPARAMETER_TARGET.equals(attributeName) || ATTRIBUTE_IOPARAMETER_TARGET_EXPRESSION.equals(attributeName)) {
-                    
+
                     continue;
                 }
-                
+
+                if (ATTRIBUTE_IOPARAMETER_SOURCE_TYPE.equals(attributeName)) {
+                    parameter.setSourceType(xtr.getAttributeValue(i));
+                    continue;
+                }
+
                 ExtensionAttribute extensionAttribute = new ExtensionAttribute();
                 extensionAttribute.setName(attributeName);
                 extensionAttribute.setValue(xtr.getAttributeValue(i));
@@ -408,10 +540,56 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             xtw.writeEndElement();
         }
     }
+
+    public static boolean writeElementNameExtensionElement(FlowElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        String name = element.getName();
+        if (BpmnXMLUtil.containsNewLine(name)) {
+            if (!didWriteExtensionStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                didWriteExtensionStartElement = true;
+            }
+
+            xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ATTRIBUTE_ELEMENT_NAME, FLOWABLE_EXTENSIONS_NAMESPACE);
+            xtw.writeCharacters(element.getName());
+            xtw.writeEndElement();
+        }
+
+        return didWriteExtensionStartElement;
+    }
     
+    /**
+     * Iterates over the event's {@link EventDefinition}s and writes any {@link CustomBpmnEventDefinition} using
+     * the writer registered for its exact class. The writers emit elements inside {@code <extensionElements>};
+     * this helper opens that wrapper if any custom definition is encountered and lazily updates
+     * {@code didWriteExtensionStartElement}.
+     */
+    public static boolean writeCustomEventDefinitionExtensionElements(Event event, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
+        if (event == null || event.getEventDefinitions() == null) {
+            return didWriteExtensionStartElement;
+        }
+        for (EventDefinition eventDefinition : event.getEventDefinitions()) {
+            if (!(eventDefinition instanceof CustomBpmnEventDefinition)) {
+                continue;
+            }
+            CustomEventDefinitionXmlWriter writer = CUSTOM_EVENT_DEFINITION_WRITERS.get(eventDefinition.getClass());
+            if (writer == null) {
+                LOGGER.warn("No CustomEventDefinitionXmlWriter registered for {} on event '{}'; the custom event definition will be omitted from the serialized XML. "
+                        + "Register a writer via BpmnXMLUtil.addCustomEventDefinitionWriter(...) to round-trip this type.",
+                        eventDefinition.getClass().getName(), event.getId());
+                continue;
+            }
+            if (!didWriteExtensionStartElement) {
+                xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                didWriteExtensionStartElement = true;
+            }
+            writer.write(event, eventDefinition, xtw);
+        }
+        return didWriteExtensionStartElement;
+    }
+
     public static boolean writeIOParameters(String elementName, List<IOParameter> parameterList, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
 
-        if (parameterList.isEmpty()) {
+        if (parameterList == null || parameterList.isEmpty()) {
             return didWriteExtensionStartElement;
         }
 
@@ -429,8 +607,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE, ioParameter.getSource(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getSourceType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE, ioParameter.getSourceType(), xtw);
             }
             
             if (StringUtils.isNotEmpty(ioParameter.getTargetExpression())) {
@@ -440,8 +618,8 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
                 writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET, ioParameter.getTarget(), xtw);
             }
             
-            if (StringUtils.isNotEmpty(ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE))) {
-                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TARGET_TYPE), xtw);
+            if (StringUtils.isNotEmpty(ioParameter.getTargetType())) {
+                writeDefaultAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE, ioParameter.getTargetType(), xtw);
             }
             
             if (ioParameter.isTransient()) {
@@ -588,5 +766,34 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             }
         }
         return false;
+    }
+
+    public static void parseLabelElement(XMLStreamReader xtr, BpmnModel model, String BpmnElementId) throws Exception {
+        GraphicInfo labelGraphicInfo = new GraphicInfo();
+        BpmnXMLUtil.addXMLLocation(labelGraphicInfo, xtr);
+
+        if (xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION) != null
+                && !xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION).isEmpty()) {
+            labelGraphicInfo.setRotation(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_ROTATION)).intValue());
+        }
+
+        while (xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isStartElement() && ELEMENT_DI_BOUNDS.equalsIgnoreCase(xtr.getLocalName())) {
+
+                labelGraphicInfo.setX(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_X)).intValue());
+                labelGraphicInfo.setY(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_Y)).intValue());
+                labelGraphicInfo.setWidth(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_WIDTH)).intValue());
+                labelGraphicInfo.setHeight(Double.valueOf(xtr.getAttributeValue(null, ATTRIBUTE_DI_HEIGHT)).intValue());
+                model.addLabelGraphicInfo(BpmnElementId, labelGraphicInfo);
+                break;
+            } else if (xtr.isEndElement() && ELEMENT_DI_LABEL.equalsIgnoreCase(xtr.getLocalName())) {
+                break;
+            }
+        }
+    }
+
+    public static boolean containsNewLine(String str) {
+        return str != null && str.contains("\n");
     }
 }

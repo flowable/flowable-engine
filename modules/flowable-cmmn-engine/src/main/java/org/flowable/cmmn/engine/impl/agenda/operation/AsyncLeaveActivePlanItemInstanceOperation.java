@@ -32,9 +32,8 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -59,7 +58,7 @@ public class AsyncLeaveActivePlanItemInstanceOperation extends AbstractChangePla
         if (planItemDefinition instanceof Task) {
             createAsyncJob((Task) planItemDefinition);
         } else {
-            throw new FlowableException("Programmatic error: this operation can only be planned for Task plan item definitions");
+            throw new FlowableException("Programmatic error: this operation can only be planned for Task plan item definitions. " + planItemInstanceEntity);
         }
     }
 
@@ -70,7 +69,7 @@ public class AsyncLeaveActivePlanItemInstanceOperation extends AbstractChangePla
 
         job.setJobHandlerConfiguration(createJobConfiguration());
 
-        jobService.createAsyncJob(job, task.isExclusive());
+        jobService.createAsyncJob(job, task.isAsyncLeaveExclusive());
         jobService.scheduleAsyncJob(job);
 
         if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
@@ -89,12 +88,7 @@ public class AsyncLeaveActivePlanItemInstanceOperation extends AbstractChangePla
             objectNode.put(key, transitionMetadata.get(key));
         }
 
-        try {
-            return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            LOGGER.warn("Programmatic error: could not create job configuration JSON", e);
-        }
-        return null;
+        return objectMapper.writeValueAsString(objectNode);
     }
 
     @Override

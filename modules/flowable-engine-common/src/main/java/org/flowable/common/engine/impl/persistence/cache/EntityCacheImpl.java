@@ -98,10 +98,24 @@ public class EntityCacheImpl implements EntityCache {
         }
 
         if (classCache != null) {
-            List<T> entities = new ArrayList<>(classCache.size());
+
+            // Having two ArrayLists and merge them later is faster than doing add(0, element)
+            ArrayList<T> entities = new ArrayList<>(classCache.size());
+            ArrayList<T> deletedEntities = new ArrayList<>(classCache.size());
             for (CachedEntity cachedObject : classCache.values()) {
-                entities.add((T) cachedObject.getEntity());
+
+                if (!cachedObject.getEntity().isDeleted()) {
+                    entities.add((T) cachedObject.getEntity());
+                } else {
+                    deletedEntities.add((T) cachedObject.getEntity());
+                }
+
             }
+
+            // Non-deleted entities go first in the returned list,
+            // while deleted ones go at the end.
+            // This way users of this method will first get the 'active' entities.
+            entities.addAll(deletedEntities);
             return entities;
         }
 

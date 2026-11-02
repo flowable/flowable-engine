@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.v6;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.data.MapEntry.entry;
 
 import java.util.Collections;
@@ -26,6 +27,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.api.Job;
@@ -77,6 +79,33 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task.getName()).isEqualTo("The famous task");
         assertThat(task.getAssignee()).isEqualTo("kermit");
+    }
+    
+    @Test
+    @org.flowable.engine.test.Deployment
+    public void testProcessWithError() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithError");
+        assertThat(processInstance).isNotNull();
+        assertThat(processInstance.isEnded()).isFalse();
+
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(task).isNotNull();
+
+        assertThatThrownBy(() -> taskService.complete(task.getId()))
+                .isInstanceOf(Throwable.class);
+        
+        org.flowable.task.api.Task updatedTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedTask).isNotNull();
+        
+        List<ActivityInstance> activityInstances = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId()).list();
+        ActivityInstance serviceTaskActivityInstance = null;
+        for (ActivityInstance activityInstance : activityInstances) {
+            if ("serviceTask".equals(activityInstance.getActivityId())) {
+                serviceTaskActivityInstance = activityInstance;
+            }
+        }
+        
+        assertThat(serviceTaskActivityInstance).isNull();
     }
 
     @Test

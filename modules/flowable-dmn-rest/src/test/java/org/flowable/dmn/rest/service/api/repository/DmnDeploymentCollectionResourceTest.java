@@ -26,8 +26,9 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
 import org.flowable.dmn.rest.service.api.HttpMultipartHelper;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -39,6 +40,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFile() throws Exception {
 
         try {
@@ -52,7 +54,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -66,7 +68,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -85,6 +87,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test deploying single DMN file
      */
+    @Test
     public void testPostNewDeploymentDMNFileDecisionService() throws Exception {
 
         try {
@@ -98,7 +101,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
             closeResponse(response);
 
-            String deploymentId = responseNode.get("id").textValue();
+            String deploymentId = responseNode.get("id").stringValue();
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS)
                     .isEqualTo("{"
@@ -112,7 +115,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
             // No deployment-category should have been set
-            assertThat(responseNode.get("category").textValue()).isNull();
+            assertThat(responseNode.get("category").stringValue()).isNull();
 
             // Check if process is actually deployed in the deployment
             List<String> resources = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
@@ -130,6 +133,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -182,6 +186,37 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
+        } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
+            // Always cleanup any created deployments, even if the test failed
+            List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
+            for (DmnDeployment deployment : deployments) {
+                dmnRepositoryService.deleteDeployment(deployment.getId());
+            }
+        }
+    }
+
+    @Test
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            dmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .tenantId("acme")
+                    .deploy();
+
+            dmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/simple.dmn")
+                    .tenantId("myTenant")
+                    .deploy();
+
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(
                     new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
@@ -246,6 +281,8 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
         } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
             for (DmnDeployment deployment : deployments) {
@@ -257,6 +294,7 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
     /**
      * Test getting deployments. GET dmn-repository/deployments
      */
+    @Test
     public void testGetDeploymentsDecisionService() throws Exception {
 
         try {
@@ -309,6 +347,37 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
 
+        } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
+            // Always cleanup any created deployments, even if the test failed
+            List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
+            for (DmnDeployment deployment : deployments) {
+                dmnRepositoryService.deleteDeployment(deployment.getId());
+            }
+        }
+    }
+
+    @Test
+    public void testGetDeploymentsDecisionServiceSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            dmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            DmnDeployment firstDeployment = dmnRepositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/decision_service-1.dmn")
+                    .tenantId("acme")
+                    .deploy();
+
+            dmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            DmnDeployment secondDeployment = dmnRepositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/dmn/rest/service/api/repository/decision_service-1.dmn")
+                    .tenantId("myTenant")
+                    .deploy();
+
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(
                     new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_COLLECTION) + "?sort=name&order=asc"),
@@ -373,6 +442,8 @@ public class DmnDeploymentCollectionResourceTest extends BaseSpringDmnRestTestCa
                     );
 
         } finally {
+            dmnEngineConfiguration.getClock().reset();
+            
             // Always cleanup any created deployments, even if the test failed
             List<DmnDeployment> deployments = dmnRepositoryService.createDeploymentQuery().list();
             for (DmnDeployment deployment : deployments) {

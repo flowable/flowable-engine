@@ -47,8 +47,7 @@ public abstract class AbstractExternalWorkerJobCmd implements Command<Void> {
     public final Void execute(CommandContext commandContext) {
         ExternalWorkerJobEntity externalWorkerJob = resolveJob(commandContext);
         if (externalWorkerJob.getProcessInstanceId() == null) {
-            throw new FlowableException(
-                    "External worker job with id " + externalJobId + " is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
+            throw new FlowableException(externalWorkerJob + " is not bpmn scoped. This command can only handle bpmn scoped external worker jobs");
         }
 
         runJobLogic(externalWorkerJob, commandContext);

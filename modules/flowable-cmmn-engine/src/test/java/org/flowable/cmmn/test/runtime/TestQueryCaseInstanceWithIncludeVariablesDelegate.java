@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -36,20 +39,35 @@ public class TestQueryCaseInstanceWithIncludeVariablesDelegate implements PlanIt
 
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
-        planItemInstance.setVariable("varFromTheServiceTask", "valueFromTheServiceTask");
+        Object doNotSetVariable = planItemInstance.getTransientVariable("doNotSetVariable");
+        if (doNotSetVariable == null || Boolean.FALSE.equals(doNotSetVariable)) {
+            planItemInstance.setVariable("varFromTheServiceTask", "valueFromTheServiceTask");
+        }
 
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
 
-        CaseInstance caseInstance = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceQuery()
-            .caseInstanceId(planItemInstance.getCaseInstanceId())
-            .includeCaseVariables()
+        Collection<String> queryVariableNames = (Collection<String>) planItemInstance.getTransientVariable("queryVariableNames");
+
+        CaseInstanceQuery runtimeQuery = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceQuery()
+                .caseInstanceId(planItemInstance.getCaseInstanceId());
+        if (queryVariableNames != null && !queryVariableNames.isEmpty()) {
+            runtimeQuery.includeCaseVariables(queryVariableNames);
+        } else {
+            runtimeQuery.includeCaseVariables();
+        }
+        CaseInstance caseInstance = runtimeQuery
             .singleResult();
         VARIABLES = caseInstance.getCaseVariables();
 
         if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
-            HistoricCaseInstance historicCaseInstance = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
-                .caseInstanceId(planItemInstance.getCaseInstanceId())
-                .includeCaseVariables()
+            HistoricCaseInstanceQuery historicQuery = cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery()
+                    .caseInstanceId(planItemInstance.getCaseInstanceId());
+            if (queryVariableNames != null && !queryVariableNames.isEmpty()) {
+                historicQuery.includeCaseVariables(queryVariableNames);
+            } else {
+                historicQuery.includeCaseVariables();
+            }
+            HistoricCaseInstance historicCaseInstance = historicQuery
                 .singleResult();
             HISTORIC_VARIABLES = historicCaseInstance.getCaseVariables();
         }

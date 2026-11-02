@@ -14,7 +14,6 @@
 package org.flowable.task.service.impl.persistence.entity;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -67,28 +66,19 @@ public class HistoricTaskInstanceEntityManagerImpl
 
     @Override
     public long findHistoricTaskInstanceCountByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        if (serviceConfiguration.isHistoryEnabled()) {
-            return dataManager.findHistoricTaskInstanceCountByQueryCriteria(historicTaskInstanceQuery);
-        }
-        return 0;
+        return dataManager.findHistoricTaskInstanceCountByQueryCriteria(historicTaskInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        if (serviceConfiguration.isHistoryEnabled()) {
-            return dataManager.findHistoricTaskInstancesByQueryCriteria(historicTaskInstanceQuery);
-        }
-        return Collections.EMPTY_LIST;
+        return dataManager.findHistoricTaskInstancesByQueryCriteria(historicTaskInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricTaskInstance> findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(HistoricTaskInstanceQueryImpl historicTaskInstanceQuery) {
-        if (serviceConfiguration.isHistoryEnabled()) {
-            return dataManager.findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(historicTaskInstanceQuery);
-        }
-        return Collections.EMPTY_LIST;
+        return dataManager.findHistoricTaskInstancesAndRelatedEntitiesByQueryCriteria(historicTaskInstanceQuery);
     }
 
     @Override

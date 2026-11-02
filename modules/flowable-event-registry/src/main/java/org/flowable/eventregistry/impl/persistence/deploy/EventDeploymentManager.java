@@ -16,6 +16,10 @@ import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
@@ -230,19 +234,35 @@ public class EventDeploymentManager {
         // Delete data
         deploymentEntityManager.deleteDeployment(deploymentId);
 
+        FlowableEventDispatcher eventDispatcher = engineConfig.getEventDispatcher();
+
         for (EventDefinition eventDefinition : eventDefinitions) {
             eventDefinitionCache.remove(eventDefinition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(eventDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+            }
         }
         
         for (ChannelDefinition channelDefinition : channelDefinitions) {
             removeChannelDefinitionFromCache(channelDefinition);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(channelDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+            }
         }
     }
-    
+
     public void removeChannelDefinitionFromCache(ChannelDefinition channelDefinition) {
-        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinition.getId());
-        
+        removeChannelDefinitionFromCache(channelDefinition.getId());
+    }
+
+    public ChannelDefinition removeChannelDefinitionFromCache(String channelDefinitionId) {
+        ChannelDefinitionCacheEntry cacheEntry = channelDefinitionCache.get(channelDefinitionId);
+        ChannelDefinition channelDefinition = null;
+
         if (cacheEntry != null) {
+            channelDefinition = cacheEntry.getChannelDefinitionEntity();
             ChannelModel channelModel = cacheEntry.getChannelModel();
             for (ChannelModelProcessor channelModelProcessor : engineConfig.getChannelModelProcessors()) {
                 if (channelModelProcessor.canProcess(channelModel)) {
@@ -252,9 +272,12 @@ public class EventDeploymentManager {
                     channelModelProcessor.unregisterChannelModel(channelModel, channelDefinition.getTenantId(), engineConfig.getEventRepositoryService());
                 }
             }
+
         }
         
-        channelDefinitionCache.remove(channelDefinition.getId());
+        channelDefinitionCache.remove(channelDefinitionId);
+
+        return channelDefinition;
     }
 
     public List<Deployer> getDeployers() {

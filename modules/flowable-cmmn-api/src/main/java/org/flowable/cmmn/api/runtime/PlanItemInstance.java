@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -47,9 +48,12 @@ public interface PlanItemInstance {
     Date getCompletedTime();
     Date getOccurredTime();
     Date getTerminatedTime();
+    Date getFailedTime();
     Date getExitTime();
     Date getEndedTime();
     String getStartUserId();
+    String getAssignee();
+    String getCompletedBy();
     String getReferenceId();
     String getReferenceType();
     boolean isCompletable();
@@ -58,7 +62,7 @@ public interface PlanItemInstance {
     String getFormKey();
     String getExtraValue();
     String getTenantId();
-    
+    Map<String, Object> getPlanItemInstanceLocalVariables();
 
     /** Sets an optional localized name for the plan item */
     void setLocalizedName(String localizedName);

@@ -1,1 +1,0 @@
-alter table ACT_HI_TASKINST add PROPAGATED_STAGE_INST_ID_ nvarchar(255);

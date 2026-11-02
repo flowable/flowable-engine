@@ -18,7 +18,9 @@ import java.util.Map;
 import org.flowable.app.api.AppManagementService;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.impl.cmd.GetTableNamesCmd;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.impl.cmd.GetTableCountCmd;
+import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
 
 /**
@@ -39,5 +41,9 @@ public class AppManagementServiceImpl extends CommonEngineServiceImpl<AppEngineC
     public Collection<String> getTableNames() {
         return commandExecutor.execute(new GetTableNamesCmd());
     }
-    
+ 
+    @Override
+    public LockManager getLockManager(String lockName) {
+        return new LockManagerImpl(commandExecutor, lockName, getConfiguration().getLockPollRate(), configuration.getEngineCfgKey());
+    }
 }

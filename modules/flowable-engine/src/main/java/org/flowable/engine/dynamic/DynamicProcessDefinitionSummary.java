@@ -21,9 +21,9 @@ import org.flowable.bpmn.model.ScriptTask;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.DynamicBpmnConstants;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Pojo class who can be used to check information between {@link org.flowable.engine.DynamicBpmnService#getProcessDefinitionInfo(String)} and {@link org.flowable.bpmn.model.BpmnModel}. Without

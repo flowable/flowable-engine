@@ -23,11 +23,11 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -123,7 +123,7 @@ public class TriggerModeSentryTest extends FlowableCmmnTestCase {
 
     private void assertSentryPartInstanceCount(CaseInstance caseInstance, int count) {
         List<SentryPartInstanceEntity> sentryPartInstanceEntities = cmmnEngineConfiguration.getCommandExecutor()
-                .execute(new Command<List<SentryPartInstanceEntity>>() {
+                .execute(new Command<>() {
 
                     @Override
                     public List<SentryPartInstanceEntity> execute(CommandContext commandContext) {

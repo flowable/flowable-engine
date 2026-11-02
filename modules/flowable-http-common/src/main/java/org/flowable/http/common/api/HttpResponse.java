@@ -22,6 +22,7 @@ public class HttpResponse {
     protected String reason;
     protected HttpHeaders httpHeaders;
     protected String body;
+    protected byte[] bodyBytes;
     protected boolean bodyResponseHandled;
 
     public HttpResponse() {
@@ -78,6 +79,14 @@ public class HttpResponse {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public byte[] getBodyBytes() {
+        return bodyBytes;
+    }
+
+    public void setBodyBytes(byte[] bodyBytes) {
+        this.bodyBytes = bodyBytes;
     }
 
     public boolean isBodyResponseHandled() {

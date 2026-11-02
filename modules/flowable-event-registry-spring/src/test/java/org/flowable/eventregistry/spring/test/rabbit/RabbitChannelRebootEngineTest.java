@@ -184,6 +184,8 @@ public class RabbitChannelRebootEngineTest {
         for (EventDeployment eventDeployment : eventDeployments) {
             eventRepositoryService.deleteDeployment(eventDeployment.getId());
         }
+
+        applicationContext.close();
     }
 
     @Configuration
@@ -204,12 +206,12 @@ public class RabbitChannelRebootEngineTest {
 
         @Bean
         public Queue testListenerQueue() {
-            return new Queue("testListener", false);
+            return new Queue("testListener", true);
         }
 
         @Bean
         public Queue testCustomerQueue() {
-            return new Queue("test-customer", false);
+            return new Queue("test-customer", true);
         }
 
         @RabbitListener(queues = "testListener")

@@ -12,7 +12,9 @@
  */
 package org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -24,9 +26,18 @@ public class HistoricVariableInstanceByScopeIdAndScopeTypeMatcher extends Cached
 
     @Override
     public boolean isRetained(HistoricVariableInstanceEntity historicVariableInstanceEntity, Object parameter) {
-        Map<String, String> map = (Map<String, String>) parameter;
-        return map.get("scopeId").equals(historicVariableInstanceEntity.getScopeId())
-                && map.get("scopeType").equals(historicVariableInstanceEntity.getScopeType());
+        Map<String, Object> map = (Map<String, Object>) parameter;
+        if (!Objects.equals(historicVariableInstanceEntity.getScopeId(), map.get("scopeId"))) {
+            return false;
+        }
+        if (!Objects.equals(historicVariableInstanceEntity.getScopeType(), map.get("scopeType"))) {
+            return false;
+        }
+        Collection<String> variableNames = (Collection<String>) map.get("variableNames");
+        if (variableNames != null && !variableNames.isEmpty()) {
+            return variableNames.contains(historicVariableInstanceEntity.getName());
+        }
+        return true;
     }
 
 }

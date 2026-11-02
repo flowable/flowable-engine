@@ -22,7 +22,7 @@ import java.util.Set;
 /**
  * @author Tijs Rademakers
  */
-public class UserTask extends Task {
+public class UserTask extends Task implements HasValidateFormFields {
 
     protected String assignee;
     protected String owner;
@@ -40,6 +40,7 @@ public class UserTask extends Task {
     protected String skipExpression;
     protected String validateFormFields;
     protected String taskIdVariableName;
+    protected String taskCompleterVariableName;
 
     protected Map<String, Set<String>> customUserIdentityLinks = new HashMap<>();
     protected Map<String, Set<String>> customGroupIdentityLinks = new HashMap<>();
@@ -208,10 +209,11 @@ public class UserTask extends Task {
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public String getValidateFormFields() {
         return validateFormFields;
     }
-
+    @Override
     public void setValidateFormFields(String validateFormFields) {
         this.validateFormFields = validateFormFields;
     }
@@ -222,6 +224,14 @@ public class UserTask extends Task {
 
     public void setTaskIdVariableName(String taskIdVariableName) {
         this.taskIdVariableName = taskIdVariableName;
+    }
+
+    public String getTaskCompleterVariableName() {
+        return taskCompleterVariableName;
+    }
+
+    public void setTaskCompleterVariableName(String taskCompleterVariableName) {
+        this.taskCompleterVariableName = taskCompleterVariableName;
     }
 
     @Override
@@ -241,6 +251,7 @@ public class UserTask extends Task {
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
         setTaskIdVariableName(otherElement.getTaskIdVariableName());
+        setTaskCompleterVariableName(otherElement.getTaskCompleterVariableName());
         setExtensionId(otherElement.getExtensionId());
         setSkipExpression(otherElement.getSkipExpression());
         setValidateFormFields(otherElement.getValidateFormFields());

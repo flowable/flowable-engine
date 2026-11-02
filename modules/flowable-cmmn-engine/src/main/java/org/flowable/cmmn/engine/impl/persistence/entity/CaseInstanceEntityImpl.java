@@ -30,12 +30,13 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -58,6 +59,10 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     protected String referenceType;
     protected boolean completable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
 
     protected Date lockTime;
     protected String lockOwner;
@@ -119,6 +124,9 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
         persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completable);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         persistentState.put("lockTime", lockTime);
         persistentState.put("lockOwner", lockOwner);
         return persistentState;
@@ -269,6 +277,36 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
@@ -338,9 +376,10 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     }
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         variableInstance.setScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+        variableInstance.setScopeDefinitionId(caseDefinitionId);
     }
 
     @Override
@@ -481,5 +520,23 @@ public class CaseInstanceEntityImpl extends AbstractCmmnEngineVariableScopeEntit
     @Override
     public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
         this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("CaseInstance[id=").append(id)
+                .append(", caseDefinitionId=").append(caseDefinitionId)
+                .append(", caseDefinitionKey=").append(caseDefinitionKey)
+                .append(", parentId=").append(parentId)
+                .append(", name=").append(name);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+
+        sb.append("]");
+
+        return sb.toString();
     }
 }

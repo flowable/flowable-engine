@@ -13,18 +13,20 @@
 package org.flowable.eventregistry.impl.serialization;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.eventregistry.api.OutboundEventSerializer;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Simple {@link EventInstance} serialization that maps all {@link org.flowable.eventregistry.api.runtime.EventPayloadInstance}'s
@@ -34,7 +36,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class EventPayloadToJsonStringSerializer implements OutboundEventSerializer {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper;
+
+    public EventPayloadToJsonStringSerializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public String serialize(EventInstance eventInstance) {
@@ -96,19 +102,31 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
                     }
 
                 } else if (EventPayloadTypes.JSON.equals(definitionType)) {
-
-                    if (payloadInstanceValue instanceof JsonNode) {
-                        objectNode.set(payloadInstance.getDefinitionName(), (JsonNode) payloadInstanceValue);
-                    } else if (payloadInstanceValue instanceof String) {
-                        JsonNode jsonNode = null;
+                    Object jsonValue = payloadInstanceValue;
+                    if (payloadInstanceValue instanceof Supplier<?>) {
+                        Object suppliedValue = ((Supplier<?>) payloadInstanceValue).get();
+                        JsonNode jsonNode = JsonUtil.asJsonNode(suppliedValue, objectMapper, true);
+                        if (jsonNode != null) {
+                            jsonValue = jsonNode;
+                        }
+                    } else {
+                        JsonNode jsonNode = JsonUtil.asJsonNode(jsonValue, objectMapper, true);
+                        if (jsonNode != null) {
+                            jsonValue = jsonNode;
+                        }
+                    }
+                    if (jsonValue instanceof JsonNode) {
+                        objectNode.set(payloadInstance.getDefinitionName(), (JsonNode) jsonValue);
+                    } else if (jsonValue instanceof String) {
+                        JsonNode jsonNode;
                         try {
-                            jsonNode = objectMapper.readTree((String) payloadInstanceValue);
-                        } catch (JsonProcessingException e) {
+                            jsonNode = objectMapper.readTree((String) jsonValue);
+                        } catch (JacksonException e) {
                             throw new FlowableIllegalArgumentException("Could not read json event payload", e);
                         }
                         objectNode.set(payloadInstance.getDefinitionName(), jsonNode);
                     }  else {
-                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + payloadInstanceValue + " to type 'json'");
+                        throw new FlowableIllegalArgumentException("Cannot convert event payload " + jsonValue + " to type 'json'");
                     }
 
                 } else {
@@ -122,8 +140,8 @@ public class EventPayloadToJsonStringSerializer implements OutboundEventSerializ
 
         try {
             return objectMapper.writeValueAsString(objectNode);
-        } catch (JsonProcessingException e) {
-            throw new FlowableException("Could not serialize event to json string", e);
+        } catch (JacksonException e) {
+            throw new FlowableException("Could not serialize event to json string for " + eventInstance, e);
         }
     }
 

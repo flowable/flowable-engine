@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="repeatingCaseTaskSyncChildStage" name="Repeating case task with synchronous child (stage)">
+        <casePlanModel id="cpm" name="Case plan model">
+
+            <planItem id="planItemStage" name="Stage" definitionRef="stage1"/>
+
+            <!-- The stage is auto-complete on purpose: only an auto-complete container is evaluated as
+                 completable at the moment the synchronously completed case task is still pending its 'complete'
+                 event, which is what triggers the premature completion this test guards against. A
+                 non-auto-complete stage stays active via its available children and is not affected. -->
+            <stage id="stage1" name="Stage" flowable:autoComplete="true">
+                <!-- Task A: the in-stage gate. Completing it fires the case task's on-part. -->
+                <planItem id="planItem1" name="Task A" definitionRef="humanTask1"/>
+
+                <!-- Task B: collection-repeating case task, gated by on-part onComplete(Task A).
+                     Child case completes synchronously. -->
+                <planItem id="planItem2" name="Task B" definitionRef="caseTask1">
+                    <itemControl>
+                        <repetitionRule flowable:counterVariable="repetitionCounter"
+                                        flowable:collectionVariable="taskOutputList"
+                                        flowable:elementVariable="item"
+                                        flowable:elementIndexVariable="itemIndex"></repetitionRule>
+                    </itemControl>
+                    <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
+                </planItem>
+
+                <!-- Task C: the human task that should become active once the case task completed. -->
+                <planItem id="planItem3" name="Task C" definitionRef="humanTask3">
+                    <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry2"></entryCriterion>
+                </planItem>
+
+                <sentry id="sentry1">
+                    <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <sentry id="sentry2">
+                    <planItemOnPart id="sentryOnPart2" sourceRef="planItem2">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <humanTask id="humanTask1" name="Task A"/>
+                <caseTask id="caseTask1" name="Task B" caseRef="immediateChildCase" flowable:fallbackToDefaultTenant="true"/>
+                <humanTask id="humanTask3" name="Task C"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

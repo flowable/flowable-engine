@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mssql: [2017-latest-ubuntu]
+        mssql: [2019-latest, 2022-latest]
     services:
       mssql:
         image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
@@ -30,15 +30,13 @@ jobs:
           - 1433/tcp
         # needed because the mssql container does not provide a health check
         options: >-
-          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
+          --health-cmd="/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
           --health-start-period 10s
           --health-interval 10s
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Prepare Database
         run: ./.github/actions/scripts/prepare-mssql.sh
         env:
@@ -46,10 +44,18 @@ jobs:
           # If we were running the job on a container this would be mssql
           MSSQL_HOST: localhost
           MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
-          java-version: 1.8
+          distribution: 'zulu'
+          java-version: 17
+      - name: Restore Maven Repository Cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
       - name: Test
+        id: test
         # use localhost for the host here because we have specified a vm for the job.
         # If we were running the job on a container this would be mssql
         # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
@@ -57,111 +63,18 @@ jobs:
         run: >-
           ./mvnw clean install
           ${MAVEN_ARGS}
-          -PcleanDb,mssql
-          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
+          -PcleanDb,mssql,distro
+          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
+          -Dspring.datasource.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable;encrypt=false"
+          -Dspring.datasource.username=flowable
+          -Dspring.datasource.password=flowable
           -Dmaven.test.redirectTestOutputToFile=false
-  test_mssql_dmn:
-    name: DMN SQL Server ${{ matrix.mssql }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        mssql: [2017-latest-ubuntu]
-    services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
-        env:
-          SA_PASSWORD: flowableStr0ngPassword
-          ACCEPT_EULA: Y
-        ports:
-          - 1433/tcp
-        # needed because the mssql container does not provide a health check
-        options: >-
-          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
-          --health-start-period 10s
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v2-beta
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with:
-          fetch-depth: 10
-      - name: Prepare Database
-        run: ./.github/actions/scripts/prepare-mssql.sh
-        env:
-          # use localhost for the host here because we have specified a vm for the job.
-          # If we were running the job on a container this would be mssql
-          MSSQL_HOST: localhost
-          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Test
-        # use localhost for the host here because we have specified a vm for the job.
-        # If we were running the job on a container this would be mssql
-        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
-        # and new lines from the end would be removed
-        run: >-
-          ./mvnw clean install
-          ${MAVEN_ARGS}
-          -Pdmn,mssql
-          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
-          -Djdbc.username=flowable
-          -Djdbc.password=flowable
-          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-          -Dmaven.test.redirectTestOutputToFile=false
-          -pl org.flowable:flowable-dmn-engine -am
-  test_mssql_content:
-    name: Content SQL Server ${{ matrix.mssql }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        mssql: [2017-latest-ubuntu]
-    services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:${{ matrix.mssql }}
-        env:
-          SA_PASSWORD: flowableStr0ngPassword
-          ACCEPT_EULA: Y
-        ports:
-          - 1433/tcp
-        # needed because the mssql container does not provide a health check
-        options: >-
-          --health-cmd="/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P flowableStr0ngPassword -l 30 -Q \"SELECT 1\" || exit 1"
-          --health-start-period 10s
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 10
-    steps:
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
-      - name: Prepare Database
-        run: ./.github/actions/scripts/prepare-mssql.sh
-        env:
-          # use localhost for the host here because we have specified a vm for the job.
-          # If we were running the job on a container this would be mssql
-          MSSQL_HOST: localhost
-          MSSQL_PORT: ${{ job.services.mssql.ports[1433] }} # get randomly assigned published port
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Test
-        # use localhost for the host here because we have specified a vm for the job.
-        # If we were running the job on a container this would be mssql
-        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
-        # and new lines from the end would be removed
-        run: >-
-          ./mvnw clean install
-          ${MAVEN_ARGS}
-          -Pcontent,mssql
-          -Djdbc.url="jdbc:sqlserver://localhost:${{ job.services.mssql.ports[1433] }};database=flowable"
-          -Djdbc.username=flowable
-          -Djdbc.password=flowable
-          -Djdbc.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-          -Dmaven.test.redirectTestOutputToFile=false
-          -pl org.flowable:flowable-content-engine -am
+          name: surefire-test-reports-${{ matrix.mssql }}
+          path: '**/target/surefire-reports/*'

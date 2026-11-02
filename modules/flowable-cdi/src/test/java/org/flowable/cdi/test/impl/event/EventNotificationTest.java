@@ -18,7 +18,7 @@ import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EventNotificationTest extends CdiFlowableTestCase {
 

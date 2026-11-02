@@ -14,7 +14,6 @@ package org.flowable.bpmn.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -80,7 +79,9 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement implements
         super.setValues(otherHandler);
         setImplementation(otherHandler.getImplementation());
         setImplementationType(otherHandler.getImplementationType());
-        Optional.ofNullable(this.scriptInfo).map(ScriptInfo::clone).ifPresent(this::setScriptInfo);
+        if (otherHandler.getScriptInfo() != null) {
+            setScriptInfo(otherHandler.getScriptInfo().clone());
+        }
         fieldExtensions = new ArrayList<>();
         if (otherHandler.getFieldExtensions() != null && !otherHandler.getFieldExtensions().isEmpty()) {
             for (FieldExtension extension : otherHandler.getFieldExtensions()) {

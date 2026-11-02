@@ -20,9 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
-        # See https://bugs.mysql.com/bug.php?id=99019
-        mysql: [5.7, 8.0.18]
+        mysql: [8.0, 8.4]
     services:
       mysql:
         image: mysql:${{ matrix.mysql }}
@@ -38,110 +36,37 @@ jobs:
     steps:
       - name: "Set MySQL collation"
         run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
-      - uses: actions/checkout@v2-beta
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
         with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
+          distribution: 'zulu'
+          java-version: 17
+      - name: Restore Maven Repository Cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          java-version: 1.8
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
       - name: Test
+        id: test
         # use localhost for the host here because we have specified a vm for the job.
         # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
         # and new lines from the end would be removed
         run: >-
           ./mvnw clean install
           ${MAVEN_ARGS}
-          -PcleanDb,mysql
+          -PcleanDb,mysql,distro
           -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
           -Djdbc.username=flowable
           -Djdbc.password=flowable
           -Djdbc.driver=com.mysql.cj.jdbc.Driver
+          -Dspring.datasource.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
+          -Dspring.datasource.username=flowable
+          -Dspring.datasource.password=flowable
           -Dmaven.test.redirectTestOutputToFile=false
-  test_mysql_dmn:
-    name: MySQL ${{ matrix.mysql }} DMN
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
-        # See https://bugs.mysql.com/bug.php?id=99019
-        mysql: [5.7, 8.0.18]
-    services:
-      mysql:
-        image: mysql:${{ matrix.mysql }}
-        env:
-          MYSQL_DATABASE: flowable
-          MYSQL_USER: flowable
-          MYSQL_PASSWORD: flowable
-          MYSQL_ROOT_PASSWORD: flowable
-        ports:
-          - 3306/tcp
-        # needed because the mysql container does not provide a health check
-        options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
-    steps:
-      - name: "Set MySQL collation"
-        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
-      - uses: actions/checkout@v2-beta
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Test
-        # use mysql for the host here because we have specified a container for the job.
-        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
-        # and new lines from the end would be removed
-        run: >-
-          ./mvnw clean install
-          ${MAVEN_ARGS}
-          -Pdmn,mysql
-          -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
-          -Djdbc.username=flowable
-          -Djdbc.password=flowable
-          -Djdbc.driver=com.mysql.cj.jdbc.Driver
-          -Dmaven.test.redirectTestOutputToFile=false
-          -pl org.flowable:flowable-dmn-engine -am
-  test_mysql_content:
-    name: MySQL ${{ matrix.mysql }} Content
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        # Not testing with latest 8 since they have a bug for exists sub query with order by in the outer
-        # See https://bugs.mysql.com/bug.php?id=99019
-        mysql: [5.7, 8.0.18]
-    services:
-      mysql:
-        image: mysql:${{ matrix.mysql }}
-        env:
-          MYSQL_DATABASE: flowable
-          MYSQL_USER: flowable
-          MYSQL_PASSWORD: flowable
-          MYSQL_ROOT_PASSWORD: flowable
-        ports:
-          - 3306/tcp
-        # needed because the mysql container does not provide a health check
-        options: --health-cmd="mysqladmin -uflowable -pflowable status" --health-interval 10s --health-timeout 5s --health-retries 5 --tmpfs /var/lib/mysql:rw
-    steps:
-      - name: "Set MySQL collation"
-        run: docker exec ${{ job.services.mysql.id }} sh -c 'mysql --user=flowable --password=flowable --database=flowable --execute="alter database flowable character set utf8mb4 collate utf8mb4_bin"'
-      - uses: actions/checkout@v2-beta
-        with:
-          fetch-depth: 10
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-      - name: Test
-        # use localhost for the host here because we have specified a vm for the job.
-        # '>-' is a special YAML syntax and means that new lines would be replaced with spaces
-        # and new lines from the end would be removed
-        run: >-
-          ./mvnw clean install
-          ${MAVEN_ARGS}
-          -Pcontent,mysql
-          -Djdbc.url=jdbc:mysql://localhost:${{ job.services.mysql.ports[3306] }}/flowable?characterEncoding=UTF-8
-          -Djdbc.username=flowable
-          -Djdbc.password=flowable
-          -Djdbc.driver=com.mysql.cj.jdbc.Driver
-          -Dmaven.test.redirectTestOutputToFile=false
-          -pl org.flowable:flowable-content-engine -am
+          name: surefire-test-reports-mysql-${{ matrix.mysql }}
+          path: '**/target/surefire-reports/*'

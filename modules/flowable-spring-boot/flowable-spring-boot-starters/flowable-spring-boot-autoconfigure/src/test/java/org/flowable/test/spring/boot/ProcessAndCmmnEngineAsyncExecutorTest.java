@@ -14,7 +14,7 @@ package org.flowable.test.spring.boot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.common.spring.async.SpringAsyncTaskExecutor;
@@ -30,16 +30,16 @@ import org.flowable.spring.job.service.SpringAsyncExecutor;
 import org.flowable.spring.job.service.SpringRejectedJobsHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
+import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 
@@ -244,7 +244,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Cmmn
         @Bean
-        public AsyncListenableTaskExecutor cmmnTaskExecutor() {
+        public AsyncTaskExecutor cmmnTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }
@@ -254,7 +254,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Process
         @Bean
-        public AsyncListenableTaskExecutor processTaskExecutor() {
+        public AsyncTaskExecutor processTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }
@@ -264,7 +264,7 @@ public class ProcessAndCmmnEngineAsyncExecutorTest {
 
         @Primary
         @Bean
-        public AsyncListenableTaskExecutor primaryTaskExecutor() {
+        public AsyncTaskExecutor primaryTaskExecutor() {
             return new SimpleAsyncTaskExecutor();
         }
     }

@@ -26,6 +26,7 @@ public class FormProperty extends BaseElement {
     protected String type;
     protected String defaultExpression;
     protected String datePattern;
+    protected Boolean lenientDateParsing;
     protected boolean readable = true;
     protected boolean writeable = true;
     protected boolean required;
@@ -79,6 +80,14 @@ public class FormProperty extends BaseElement {
         this.datePattern = datePattern;
     }
 
+    public Boolean getLenientDateParsing() {
+        return lenientDateParsing;
+    }
+
+    public void setLenientDateParsing(Boolean lenientDateParsing) {
+        this.lenientDateParsing = lenientDateParsing;
+    }
+
     public boolean isReadable() {
         return readable;
     }
@@ -126,6 +135,7 @@ public class FormProperty extends BaseElement {
         setType(otherProperty.getType());
         setDefaultExpression(otherProperty.getDefaultExpression());
         setDatePattern(otherProperty.getDatePattern());
+        setLenientDateParsing(otherProperty.getLenientDateParsing());
         setReadable(otherProperty.isReadable());
         setWriteable(otherProperty.isWriteable());
         setRequired(otherProperty.isRequired());

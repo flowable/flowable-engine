@@ -16,6 +16,7 @@ package org.flowable.cmmn.test.migration;
 import java.util.List;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
@@ -40,6 +41,7 @@ public class AbstractCaseMigrationTest {
     protected CmmnMigrationService cmmnMigrationService;
     protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
+    protected CmmnManagementService cmmnManagementService;
 
     @BeforeEach
     protected void setUp(CmmnEngineConfiguration cmmnEngineConfiguration) {
@@ -49,6 +51,7 @@ public class AbstractCaseMigrationTest {
         this.cmmnMigrationService = cmmnEngineConfiguration.getCmmnMigrationService();
         this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
     }
 
     @AfterEach
@@ -67,6 +70,19 @@ public class AbstractCaseMigrationTest {
 
         return cmmnRepositoryService.createCaseDefinitionQuery()
                 .deploymentId(deployment.getId())
+                .singleResult();
+    }
+
+    protected CaseDefinition deployCaseDefinition(String name, String path, String tenantId) {
+        CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
+                .name(name)
+                .addClasspathResource(path)
+                .tenantId(tenantId)
+                .deploy();
+
+        return cmmnRepositoryService.createCaseDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .caseDefinitionTenantId(tenantId)
                 .singleResult();
     }
 

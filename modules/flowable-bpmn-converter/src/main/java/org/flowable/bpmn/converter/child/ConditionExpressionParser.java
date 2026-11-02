@@ -30,10 +30,11 @@ public class ConditionExpressionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof SequenceFlow)) {
+        if (!(parentElement instanceof SequenceFlow sequenceFlow)) {
             return;
         }
 
-        ((SequenceFlow) parentElement).setConditionExpression(xtr.getElementText().trim());
+        sequenceFlow.setConditionLanguage(xtr.getAttributeValue(null, ATTRIBUTE_SCRIPT_LANGUAGE));
+        sequenceFlow.setConditionExpression(xtr.getElementText().trim());
     }
 }

@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.MimeMessage;
-
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
+
+import jakarta.mail.internet.MimeMessage;
 
 /**
  * @author Joram Barrez
@@ -36,8 +36,7 @@ public class EmailServiceTaskTest extends PluggableFlowableTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        wiser = new Wiser();
-        wiser.setPort(5025);
+        wiser = Wiser.port(5025);
         wiser.start();
     }
 

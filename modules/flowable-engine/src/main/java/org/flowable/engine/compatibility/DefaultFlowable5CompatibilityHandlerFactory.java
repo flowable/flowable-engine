@@ -32,7 +32,7 @@ public class DefaultFlowable5CompatibilityHandlerFactory implements Flowable5Com
         }
 
         try {
-            Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).newInstance();
+            Flowable5CompatibilityHandler handler = (Flowable5CompatibilityHandler) Class.forName(compatibilityHandlerClassName).getConstructor().newInstance();
             return handler;
         } catch (Exception e) {
             LOGGER.info("Flowable 5 compatibility handler implementation not found or error during instantiation : {}. Flowable 5 backwards compatibility disabled.",

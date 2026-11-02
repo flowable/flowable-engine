@@ -25,11 +25,10 @@ import org.flowable.spring.boot.condition.ConditionalOnLdap;
 import org.flowable.spring.boot.idm.IdmEngineServicesAutoConfiguration;
 import org.flowable.spring.security.FlowableAuthenticationProvider;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -39,7 +38,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
  * @author Filip Hrisafov
  */
 @ConditionalOnLdap
-@AutoConfigureBefore({
+@AutoConfiguration(before = {
     FlowableSecurityAutoConfiguration.class,
     IdmEngineServicesAutoConfiguration.class,
     ProcessEngineServicesAutoConfiguration.class
@@ -47,7 +46,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 @EnableConfigurationProperties({
     FlowableLdapProperties.class
 })
-@Configuration(proxyBeanMethods = false)
 public class FlowableLdapAutoConfiguration {
 
     protected final FlowableLdapProperties properties;

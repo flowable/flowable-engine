@@ -12,10 +12,8 @@
  */
 package org.flowable.eventregistry.spring.configurator;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.spring.SpringEngineConfiguration;
-import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 
@@ -44,16 +42,8 @@ public class SpringEventRegistryConfigurator extends EventRegistryEngineConfigur
             eventEngineConfiguration.setBeans(engineConfiguration.getBeans());
         }
 
-        initEventRegistryEngine();
+        initEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
 
-    @Override
-    protected synchronized EventRegistryEngine initEventRegistryEngine() {
-        if (eventEngineConfiguration == null) {
-            throw new FlowableException("EventRegistryEngineConfiguration is required");
-        }
-
-        return eventEngineConfiguration.buildEventRegistryEngine();
-    }
 }

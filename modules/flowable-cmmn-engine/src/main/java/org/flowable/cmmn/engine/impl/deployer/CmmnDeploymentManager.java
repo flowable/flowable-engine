@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.engine.impl.deployer;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +29,12 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class CmmnDeploymentManager {
@@ -106,7 +112,7 @@ public class CmmnDeploymentManager {
             CmmnDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedCaseDefinition = caseDefinitionCache.get(caseDefinitionId);
+            cachedCaseDefinition = deployment.getCaseDefinitionCacheEntry(caseDefinitionId);
 
             if (cachedCaseDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put case definition '" + caseDefinitionId + "' in the cache");
@@ -125,10 +131,24 @@ public class CmmnDeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeploymentEntity.class);
         }
         
+        List<EngineDeployer> engineUnDeployers = new ArrayList<>(deployers);
+        engineUnDeployers.sort(Comparator.comparingInt(EngineDeployer::getUndeployOrder));
+
+        for (EngineDeployer deployer : engineUnDeployers) {
+            deployer.undeploy(deployment, cascade);
+        }
+
+        List<CaseDefinition> caseDefinitions = new CaseDefinitionQueryImpl().deploymentId(deploymentId).list();
+
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
-        
-        for (CaseDefinition caseDefinition : new CaseDefinitionQueryImpl().deploymentId(deploymentId).list()) {
+
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        for (CaseDefinition caseDefinition : caseDefinitions) {
             caseDefinitionCache.remove(caseDefinition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(caseDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
     }
 

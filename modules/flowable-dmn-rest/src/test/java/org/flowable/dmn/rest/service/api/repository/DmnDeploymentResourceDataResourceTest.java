@@ -27,12 +27,14 @@ import org.apache.http.message.BasicHeader;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
 public class DmnDeploymentResourceDataResourceTest extends BaseSpringDmnRestTestCase {
 
+    @Test
     public void testGetDmnDeploymentResource() throws Exception {
 
         try {
@@ -53,6 +55,7 @@ public class DmnDeploymentResourceDataResourceTest extends BaseSpringDmnRestTest
         }
     }
 
+    @Test
     public void testGetDmnDeploymentResourceForUnexistingDmnDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, "unexisting", "test.txt"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);

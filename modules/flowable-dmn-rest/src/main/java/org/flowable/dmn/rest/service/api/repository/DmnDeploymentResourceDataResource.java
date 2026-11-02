@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +30,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Decision Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DmnDeploymentResourceDataResource extends BaseDmnDeploymentResourceDataResource {
 
     @ApiOperation(value = "Get a decision deployment resource content", tags = {"Deployment" }, nickname = "getDecisionTableDeploymentResource",

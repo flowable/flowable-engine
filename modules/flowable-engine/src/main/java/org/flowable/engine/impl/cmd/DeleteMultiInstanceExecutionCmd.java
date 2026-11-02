@@ -58,15 +58,15 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = miActivityElement.getLoopCharacteristics();
         
         if (miActivityElement.getLoopCharacteristics() == null) {
-            throw new FlowableException("No multi instance execution found for execution id " + executionId);
+            throw new FlowableException("No multi instance execution found for " + execution);
         }
         
         if (!(miActivityElement.getBehavior() instanceof MultiInstanceActivityBehavior)) {
-            throw new FlowableException("No multi instance behavior found for execution id " + executionId);
+            throw new FlowableException("No multi instance behavior found for " + execution);
         }
         
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-            throw new FlowableException("Flowable 5 process definitions are not supported");
+            throw new FlowableException("Flowable 5 process definitions are not supported for " + execution);
         }
         
         ExecutionEntity miExecution = getMultiInstanceRootExecution(execution);

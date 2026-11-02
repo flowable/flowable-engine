@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
@@ -38,10 +39,17 @@ class UserTaskWithEventRegistryBoundaryEventConverterTest {
                 .isInstanceOfSatisfying(BoundaryEvent.class, boundaryEvent -> {
                     assertThat(boundaryEvent.getId()).isEqualTo("eventRegistryEvent");
                     assertThat(boundaryEvent.getAttachedToRefId()).isEqualTo("usertask");
+                    assertThat(boundaryEvent.getEventDefinitions())
+                            .singleElement()
+                            .isInstanceOfSatisfying(EventRegistryEventDefinition.class,
+                                    def -> assertThat(def.getEventDefinitionKey()).isEqualTo("myEvent"));
+                    // The legacy <flowable:eventType> extension element is retained alongside the typed
+                    // EventRegistryEventDefinition, so the extension-element map carries both eventType
+                    // and eventCorrelationParameter.
                     assertThat(boundaryEvent.getExtensionElements()).hasSize(2);
-                    ExtensionElement extensionElement = boundaryEvent.getExtensionElements().get("eventType").get(0);
-                    assertThat(extensionElement.getElementText()).isEqualTo("myEvent");
-                    extensionElement = boundaryEvent.getExtensionElements().get("eventCorrelationParameter").get(0);
+                    assertThat(boundaryEvent.getExtensionElements().get("eventType")).extracting(ExtensionElement::getElementText)
+                            .containsExactly("myEvent");
+                    ExtensionElement extensionElement = boundaryEvent.getExtensionElements().get("eventCorrelationParameter").get(0);
                     assertThat(extensionElement.getAttributeValue(null, "name")).isEqualTo("customerId");
                     assertThat(extensionElement.getAttributeValue(null, "value")).isEqualTo("${customerIdVar}");
                 });

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
+  <case id="example-stage-case" name="Example Stage Case">
+    <casePlanModel id="example-case-model" name="Example Case" flowable:formFieldValidation="true">
+      <planItem id="planItem1" name="Start Repeating Task" definitionRef="repeating-task">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter" />
+        </itemControl>
+      </planItem>
+      <planItem id="planItem4" name="Repeating Stage" definitionRef="repeating-stage">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter" />
+        </itemControl>
+        <entryCriterion id="repeating-stage-sentry" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <planItem id="planItemExitTask" name="Exit Task" definitionRef="exit-task"></planItem>
+      <planItem id="extraPlanItem" name="Extra Task" definitionRef="extra-task" />
+      <sentry id="sentrycmmnExitSentry">
+        <planItemOnPart id="sentryOnPartcmmnExitSentry" sourceRef="planItemExitTask">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="repeating-task" name="Start Repeating Task" />
+      <humanTask id="exit-task" name="Exit Task" />
+      <stage id="repeating-stage" name="Repeating Stage">
+        <extensionElements>
+          <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${planItemInstance.setVariableLocal(&quot;localStageNr&quot;, stageNr)}"></flowable:planItemLifecycleListener>
+          <flowable:planItemLifecycleListener sourceState="wait_repetition" targetState="active" expression="${planItemInstance.setVariableLocal(&quot;localStageNr&quot;, stageNr)}"></flowable:planItemLifecycleListener>
+        </extensionElements>
+        <planItem id="planItem2" name="Stage repeating Task ${localStageNr}" definitionRef="stage-repeating-task" />
+        <humanTask id="stage-repeating-task" name="Stage repeating Task ${localStageNr}" />
+      </stage>
+      <humanTask id="extra-task" name="Extra Task" />
+      <exitCriterion id="cmmnExitSentry" sentryRef="sentrycmmnExitSentry" />
+    </casePlanModel>
+  </case>
+</definitions>

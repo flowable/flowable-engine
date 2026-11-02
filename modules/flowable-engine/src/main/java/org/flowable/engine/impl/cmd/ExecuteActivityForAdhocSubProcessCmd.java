@@ -47,23 +47,21 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
             throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
         }
 
-        if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess)) {
-            throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
+        if (!(execution.getCurrentFlowElement() instanceof AdhocSubProcess adhocSubProcess)) {
+            throw new FlowableException("The current flow element of the requested " + execution + " is not an ad-hoc sub process");
         }
 
         FlowNode foundNode = null;
-        AdhocSubProcess adhocSubProcess = (AdhocSubProcess) execution.getCurrentFlowElement();
 
         // if sequential ordering, only one child execution can be active
         if (adhocSubProcess.hasSequentialOrdering()) {
             if (execution.getExecutions().size() > 0) {
-                throw new FlowableException("Sequential ad-hoc sub process already has an active execution");
+                throw new FlowableException("Sequential ad-hoc sub process in " + execution + " already has an active execution");
             }
         }
 
         for (FlowElement flowElement : adhocSubProcess.getFlowElements()) {
-            if (activityId.equals(flowElement.getId()) && flowElement instanceof FlowNode) {
-                FlowNode flowNode = (FlowNode) flowElement;
+            if (activityId.equals(flowElement.getId()) && flowElement instanceof FlowNode flowNode) {
                 if (flowNode.getIncomingFlows().size() == 0) {
                     foundNode = flowNode;
                 }
@@ -71,7 +69,7 @@ public class ExecuteActivityForAdhocSubProcessCmd implements Command<Execution>,
         }
 
         if (foundNode == null) {
-            throw new FlowableException("The requested activity with id " + activityId + " can not be enabled");
+            throw new FlowableException("The requested activity with id " + activityId + " can not be enabled in " + execution);
         }
 
         ExecutionEntity activityExecution = CommandContextUtil.getExecutionEntityManager().createChildExecution(execution);

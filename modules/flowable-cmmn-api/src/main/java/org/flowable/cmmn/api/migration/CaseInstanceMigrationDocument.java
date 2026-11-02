@@ -15,6 +15,7 @@ package org.flowable.cmmn.api.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Valentin Zickner
@@ -28,6 +29,10 @@ public interface CaseInstanceMigrationDocument {
     Integer getMigrateToCaseDefinitionVersion();
 
     String getMigrateToCaseDefinitionTenantId();
+    
+    Set<String> getCaseInstanceIdsToMigrate();
+    
+    Boolean getEnableAutomaticPlanItemInstanceCreation();
 
     List<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitionMappings();
     
@@ -38,6 +43,16 @@ public interface CaseInstanceMigrationDocument {
     List<WaitingForRepetitionPlanItemDefinitionMapping> getWaitingForRepetitionPlanItemDefinitionMappings();
     
     List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> getRemoveWaitingForRepetitionPlanItemDefinitionMappings();
+    
+    List<ChangePlanItemIdMapping> getChangePlanItemIdMappings();
+    
+    List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings();
+    
+    List<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIdsMappings();
+
+    String getPreUpgradeExpression();
+
+    String getPostUpgradeExpression();
 
     Map<String, Map<String, Object>> getPlanItemLocalVariables();
 

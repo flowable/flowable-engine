@@ -45,7 +45,7 @@ public class ExpressionUtil {
         } else if (evaluationResult instanceof String) {
             return "true".equals(((String) evaluationResult).toLowerCase());
         } else {
-            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
+            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value with " + variableContainer);
         }
     }
 
@@ -212,6 +212,8 @@ public class ExpressionUtil {
         if (planItemInstanceContainer != null && planItemInstanceContainer.getChildPlanItemInstances() != null) {
             return planItemInstanceContainer.getChildPlanItemInstances()
                 .stream()
+                .filter(pi -> planItemInstanceEntity.getPlanItem() != null)
+                .filter(pi -> pi.getPlanItem() != null)
                 .filter(pi -> planItemInstanceEntity.getPlanItem().getId().equals(pi.getPlanItem().getId()))
                 .filter(pi -> !PlanItemInstanceState.isInTerminalState(pi))
                 .filter(pi -> !pi.getId().equals(planItemInstanceEntity.getId()))

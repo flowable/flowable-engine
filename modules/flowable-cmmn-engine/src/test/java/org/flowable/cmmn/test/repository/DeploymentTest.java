@@ -23,14 +23,16 @@ import java.util.List;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.validation.CaseValidator;
+import org.flowable.cmmn.validation.CaseValidatorImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.h2.util.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -192,6 +194,39 @@ public class DeploymentTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void alreadyDeployedCaseModelWithErrorsShouldNotFail() {
+        CaseValidator originalValidator = cmmnEngineConfiguration.getCaseValidator();
+
+        try {
+            // We disable all the validations so we can test this
+            cmmnEngineConfiguration.setCaseValidator(new CaseValidatorImpl());
+
+            org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithErrors.cmmn")
+                    .deploy();
+            autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+            CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                    .caseDefinitionKey("myCase")
+                    .singleResult();
+            assertThat(caseDefinition).isNotNull();
+
+            cmmnEngineConfiguration.setCaseValidator(originalValidator);
+
+            // remove it from the cache to force parsing it again
+            cmmnEngineConfiguration.getDeploymentManager()
+                    .getCaseDefinitionCache()
+                    .clear();
+
+            CmmnModel cmmnModel = cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
+
+            assertThat(cmmnModel).isNotNull();
+
+        } finally {
+            cmmnEngineConfiguration.setCaseValidator(originalValidator);
+        }
+    }
+
+    @Test
     public void deployingCaseModelWithWarningsShouldNotFail() {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = null;
 
@@ -208,5 +243,38 @@ public class DeploymentTest extends FlowableCmmnTestCase {
             }
         }
 
+    }
+
+    @Test
+    public void deployingCaseModelWithEmptyCDATAShouldNotFail() {
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionWithEmptyCDATA.cmmn")
+                .deploy();
+        autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("myCase")
+                .singleResult();
+        assertThat(caseDefinition).isNotNull();
+
+    }
+
+    @Test
+    public void testCaseDefinitionDescriptionIsTruncatedToMaximumLength() {
+        String documentation = "a".repeat(2500) + "b".repeat(2500);
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeployment()
+                .addString("caseWithLongDescription.cmmn",
+                        "<definitions xmlns=\"http://www.omg.org/spec/CMMN/20151109/MODEL\" targetNamespace=\"http://flowable.org/cmmn\">"
+                                + "<case id=\"caseWithLongDescription\">"
+                                + "<documentation>" + documentation + "</documentation>"
+                                + "<casePlanModel id=\"myPlanModel\" />"
+                                + "</case>"
+                                + "</definitions>")
+                .deploy();
+        autoCleanupDeploymentIds.add(cmmnDeployment.getId());
+
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery()
+                .caseDefinitionKey("caseWithLongDescription")
+                .singleResult();
+        assertThat(caseDefinition.getDescription()).isEqualTo(documentation.substring(0, 4000));
     }
 }

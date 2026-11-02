@@ -24,14 +24,16 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -81,6 +83,7 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
                         + "callbackType: 'testCallbackType',"
                         + "referenceId: 'testReferenceId',"
                         + "referenceType: 'testReferenceType',"
+                        + "superProcessInstanceId: null, "
                         + "propagatedStageInstanceId: 'testStageInstanceId',"
                         + "suspended: false,"
                         + "tenantId: '',"
@@ -98,7 +101,57 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
-        assertThat(responseNode.get("tenantId").textValue()).isEqualTo("myTenant");
+        assertThat(responseNode.get("tenantId").stringValue()).isEqualTo("myTenant");
+    }
+    
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testGetProcessInstanceWithParentInstance() throws Exception {
+        Authentication.setAuthenticatedUserId("testUser");
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processOne")
+                .businessKey("myBusinessKey")
+                .start();
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        
+        ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+        assertThat(subProcessInstance).isNotNull();
+        
+        ProcessDefinition subProcessDefinition = repositoryService.getProcessDefinition(subProcessInstance.getProcessDefinitionId());
+        
+        Authentication.setAuthenticatedUserId(null);
+
+        String url = buildUrl(RestUrls.URL_PROCESS_INSTANCE, subProcessInstance.getId());
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        // Check resulting instance
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: '" + subProcessInstance.getId() + "',"
+                        + "startTime: '${json-unit.any-string}',"
+                        + "startUserId: '" + subProcessInstance.getStartUserId() + "',"
+                        + "processDefinitionId: '" + subProcessInstance.getProcessDefinitionId() + "',"
+                        + "processDefinitionName: '" + subProcessDefinition.getName() + "', "
+                        + "businessKey: null,"
+                        + "businessStatus: null,"
+                        + "callbackId: null,"
+                        + "callbackType: null,"
+                        + "referenceId: null,"
+                        + "referenceType: null,"
+                        + "superProcessInstanceId: '" + processInstance.getId() + "', "
+                        + "propagatedStageInstanceId: null,"
+                        + "suspended: false,"
+                        + "tenantId: '',"
+                        + "url: '" + url + "',"
+                        + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, subProcessInstance.getProcessDefinitionId()) + "'"
+                        + "}"
+                );
     }
 
     /**
@@ -226,5 +279,108 @@ public class ProcessInstanceResourceTest extends BaseSpringRestTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("name one");
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessKey()).isEqualTo("key two");
 
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstanceBusinessStatus() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"businessStatus\": \"myStatus\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getBusinessStatus()).isEqualTo("myStatus");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstanceDueDate() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"dueDate\": \"2026-06-15T10:00:00.000+0000\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getDueDate()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstanceMultipleProperties() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"name\": \"updated name\", \"businessKey\": \"updatedKey\", \"businessStatus\": \"updatedStatus\", \"dueDate\": \"2026-06-15T10:00:00.000+0000\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("name").asText()).isEqualTo("updated name");
+        assertThat(responseNode.get("businessKey").asText()).isEqualTo("updatedKey");
+        assertThat(responseNode.get("businessStatus").asText()).isEqualTo("updatedStatus");
+        assertThat(responseNode.get("dueDate").asText()).isNotEmpty();
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getName()).isEqualTo("updated name");
+        assertThat(updatedInstance.getBusinessKey()).isEqualTo("updatedKey");
+        assertThat(updatedInstance.getBusinessStatus()).isEqualTo("updatedStatus");
+        assertThat(updatedInstance.getDueDate()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUpdateProcessInstanceNoChanges() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("processOne")
+                .name("original")
+                .start();
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("original");
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testClaimProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"claim\", \"assignee\": \"kermit\"}"));
+        CloseableHttpResponse response = executeRequest(httpPut, HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+
+        assertThat(responseNode.get("claimedBy").asText()).isEqualTo("kermit");
+        assertThat(responseNode.get("claimTime").asText()).isNotEmpty();
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isEqualTo("kermit");
+        assertThat(updatedInstance.getClaimTime()).isNotNull();
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testUnclaimProcessInstance() throws Exception {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
+
+        runtimeService.claimProcessInstance(processInstance.getId(), "kermit");
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE, processInstance.getId());
+        HttpPut httpPut = new HttpPut(url);
+        httpPut.setEntity(new StringEntity("{\"action\": \"unclaim\"}"));
+        closeResponse(executeRequest(httpPut, HttpStatus.SC_OK));
+
+        ProcessInstance updatedInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(updatedInstance.getClaimedBy()).isNull();
+        assertThat(updatedInstance.getClaimTime()).isNull();
     }
 }

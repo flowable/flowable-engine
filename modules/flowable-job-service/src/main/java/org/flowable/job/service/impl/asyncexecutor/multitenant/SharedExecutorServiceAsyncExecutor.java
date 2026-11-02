@@ -63,7 +63,9 @@ public class SharedExecutorServiceAsyncExecutor extends DefaultAsyncJobExecutor 
 
                 return new TenantAwareExecuteAsyncRunnable(job, jobServiceConfiguration,
                         SharedExecutorServiceAsyncExecutor.this.tenantInfoHolder,
-                        SharedExecutorServiceAsyncExecutor.this.tenantInfoHolder.getCurrentTenantId());
+                        SharedExecutorServiceAsyncExecutor.this.tenantInfoHolder.getCurrentTenantId(),
+                        SharedExecutorServiceAsyncExecutor.this.jobExecutionObservationProvider
+                );
             }
 
         });

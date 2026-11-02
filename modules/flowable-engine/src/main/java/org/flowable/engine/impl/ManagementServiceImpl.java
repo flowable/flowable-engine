@@ -23,12 +23,14 @@ import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartBuilder;
 import org.flowable.batch.api.BatchPartQuery;
 import org.flowable.batch.api.BatchQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchPartBuilderImpl;
 import org.flowable.batch.service.impl.BatchBuilderImpl;
 import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.BatchQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.api.management.TablePageQuery;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdBuilder;
@@ -41,7 +43,6 @@ import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.TablePageQueryImpl;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
@@ -58,6 +59,7 @@ import org.flowable.engine.impl.cmd.GetAllBatchesCmd;
 import org.flowable.engine.impl.cmd.GetBatchDocumentCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartCmd;
 import org.flowable.engine.impl.cmd.GetBatchPartDocumentCmd;
+import org.flowable.engine.impl.cmd.GetBatchSummaryCmd;
 import org.flowable.engine.impl.cmd.GetEventLogEntriesCmd;
 import org.flowable.engine.impl.cmd.GetTableNameCmd;
 import org.flowable.engine.impl.cmd.HandleHistoryCleanupTimerJobCmd;
@@ -104,6 +106,8 @@ import org.flowable.job.service.impl.cmd.MoveSuspendedJobToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
 import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
 import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
+import org.flowable.job.service.impl.cmd.UnacquireAllExternalWorkerJobsForWorkerCmd;
+import org.flowable.job.service.impl.cmd.UnacquireExternalWorkerJobCmd;
 
 /**
  * @author Tom Baeyens
@@ -387,6 +391,11 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     }
 
     @Override
+    public BatchSummary getBatchSummary(String batchId) {
+        return commandExecutor.execute(new GetBatchSummaryCmd(batchId));
+    }
+
+    @Override
     public Map<String, String> getProperties() {
         return commandExecutor.execute(new GetPropertiesCmd(configuration.getEngineCfgKey()));
     }
@@ -394,13 +403,16 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
-        return commandExecutor.execute(config, new Command<String>() {
+        return commandExecutor.execute(config, new Command<>() {
             @Override
             public String execute(CommandContext commandContext) {
                 DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog, schema);
+                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, CommandContextUtil.getEntityCache(commandContext), connection, catalog,
+                        schema);
                 commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager().schemaUpdate();
+                ProcessEngineConfigurationImpl engineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+                engineConfiguration.getCommonSchemaManager().schemaUpdate();
+                return engineConfiguration.getSchemaManager().schemaUpdate();
             }
         });
     }
@@ -463,6 +475,21 @@ public class ManagementServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public ExternalWorkerCompletionBuilder createExternalWorkerCompletionBuilder(String externalJobId, String workerId) {
         return new ExternalWorkerCompletionBuilderImpl(commandExecutor, externalJobId, workerId, configuration.getJobServiceConfiguration());
+    }
+    
+    @Override
+    public void unacquireExternalWorkerJob(String jobId, String workerId) {
+        commandExecutor.execute(new UnacquireExternalWorkerJobCmd(jobId, workerId, configuration.getJobServiceConfiguration()));
+    }
+    
+    @Override
+    public void unacquireAllExternalWorkerJobsForWorker(String workerId) {
+        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, null, configuration.getJobServiceConfiguration()));
+    }
+    
+    @Override
+    public void unacquireAllExternalWorkerJobsForWorker(String workerId, String tenantId) {
+        commandExecutor.execute(new UnacquireAllExternalWorkerJobsForWorkerCmd(workerId, tenantId, configuration.getJobServiceConfiguration()));
     }
 
     @Override

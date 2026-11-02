@@ -12,20 +12,15 @@
  */
 package org.flowable.job.service.impl.history.async;
 
-import java.text.ParseException;
-import java.text.ParsePosition;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.TimeZone;
-
-import com.fasterxml.jackson.databind.util.ISO8601Utils;
 
 public class AsyncHistoryDateUtil {
 
-    protected static TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
-
     public static String formatDate(Date date) {
         if (date != null) {
-            return ISO8601Utils.format(date, true, utcTimeZone);
+            return date.toInstant().toString();
         }
         return null;
     }
@@ -33,8 +28,8 @@ public class AsyncHistoryDateUtil {
     public static Date parseDate(String s) {
         if (s != null) {
             try {
-                return ISO8601Utils.parse(s, new ParsePosition(0));
-            } catch (ParseException e) {
+                return Date.from(Instant.parse(s));
+            } catch (DateTimeParseException e) {
                 return null;
             }
         }

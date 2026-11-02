@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "docusaurus": "^1.14.6"
+  },
+  "dependencies": {
+    "react": "^16.10.2"
   }
 }

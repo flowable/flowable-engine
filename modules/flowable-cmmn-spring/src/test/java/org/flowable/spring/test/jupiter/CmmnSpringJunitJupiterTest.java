@@ -30,10 +30,12 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestHelper;
 import org.flowable.cmmn.spring.CmmnEngineFactoryBean;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
+import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
 import org.h2.Driver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -42,6 +44,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author Filip Hrisafov
@@ -82,14 +86,26 @@ public class CmmnSpringJunitJupiterTest {
     @EnableTransactionManagement
     static class TestConfiguration {
 
+        @Value("${jdbc.url:jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000}")
+        protected String jdbcUrl;
+
+        @Value("${jdbc.driver:org.h2.Driver}")
+        protected String jdbcDriver;
+
+        @Value("${jdbc.username:sa}")
+        protected String jdbcUsername;
+
+        @Value("${jdbc.password:}")
+        protected String jdbcPassword;
+
         @Bean
         public DataSource dataSource() {
-            SimpleDriverDataSource dataSource = new SimpleDriverDataSource();
-            dataSource.setDriverClass(Driver.class);
-            dataSource.setUrl("jdbc:h2:mem:flowable-cmmn-jupiter;DB_CLOSE_DELAY=1000");
-            dataSource.setUsername("sa");
-            dataSource.setPassword("");
-
+            HikariDataSource dataSource = new HikariDataSource();
+            dataSource.setMinimumIdle(0);
+            dataSource.setJdbcUrl(jdbcUrl);
+            dataSource.setDriverClassName(jdbcDriver);
+            dataSource.setUsername(jdbcUsername);
+            dataSource.setPassword(jdbcPassword);
             return dataSource;
         }
 
@@ -99,12 +115,19 @@ public class CmmnSpringJunitJupiterTest {
         }
 
         @Bean
-        public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager) {
+        public SpringCmmnEngineConfiguration cmmnEngineConfiguration(DataSource dataSource, PlatformTransactionManager transactionManager,
+                SpringIdmEngineConfigurator idmEngineConfigurator) {
             SpringCmmnEngineConfiguration configuration = new SpringCmmnEngineConfiguration();
             configuration.setDataSource(dataSource);
             configuration.setTransactionManager(transactionManager);
             configuration.setDatabaseSchemaUpdate("true");
+            configuration.setIdmEngineConfigurator(idmEngineConfigurator);
             return configuration;
+        }
+
+        @Bean
+        public SpringIdmEngineConfigurator idmEngineConfigurator() {
+            return new SpringIdmEngineConfigurator();
         }
 
         @Bean

@@ -24,20 +24,20 @@ public interface FunctionNode extends Node {
 	/**
 	 * Get the full function name
 	 */
-	public String getName();
+    String getName();
 
 	/**
 	 * Get the unique index of this identifier in the expression (e.g. preorder index)
 	 */
-	public int getIndex();
+    int getIndex();
 
 	/**
 	 * Get the number of parameters for this function
 	 */
-	public int getParamCount();
+    int getParamCount();
 	
 	/**
 	 * @return <code>true</code> if this node supports varargs.
 	 */
-	public boolean isVarArgs();
+    boolean isVarArgs();
 }

@@ -22,8 +22,6 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.repository.Deployment;
-import org.flowable.form.api.FormDeployment;
-import org.flowable.form.engine.FormEngine;
 
 /**
  * @author Filip Hrisafov
@@ -55,13 +53,6 @@ public class DeploymentCleanerUtil {
         List<DmnDeployment> dmnDeployments = dmnEngine.getDmnRepositoryService().createDeploymentQuery().list();
         for (DmnDeployment dmnDeployment : dmnDeployments) {
             dmnEngine.getDmnRepositoryService().deleteDeployment(dmnDeployment.getId());
-        }
-    }
-
-    public static void deleteDeployments(FormEngine formEngine) {
-        List<FormDeployment> formDeployments = formEngine.getFormRepositoryService().createDeploymentQuery().list();
-        for (FormDeployment formDeployment : formDeployments) {
-            formEngine.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true);
         }
     }
 

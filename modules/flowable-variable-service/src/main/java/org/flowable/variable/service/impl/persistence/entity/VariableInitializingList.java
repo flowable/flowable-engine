@@ -15,8 +15,10 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Supplier;
 
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.variable.service.impl.types.CacheableVariable;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.flowable.variable.service.impl.types.JPAEntityVariableType;
@@ -29,6 +31,11 @@ import org.flowable.variable.service.impl.types.JPAEntityVariableType;
 public class VariableInitializingList extends ArrayList<VariableInstanceEntity> {
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Command context attribute that is set while a query that includes variables without initializing their values is executed.
+     */
+    public static final String EXCLUDE_VARIABLE_INITIALIZATION_ATTRIBUTE = "flowable.excludeVariableInitialization";
 
     @Override
     public void add(int index, VariableInstanceEntity e) {
@@ -62,7 +69,8 @@ public class VariableInitializingList extends ArrayList<VariableInstanceEntity> 
      * If the passed {@link VariableInstanceEntity} is a binary variable and the command-context is active, the variable value is fetched to ensure the byte-array is populated.
      */
     protected void initializeVariable(VariableInstanceEntity e) {
-        if (Context.getCommandContext() != null && e != null && e.getType() != null) {
+        CommandContext commandContext = Context.getCommandContext();
+        if (commandContext != null && !isVariableInitializationExcluded(commandContext) && e != null && e.getType() != null) {
             e.getValue();
 
             // make sure JPA entities are cached for later retrieval
@@ -70,5 +78,27 @@ public class VariableInitializingList extends ArrayList<VariableInstanceEntity> 
                 ((CacheableVariable) e.getType()).setForceCacheable(true);
             }
         }
+    }
+
+    /**
+     * Executes the passed query that includes variables. When {@code excludeVariableInitialization} is true, the values of the variables
+     * that are added to a {@link VariableInitializingList} or a {@link HistoricVariableInitializingList} are not initialized, a value is
+     * then only resolved when it is read.
+     */
+    public static <T> T executeQueryIncludingVariables(CommandContext commandContext, boolean excludeVariableInitialization, Supplier<T> query) {
+        if (!excludeVariableInitialization || isVariableInitializationExcluded(commandContext)) {
+            return query.get();
+        }
+
+        commandContext.addAttribute(EXCLUDE_VARIABLE_INITIALIZATION_ATTRIBUTE, Boolean.TRUE);
+        try {
+            return query.get();
+        } finally {
+            commandContext.removeAttribute(EXCLUDE_VARIABLE_INITIALIZATION_ATTRIBUTE);
+        }
+    }
+
+    public static boolean isVariableInitializationExcluded(CommandContext commandContext) {
+        return Boolean.TRUE.equals(commandContext.getAttribute(EXCLUDE_VARIABLE_INITIALIZATION_ATTRIBUTE));
     }
 }

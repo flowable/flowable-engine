@@ -16,24 +16,21 @@ jobs:
     name: Linux (OpenJDK EA)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2-beta
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Restore Maven Repository Cache
+        uses: actions/cache/restore@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
-          fetch-depth: 10
-      - name: Cache Maven Repository
-        uses: actions/cache@v1
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: 'Set up JDK'
+        uses: oracle-actions/setup-java@fff43251af9936a0e6a4d5d0946e14f1680e9b6b # v1.5.0
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          website: jdk.java.net
+          release: EA
       - name: Install
-        # If installing the JDK is in a different step then wrong java would be used
         # Need to do install first in order for the OSGi tests to work
-        run: |
-          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+        run: ./mvnw install ${MAVEN_ARGS} -DskipTests=true -Dmaven.javadoc.skip=true -B -V
       - name: Test
-        # If installing the JDK is in a different step then wrong java would be used
-        run: |
-          . ./.github/actions/scripts/install-jdk.sh --feature ea --os linux-x64
-          ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
+        run: ./mvnw verify -Pdistro,errorLogging ${MAVEN_ARGS} -Dmaven.test.redirectTestOutputToFile=false
         continue-on-error: true

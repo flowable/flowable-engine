@@ -28,7 +28,7 @@ import javax.management.remote.JMXServiceURL;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Saeid Mirzaei

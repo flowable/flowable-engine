@@ -62,6 +62,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
 
     List<ProcessInstance> findProcessInstanceAndVariablesByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
 
+    List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl executionQuery);
+
     Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(String processInstanceId);
 
     Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(String activityId, String processInstanceId);
@@ -90,6 +92,10 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     String updateProcessInstanceBusinessKey(ExecutionEntity executionEntity, String businessKey);
     
     String updateProcessInstanceBusinessStatus(ExecutionEntity executionEntity, String businessStatus);
+
+    void updateProcessInstanceDueDate(ExecutionEntity executionEntity, Date dueDate);
+
+    void updateProcessInstanceClaimTime(ExecutionEntity executionEntity, Date claimTime, String claimedBy);
 
     void deleteProcessInstancesByProcessDefinition(String processDefinitionId, String deleteReason, boolean cascade);
     

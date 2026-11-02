@@ -32,20 +32,39 @@ public class CaseValidatorImpl implements CaseValidator {
 
     @Override
     public List<ValidationEntry> validate(CmmnModel model) {
+        return validate(model, null);
+    }
+
+    @Override
+    public List<ValidationEntry> validate(CmmnModel model, CaseValidationContext validationContext) {
         List<ValidationEntry> allEntries = new ArrayList<>();
 
         for (ValidatorSet validatorSet : validatorSets) {
-            CaseValidationContextImpl validationContext = new CaseValidationContextImpl(validatorSet);
-
-            for (Validator validator : validatorSet.getValidators()) {
-                validator.validate(model, validationContext);
+            CaseValidationContext currentValidationContext;
+            if (validationContext == null) {
+                currentValidationContext = new CaseValidationContextImpl(validatorSet);
+            } else {
+                currentValidationContext = validationContext;
+                currentValidationContext.setCurrentValidatorSet(validatorSet);
             }
 
+            for (Validator validator : validatorSet.getValidators()) {
+                validator.validate(model, currentValidationContext);
+            }
+
+            if (validationContext == null) {
+                allEntries.addAll(currentValidationContext.getEntries());
+            }
+        }
+
+        if (validationContext != null) {
             allEntries.addAll(validationContext.getEntries());
         }
 
         return allEntries;
     }
+
+
 
     @Override
     public List<ValidatorSet> getValidatorSets() {

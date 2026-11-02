@@ -90,6 +90,7 @@ public interface Problems {
     String SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED = "flowable-subprocess-start-event-event-definition-not-allowed";
 
     String EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION = "flowable-event-subprocess-invalid-start-event-definition";
+    String EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME = "flowable-event-subprocess-invalid-start-event-variable-name";
     String EVENT_SUBPROCESS_BOUNDARY_EVENT = "flowable-event-subprocess-boundary-event";
 
     String BOUNDARY_EVENT_NO_EVENT_DEFINITION = "flowable-boundary-event-no-event-definition";
@@ -133,6 +134,7 @@ public interface Problems {
     String DATA_OBJECT_MISSING_NAME = "flowable-data-object-missing-name";
 
     String END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION = "flowable-end-event-cancel-only-inside-transaction";
+    String END_EVENT_INVALID_EVENT_DEFINITION = "flowable-end-event-invalid-event-definition";
 
     String DI_INVALID_REFERENCE = "flowable-di-invalid-reference";
     String DI_DOES_NOT_REFERENCE_FLOWNODE = "flowable-di-does-not-reference-flownode";

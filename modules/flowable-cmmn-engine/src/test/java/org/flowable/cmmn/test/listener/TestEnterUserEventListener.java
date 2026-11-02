@@ -30,7 +30,9 @@ public class TestEnterUserEventListener extends AbstractTestLifecycleListener {
 
     @Override
     public void stateChanged(DelegatePlanItemInstance planItemInstance, String oldState, String newState) {
-        if (PlanItemDefinitionType.USER_EVENT_LISTENER.equals(planItemInstance.getPlanItemDefinitionType())) {
+        if (PlanItemDefinitionType.USER_EVENT_LISTENER.equals(planItemInstance.getPlanItemDefinitionType()) &&
+                !PlanItemInstanceState.ACTIVE.equals(oldState)) {
+            
             events.add(new TestLifeCycleEvent(planItemInstance, oldState, newState));
         }
     }

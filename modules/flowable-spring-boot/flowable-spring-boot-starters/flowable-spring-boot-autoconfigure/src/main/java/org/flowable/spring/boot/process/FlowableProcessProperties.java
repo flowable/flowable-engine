@@ -12,6 +12,8 @@
  */
 package org.flowable.spring.boot.process;
 
+import java.time.Duration;
+
 import org.flowable.spring.boot.FlowableServlet;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
@@ -40,8 +42,8 @@ public class FlowableProcessProperties {
     protected int definitionCacheLimit = -1;
 
     /**
-     * Enables extra checks on the BPMN xml that is parsed. See https://www.flowable.org/docs/userguide/index.html#advanced.safe.bpmn.xml
-     * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence you need to disable if your platform does not allow the use of
+     * Enables extra checks on the BPMN xml that is parsed.
+     * Unfortunately, this feature is not available on some platforms, hence you need to disable if your platform does not allow the use of
      * StaxSource during XML parsing.
      */
     private boolean enableSafeXml = true;
@@ -51,6 +53,17 @@ public class FlowableProcessProperties {
      * This is a fallback applied for all events. We suggest modelling your processes appropriately, i.e. making the start event async.
      */
     private boolean eventRegistryStartProcessInstanceAsync = false;
+
+    /**
+     * Whether the check for unique process instances should be done with a lock.
+     * We do not recommend changing this property, unless you have been explicitly asked by a Flowable maintainer.
+     */
+    private boolean eventRegistryUniqueProcessInstanceCheckWithLock = true;
+
+    /**
+     * The amount of time for the lock of a unique start event.
+     */
+    private Duration eventRegistryUniqueProcessInstanceStartLockTime = Duration.ofMinutes(10);
 
     public FlowableServlet getServlet() {
         return servlet;
@@ -86,6 +99,22 @@ public class FlowableProcessProperties {
 
     public void setEventRegistryStartProcessInstanceAsync(boolean eventRegistryStartProcessInstanceAsync) {
         this.eventRegistryStartProcessInstanceAsync = eventRegistryStartProcessInstanceAsync;
+    }
+
+    public boolean isEventRegistryUniqueProcessInstanceCheckWithLock() {
+        return eventRegistryUniqueProcessInstanceCheckWithLock;
+    }
+
+    public void setEventRegistryUniqueProcessInstanceCheckWithLock(boolean eventRegistryUniqueProcessInstanceCheckWithLock) {
+        this.eventRegistryUniqueProcessInstanceCheckWithLock = eventRegistryUniqueProcessInstanceCheckWithLock;
+    }
+
+    public Duration getEventRegistryUniqueProcessInstanceStartLockTime() {
+        return eventRegistryUniqueProcessInstanceStartLockTime;
+    }
+
+    public void setEventRegistryUniqueProcessInstanceStartLockTime(Duration eventRegistryUniqueProcessInstanceStartLockTime) {
+        this.eventRegistryUniqueProcessInstanceStartLockTime = eventRegistryUniqueProcessInstanceStartLockTime;
     }
 
     public static class AsyncHistory {

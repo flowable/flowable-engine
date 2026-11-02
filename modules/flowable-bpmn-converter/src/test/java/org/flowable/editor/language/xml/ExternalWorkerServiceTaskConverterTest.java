@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOParameter;
 import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
 
 class ExternalWorkerServiceTaskConverterTest {
@@ -32,5 +33,15 @@ class ExternalWorkerServiceTaskConverterTest {
         assertThat(externalWorkerServiceTask.getTopic()).isEqualTo("topic");
         assertThat(externalWorkerServiceTask.getSkipExpression()).isEqualTo("skipExpression");
         assertThat(externalWorkerServiceTask.isExclusive()).isTrue();
+
+        assertThat(externalWorkerServiceTask.getInParameters()).hasSize(1);
+        IOParameter inParameter = externalWorkerServiceTask.getInParameters().get(0);
+        assertThat(inParameter.getSource()).isEqualTo("description");
+        assertThat(inParameter.getTarget()).isEqualTo("theDescription");
+        assertThat(externalWorkerServiceTask.getOutParameters()).hasSize(1);
+        IOParameter outParameter = externalWorkerServiceTask.getOutParameters().get(0);
+        assertThat(outParameter.getSource()).isEqualTo("theResult");
+        assertThat(outParameter.getTarget()).isEqualTo("result");
+
     }
 }

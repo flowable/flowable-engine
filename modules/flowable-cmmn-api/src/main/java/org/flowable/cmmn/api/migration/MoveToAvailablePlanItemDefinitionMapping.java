@@ -12,9 +12,31 @@
  */
 package org.flowable.cmmn.api.migration;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class MoveToAvailablePlanItemDefinitionMapping extends PlanItemDefinitionMapping {
+    
+    protected Map<String, Object> withLocalVariables = new LinkedHashMap<>();
 
     public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId) {
         super(planItemDefinitionId);
+    }
+    
+    public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId, Map<String, Object> withLocalVariables) {
+        super(planItemDefinitionId);
+        this.withLocalVariables = withLocalVariables;
+    }
+
+    public MoveToAvailablePlanItemDefinitionMapping(String planItemDefinitionId, String condition) {
+        super(planItemDefinitionId, condition);
+    }
+
+    public Map<String, Object> getWithLocalVariables() {
+        return withLocalVariables;
+    }
+
+    public void setWithLocalVariables(Map<String, Object> withLocalVariables) {
+        this.withLocalVariables = withLocalVariables;
     }
 }

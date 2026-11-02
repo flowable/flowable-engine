@@ -27,7 +27,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
+import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -38,12 +41,17 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
  */
 public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableTestCase {
+
+    protected AsyncTaskInvoker originalAsyncTaskInvoker;
+    protected AsyncTaskExecutor originalAsyncTaskInvokerTaskExecutor;
 
     public ServiceTaskWithFuturesNoQueueCapacityTest() {
         super("flowable.cfg.xml");
@@ -54,9 +62,36 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
         super.additionalConfiguration(processEngineConfiguration);
 
         // The thread pool will start rejecting jobs once we reach 6 parallel jobs (1 in queue, 4 running)
-        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setAsyncExecutorThreadPoolQueueSize(1);
-        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setAsyncExecutorCorePoolSize(4);
-        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setAsyncExecutorMaxPoolSize(4);
+        AsyncTaskExecutorConfiguration executorConfiguration = new AsyncTaskExecutorConfiguration();
+        executorConfiguration.setQueueSize(1);
+        executorConfiguration.setCorePoolSize(4);
+        executorConfiguration.setMaxPoolSize(4);
+        executorConfiguration.setThreadNamePrefix("flowable-async-task-invoker-thread-");
+        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setAsyncTaskInvokerTaskExecutorConfiguration(executorConfiguration);
+    }
+
+    @BeforeEach
+    void setUp() {
+        this.originalAsyncTaskInvoker = this.processEngineConfiguration.getAsyncTaskInvoker();
+        this.originalAsyncTaskInvokerTaskExecutor = this.processEngineConfiguration.getAsyncTaskInvokerTaskExecutor();
+    }
+
+    @AfterEach
+    void tearDown() {
+        if (this.originalAsyncTaskInvoker != null) {
+            this.processEngineConfiguration.setAsyncTaskInvoker(this.originalAsyncTaskInvoker);
+        }
+
+        AsyncTaskExecutor currentAsyncTaskExecutor = this.processEngineConfiguration.getAsyncTaskInvokerTaskExecutor();
+
+        if (this.originalAsyncTaskInvokerTaskExecutor != null) {
+            this.processEngineConfiguration.setAsyncTaskInvokerTaskExecutor(this.originalAsyncTaskInvokerTaskExecutor);
+        }
+
+        if (this.originalAsyncTaskInvokerTaskExecutor != currentAsyncTaskExecutor) {
+            // If they are different shut down the current one
+            currentAsyncTaskExecutor.shutdown();
+        }
     }
 
     @Test
@@ -89,10 +124,10 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
                             "executionThread7", "executionThread8", "executionThread9"
                     )
                     .containsValues(
-                            "flowable-async-job-executor-thread-1",
-                            "flowable-async-job-executor-thread-2",
-                            "flowable-async-job-executor-thread-3",
-                            "flowable-async-job-executor-thread-4",
+                            "flowable-async-task-invoker-thread-1",
+                            "flowable-async-task-invoker-thread-2",
+                            "flowable-async-task-invoker-thread-3",
+                            "flowable-async-task-invoker-thread-4",
                             currentThreadName
                     );
         }
@@ -101,12 +136,18 @@ public class ServiceTaskWithFuturesNoQueueCapacityTest extends ResourceFlowableT
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesNoQueueCapacityTest.testDelegateExpression.bpmn20.xml")
     void testDelegateExpressionWithRejectAsyncTaskInvoker() {
+        DefaultAsyncTaskExecutor asyncTaskExecutor = new DefaultAsyncTaskExecutor();
+        asyncTaskExecutor.setCorePoolSize(4);
+        asyncTaskExecutor.setMaxPoolSize(4);
+        asyncTaskExecutor.setQueueSize(1);
+        asyncTaskExecutor.start();
+        processEngineConfiguration.setAsyncTaskInvokerTaskExecutor(asyncTaskExecutor);
         // No need to reset the invoker because the ResourceFlowableTestCase creates a new engine before every test run
         processEngineConfiguration.setAsyncTaskInvoker(new AsyncTaskInvoker() {
 
             @Override
             public <T> CompletableFuture<T> submit(Callable<T> task) {
-                return processEngineConfiguration.getAsyncTaskExecutor().submit(task);
+                return processEngineConfiguration.getAsyncTaskInvokerTaskExecutor().submit(task);
             }
         });
 

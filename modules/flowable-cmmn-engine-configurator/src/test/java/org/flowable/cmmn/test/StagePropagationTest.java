@@ -19,11 +19,11 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * An integration test between CMMN and BPMN for the stage instance id delegation over the execution to user tasks.
@@ -32,16 +32,12 @@ import org.junit.Test;
  */
 public class StagePropagationTest extends AbstractProcessEngineIntegrationTest {
 
-    @Before
-    public void deployProcessModels() {
-        if (processEngineRepositoryService.createDeploymentQuery().count() == 0) {
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/StagePropagationTestProcess.bpmn20.xml").deploy();
-            processEngineRepositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/test/StagePropagationTestSubProcess.bpmn20.xml").deploy();
-        }
-    }
-
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/StagePropagationTest.multipleTests.cmmn")
+    @Deployment(resources = {
+            "org/flowable/cmmn/test/StagePropagationTestProcess.bpmn20.xml",
+            "org/flowable/cmmn/test/StagePropagationTestSubProcess.bpmn20.xml"
+    })
     public void testStageOnTaskPropagation() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("stagePropagationTest")

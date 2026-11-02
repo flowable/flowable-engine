@@ -13,11 +13,13 @@
 
 package org.flowable.engine.test.bpmn.mail;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.mail.common.api.client.MailClientProvider;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
@@ -31,18 +33,22 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
 
     protected Wiser wiser;
     private String initialForceTo;
+    private Charset initialDefaultCharset;
+    private MailClientProvider initialMailClientProvider;
     private Map<String, MailServerInfo> initialMailServers;
 
     @BeforeEach
     protected void setUp() throws Exception {
 
         initialForceTo = processEngineConfiguration.getMailServerForceTo();
+        initialDefaultCharset = processEngineConfiguration.getMailServerDefaultCharset();
+        initialMailClientProvider = processEngineConfiguration.getMailClientProvider();
+        reinitilizeMailClients();
         Map<String, MailServerInfo> mailServers = processEngineConfiguration.getMailServers();
         initialMailServers = mailServers == null ? null : new HashMap<>(mailServers);
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();
@@ -63,7 +69,14 @@ public abstract class EmailTestCase extends PluggableFlowableTestCase {
         Thread.sleep(250L);
 
         processEngineConfiguration.setMailServerForceTo(initialForceTo);
+        processEngineConfiguration.setMailServerDefaultCharset(initialDefaultCharset);
         processEngineConfiguration.setMailServers(initialMailServers);
+        processEngineConfiguration.setMailClientProvider(initialMailClientProvider);
+    }
+
+    protected void reinitilizeMailClients() {
+        processEngineConfiguration.setMailClientProvider(null);
+        processEngineConfiguration.initMailClients();
     }
 
     protected void addMailServer(String tenantId, String defaultFrom, String forceTo) {

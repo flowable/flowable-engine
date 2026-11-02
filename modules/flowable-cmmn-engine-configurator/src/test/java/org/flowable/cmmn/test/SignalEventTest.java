@@ -27,7 +27,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SignalEventTest extends AbstractProcessEngineIntegrationTest {
 

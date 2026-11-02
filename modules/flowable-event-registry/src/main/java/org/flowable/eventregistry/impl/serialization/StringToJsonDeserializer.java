@@ -12,13 +12,12 @@
  */
 package org.flowable.eventregistry.impl.serialization;
 
-import java.io.IOException;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.InboundEventDeserializer;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -26,13 +25,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class StringToJsonDeserializer implements InboundEventDeserializer<JsonNode> {
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected final ObjectMapper objectMapper;
+
+    public StringToJsonDeserializer(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public JsonNode deserialize(Object rawEvent) {
         try {
             return objectMapper.readTree(rawEvent.toString());
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new FlowableException("Could not deserialize event to json", e);
         }
     }

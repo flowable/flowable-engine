@@ -19,7 +19,7 @@ import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -29,7 +29,7 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class SubprocessValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<SubProcess> subProcesses = process.findFlowElementsOfType(SubProcess.class);
         for (SubProcess subProcess : subProcesses) {
 
@@ -38,12 +38,12 @@ public class SubprocessValidator extends ProcessLevelValidator {
                 // Verify start events
                 List<StartEvent> startEvents = process.findFlowElementsInSubProcessOfType(subProcess, StartEvent.class, false);
                 if (startEvents.size() > 1) {
-                    addError(errors, Problems.SUBPROCESS_MULTIPLE_START_EVENTS, process, subProcess, "Multiple start events not supported for subprocess");
+                    validationContext.addError(Problems.SUBPROCESS_MULTIPLE_START_EVENTS, process, subProcess, "Multiple start events not supported for subprocess");
                 }
 
                 for (StartEvent startEvent : startEvents) {
                     if (!startEvent.getEventDefinitions().isEmpty()) {
-                        addError(errors, Problems.SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED, process, startEvent, "event definitions only allowed on start event if subprocess is an event subprocess");
+                        validationContext.addError(Problems.SUBPROCESS_START_EVENT_EVENT_DEFINITION_NOT_ALLOWED, process, startEvent, "event definitions only allowed on start event if subprocess is an event subprocess");
                     }
                 }
 

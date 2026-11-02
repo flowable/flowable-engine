@@ -12,14 +12,23 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.ScriptServiceTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 
 /**
  * Implementation of ScriptActivity CMMN 2.0 PlanItem.
@@ -37,12 +46,31 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         ScriptingEngines scriptingEngines = CommandContextUtil.getCmmnEngineConfiguration().getScriptingEngines();
         if (scriptingEngines == null) {
-            throw new FlowableException("Could not execute script task instance: no scripting engines found.");
+            throw new FlowableException("Could not execute script task instance: no scripting engines found. For " + planItemInstanceEntity);
         }
         String scriptFormat = scriptTask.getScriptFormat() != null ? scriptTask.getScriptFormat() : ScriptingEngines.DEFAULT_SCRIPTING_LANGUAGE;
         
         try {
-            Object result = scriptingEngines.evaluate(scriptTask.getScript(), scriptFormat, planItemInstanceEntity, scriptTask.isAutoStoreVariables());
+            ScriptEngineRequest.Builder request = ScriptEngineRequest.builder()
+                    .language(scriptFormat)
+                    .script(scriptTask.getScript())
+                    .scopeContainer(planItemInstanceEntity)
+                    .traceEnhancer(trace -> trace.addTraceTag("type", "scriptTask"));
+            if (scriptTask.isAutoStoreVariables()) {
+                request.storeScriptVariables();
+            }
+
+            List<IOParameter> inParameters = scriptTask.getInParameters();
+            if (inParameters != null && !inParameters.isEmpty()) {
+                MapDelegateVariableContainer inputVariableContainer = new MapDelegateVariableContainer();
+                IOParameterUtil.processInParameters(inParameters, planItemInstanceEntity, inputVariableContainer,
+                        CommandContextUtil.getExpressionManager(commandContext));
+                request.inputVariableContainer(inputVariableContainer);
+            } else if (scriptTask.isDoNotIncludeVariables()) {
+                request.inputVariableContainer(VariableContainer.empty());
+            }
+
+            Object result = scriptingEngines.evaluate(request.build()).getResult();
             String resultVariableName = scriptTask.getResultVariableName();
             if (StringUtils.isNotBlank(scriptTask.getResultVariableName())) {
                 planItemInstanceEntity.setVariable(resultVariableName.trim(), result);
@@ -51,7 +79,10 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
         } catch (FlowableException e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof FlowableException) {
+            if (rootCause instanceof BusinessError cmmnFault) {
+                FaultPropagation.propagateFault(cmmnFault, commandContext, planItemInstanceEntity);
+                return;
+            } else if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             } else {
                 throw e;

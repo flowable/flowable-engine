@@ -23,17 +23,15 @@ public class ScriptExecutionListener extends AbstractScriptEvaluator implements 
 
     private static final long serialVersionUID = 1L;
 
-    public ScriptExecutionListener() {
-        autoStoreVariables = true;
-    }
-
+    @Override
     protected ScriptingEngines getScriptingEngines() {
         return CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
     }
 
     @Override
     public void notify(DelegateExecution execution) {
-        validateParametersAndEvaluteScript(execution);
+        evaluateScriptRequest(createScriptRequest(execution)
+                .traceEnhancer(trace -> trace.addTraceTag("type", "executionListener"))
+                .storeScriptVariables());
     }
-
 }

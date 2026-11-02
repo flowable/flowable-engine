@@ -27,8 +27,8 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -53,6 +53,11 @@ public class ComputeDeleteHistoricProcessInstanceIdsJobHandler implements JobHan
         boolean sequentialExecution = config.isSequentialExecution();
         if (config.hasError()) {
             failBatchPart(engineConfiguration, batchService, batchPart, batch, config.getError(), sequentialExecution);
+            return;
+        }
+
+        if (DeleteProcessInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_STOPPED, null);
             return;
         }
 

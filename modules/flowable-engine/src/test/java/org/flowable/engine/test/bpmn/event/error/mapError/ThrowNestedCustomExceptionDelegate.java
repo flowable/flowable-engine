@@ -29,13 +29,26 @@ public class ThrowNestedCustomExceptionDelegate implements JavaDelegate {
 
         String exceptionClassName = exceptionClassVar.toString();
         String nestedExceptionClassName = nestedExceptionClassVar.toString();
+        Object exceptionMessage = execution.getVariable("exceptionMessage");
+        Object nestedExceptionMessage = execution.getVariable("nestedExceptionMessage");
+
 
         if (StringUtils.isNotEmpty(exceptionClassName) && StringUtils.isNotEmpty(nestedExceptionClassName)) {
             RuntimeException exception = null;
             RuntimeException nestedException = null;
             try {
-                nestedException = (RuntimeException) Class.forName(nestedExceptionClassName).newInstance();
-                exception = (RuntimeException) Class.forName(exceptionClassName).getConstructor(Throwable.class).newInstance(nestedException);
+                if (nestedExceptionMessage != null) {
+                    nestedException = (RuntimeException) Class.forName(nestedExceptionClassName).getConstructor(String.class).newInstance(nestedExceptionMessage.toString());
+                } else {
+                    nestedException = (RuntimeException) Class.forName(nestedExceptionClassName).getConstructor().newInstance();
+                }
+
+                if (exceptionMessage != null) {
+                    exception = (RuntimeException) Class.forName(exceptionClassName).getConstructor(String.class, Throwable.class)
+                            .newInstance(exceptionMessage.toString(), nestedException);
+                } else {
+                    exception = (RuntimeException) Class.forName(exceptionClassName).getConstructor(Throwable.class).newInstance(nestedException);
+                }
 
             } catch (Exception e) {
                 throw new FlowableException("Class not found", e);

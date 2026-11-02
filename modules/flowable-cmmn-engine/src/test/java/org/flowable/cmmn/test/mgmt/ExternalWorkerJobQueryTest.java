@@ -23,14 +23,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.job.ExternalWorkerTaskCompleteJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJobQuery;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -99,6 +99,27 @@ public class ExternalWorkerJobQueryTest extends FlowableCmmnTestCase {
                 .containsOnly(caseInstance1.getId(), caseInstance2.getId());
 
         query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionId("invalid");
+        assertThat(query.count()).isZero();
+        assertThat(query.list()).isEmpty();
+        assertThat(query.singleResult()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/mgmt/ExternalWorkerJobQueryTest.cmmn")
+    public void testQueryByCaseDefinitionKey() {
+        CaseInstance caseInstance1 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+        ExternalWorkerJobQuery query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionKey("externalWorkerJobQueryTest");
+        assertThat(query.count()).isEqualTo(4);
+        assertThat(query.list())
+                .extracting(ExternalWorkerJob::getScopeId)
+                .containsOnly(caseInstance1.getId(), caseInstance2.getId());
+
+        query = cmmnManagementService.createExternalWorkerJobQuery().caseDefinitionKey("invalid");
         assertThat(query.count()).isZero();
         assertThat(query.list()).isEmpty();
         assertThat(query.singleResult()).isNull();

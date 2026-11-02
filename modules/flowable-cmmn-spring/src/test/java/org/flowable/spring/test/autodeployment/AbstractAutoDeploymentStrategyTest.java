@@ -23,7 +23,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
@@ -73,7 +73,7 @@ public class AbstractAutoDeploymentStrategyTest {
     protected final String resourceName2 = "resourceName2.form";
     protected final String resourceName3 = "resourceName2.test";
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
 
         when(cmmnEngineMock.getCmmnRepositoryService()).thenReturn(repositoryServiceMock);

@@ -53,4 +53,6 @@ public interface BatchService {
     
     Batch completeBatch(String batchId, String status);
 
+    BatchSummary calculateBatchSummary(String batchId);
+
 }

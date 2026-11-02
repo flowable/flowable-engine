@@ -19,7 +19,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.job.api.Job;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez

@@ -30,8 +30,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Default cache: keep everything in memory, unless a limit is set.
@@ -54,7 +54,8 @@ public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefini
     /** Cache which has a hard limit: no more elements will be cached than the limit. */
     public ProcessDefinitionInfoCache(CommandExecutor commandExecutor, final int limit) {
         this.commandExecutor = commandExecutor;
-        this.cache = Collections.synchronizedMap(new LinkedHashMap<String, ProcessDefinitionInfoCacheObject>(limit + 1, 0.75f, true) {
+        this.cache = Collections.synchronizedMap(new LinkedHashMap<>(limit + 1, 0.75f, true) {
+
             // +1 is needed, because the entry is inserted first, before it is removed
             // 0.75 is the default (see javadocs)
             // true will keep the 'access-order', which is needed to have a real LRU cache
@@ -75,7 +76,7 @@ public class ProcessDefinitionInfoCache implements DeploymentCache<ProcessDefini
     @Override
     public ProcessDefinitionInfoCacheObject get(final String processDefinitionId) {
         ProcessDefinitionInfoCacheObject infoCacheObject = null;
-        Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<ProcessDefinitionInfoCacheObject>() {
+        Command<ProcessDefinitionInfoCacheObject> cacheCommand = new Command<>() {
 
             @Override
             public ProcessDefinitionInfoCacheObject execute(CommandContext commandContext) {

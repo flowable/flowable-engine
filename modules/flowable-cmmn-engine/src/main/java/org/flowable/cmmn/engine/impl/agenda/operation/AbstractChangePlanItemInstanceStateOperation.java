@@ -35,6 +35,12 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
     }
 
     @Override
+    public void onPlanned() {
+        // The plan item is marked as being 'in flux'. After the state is changed, the flag is changed back (see below).
+        this.planItemInstanceEntity.setStateChangeUnprocessed(true);
+    }
+
+    @Override
     public void run() {
         String oldState = planItemInstanceEntity.getState();
         String newState = getNewState();
@@ -53,12 +59,15 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         }
 
         planItemInstanceEntity.setState(newState);
+
         CmmnEngineConfiguration cmmnEngineConfiguration =CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         cmmnEngineConfiguration.getListenerNotificationHelper().executeLifecycleListeners(
                 commandContext, planItemInstanceEntity, oldState, getNewState());
 
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
         internalExecute();
+
+        planItemInstanceEntity.setStateChangeUnprocessed(false);
         
         if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isLoggingSessionEnabled()) {
             String loggingType = null;
@@ -86,7 +95,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
     protected abstract void internalExecute();
 
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
-        return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
+        return new PlanItemLifeCycleEvent(planItemInstanceEntity, getLifeCycleTransition());
     }
 
     public abstract String getNewState();
@@ -116,18 +125,20 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         if (planItem != null) {
             stringBuilder.append(planItem);
-        } else {
-            stringBuilder.append(planItemInstanceEntity);
         }
 
-        stringBuilder.append(", ");
+        stringBuilder.append(" (CaseInstance id: ");
+        stringBuilder.append(planItemInstanceEntity.getCaseInstanceId());
+        stringBuilder.append(", PlanItemInstance id: ");
+        stringBuilder.append(planItemInstanceEntity.getId());
+        stringBuilder.append("), ");
 
         String currentState = planItemInstanceEntity.getState();
         String newState = getNewState();
 
         if (!Objects.equals(currentState, newState)) {
 
-            stringBuilder.append("new state: [").append(getNewState()).append("]");
+            stringBuilder.append("from [").append(currentState).append("] to new state: [").append(getNewState()).append("]");
             stringBuilder.append(" with transition [");
             stringBuilder.append(getLifeCycleTransition());
             stringBuilder.append("]");

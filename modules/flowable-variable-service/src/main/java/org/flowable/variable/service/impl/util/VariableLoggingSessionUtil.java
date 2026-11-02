@@ -12,12 +12,17 @@
  */
 package org.flowable.variable.service.impl.util;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.UUID;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
@@ -33,9 +38,9 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class VariableLoggingSessionUtil {
     
@@ -68,20 +73,25 @@ public class VariableLoggingSessionUtil {
                 loggingNode.putNull("variableValue");
                 
             } else {
-                addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode);
+                addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode, objectMapper);
             }
         }
         
         return loggingNode;
     }
     
-    public static void addVariableValue(Object variableValue, String variableTypeName, String variableRawValueName, String variableValueName, ObjectNode loggingNode) {
+    public static void addVariableValue(Object variableValue, String variableTypeName, String variableRawValueName, String variableValueName,
+            ObjectNode loggingNode, ObjectMapper objectMapper) {
         if (LongType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Long) variableValue);
         } else if (IntegerType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Integer) variableValue);
         } else if (DoubleType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Double) variableValue);
+        } else if (BigDecimalType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, (BigDecimal) variableValue);
+        } else if (BigIntegerType.TYPE_NAME.equals(variableTypeName)) {
+            loggingNode.put(variableRawValueName, (BigInteger) variableValue);
         } else if (ShortType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Short) variableValue);
         } else if (DateType.TYPE_NAME.equals(variableTypeName)) {
@@ -93,7 +103,8 @@ public class VariableLoggingSessionUtil {
         } else if (BooleanType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put(variableRawValueName, (Boolean) variableValue);
         } else if (JsonType.TYPE_NAME.equals(variableTypeName)) {
-            loggingNode.set(variableRawValueName, (JsonNode) variableValue);
+            JsonNode jsonNode = JsonUtil.asJsonNode(variableValue, objectMapper);
+            loggingNode.set(variableRawValueName, jsonNode);
         } else if (UUIDType.TYPE_NAME.equals(variableTypeName)) {
             loggingNode.put("variableRawValue", ((UUID) variableValue).toString());
         } else if (NullType.TYPE_NAME.equals(variableTypeName)) {

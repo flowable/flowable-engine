@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+  <case id="timerJobQueryTest" name="Timer Job Query Test">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItemtimerEventListener1" definitionRef="timerEventListener1"></planItem>
+      <planItem id="planItemhumanTask1" name="Human task" definitionRef="humanTask1">
+        <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1"></entryCriterion>
+      </planItem>
+      <sentry id="sentryentryCriterion1">
+        <planItemOnPart id="sentryOnPartentryCriterion1" sourceRef="planItemtimerEventListener1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="timerEventListener1">
+        <timerExpression><![CDATA[PT1H]]></timerExpression>
+      </timerEventListener>
+      <humanTask id="humanTask1" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+      </humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

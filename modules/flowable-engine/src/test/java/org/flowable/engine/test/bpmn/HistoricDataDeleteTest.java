@@ -17,14 +17,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -39,14 +54,19 @@ import org.flowable.engine.impl.delete.DeleteProcessInstanceBatchConstants;
 import org.flowable.engine.impl.jobexecutor.BpmnHistoryCleanupJobHandler;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.history.SerializableVariable;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
 
@@ -960,7 +980,9 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                 if (processEngineConfiguration.isAsyncHistoryEnabled()) {
                     waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
                 }
-                        
+
+                processEngineConfiguration.resetClock();
+
                 managementService.handleHistoryCleanupTimerJob();
                 
                 assertThat(managementService.createTimerJobQuery().handlerType(BpmnHistoryCleanupJobHandler.TYPE).count()).isEqualTo(1);
@@ -1153,6 +1175,255 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    void testDeleteHistoricInstancesWithAllQueryOptions() throws InvocationTargetException, IllegalAccessException {
+        // This test is meant to validate that all query options are present when doing delete
+        // If this test fails verify that the properties that are missing are added to DeleteHistoricProcessInstancesUsingBatchesCmd and BatchDeleteProcessConfig
+        Map<String, String> methodNameToExpectedQueryPropertyName = new HashMap<>();
+        methodNameToExpectedQueryPropertyName.put("deploymentIdIn", "deploymentIds");
+        methodNameToExpectedQueryPropertyName.put("processDefinitionKeyNotIn", "processKeyNotIn");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKey", "businessKey");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKeyLike", "businessKeyLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessKeyLikeIgnoreCase", "businessKeyLikeIgnoreCase");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatus", "businessStatus");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLike", "businessStatusLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceBusinessStatusLikeIgnoreCase", "businessStatusLikeIgnoreCase");
+        methodNameToExpectedQueryPropertyName.put("processInstanceCallbackType", "callbackType");
+        methodNameToExpectedQueryPropertyName.put("processInstanceCallbackId", "callbackId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceCallbackIds", "callbackIds");
+        methodNameToExpectedQueryPropertyName.put("withoutProcessInstanceCallbackId", "withoutCallbackId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceReferenceType", "referenceType");
+        methodNameToExpectedQueryPropertyName.put("processInstanceReferenceId", "referenceId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceName", "name");
+        methodNameToExpectedQueryPropertyName.put("processInstanceNameLike", "nameLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceNameLikeIgnoreCase", "nameLikeIgnoreCase");
+        methodNameToExpectedQueryPropertyName.put("processInstanceWithoutTenantId", "withoutTenantId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceTenantId", "tenantId");
+        methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLike", "tenantIdLike");
+        methodNameToExpectedQueryPropertyName.put("processInstanceTenantIdLikeIgnoreCase", "tenantIdLikeIgnoreCase");
+        Set<String> methodsToIgnore = new HashSet<>();
+        methodsToIgnore.add("parentCaseInstanceId");
+        methodsToIgnore.add("limitProcessInstanceVariables");
+        methodsToIgnore.add("includeProcessVariables");
+        methodsToIgnore.add("locale");
+        methodsToIgnore.add("withLocalizationFallback");
+        methodsToIgnore.add("withoutSorting");
+        methodsToIgnore.add("returnIdsOnly");
+        methodsToIgnore.add("asc");
+        methodsToIgnore.add("desc");
+        methodsToIgnore.add("or");
+        methodsToIgnore.add("endOr");
+        methodsToIgnore.add("singleResult");
+        Set<String> methodsWith2ParametersToIgnore = new HashSet<>();
+        methodsWith2ParametersToIgnore.add("involvedUser");
+        methodsWith2ParametersToIgnore.add("involvedGroup");
+        HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+        Map<String, String> expectedParameters = new LinkedHashMap<>();
+
+        Map<Method, Pair<String, Object>> methodsAndParametersForOr = new LinkedHashMap<>();
+
+        for (Method method : HistoricProcessInstanceQuery.class.getMethods()) {
+            String methodName = method.getName();
+            if (methodsToIgnore.contains(methodName)
+                    || methodName.startsWith("orderBy")
+                    || methodName.startsWith("variable")
+                    || methodName.startsWith("localVariable")
+                    || (method.getParameterCount() == 2 && methodsWith2ParametersToIgnore.contains(methodName))
+            ) {
+                continue;
+            }
+            Class<?> returnType = method.getReturnType();
+            if (!returnType.isInstance(query)) {
+                // We only care about methods that return the query itself
+                continue;
+            }
+            
+            System.out.println(methodName);
+
+            Instant baseTime = Instant.now().truncatedTo(ChronoUnit.SECONDS)
+                    .minus(365, ChronoUnit.DAYS)
+                    .with(ChronoField.MILLI_OF_SECOND, 563);
+
+            Parameter[] parameters = method.getParameters();
+            String propertyName = methodNameToExpectedQueryPropertyName.getOrDefault(methodName, methodName);
+            if (parameters.length == 0) {
+                expectedParameters.put(propertyName, "true");
+                method.invoke(query);
+                methodsAndParametersForOr.put(method, Pair.of("true", null));
+            } else if (parameters.length == 1) {
+                Parameter parameter = parameters[0];
+                Class<?> parameterType = parameter.getType();
+                Object parameterValue;
+                Object parameterOrValue;
+                String expectedValue;
+                String expectedOrValue;
+                if (parameterType.isAssignableFrom(String.class)) {
+                    parameterValue = methodName + "Value";
+                    expectedValue = "'" + parameterValue + "'";
+                    parameterOrValue = methodName + "OrValue";
+                    expectedOrValue = "'" + parameterOrValue + "'";
+                    if (methodName.equals("processInstanceNameLikeIgnoreCase")) {
+                        expectedValue = expectedValue.toLowerCase();
+                        expectedOrValue = expectedOrValue.toLowerCase();
+                    }
+                } else if (parameterType.isAssignableFrom(Set.class)) {
+                    String value1 = methodName + "SetValue1";
+                    String value2 = methodName + "SetValue2";
+                    parameterValue = new LinkedHashSet<>(Arrays.asList(value1, value2));
+                    expectedValue = "["
+                            + "  '" + value1 + "',"
+                            + "  '" + value2 + "'"
+                            + "]";
+
+                    String value1Or = value1 + "Or";
+                    String value2Or = value2 + "Or";
+                    parameterOrValue = new LinkedHashSet<>(Arrays.asList(value1Or, value2Or));
+                    expectedOrValue = "["
+                            + "  '" + value1Or + "',"
+                            + "  '" + value2Or + "'"
+                            + "]";
+                } else if (parameterType.isAssignableFrom(List.class)) {
+                    String value1 = methodName + "ListValue1";
+                    String value2 = methodName + "ListValue2";
+                    parameterValue = Arrays.asList(value1, value2);
+                    expectedValue = "["
+                            + "  '" + value1 + "',"
+                            + "  '" + value2 + "'"
+                            + "]";
+
+                    String value1Or = value1 + "Or";
+                    String value2Or = value2 + "Or";
+                    parameterOrValue = Arrays.asList(value1Or, value2Or);
+                    expectedOrValue = "["
+                            + "  '" + value1Or + "',"
+                            + "  '" + value2Or + "'"
+                            + "]";
+                } else if (parameterType.isAssignableFrom(Integer.class)) {
+                    parameterValue = methodName.hashCode();
+                    expectedValue = parameterValue.toString();
+
+                    parameterOrValue = methodName.hashCode() * 21;
+                    expectedOrValue = parameterOrValue.toString();
+                } else if (parameterType.isAssignableFrom(Date.class)) {
+                    baseTime = baseTime.plus(10, ChronoUnit.DAYS);
+                    parameterValue = Date.from(baseTime);
+                    expectedValue = "'" + baseTime + "'";
+
+                    Instant orTime = baseTime.plus(3, ChronoUnit.DAYS);
+                    parameterOrValue = Date.from(orTime);
+                    expectedOrValue = "'" + orTime + "'";
+                } else if (parameterType.isAssignableFrom(boolean.class)) {
+                    parameterValue = true;
+                    expectedValue = parameterValue.toString();
+
+                    parameterOrValue = true;
+                    expectedOrValue = parameterOrValue.toString();
+                } else {
+                    throw new AssertionFailedError("No value could be resolved for method " + method);
+                }
+
+                expectedParameters.put(propertyName, expectedValue);
+                method.invoke(query, parameterValue);
+                methodsAndParametersForOr.put(method, Pair.of(expectedOrValue, parameterOrValue));
+            } else {
+                throw new AssertionFailedError("No value could be resolved for method " + method);
+            }
+        }
+
+        query.or();
+        for (Map.Entry<Method, Pair<String, Object>> entry : methodsAndParametersForOr.entrySet()) {
+            Object argument = entry.getValue().getRight();
+            if (argument == null) {
+                entry.getKey().invoke(query);
+            } else {
+                entry.getKey().invoke(query, argument);
+            }
+        }
+        query.endOr();
+
+        String batchId = query.deleteSequentiallyUsingBatch(5, "Test Deletion");
+        batchesToRemove.add(batchId);
+
+        Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+        assertThat(batch).isNotNull();
+
+        Function<Method, String> propertyNameProvider = m -> methodNameToExpectedQueryPropertyName.getOrDefault(m.getName(), m.getName());
+        String expectedOrQueryValue = methodsAndParametersForOr.entrySet()
+                .stream()
+                .map(entry -> propertyNameProvider.apply(entry.getKey()) + ": " + entry.getValue().getLeft())
+                .collect(Collectors.joining(","));
+
+        expectedParameters.put("orQueryObjects", "[{" + expectedOrQueryValue + "}]");
+
+        String expectedQueryValue = expectedParameters.entrySet()
+                .stream()
+                .map(entry -> entry.getKey() + ": " + entry.getValue())
+                .collect(Collectors.joining(","));
+
+        assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                .isEqualTo("{"
+                        + "  numberOfInstances: 0,"
+                        + "  batchSize: 5,"
+                        + "  sequential: true,"
+                        + "  query: {" + expectedQueryValue + "}"
+                        + "}");
+    }
+
+    @Test
+    void testDeleteHistoricInstancesWithInvolvedOptions()  {
+        String batchId = historyService.createHistoricProcessInstanceQuery()
+                .involvedUser("kermit")
+                .involvedUser("fozzie", IdentityLinkType.ASSIGNEE)
+                .involvedGroups(new HashSet<>(Arrays.asList("sales", "hr")))
+                .involvedGroup("admin", IdentityLinkType.CANDIDATE)
+                .or()
+                .involvedUser("kermitOr")
+                .involvedUser("fozzieOr", IdentityLinkType.ASSIGNEE)
+                .involvedGroups(new HashSet<>(Arrays.asList("salesOr", "hrOr")))
+                .involvedGroup("adminOr", IdentityLinkType.CANDIDATE)
+                .endOr()
+                .deleteSequentiallyUsingBatch(10, "Test");
+        batchesToRemove.add(batchId);
+
+        Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+        assertThat(batch).isNotNull();
+
+        assertThatJson(batch.getBatchDocumentJson(ScopeTypes.BPMN))
+                .when(Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  numberOfInstances: 0,"
+                        + "  batchSize: 10,"
+                        + "  sequential: true,"
+                        + "  query: {"
+                        + "    involvedUser: 'kermit',"
+                        + "    involvedUserIdentityLink: {"
+                        + "      userId: 'fozzie',"
+                        + "      type: 'assignee'"
+                        + "    },"
+                        + "    involvedGroups: [ 'hr', 'sales' ],"
+                        + "    involvedGroupIdentityLink: {"
+                        + "      groupId: 'admin',"
+                        + "      type: 'candidate'"
+                        + "    },"
+                        + "    orQueryObjects: ["
+                        + "      {"
+                        + "        involvedUser: 'kermitOr',"
+                        + "        involvedUserIdentityLink: {"
+                        + "          userId: 'fozzieOr',"
+                        + "          type: 'assignee'"
+                        + "        },"
+                        + "        involvedGroups: [ 'hrOr', 'salesOr' ],"
+                        + "        involvedGroupIdentityLink: {"
+                        + "          groupId: 'adminOr',"
+                        + "          type: 'candidate'"
+                        + "        }"
+                        + "      }"
+                        + "    ]"
+                        + "  }"
+                        + "}");
+    }
+
+
+    @Test
     void testHistoryCleanupTimerJobCorrectlyUpdated() {
         String originalConfig = processEngineConfiguration.getHistoryCleaningTimeCycleConfig();
         String initialConfig = "0 0 1 * * ?";
@@ -1189,5 +1460,126 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
                     .forEach(job -> managementService.deleteTimerJob(job.getId()));
         }
     }
+
+    @Test
+    @Deployment(resources="org/flowable/engine/test/bpmn/oneTask.bpmn20.xml")
+    public void testDeleteHistoricInstancesUsingBatchWithStoppedBatch() {
+        List<String> processInstanceIds = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startToEnd");
+            processInstanceIds.add(processInstance.getId());
+            runtimeService.setVariable(processInstance.getId(), "testVar", "testValue" + (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "numVar", (i + 1));
+            runtimeService.setVariable(processInstance.getId(), "serializableVar", new SerializableVariable("test" + (i+1)));
+        }
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+
+            for (int i = 0; i < 10; i++) {
+                Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(i)).singleResult();
+                taskService.setVariableLocal(task.getId(), "taskVar", "taskValue" + (i + 1));
+                taskService.setVariableLocal(task.getId(), "taskSerializableVar", new SerializableVariable("test" + (i + 1)));
+                taskService.complete(task.getId());
+            }
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
+            Calendar cal = new GregorianCalendar();
+            cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) + 1);
+            query.finishedBefore(cal.getTime());
+            String batchId = query.deleteSequentiallyUsingBatch(5, "Test Deletion");
+            batchesToRemove.add(batchId);
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(20);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(80);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(20);
+
+            Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
+            assertThat(batch).isNotNull();
+            assertThat(batch.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_IN_PROGRESS);
+            assertThat(batch.getBatchType()).isEqualTo(Batch.HISTORIC_PROCESS_DELETE_TYPE);
+
+            assertThat(managementService.createBatchPartQuery().list())
+                    .hasSize(1)
+                    .allSatisfy(part -> {
+                        assertThat(part.getStatus()).isEqualTo(DeleteProcessInstanceBatchConstants.STATUS_WAITING);
+                        assertThat(part.getType()).isEqualTo(DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE);
+                    });
+
+            assertThat(managementService.createJobQuery().list())
+                    .hasSize(1)
+                    .allSatisfy(job -> {
+                        assertThat(job.getJobHandlerType()).isEqualTo(DeleteHistoricProcessInstancesSequentialJobHandler.TYPE);
+                    });
+
+            Job job = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+
+            assertThat(managementService.createBatchPartQuery().list())
+                    .extracting(BatchPart::getStatus, BatchPart::getType)
+                    .containsExactlyInAnyOrder(
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_WAITING, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
+                    );
+
+            managementService.executeCommand(commandContext -> {
+                CommandContextUtil.getBatchService(commandContext)
+                        .completeBatch(batchId, DeleteProcessInstanceBatchConstants.STATUS_STOPPED);
+                return null;
+            });
+
+            job = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+
+            assertThat(managementService.createJobQuery().list()).isEmpty();
+            assertThat(managementService.createTimerJobQuery().list()).isEmpty();
+            assertThat(managementService.createBatchPartQuery().list())
+                    .extracting(BatchPart::getStatus, BatchPart::getType)
+                    .containsExactlyInAnyOrder(
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_COMPLETED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE),
+                            tuple(DeleteProcessInstanceBatchConstants.STATUS_STOPPED, DeleteProcessInstanceBatchConstants.BATCH_PART_DELETE_PROCESS_INSTANCES_TYPE)
+                    );
+
+            if (processEngineConfiguration.isAsyncHistoryEnabled()) {
+                waitForHistoryJobExecutorToProcessAllJobs(7000, 300);
+            }
+
+            assertThat(historyService.createHistoricProcessInstanceQuery().count()).isEqualTo(15);
+            assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(55);
+            assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(15);
+
+            for (int i = 0; i < 20; i++) {
+                if (i < 5) {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
+                    }
+
+                } else if (i < 10) {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(2);
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(5);
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(5);
+                    }
+                } else {
+                    assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).hasSize(1);
+                    assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(1);
+                    assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
+                        assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstanceIds.get(i)).count()).isEqualTo(3);
+                    }
+                }
+            }
+        }
+    }
+
 
 }

@@ -49,7 +49,7 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskDelegateExpressionTest.testDelegateExpression.bpmn20.xml")
     public void testDelegateExpressionActivityInstanceQuery() {
-        String processId = managementService.executeCommand(new Command<String>() {
+        String processId = managementService.executeCommand(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {
@@ -58,30 +58,31 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                         .transientVariable("delegateBean", new DummyTestDelegateBean())
                         .start()
                         .getProcessInstanceId();
-                
+
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
-                
+
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
                 assertThat(activityInstances).hasSize(5);
-                Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream().collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
+                Map<String, List<ActivityInstanceEntity>> activityInstanceMap = activityInstances.stream()
+                        .collect(Collectors.groupingBy(ActivityInstanceEntity::getActivityId));
                 assertThat(activityInstanceMap).containsKey("theStart");
                 assertThat(activityInstanceMap.get("theStart")).hasSize(1);
                 assertThat(activityInstanceMap.get("theStart").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("theStart").get(0).getTransactionOrder()).isEqualTo(1);
-                
+
                 assertThat(activityInstanceMap).containsKey("service1");
                 assertThat(activityInstanceMap.get("service1")).hasSize(1);
                 assertThat(activityInstanceMap.get("service1").get(0).getEndTime()).isNotNull();
                 assertThat(activityInstanceMap.get("service1").get(0).getTransactionOrder()).isEqualTo(3);
-                
+
                 assertThat(activityInstanceMap).containsKey("usertask1");
                 assertThat(activityInstanceMap.get("usertask1")).hasSize(1);
                 assertThat(activityInstanceMap.get("usertask1").get(0).getEndTime()).isNull();
                 assertThat(activityInstanceMap.get("usertask1").get(0).getTransactionOrder()).isEqualTo(5);
-                
+
                 return processId;
             }
-            
+
         });
 
         assertThat(runtimeService.getVariables(processId))
@@ -120,7 +121,7 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
     @Test
     @Deployment
     public void testDelegateExpressionPassThrough() {
-        String processId = managementService.executeCommand(new Command<String>() {
+        String processId = managementService.executeCommand(new Command<>() {
 
             @Override
             public String execute(CommandContext commandContext) {
@@ -129,40 +130,40 @@ public class ServiceTaskDelegateExpressionTest extends PluggableFlowableTestCase
                         .transientVariable("delegateBean", new DummyTestDelegateBean())
                         .start()
                         .getProcessInstanceId();
-                
+
                 ActivityInstanceEntityManager activityInstanceEntityManager = processEngineConfiguration.getActivityInstanceEntityManager();
-                
+
                 List<ActivityInstanceEntity> activityInstances = activityInstanceEntityManager.findActivityInstancesByProcessInstanceId(processId, true);
                 assertThat(activityInstances).hasSize(5);
-                
+
                 ActivityInstanceEntity activityInstance = activityInstances.get(0);
                 assertThat(activityInstance.getActivityId()).isEqualTo("theStart");
                 assertThat(activityInstance.getEndTime()).isNotNull();
                 assertThat(activityInstance.getTransactionOrder()).isEqualTo(1);
-                
+
                 activityInstance = activityInstances.get(1);
                 assertThat(activityInstance.getActivityType()).isEqualTo("sequenceFlow");
                 assertThat(activityInstance.getActivityId()).isEqualTo("_flow_theStart__service1");
                 assertThat(activityInstance.getTransactionOrder()).isEqualTo(2);
-                
+
                 activityInstance = activityInstances.get(2);
                 assertThat(activityInstance.getActivityId()).isEqualTo("service1");
                 assertThat(activityInstance.getEndTime()).isNotNull();
                 assertThat(activityInstance.getTransactionOrder()).isEqualTo(3);
-                
+
                 activityInstance = activityInstances.get(3);
                 assertThat(activityInstance.getActivityType()).isEqualTo("sequenceFlow");
                 assertThat(activityInstance.getActivityId()).isEqualTo("_flow_service1__theEnd");
                 assertThat(activityInstance.getTransactionOrder()).isEqualTo(4);
-                
+
                 activityInstance = activityInstances.get(4);
                 assertThat(activityInstance.getActivityId()).isEqualTo("theEnd");
                 assertThat(activityInstance.getEndTime()).isNotNull();
                 assertThat(activityInstance.getTransactionOrder()).isEqualTo(5);
-                
+
                 return processId;
             }
-            
+
         });
         
         managementService.executeCommand(new Command<Void>() {

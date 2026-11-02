@@ -29,8 +29,8 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
+import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.FlowableTaskAlreadyClaimedException;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.TaskServiceImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
@@ -42,7 +42,7 @@ import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
-import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.task.api.DelegationState;
@@ -589,7 +589,7 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.saveTask(task);
 
         String taskId = task.getId();
-        taskService.complete(taskId, null);
+        taskService.complete(taskId);
 
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             historyService.deleteHistoricTaskInstance(taskId);
@@ -1415,41 +1415,43 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
+        String taskErrorString = "Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "]";
 
         try {
             taskService.deleteTask(task.getId());
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
         try {
             taskService.deleteTask(task.getId(), true);
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
         try {
             taskService.deleteTask(task.getId(), "test");
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
         try {
             taskService.deleteTasks(Collections.singletonList(task.getId()));
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
         try {
             taskService.deleteTasks(Collections.singletonList(task.getId()), true);
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
         try {
             taskService.deleteTasks(Collections.singletonList(task.getId()), "test");
         } catch (FlowableException ae) {
-            assertEquals("The task cannot be deleted because is part of a running process", ae.getMessage());
+            assertEquals("The " + taskErrorString + " cannot be deleted because is part of a running process", ae.getMessage());
         }
 
     }

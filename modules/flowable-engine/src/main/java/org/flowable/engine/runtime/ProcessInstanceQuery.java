@@ -13,6 +13,7 @@
 package org.flowable.engine.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -48,6 +49,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      */
     ProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
     
+    /**
+     * Select process instances with a business key like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceBusinessKeyLikeIgnoreCase(String businessKeyLikeIgnoreCase);
+    
     /** Select process instances with the given business status */
     ProcessInstanceQuery processInstanceBusinessStatus(String businessStatus);
 
@@ -55,6 +61,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select process instances with a business status like the given value.
      */
     ProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
+    
+    /**
+     * Select process instances with a business status like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceBusinessStatusLikeIgnoreCase(String businessStatusLikeIgnoreCase);
 
     /**
      * Only select process instances that have the given tenant id.
@@ -65,6 +76,11 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with a tenant id like the given one.
      */
     ProcessInstanceQuery processInstanceTenantIdLike(String tenantIdLike);
+    
+    /**
+     * Only select process instances with a tenant id like the given one, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
 
     /**
      * Only select process instances that do not have a tenant id.
@@ -73,11 +89,27 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
 
     /** Only select process instances whose process definition category is processDefinitionCategory. */
     ProcessInstanceQuery processDefinitionCategory(String processDefinitionCategory);
+    
+    /** Only select process instances whose process definition category is like the given value. */
+    ProcessInstanceQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
+    
+    /** Only select process instances whose process definition category is like the given value, ignoring upper/lower case. */
+    ProcessInstanceQuery processDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase);
 
     /**
      * Select process instances whose process definition name is processDefinitionName
      */
     ProcessInstanceQuery processDefinitionName(String processDefinitionName);
+    
+    /**
+     * Select process instances whose process definition name is like the given value
+     */
+    ProcessInstanceQuery processDefinitionNameLike(String processDefinitionNameLike);
+    
+    /**
+     * Select process instances whose process definition name is like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase);
 
     /**
      * Only select process instances with a certain process definition version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
@@ -93,6 +125,21 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Select the process instances which are defined by process definitions with the given keys.
      */
     ProcessInstanceQuery processDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /**
+     * Select the process instances which are defined by process definitions that don't match the given keys.
+     */
+    ProcessInstanceQuery excludeProcessDefinitionKeys(Set<String> processDefinitionKeys);
+    
+    /**
+     * Select process instances whose process definition key is like the given value
+     */
+    ProcessInstanceQuery processDefinitionKeyLike(String processDefinitionKeyLike);
+    
+    /**
+     * Select process instances whose process definition key is like the given value, ignoring upper/lower case.
+     */
+    ProcessInstanceQuery processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase);
 
     /**
      * Select the process instances which are defined by a process definition with the given id.
@@ -322,15 +369,46 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      */
     ProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
+
     /**
-     * Only select process instances with the given callback id. 
+     * Only select process instances with a root instance with a name like the given value.
+     */
+    ProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
+
+    /**
+     * Only select process instances with one of the given root scope ids.
+     */
+    ProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds);
+
+    /**
+     * Only select process instances with the given parent process instance id.
+     */
+    ProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
+    /**
+     * Only select process instances with one of the given parent scope ids.
+     */
+    ProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds);
+
+    /**
+     * Only select process instances with the given callback id.
      */
     ProcessInstanceQuery processInstanceCallbackId(String callbackId);
+
+    /**
+     * Only select process instances with the given callback ids.
+     */
+    ProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
     
     /**
      * Only select process instances with the given callback type.
      */
     ProcessInstanceQuery processInstanceCallbackType(String callbackType);
+    
+    /**
+     * Only select process instances that are a sub process of the provided case instance id. 
+     */
+    ProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
      * Only select process instances with the given reference id.
@@ -353,16 +431,33 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
     ProcessInstanceQuery withLocalizationFallback();
 
     /**
+     * Return only the id value of the process instances, to reduce any additional instance data to be returned.
+     */
+    ProcessInstanceQuery returnIdsOnly();
+
+    /**
      * Include process variables in the process query result
      */
     ProcessInstanceQuery includeProcessVariables();
 
     /**
-     * Limit process instance variables
-     * @deprecated no longer needed, this is a noop
+     * Include the process variables with the given names into the query result.
      */
-    @Deprecated
-    ProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
+    ProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
+
+    /**
+     * Include process variables in the process query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    ProcessInstanceQuery includeProcessVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the process variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    ProcessInstanceQuery includeProcessVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
 
     /**
      * Only select process instances that failed due to an exception happening during a job execution.

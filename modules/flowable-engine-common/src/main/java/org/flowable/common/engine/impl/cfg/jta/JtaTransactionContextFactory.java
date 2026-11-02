@@ -13,7 +13,7 @@
 
 package org.flowable.common.engine.impl.cfg.jta;
 
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 import org.flowable.common.engine.impl.cfg.TransactionContext;
 import org.flowable.common.engine.impl.cfg.TransactionContextFactory;

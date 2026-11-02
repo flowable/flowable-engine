@@ -58,19 +58,24 @@ public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskIns
     HistoricTaskInstanceQuery taskParentTaskId(String parentTaskId);
 
     /**
-     * Only select select historic task instances which are completed on the given date
+     * Only select historic task instances which are completed on the given date
      */
     HistoricTaskInstanceQuery taskCompletedOn(Date endDate);
 
     /**
-     * Only select select historic task instances which are completed before the given date
+     * Only select historic task instances which are completed before the given date
      */
     HistoricTaskInstanceQuery taskCompletedBefore(Date endDate);
 
     /**
-     * Only select select historic task instances which are completed after the given date
+     * Only select historic task instances which are completed after the given date
      */
     HistoricTaskInstanceQuery taskCompletedAfter(Date endDate);
+
+    /**
+     * Only select historic task instances which are completed by the given user
+     */
+    HistoricTaskInstanceQuery taskCompletedBy(String userId);
 
     /**
      * Only select historic tasks without a delete reason (completed normally)

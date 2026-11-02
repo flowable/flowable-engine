@@ -14,6 +14,7 @@ package org.flowable.engine;
 
 import java.util.Collection;
 
+import org.flowable.common.engine.impl.agenda.Agenda;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.interceptor.MigrationContext;
 

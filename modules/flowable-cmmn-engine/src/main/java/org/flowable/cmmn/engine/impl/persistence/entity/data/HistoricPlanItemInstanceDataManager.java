@@ -39,4 +39,6 @@ public interface HistoricPlanItemInstanceDataManager extends DataManager<Histori
     void bulkDeleteHistoricPlanItemInstancesForCaseInstanceIds(Collection<String> caseInstanceIds);
 
     void deleteHistoricPlanItemInstancesForNonExistingCaseInstances();
+
+    List<HistoricPlanItemInstance> findWithVariablesByCriteria(HistoricPlanItemInstanceQueryImpl historicPlanItemInstanceQuery);
 }

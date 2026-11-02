@@ -14,9 +14,8 @@
 package org.flowable.cmmn.rest.service.api.history.task;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -37,62 +36,65 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
-    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")
+    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The case instance id of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instance of a case instance and its children.", paramType = "query"),
-            @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
-            @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns historic task instances without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
-            @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskNameLike", dataType = "string", value = "The task name with like operator for the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskDescription", dataType = "string", value = "The task description of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskDescriptionLike", dataType = "string", value = "The task description with like operator for the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCategory", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
-            @ApiImplicitParam(name = "taskCategoryIn", dataType = "string", value = "Select tasks with the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
-            @ApiImplicitParam(name = "taskCategoryNotIn", dataType = "string", value = "Select tasks not assigned to the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
-            @ApiImplicitParam(name = "taskWithoutCategory", dataType = "string", value = "Select tasks with no category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
-            @ApiImplicitParam(name = "taskDeleteReason", dataType = "string", value = "The task delete reason of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskDeleteReasonLike", dataType = "string", value = "The task delete reason with like operator for the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskAssigneeLike", dataType = "string", value = "The assignee with like operator for the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskOwner", dataType = "string", value = "The owner of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskOwnerLike", dataType = "string", value = "The owner with like operator for the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "taskInvolvedUser", dataType = "string", value = "An involved user of the historic task instance", paramType = "query"),
-            @ApiImplicitParam(name = "taskCandidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
-            @ApiImplicitParam(name = "taskIgnoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)"),
-            @ApiImplicitParam(name = "taskPriority", dataType = "string", value = "The priority of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic task instance is finished.", paramType = "query"),
-            @ApiImplicitParam(name = "processFinished", dataType = "boolean", value = "Indication if the process instance of the historic task instance is finished.", paramType = "query"),
-            @ApiImplicitParam(name = "parentTaskId", dataType = "string", value = "An optional parent task id of the historic task instance.", paramType = "query"),
-            @ApiImplicitParam(name = "dueDate", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date equal this date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueDateAfter", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date after this date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueDateBefore", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date before this date.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutDueDate", dataType = "boolean", value = "Return only historic task instances that have no due-date. When false is provided as value, this parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCompletedOn", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed on this date.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCompletedAfter", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed after this date.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCompletedBefore", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed before this date.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCreatedOn", dataType = "string", format="date-time", value = "Return only historic task instances that were created on this date.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCreatedBefore", dataType = "string", format="date-time", value = "Return only historic task instances that were created before this date.", paramType = "query"),
-            @ApiImplicitParam(name = "taskCreatedAfter", dataType = "string", format="date-time", value = "Return only historic task instances that were created after this date.", paramType = "query"),
-            @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "An indication if the historic task instance local variables should be returned as well.", paramType = "query"),
-            @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include historic process variables in the result.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
-            @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns historic task instances without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
-
+        @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The case instance id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "caseInstanceIdWithChildren", dataType = "string", value = "Selects the historic task instance of a case instance and its children.", paramType = "query"),
+        @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The case definition id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
+        @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns historic task instances without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
+        @ApiImplicitParam(name = "taskDefinitionKey", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
+        @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskNameLike", dataType = "string", value = "The task name with like operator for the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskNameLikeIgnoreCase", dataType = "string", value = "The task name with like operator for the historic task instance ignoring case.", paramType = "query"),
+        @ApiImplicitParam(name = "taskDescription", dataType = "string", value = "The task description of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskDescriptionLike", dataType = "string", value = "The task description with like operator for the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCategory", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+        @ApiImplicitParam(name = "taskCategoryIn", dataType = "string", value = "Select tasks with the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+        @ApiImplicitParam(name = "taskCategoryNotIn", dataType = "string", value = "Select tasks not assigned to the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+        @ApiImplicitParam(name = "taskWithoutCategory", dataType = "string", value = "Select tasks with no category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
+        @ApiImplicitParam(name = "taskDeleteReason", dataType = "string", value = "The task delete reason of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskDeleteReasonLike", dataType = "string", value = "The task delete reason with like operator for the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskAssignee", dataType = "string", value = "The assignee of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskAssigneeLike", dataType = "string", value = "The assignee with like operator for the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskOwner", dataType = "string", value = "The owner of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskOwnerLike", dataType = "string", value = "The owner with like operator for the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "taskInvolvedUser", dataType = "string", value = "An involved user of the historic task instance", paramType = "query"),
+        @ApiImplicitParam(name = "taskCandidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
+        @ApiImplicitParam(name = "taskIgnoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)"),
+        @ApiImplicitParam(name = "taskPriority", dataType = "string", value = "The priority of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic task instance is finished.", paramType = "query"),
+        @ApiImplicitParam(name = "processFinished", dataType = "boolean", value = "Indication if the process instance of the historic task instance is finished.", paramType = "query"),
+        @ApiImplicitParam(name = "parentTaskId", dataType = "string", value = "An optional parent task id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "dueDate", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date equal this date.", paramType = "query"),
+        @ApiImplicitParam(name = "dueDateAfter", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date after this date.", paramType = "query"),
+        @ApiImplicitParam(name = "dueDateBefore", dataType = "string", format="date-time", value = "Return only historic task instances that have a due date before this date.", paramType = "query"),
+        @ApiImplicitParam(name = "withoutDueDate", dataType = "boolean", value = "Return only historic task instances that have no due-date. When false is provided as value, this parameter is ignored.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCompletedOn", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed on this date.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCompletedAfter", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed after this date.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCompletedBefore", dataType = "string", format="date-time", value = "Return only historic task instances that have been completed before this date.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCreatedOn", dataType = "string", format="date-time", value = "Return only historic task instances that were created on this date.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCreatedBefore", dataType = "string", format="date-time", value = "Return only historic task instances that were created before this date.", paramType = "query"),
+        @ApiImplicitParam(name = "taskCreatedAfter", dataType = "string", format="date-time", value = "Return only historic task instances that were created after this date.", paramType = "query"),
+        @ApiImplicitParam(name = "includeTaskLocalVariables", dataType = "boolean", value = "An indication if the historic task instance local variables should be returned as well.", paramType = "query"),
+        @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "Indication to include historic process variables in the result.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
+        @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
+        @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+        @ApiImplicitParam(name = "withoutProcessInstanceId", dataType = "boolean", value = "If true, only returns historic task instances without a process instance id set. If false, the withoutProcessInstanceId parameter is ignored.", paramType = "query"),
+        @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "The plan item instance instance id of the historic task instance.", paramType = "query"),
+        @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+        @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances", produces = "application/json")
-    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricTaskInstanceQueryRequest queryRequest = new HistoricTaskInstanceQueryRequest();
 
@@ -126,6 +128,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("taskNameLike") != null) {
             queryRequest.setTaskNameLike(allRequestParams.get("taskNameLike"));
+        }
+        
+        if (allRequestParams.get("taskNameLikeIgnoreCase") != null) {
+            queryRequest.setTaskNameLikeIgnoreCase(allRequestParams.get("taskNameLikeIgnoreCase"));
         }
 
         if (allRequestParams.get("taskDescription") != null) {
@@ -220,6 +226,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setDueDateBefore(RequestUtil.getDate(allRequestParams, "dueDateBefore"));
         }
 
+        if (allRequestParams.containsKey("withoutDueDate") && Boolean.parseBoolean(allRequestParams.get("withoutDueDate"))) {
+            queryRequest.setWithoutDueDate(Boolean.TRUE);
+        }
+
         if (allRequestParams.get("taskCreatedOn") != null) {
             queryRequest.setTaskCreatedOn(RequestUtil.getDate(allRequestParams, "taskCreatedOn"));
         }
@@ -260,6 +270,14 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setTenantIdLike(allRequestParams.get("tenantIdLike"));
         }
 
+        if (allRequestParams.get("scopeId") != null) {
+            queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+        
+        if (allRequestParams.get("scopeIds") != null) {
+            queryRequest.setScopeIds(RequestUtil.parseToSet(allRequestParams.get("scopeIds")));
+        }
+
         if (allRequestParams.get("withoutTenantId") != null) {
             queryRequest.setWithoutTenantId(Boolean.valueOf(allRequestParams.get("withoutTenantId")));
         }
@@ -272,10 +290,22 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setTaskCandidateGroup(allRequestParams.get("taskCandidateGroup"));
         }
 
-        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.valueOf(allRequestParams.get("ignoreTaskAssignee"))) {
+        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.parseBoolean(allRequestParams.get("ignoreTaskAssignee"))) {
             queryRequest.setIgnoreTaskAssignee(true);
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/cmmn-history/historic-task-instances", ""));
+        if (allRequestParams.get("planItemInstanceId") != null) {
+            queryRequest.setPlanItemInstanceId(allRequestParams.get("planItemInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
+        }
+
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <!--
+        we expect a ${customerId} and ${email} process variable
+    -->
+    <process id="signup-process" name="signup-process">
+
+        <startEvent id="start" flowable:initiator="initiator"/>
+
+            <sequenceFlow sourceRef="start" targetRef="confirm-email-task"/>
+
+        <userTask id="confirm-email-task" name="confirm-email-task"
+                  flowable:assignee="${initiator}"/>
+
+            <sequenceFlow sourceRef="confirm-email-task"
+                          targetRef="send-welcome-email-task"/>
+
+        <serviceTask id="send-welcome-email-task"
+                     flowable:delegateExpression="#{emailService}" />
+
+            <sequenceFlow sourceRef="send-welcome-email-task" targetRef="end"/>
+
+        <endEvent id="end"/>
+
+    </process>
+
+</definitions>

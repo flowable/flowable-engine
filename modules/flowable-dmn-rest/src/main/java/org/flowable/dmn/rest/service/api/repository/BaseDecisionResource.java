@@ -15,7 +15,7 @@ package org.flowable.dmn.rest.service.api.repository;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -90,12 +90,11 @@ public class BaseDecisionResource {
         List<String> resourceList = dmnRepositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceId)) {
-            final InputStream resourceStream = dmnRepositoryService.getResourceAsStream(deploymentId, resourceId);
-
             String contentType = contentTypeResolver.resolveContentType(resourceId);
             response.setContentType(contentType);
-            try {
+            try (final InputStream resourceStream = dmnRepositoryService.getResourceAsStream(deploymentId, resourceId)) {
                 return IOUtils.toByteArray(resourceStream);
+                
             } catch (Exception e) {
                 throw new FlowableException("Error converting resource stream", e);
             }

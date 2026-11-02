@@ -12,100 +12,63 @@
  */
 package org.flowable.app.engine.impl.db;
 
-import org.flowable.app.engine.AppEngineConfiguration;
-import org.flowable.app.engine.impl.util.CommandContextUtil;
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
-import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.SchemaManager;
+import java.util.Map;
 
-public class AppDbSchemaManager extends LiquibaseBasedSchemaManager {
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
+
+public class AppDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
     
-    public static final String LIQUIBASE_CHANGELOG = "org/flowable/app/db/liquibase/flowable-app-db-changelog.xml";
+    protected static final String APP_DB_SCHEMA_LOCK_NAME = "appDbSchemaLock";
+    
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.3.1.0"),
+            Map.entry("2", "6.4.0.0"),
+            Map.entry("3", "6.4.1.3")
+    );
 
     public AppDbSchemaManager() {
-        super("app", LIQUIBASE_CHANGELOG, AppEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
+        super("app", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getAppEngineConfiguration));
     }
 
     @Override
-    protected LiquibaseDatabaseConfiguration getDatabaseConfiguration() {
-        return new EngineDatabaseConfiguration(CommandContextUtil.getAppEngineConfiguration());
-    }
-
-    public void initSchema() {
-        initSchema(CommandContextUtil.getAppEngineConfiguration().getDatabaseSchemaUpdate());
-    }
-    
-    @Override
-    public void schemaCreate() {
-        try {
-            
-            getCommonSchemaManager().schemaCreate();
-            getIdentityLinkSchemaManager().schemaCreate();
-            getVariableSchemaManager().schemaCreate();
-            
-            super.schemaCreate();
-        } catch (Exception e) {
-            throw new FlowableException("Error creating App engine tables", e);
-        }
+    protected String getEngineVersion() {
+        return AppEngine.VERSION;
     }
 
     @Override
-    public void schemaDrop() {
-        try {
-            super.schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping App engine tables", e);
-        }
-        
-        try {
-            getVariableSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping variable tables", e);
-        }
-        
-        try {
-            getIdentityLinkSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping identity link tables", e);
-        }
-        
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
+    protected String getSchemaVersionPropertyName() {
+        return "app.schema.version";
     }
 
     @Override
-    public String schemaUpdate() {
-        try {
-            
-            getCommonSchemaManager().schemaUpdate();
-            
-            if (CommandContextUtil.getAppEngineConfiguration().isExecuteServiceSchemaManagers()) {
-                getIdentityLinkSchemaManager().schemaUpdate();
-                getVariableSchemaManager().schemaUpdate();
-            }
+    protected String getDbSchemaLockName() {
+        return APP_DB_SCHEMA_LOCK_NAME;
+    }
 
-            super.schemaUpdate();
+    @Override
+    protected String getEngineTableName() {
+        return "ACT_APP_DEPLOYMENT";
+    }
 
-        } catch (Exception e) {
-            throw new FlowableException("Error updating App engine tables", e);
+    @Override
+    protected String getChangeLogTableName() {
+        return "ACT_APP_DATABASECHANGELOG";
+    }
+
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
-        return null;
+        return "6.3.0.1";
     }
-    
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getCommonSchemaManager();
-    }
-    
-    protected SchemaManager getIdentityLinkSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getIdentityLinkSchemaManager();
-    }
-    
-    protected SchemaManager getVariableSchemaManager() {
-        return CommandContextUtil.getAppEngineConfiguration().getVariableSchemaManager();
+
+    @Override
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/app/db/";
     }
 }

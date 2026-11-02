@@ -34,7 +34,7 @@ public class XmlElementsToMapPayloadExtractor implements InboundEventPayloadExtr
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlElementsToMapPayloadExtractor.class);
 
     @Override
-    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Document payload) {
+    public Collection<EventPayloadInstance> extractPayload(EventModel eventModel, Document payload, String parentDeploymentId, String tenantId) {
         return eventModel.getPayload().stream()
             .filter(parameterDefinition -> parameterDefinition.isFullPayload() || getChildNode(payload, parameterDefinition.getName()) != null)
             .map(payloadDefinition -> new EventPayloadInstanceImpl(payloadDefinition, getPayloadValue(payload,

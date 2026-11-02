@@ -15,6 +15,7 @@ package org.flowable.job.service.impl.asyncexecutor;
 import org.flowable.common.engine.impl.cfg.TransactionListener;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.job.api.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +45,17 @@ public class JobAddedTransactionListener implements TransactionListener {
         // which would block the current connection/transaction (of the calling thread)
         // until the job has been handed of to the async executor.
         // When the connection pool is small, this might lead to contention and (temporary) locks.
+        if (job instanceof Entity) {
+            if (((Entity) job).isDeleted()) {
+                // If a job has been deleted then we should not execute
+                // This can happen when an async job has been created and deleted within the same transaction
+                // - When using a straight parallel multi instance processing.
+                // The async completion jobs are created in the same transaction, but if the actual behaviour was sync, then the async jobs will be deleted.
+                // - When a job gets deleted because a parallel gateway in a sub process leads to a creation of an async job and another sync service task that throws an error.
+                // When the error is handled with a boundary, then the async job gets deleted.
+                return;
+            }
+        }
         asyncExecutor.executeAsyncJob(job);
     }
 }

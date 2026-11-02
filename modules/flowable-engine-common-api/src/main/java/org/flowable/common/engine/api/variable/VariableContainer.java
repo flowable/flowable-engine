@@ -12,11 +12,20 @@
  */
 package org.flowable.common.engine.api.variable;
 
+import java.util.Set;
+
 /**
  * @author Joram Barrez
  */
 public interface VariableContainer {
-    
+
+    /**
+     * @return an empty (null object) variable container.
+     */
+    static VariableContainer empty(){
+        return EmptyVariableContainer.INSTANCE;
+    }
+
     boolean hasVariable(String variableName);
     
     Object getVariable(String variableName);
@@ -26,5 +35,7 @@ public interface VariableContainer {
     void setTransientVariable(String variableName, Object variableValue);
 
     String getTenantId();
+
+    Set<String> getVariableNames();
 
 }

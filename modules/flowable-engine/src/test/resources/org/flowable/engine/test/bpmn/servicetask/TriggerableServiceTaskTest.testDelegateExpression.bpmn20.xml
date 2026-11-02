@@ -16,7 +16,14 @@
     <sequenceFlow sourceRef="usertask1" targetRef="theEnd" />
 
     <endEvent id="theEnd" />
-    
+
+    <subProcess id="eventSubProcess" triggeredByEvent="true">
+      <startEvent id="catchError">
+        <errorEventDefinition /> <!-- no errorCode: catch any error -->
+      </startEvent>
+      <sequenceFlow id="flow3" sourceRef="catchError" targetRef="taskAfterErrorCatch" />
+      <userTask id="taskAfterErrorCatch" name="Escalated Task" />
+    </subProcess>
   </process>
 
 </definitions>

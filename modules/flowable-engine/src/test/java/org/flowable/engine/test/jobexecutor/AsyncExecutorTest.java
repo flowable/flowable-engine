@@ -15,6 +15,7 @@ package org.flowable.engine.test.jobexecutor;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Duration;
@@ -38,7 +39,6 @@ import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +85,36 @@ public class AsyncExecutorTest {
             assertThat(processEngine.getManagementService().createJobQuery().count()).isZero();
 
             assertThat(getAsyncExecutorJobCount(processEngine)).isEqualTo(1);
+        } finally {
+
+            // Clean up
+            if (processEngine != null) {
+                cleanup(processEngine);
+            }
+        }
+    }
+
+    @Test
+    public void testAsyncExecutionForStraightThroughParallelMultiInstance() {
+
+        ProcessEngine processEngine = null;
+
+        try {
+            // Deploy
+            processEngine = createProcessEngine(true);
+            setClockToCurrentTime(processEngine);
+            deploy(processEngine, "AsyncExecutorTest.testStraightThroughParallelMultiInstance.bpmn20.xml");
+
+            // Start process instance. Wait for all jobs to be done
+            ProcessInstance processInstance = processEngine.getRuntimeService()
+                    .createProcessInstanceBuilder()
+                    .processDefinitionKey("asyncExecutor")
+                    .transientVariable("loopCardinality", 2)
+                    .start();
+            assertThat(processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult())
+                    .isNull();
+
+            assertThat(getAsyncExecutorJobCount(processEngine)).isZero();
         } finally {
 
             // Clean up
@@ -194,7 +224,8 @@ public class AsyncExecutorTest {
             processEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
 
             final ProcessEngine processEngineCopy = processEngine;
-            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<>() {
+
                 @Override
                 public Boolean call() throws Exception {
                     long timerJobCount = processEngineCopy.getManagementService().createTimerJobQuery().count();
@@ -239,7 +270,8 @@ public class AsyncExecutorTest {
             processEngine.getRuntimeService().startProcessInstanceByKey("asyncScript");
 
             final ProcessEngine processEngineCopy = processEngine;
-            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<Boolean>() {
+            JobTestHelper.waitForJobExecutorOnCondition(processEngine.getProcessEngineConfiguration(), 10000L, 1000L, new Callable<>() {
+
                 @Override
                 public Boolean call() throws Exception {
                     long timerJobCount = processEngineCopy.getManagementService().createTimerJobQuery().count();
@@ -296,7 +328,7 @@ public class AsyncExecutorTest {
             assertThat(TestRejectionEventListener.COUNTER.get()).isEqualTo(1);
 
         } catch(Exception e)  {
-            Assert.fail("Unexpected exception: " + e.getMessage());
+            fail("Unexpected exception: " + e.getMessage());
             throw e;
         } finally {
 

@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,16 +31,16 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -68,12 +67,16 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey", processVariables);
 
+        runtimeService.setProcessInstanceName(processInstance.getId(), "myProcessInstance");
+        
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         startTime.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "businessKey2");
+        
+        runtimeService.setProcessInstanceName(processInstance2.getId(), "otherProcessInstance");
 
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES);
 
@@ -87,6 +90,15 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         assertResultsPresentInDataResponse(url + "?processDefinitionKey=oneTaskProcess", processInstance.getId(), processInstance2.getId());
         
+        assertResultsPresentInDataResponse(url + "?processInstanceName=myProcessInstance", processInstance.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceName=otherProcessInstance", processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("%ProcessInstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLike=" + encode("other%Instance"), processInstance2.getId());
+        
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("%proceSSinstance"), processInstance.getId(), processInstance2.getId());
+        assertResultsPresentInDataResponse(url + "?processInstanceNameLikeIgnoreCase=" + encode("OTHER%Instance"), processInstance2.getId());
+        
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey", processInstance.getId());
         assertResultsPresentInDataResponse(url + "?businessKey=businessKey2", processInstance2.getId());
         
@@ -96,6 +108,9 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         // includeProcessVariables
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=false&processInstanceId=" + processInstance.getId(), processInstance.getId(), new HashMap<>());
         assertVariablesPresentInPostDataResponse(url, "?includeProcessVariables=true&processInstanceId=" + processInstance.getId(), processInstance.getId(), processVariables);
+
+        assertVariablesPresentInPostDataResponse(url, "?includeProcessVariablesNames=stringVar,dummy&processInstanceId=" + processInstance.getId(),
+                processInstance.getId(), Map.of("stringVar", "Azerty"));
 
         // Without tenant ID, before setting tenant
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", processInstance.getId(), processInstance2.getId());
@@ -264,9 +279,32 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         httpPost.setEntity(new StringEntity(body.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
+
+    /**
+     * Test getting a list of process instance by callback id
+     */
+    @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
+    public void testGetProcessInstancesByCallbackId() throws Exception {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder().callbackId("callBackId1").processDefinitionKey("oneTaskProcess").start();
+        runtimeService.createProcessInstanceBuilder().callbackId("callBackId2").processDefinitionKey("oneTaskProcess").start();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0);
+        String id = processInstance.getId();
+        // Process instance id
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?callbackId=callBackId1";
+        assertResultsPresentInDataResponse(url, id);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?callbackIds=someOtherId,callBackId1";
+        assertResultsPresentInDataResponse(url, id);
+
+    }
     
     @Override
-    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 
         // Do the actual call
@@ -280,9 +318,8 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         // Check presence of ID's
         List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedResourceIds));
-        Iterator<JsonNode> it = dataNode.iterator();
-        while (it.hasNext()) {
-            String id = it.next().get("id").textValue();
+        for (JsonNode jsonNode : dataNode) {
+            String id = jsonNode.get("id").stringValue();
             toBeFound.remove(id);
         }
         assertThat(toBeFound).as("Not all process instances have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();
@@ -308,14 +345,171 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
 
         for (JsonNode node : valueNode.get("variables")) {
             ObjectNode variableNode = (ObjectNode) node;
-            String variableName = variableNode.get("name").textValue();
+            String variableName = variableNode.get("name").stringValue();
             Object variableValue = objectMapper.convertValue(variableNode.get("value"), Object.class);
 
             assertThat(expectedVariables).containsKey(variableName);
             assertThat(variableValue).isEqualTo(expectedVariables.get(variableName));
-            assertThat(variableNode.get("type").textValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
-            assertThat(variableNode.get("scope").textValue()).isEqualTo("local");
+            assertThat(variableNode.get("type").stringValue()).isEqualTo(expectedVariables.get(variableName).getClass().getSimpleName().toLowerCase());
+            assertThat(variableNode.get("scope").stringValue()).isEqualTo("local");
         }
 
+    }
+
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
+
+    })
+    public void testQueryByRootScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance thirdLevelCallActivity1_1_1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(secondLevelCallActivity1_1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1_2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES)
+                + "?rootScopeId=" + processInstance.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + firstLevelCallActivity1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity1_1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + thirdLevelCallActivity1_1_1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity1_2.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + firstLevelCallActivity2.getCalledProcessInstanceId() + "' }"
+                        + "  ]"
+                        + "}");
+
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?parentScopeId="
+                + firstLevelCallActivity1.getCalledProcessInstanceId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + secondLevelCallActivity1.getCalledProcessInstanceId() + "' },"
+                        + "    { id: '" + secondLevelCallActivity2.getCalledProcessInstanceId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
+    })
+    public void testQueryByRootScopeIds() throws IOException {
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+        ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES)
+                + "?rootScopeIds=" + processInstance1.getId() + "," + processInstance2.getId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("$.data")
+                .isArray()
+                .hasSize(10);
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml"
+    })
+    public void testQueryByParentScopeIds() throws IOException {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        ActivityInstance firstLevelCallActivity1 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity1").singleResult();
+
+        ActivityInstance firstLevelCallActivity2 = runtimeService.createActivityInstanceQuery().processInstanceId(processInstance.getId())
+                .activityId("callActivity2").singleResult();
+
+        ActivityInstance secondLevelCallActivity1 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity1").singleResult();
+        ActivityInstance secondLevelCallActivity2 = runtimeService.createActivityInstanceQuery()
+                .processInstanceId(firstLevelCallActivity1.getCalledProcessInstanceId())
+                .activityId("callActivity2").singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCES) + "?parentScopeIds="
+                + firstLevelCallActivity1.getCalledProcessInstanceId() + "," + secondLevelCallActivity1.getCalledProcessInstanceId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .inPath("$.data")
+                .isArray()
+                .hasSize(3);
     }
 }

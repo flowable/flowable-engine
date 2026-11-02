@@ -12,12 +12,27 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author Tijs Rademakers
  */
 public class ConditionalEventDefinition extends EventDefinition {
 
+    private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(
+            EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT,
+            EventDefinitionLocation.INTERMEDIATE_CATCH_EVENT,
+            EventDefinitionLocation.BOUNDARY_EVENT));
+
+    @Override
+    public Set<EventDefinitionLocation> getSupportedLocations() {
+        return SUPPORTED_LOCATIONS;
+    }
+
     protected String conditionExpression;
+    protected String conditionLanguage;
 
     public String getConditionExpression() {
         return conditionExpression;
@@ -25,6 +40,14 @@ public class ConditionalEventDefinition extends EventDefinition {
 
     public void setConditionExpression(String conditionExpression) {
         this.conditionExpression = conditionExpression;
+    }
+
+    public String getConditionLanguage() {
+        return conditionLanguage;
+    }
+
+    public void setConditionLanguage(String conditionLanguage) {
+        this.conditionLanguage = conditionLanguage;
     }
 
     @Override
@@ -37,5 +60,6 @@ public class ConditionalEventDefinition extends EventDefinition {
     public void setValues(ConditionalEventDefinition otherDefinition) {
         super.setValues(otherDefinition);
         setConditionExpression(otherDefinition.getConditionExpression());
+        setConditionLanguage(otherDefinition.getConditionLanguage());
     }
 }

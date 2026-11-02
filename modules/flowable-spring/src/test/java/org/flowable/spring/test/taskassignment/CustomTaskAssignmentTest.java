@@ -18,12 +18,14 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/taskassignment/taskassignment-context.xml")
+@DirtiesContext
 public class CustomTaskAssignmentTest extends SpringFlowableTestCase {
 
     @Test

@@ -28,8 +28,8 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -60,7 +60,7 @@ public class DelegateHelper {
             delegateExecution.setCurrentFlowElement(flowElement);
             CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) delegateExecution, false);
         } else {
-            throw new FlowableException(sequenceFlowId + " does not match a sequence flow");
+            throw new FlowableException(sequenceFlowId + " does not match a sequence flow for " + delegateExecution);
         }
     }
 
@@ -81,7 +81,7 @@ public class DelegateHelper {
         BpmnModel bpmnModel = getBpmnModel(execution);
         FlowElement flowElement = bpmnModel.getFlowElement(execution.getCurrentActivityId());
         if (flowElement == null) {
-            throw new FlowableException("Could not find a FlowElement for activityId " + execution.getCurrentActivityId());
+            throw new FlowableException("Could not find a FlowElement for activityId " + execution.getCurrentActivityId() + " in " + execution);
         }
         return flowElement;
     }

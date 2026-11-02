@@ -84,7 +84,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
             }
 
             if (execution.isSuspended()) {
-                throw new FlowableException("Cannot throw signal event '" + eventName + "' because execution '" + executionId + "' is suspended");
+                throw new FlowableException("Cannot throw signal event '" + eventName + "' because " + execution + " is suspended");
             }
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
@@ -96,7 +96,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
             signalEvents = eventSubscriptionService.findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
 
             if (signalEvents.isEmpty()) {
-                throw new FlowableException("Execution '" + executionId + "' has not subscribed to a signal event with name '" + eventName + "'.");
+                throw new FlowableException(execution + " has not subscribed to a signal event with name '" + eventName + "'.");
             }
         }
 

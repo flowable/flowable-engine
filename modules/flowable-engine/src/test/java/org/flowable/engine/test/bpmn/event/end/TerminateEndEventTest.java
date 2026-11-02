@@ -36,6 +36,7 @@ import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -97,6 +98,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         assertHistoricProcessInstanceDetails(pi);
 
         assertHistoricProcessInstanceDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT);
+        assertHistoricProcessInstanceState(pi, ProcessInstanceState.COMPLETED);
         assertHistoricTasksDeleteReason(pi, null, "check before termination");
         assertHistoricTasksDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT, "check before end");
         assertHistoricActivitiesDeleteReason(pi, DeleteReason.TERMINATE_END_EVENT, "preNormalTerminateTask");
@@ -1097,6 +1099,18 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
                 assertThat(historicProcessInstance.getDeleteReason()).isNull();
             } else {
                 assertThat(historicProcessInstance.getDeleteReason()).startsWith(expectedDeleteReason);
+            }
+        }
+    }
+
+    protected void assertHistoricProcessInstanceState(ProcessInstance processInstance, String expectedState) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId()).singleResult();
+            if (expectedState == null) {
+                assertThat(historicProcessInstance.getState()).isNull();
+            } else {
+                assertThat(historicProcessInstance.getState()).startsWith(expectedState);
             }
         }
     }

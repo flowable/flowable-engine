@@ -15,7 +15,7 @@ package org.flowable.rest.conf.common;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Joram Barrez
@@ -24,10 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JacksonConfiguration {
 
     @Bean()
-    public ObjectMapper objectMapper() {
+    public JsonMapper jsonMapper() {
         // To avoid instantiating and configuring the mapper everywhere
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper;
+        return JsonMapper.shared();
     }
 
 }

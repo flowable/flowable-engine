@@ -12,46 +12,20 @@
  */
 package org.flowable.dmn.rest;
 
-import java.util.List;
-
-import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration(proxyBeanMethods = false)
 @ComponentScan({ "org.flowable.dmn.rest.exception", "org.flowable.dmn.rest.service.api" })
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Bean
     public MultipartResolver multipartResolver() {
-        return new PutAwareStandardServletMultiPartResolver();
-    }
-
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                break;
-            }
-        }
+        return new StandardServletMultipartResolver();
     }
 
 }

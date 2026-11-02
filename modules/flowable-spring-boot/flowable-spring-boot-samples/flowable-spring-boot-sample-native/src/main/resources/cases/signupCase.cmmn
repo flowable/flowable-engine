@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn"
+             design:palette="flowable-core-case-palette">
+    <case id="signupCase" name="SignupCase" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <extensionElements>
+                <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+            </extensionElements>
+            <planItem id="planItemcmmnTask_1" name="Confirm email task" definitionRef="cmmnTask_1"></planItem>
+            <planItem id="planItemcmmnTask_2" name="Send welcome email" definitionRef="cmmnTask_2">
+                <entryCriterion id="cmmnEntrySentry_3" sentryRef="sentrycmmnEntrySentry_3"></entryCriterion>
+            </planItem>
+            <sentry id="sentrycmmnEntrySentry_3">
+                <extensionElements>
+                    <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+                </extensionElements>
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_3" sourceRef="planItemcmmnTask_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="cmmnTask_1" name="Confirm email task" flowable:assignee="${initiator}">
+                <extensionElements>
+                    <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </humanTask>
+            <task id="cmmnTask_2" name="Send welcome email" flowable:type="java" flowable:delegateExpression="${emailService}">
+                <extensionElements>
+                    <design:stencilid><![CDATA[ServiceTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </task>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_signupCase">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="679.0" width="830.0" x="270.0" y="120.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_1" cmmnElementRef="planItemcmmnTask_1">
+                <dc:Bounds height="80.0" width="100.0" x="331.0" y="229.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_2" cmmnElementRef="planItemcmmnTask_2">
+                <dc:Bounds height="80.0" width="100.0" x="622.0" y="229.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_cmmnEntrySentry_3" cmmnElementRef="cmmnEntrySentry_3">
+                <dc:Bounds height="28.0" width="18.0" x="613.0" y="255.0"></dc:Bounds>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_cmmnConnector_4" cmmnElementRef="planItemcmmnTask_1" targetCMMNElementRef="cmmnEntrySentry_3">
+                <di:extension>
+                    <flowable:docker type="source" x="50.0" y="40.0"></flowable:docker>
+                    <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+                </di:extension>
+                <di:waypoint x="431.0" y="269.0"></di:waypoint>
+                <di:waypoint x="613.0" y="269.0"></di:waypoint>
+                <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

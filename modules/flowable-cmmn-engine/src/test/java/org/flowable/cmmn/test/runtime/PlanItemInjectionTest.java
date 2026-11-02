@@ -22,19 +22,17 @@ import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
-import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Testing dynamic injection of a new plan item at runtime.
@@ -42,8 +40,6 @@ import org.junit.Test;
  * @author Micha Kiener
  */
 public class PlanItemInjectionTest extends FlowableCmmnTestCase {
-
-    protected CmmnDeploymentManager deploymentManager;
 
     @Test
     @CmmnDeployment
@@ -921,14 +917,8 @@ public class PlanItemInjectionTest extends FlowableCmmnTestCase {
         }
     }
 
-    @Override
-    public void setupServices() {
-        super.setupServices();
-        CmmnEngineConfiguration cmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
-        this.deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
-    }
-
     protected CmmnModel getCmmnModel(String caseDefinitionId) {
+        CmmnDeploymentManager deploymentManager = cmmnEngineConfiguration.getDeploymentManager();
         CaseDefinitionCacheEntry cacheEntry = deploymentManager.getCaseDefinitionCache().get(caseDefinitionId);
         if (cacheEntry != null) {
             return cacheEntry.getCmmnModel();

@@ -15,9 +15,6 @@ package org.flowable.engine.impl.test;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableOptimisticLockingException;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.CleanTest;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
@@ -26,9 +23,6 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.DefaultHistoryManager;
-import org.flowable.engine.impl.history.HistoryManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.DeploymentId;
 import org.flowable.job.api.HistoryJob;
@@ -105,9 +99,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
     protected void doFinally(ExtensionContext context, TestInstance.Lifecycle lifecycleForClean) {
         ProcessEngine processEngine = getProcessEngine(context);
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration();
-        boolean isAsyncHistoryEnabled = processEngineConfiguration.isAsyncHistoryEnabled();
-
-        if (isAsyncHistoryEnabled) {
+        if (processEngineConfiguration.isAsyncHistoryEnabled()) {
             ManagementService managementService = processEngine.getManagementService();
             List<HistoryJob> jobs = managementService.createHistoryJobQuery().list();
             for (HistoryJob job : jobs) {
@@ -115,14 +107,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
             }
         }
 
-        HistoryManager asyncHistoryManager = null;
         try {
-            if (isAsyncHistoryEnabled) {
-                processEngineConfiguration.setAsyncHistoryEnabled(false);
-                asyncHistoryManager = processEngineConfiguration.getHistoryManager();
-                processEngineConfiguration.setHistoryManager(new DefaultHistoryManager(processEngineConfiguration));
-            }
-
             String annotationDeploymentKey = context.getUniqueId() + ANNOTATION_DEPLOYMENT_ID_KEY;
             String deploymentIdFromDeploymentAnnotation = getStore(context).get(annotationDeploymentKey, String.class);
             if (deploymentIdFromDeploymentAnnotation != null) {
@@ -142,12 +127,6 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
             }
 
         } finally {
-
-            if (isAsyncHistoryEnabled) {
-                processEngineConfiguration.setAsyncHistoryEnabled(true);
-                processEngineConfiguration.setHistoryManager(asyncHistoryManager);
-            }
-
             processEngineConfiguration.getClock().reset();
         }
     }
@@ -170,16 +149,7 @@ public abstract class InternalFlowableExtension implements AfterEachCallback, Be
                 processEngine.getProcessEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<Void>() {
-
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                processEngine.getProcessEngineConfiguration().getSchemaManagementCmd()
         );
     }
 

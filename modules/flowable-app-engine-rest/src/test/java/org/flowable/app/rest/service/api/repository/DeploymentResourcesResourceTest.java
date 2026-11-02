@@ -24,8 +24,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -39,6 +40,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single deployment. GET app-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResources() throws Exception {
 
         try {
@@ -59,12 +61,17 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
                     .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS, Option.IGNORING_ARRAY_ORDER)
                     .isEqualTo("["
                             + "  {"
+                            + "    id: 'org/flowable/app/rest/service/api/repository/oneApp.app',"
+                            + "    mediaType: 'application/json',"
+                            + "    type: 'appDefinition'"
+                            + "  },"
+                            + "  {"
                             + "    id: 'test.txt',"
                             + "    url: '" + SERVER_URL_PREFIX + AppRestUrls
                             .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
                             + "    contentUrl: '" + SERVER_URL_PREFIX + AppRestUrls
                             .createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
-                            + "    mediaType: null,"
+                            + "    mediaType: 'text/plain',"
                             + "    type: 'resource'"
                             + "  }"
                             + "]");
@@ -81,6 +88,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single unexisting deployment. GET app-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResourcesUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + AppRestUrls.createRelativeResourceUrl(AppRestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));

@@ -60,12 +60,12 @@ In addition to using the values listed above for deploymentMode, you may want cu
 ## Unit testing
 
 When integrating with Spring, decisions can be tested very easily using the standard [Flowable testing facilities](eventregistry/ch03-API.md#unit-testing).
-The following examples show how a decision is tested in typical Spring-based JUnit 5 tests:
+The following examples show how a decision is tested in typical Spring-based JUnit Jupiter tests:
 
-**JUnit 5 test.**
+**JUnit Jupiter test.**
 
     @ExtendWith(FlowableEventSpringExtension.class)
-    @SpringJUnitConfig(classes = EventRegistryJmsConfiguration.class)
+    @SpringJUnitConfig(EventRegistryJmsConfiguration.class)
     public class SpringEventRegistryChangeDetectorTest {
 
       @Autowired

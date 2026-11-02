@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -24,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.MultiValuePart;
 import org.flowable.http.common.api.client.AsyncExecutableHttpRequest;
 import org.flowable.http.common.api.client.FlowableAsyncHttpClient;
 import org.flowable.http.common.impl.HttpClientConfig;
@@ -31,9 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import io.netty.channel.ChannelOption;
@@ -42,7 +51,10 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.http.client.HttpClientRequest;
+import reactor.netty.http.client.HttpClientResponse;
 import reactor.netty.resources.ConnectionProvider;
+import reactor.util.context.Context;
 
 /**
  * @author Filip Hrisafov
@@ -54,6 +66,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     private static final Pattern SPACE_CHARACTER_PATTERN = Pattern.compile(" ");
     private static final String ENCODED_SPACE_CHARACTER = "%20";
 
+    // Class qualified to avoid collisions with other keys that might be present in the Reactor context.
+    private static final String FOLLOW_REDIRECT_CONTEXT_KEY = SpringWebClientFlowableHttpClient.class.getName() + ".followRedirect";
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final WebClient webClient;
@@ -64,7 +79,12 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 .builder("flowableHttpClient")
                 .maxConnections(500)
                 .build())
-                .compress(true);
+                .compress(true)
+                // Whether a redirect is followed is decided per request through the Reactor context written in
+                // callAsync (populated from HttpRequest#isNoRedirects). Reactor Netty drops the sensitive headers
+                // (Authorization, Proxy-Authorization, ...) when a followed redirect targets a different domain, so
+                // credentials are not leaked to the redirect target.
+                .followRedirect(SpringWebClientFlowableHttpClient::shouldFollowRedirect);
 
         if (config.isDisableCertVerify()) {
             try {
@@ -79,12 +99,9 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
         }
 
-        httpClient = httpClient.tcpConfiguration(tcpClient -> {
-            tcpClient = tcpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout());
-            tcpClient = tcpClient.doOnConnected(conn -> conn
-                    .addHandlerLast(new ReadTimeoutHandler(config.getSocketTimeout(), TimeUnit.MILLISECONDS)));
-            return tcpClient;
-        });
+        httpClient = httpClient.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getConnectTimeout())
+                .doOnConnected(conn -> conn
+                        .addHandlerLast(new ReadTimeoutHandler(config.getSocketTimeout(), TimeUnit.MILLISECONDS)));
 
         WebClient.Builder webClientBuilder = WebClient.builder();
         webClientBuilder = webClientBuilder.clientConnector(new ReactorClientHttpConnector(httpClient));
@@ -128,7 +145,17 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                     break;
                 }
                 case "DELETE": {
-                    headersSpec = webClient.delete().uri(uri);
+                    WebClient.RequestBodySpec delete = webClient.method(HttpMethod.DELETE).uri(uri);
+                    setRequestEntity(requestInfo, delete);
+                    headersSpec = delete;
+                    break;
+                }
+                case "HEAD": {
+                    headersSpec = webClient.head().uri(uri);
+                    break;
+                }
+                case "OPTIONS": {
+                    headersSpec = webClient.options().uri(uri);
                     break;
                 }
                 default: {
@@ -136,14 +163,19 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
                 }
             }
 
-            if (requestInfo.getHttpHeaders() != null) {
-                setHeaders(headersSpec, requestInfo.getHttpHeaders());
-            }
+            setHeaders(headersSpec, requestInfo.getHttpHeaders());
+            setHeaders(headersSpec, requestInfo.getSecureHttpHeaders());
 
-            return new WebClientExecutableHttpRequest(headersSpec);
+            return new WebClientExecutableHttpRequest(headersSpec, !requestInfo.isNoRedirects());
         } catch (URISyntaxException ex) {
             throw new FlowableException("Invalid URL exception occurred", ex);
         }
+    }
+
+    public static boolean shouldFollowRedirect(HttpClientRequest request, HttpClientResponse response) {
+        boolean followRedirect = request.currentContextView().getOrDefault(FOLLOW_REDIRECT_CONTEXT_KEY, Boolean.FALSE);
+        int statusCode = response.status().code();
+        return followRedirect && statusCode >= 300 && statusCode < 400;
     }
 
     protected WebClient determineWebClient(HttpRequest requestInfo) {
@@ -175,10 +207,41 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             }
 
             requestBodySpec.bodyValue(requestInfo.getBody());
+        } else if (requestInfo.getBodyBytes() != null) {
+            // A caller-supplied Content-Type header (added afterwards) takes precedence over this default.
+            requestBodySpec.contentType(MediaType.APPLICATION_OCTET_STREAM);
+            requestBodySpec.bodyValue(requestInfo.getBodyBytes());
+        } else if (requestInfo.getMultiValueParts() != null) {
+            MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+            for (MultiValuePart part : requestInfo.getMultiValueParts()) {
+                String name = part.getName();
+                Object value = part.getBody();
+
+
+                if (value instanceof byte[]) {
+                    value = new ByteArrayResourceWithFileName((byte[]) value, part.getFilename());
+                }
+                MultipartBodyBuilder.PartBuilder partBuilder;
+                if (StringUtils.isNotBlank(part.getMimeType())) {
+                    partBuilder = multipartBodyBuilder.part(name, value, MediaType.parseMediaType(part.getMimeType()));
+                } else {
+                    partBuilder = multipartBodyBuilder.part(name, value);
+                }
+                if (StringUtils.isNotEmpty(part.getFilename())) {
+                    partBuilder.filename(part.getFilename());
+                }
+            }
+
+            requestBodySpec.body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()));
+        } else if (requestInfo.getFormParameters() != null) {
+            requestBodySpec.body(BodyInserters.fromFormData(CollectionUtils.toMultiValueMap(requestInfo.getFormParameters())));
         }
     }
 
     protected void setHeaders(WebClient.RequestHeadersSpec<?> base, org.flowable.http.common.api.HttpHeaders headers) {
+        if (headers == null) {
+            return;
+        }
         base.headers(httpHeaders -> {
             httpHeaders.putAll(headers);
         });
@@ -187,8 +250,11 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
     protected HttpResponse toFlowableHttpResponse(ResponseEntity<ByteArrayResource> response) {
         HttpResponse responseInfo = new HttpResponse();
 
-        responseInfo.setStatusCode(response.getStatusCodeValue());
-        responseInfo.setReason(response.getStatusCode().getReasonPhrase());
+        HttpStatusCode statusCode = response.getStatusCode();
+        responseInfo.setStatusCode(statusCode.value());
+        if (statusCode instanceof HttpStatus httpStatus) {
+            responseInfo.setReason(httpStatus.getReasonPhrase());
+        }
 
         responseInfo.setHttpHeaders(toFlowableHeaders(response.getHeaders()));
 
@@ -202,6 +268,8 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             } else {
                 responseInfo.setBody(new String(bodyBytes));
             }
+
+            responseInfo.setBodyBytes(bodyBytes);
         }
 
         return responseInfo;
@@ -210,16 +278,24 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
 
     protected org.flowable.http.common.api.HttpHeaders toFlowableHeaders(HttpHeaders httpHeaders) {
         org.flowable.http.common.api.HttpHeaders headers = new org.flowable.http.common.api.HttpHeaders();
-        headers.putAll(httpHeaders);
+        for (Map.Entry<String, List<String>> entry : httpHeaders.headerSet()) {
+            String headerName = entry.getKey();
+            List<String> headerValues = entry.getValue();
+            for (String headerValue : headerValues) {
+                headers.add(headerName, headerValue);
+            }
+        }
         return headers;
     }
 
     protected class WebClientExecutableHttpRequest implements AsyncExecutableHttpRequest {
 
         protected final WebClient.RequestHeadersSpec<?> request;
+        protected final boolean followRedirect;
 
-        public WebClientExecutableHttpRequest(WebClient.RequestHeadersSpec<?> request) {
+        public WebClientExecutableHttpRequest(WebClient.RequestHeadersSpec<?> request, boolean followRedirect) {
             this.request = request;
+            this.followRedirect = followRedirect;
         }
 
         @Override
@@ -227,8 +303,24 @@ public class SpringWebClientFlowableHttpClient implements FlowableAsyncHttpClien
             return request
                     .exchangeToMono(response -> response.toEntity(ByteArrayResource.class))
                     .map(SpringWebClientFlowableHttpClient.this::toFlowableHttpResponse)
+                    .contextWrite(Context.of(FOLLOW_REDIRECT_CONTEXT_KEY, followRedirect))
                     .toFuture();
         }
 
+    }
+
+    protected static class ByteArrayResourceWithFileName extends ByteArrayResource {
+
+        protected final String filename;
+
+        public ByteArrayResourceWithFileName(byte[] byteArray, String filename) {
+            super(byteArray);
+            this.filename = filename;
+        }
+
+        @Override
+        public String getFilename() {
+            return filename;
+        }
     }
 }

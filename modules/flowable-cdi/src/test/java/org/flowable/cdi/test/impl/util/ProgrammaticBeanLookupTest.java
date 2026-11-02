@@ -14,27 +14,26 @@ package org.flowable.cdi.test.impl.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.enterprise.inject.Alternative;
-import javax.inject.Named;
+import jakarta.enterprise.inject.Alternative;
+import jakarta.inject.Named;
 
 import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.test.impl.beans.SpecializedTestBean;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 
 /**
  * 
  * @author Ronny Bräunlich
  * 
  */
-@RunWith(Arquillian.class)
+@ArquillianTest
 public class ProgrammaticBeanLookupTest {
 
     /**

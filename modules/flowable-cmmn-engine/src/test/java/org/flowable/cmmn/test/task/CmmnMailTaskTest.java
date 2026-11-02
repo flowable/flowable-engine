@@ -22,65 +22,28 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.activation.DataHandler;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import jakarta.activation.DataHandler;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 import org.apache.commons.lang3.Validate;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.jupiter.api.Tag;
-import org.subethamail.wiser.Wiser;
+import org.flowable.common.engine.impl.cfg.mail.FlowableMailClientCreator;
+import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
+import org.junit.jupiter.api.Test;
 import org.subethamail.wiser.WiserMessage;
+
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
  */
-@Tag("email")
-public class CmmnMailTaskTest extends FlowableCmmnTestCase {
-
-    protected static Wiser wiser;
-
-    @BeforeClass
-    public static void setupWiser() throws Exception {
-        wiser = new Wiser();
-        wiser.setPort(5025);
-
-        int counter = 0;
-        boolean serverUpAndRunning = false;
-        while (!serverUpAndRunning && counter++ < 11) {
-
-            wiser = new Wiser();
-            wiser.setPort(5025);
-
-            try {
-                wiser.start();
-                serverUpAndRunning = true;
-            } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
-                if (e.getMessage().toLowerCase().contains("bindexception")) {
-                    Thread.sleep(250L);
-                }
-            }
-        }
-    }
-
-    @Before
-    public void resetMessages() {
-        wiser.getMessages().clear();
-    }
-
-    @AfterClass
-    public static void stopWiser() {
-        wiser.stop();
-    }
+public class CmmnMailTaskTest extends CmmnEmailTestCase {
 
     @Test
     @CmmnDeployment
@@ -102,6 +65,8 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
         try {
             cmmnEngineConfiguration.setMailServerDefaultCharset(StandardCharsets.UTF_8);
+            MailServerInfo defaultMailServer = cmmnEngineConfiguration.getDefaultMailServer();
+            cmmnEngineConfiguration.setDefaultMailClient(FlowableMailClientCreator.createHostClient(defaultMailServer.getMailServerHost(), defaultMailServer));
             cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("testSimpleTextMail")
                     .start();
@@ -112,7 +77,9 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
             WiserMessage message = messages.get(0);
             assertThat(message.getMimeMessage().getContentType()).isEqualTo("text/plain; charset=UTF-8");
         } finally {
+            cmmnEngineConfiguration.setDefaultMailClient(null);
             cmmnEngineConfiguration.setMailServerDefaultCharset(originalCharset);
+            cmmnEngineConfiguration.initMailClients();
         }
     }
 
@@ -162,6 +129,44 @@ public class CmmnMailTaskTest extends FlowableCmmnTestCase {
 
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsStringList() throws MessagingException {
+        String recipients = "flowable@localhost, misspiggy@flowable.org";
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsArrayList() throws MessagingException {
+        List<String> recipients = Arrays.asList("flowable@localhost", "misspiggy@flowable.org");
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn")
+    public void testDynamicRecipientsArrayNode() throws MessagingException {
+        ArrayNode recipients = cmmnEngineConfiguration.getObjectMapper().createArrayNode().add("flowable@localhost").add("misspiggy@flowable.org");
+        testDynamicRecipientsInternal(recipients);
+    }
+
+    private void testDynamicRecipientsInternal(Object recipients) throws MessagingException {
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testMail")
+                .variable("toVar", recipients)
+                .variable("fromVar", "from@flowable.org")
+                .variable("ccVar", recipients)
+                .variable("bccVar", recipients)
+                .variable("subjectVar", "Testing")
+                .variable("bodyVar", "The test body")
+                .start();
+        List<WiserMessage> messages = wiser.getMessages();
+        MimeMessage mimeMessage = messages.get(0).getMimeMessage();
+        assertThat(mimeMessage.getHeader("To", null)).isEqualTo("flowable@localhost, misspiggy@flowable.org");
+        assertThat(mimeMessage.getHeader("Cc", null)).isEqualTo("flowable@localhost, misspiggy@flowable.org");
+
+    }
+
     @Test
     @CmmnDeployment
     public void testCcBccWithoutTo() {

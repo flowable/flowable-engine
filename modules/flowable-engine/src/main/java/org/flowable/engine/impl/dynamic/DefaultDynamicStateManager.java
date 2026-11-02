@@ -15,7 +15,6 @@ package org.flowable.engine.impl.dynamic;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.flowable.bpmn.model.FlowElement;
@@ -34,13 +33,25 @@ public class DefaultDynamicStateManager extends AbstractDynamicStateManager impl
 
     @Override
     public void moveExecutionState(ChangeActivityStateBuilderImpl changeActivityStateBuilder, CommandContext commandContext) {
-        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, Optional.empty(), changeActivityStateBuilder.getProcessInstanceVariables(), commandContext);
-        List<ExecutionEntity> executions = moveExecutionEntityContainerList.iterator().next().getExecutions();
-        String processInstanceId = executions.iterator().next().getProcessInstanceId();
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = resolveMoveExecutionEntityContainers(changeActivityStateBuilder, 
+        		changeActivityStateBuilder.getProcessInstanceVariables(), commandContext);
+        List<ExecutionEntity> executions = null;
+        if (!moveExecutionEntityContainerList.isEmpty()) {
+            executions = moveExecutionEntityContainerList.iterator().next().getExecutions();
+        }
+        
+        List<EnableActivityContainer> enableActivityContainerList = resolveEnableActivityContainers(changeActivityStateBuilder);
+        String processInstanceId = null;
+        if (executions != null && !executions.isEmpty()) {
+            processInstanceId = executions.iterator().next().getProcessInstanceId();
+        } else {
+            processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
+        }
         
         ProcessInstanceChangeState processInstanceChangeState = new ProcessInstanceChangeState()
             .setProcessInstanceId(processInstanceId)
             .setMoveExecutionEntityContainers(moveExecutionEntityContainerList)
+            .setEnableActivityContainers(enableActivityContainerList)
             .setLocalVariables(changeActivityStateBuilder.getLocalVariables())
             .setProcessInstanceVariables(changeActivityStateBuilder.getProcessInstanceVariables());
         

@@ -75,6 +75,14 @@ public interface ProcessDefinitionEntity extends ProcessDefinition, Entity, HasR
     String getEngineVersion();
 
     void setEngineVersion(String engineVersion);
+
+    /**
+     * The parent deployment id of the deployment of this process definition.
+     * This is not persisted, it is only set on the process definitions that are put in the process definition cache.
+     */
+    String getParentDeploymentId();
+
+    void setParentDeploymentId(String parentDeploymentId);
     
     List<IdentityLinkEntity> getIdentityLinks();
     

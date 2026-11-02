@@ -29,8 +29,8 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.idm.api.Group;
 import org.flowable.variable.api.types.VariableTypes;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -1229,12 +1229,12 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
                 if (languageNode != null) {
                     JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                     if (languageNameNode != null && !languageNameNode.isNull()) {
-                        task.setLocalizedName(languageNameNode.asText());
+                        task.setLocalizedName(languageNameNode.asString());
                     }
 
                     JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                     if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                        task.setLocalizedDescription(languageDescriptionNode.asText());
+                        task.setLocalizedDescription(languageDescriptionNode.asString());
                     }
                 }
             }

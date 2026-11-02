@@ -13,10 +13,12 @@
 package org.flowable.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
@@ -25,12 +27,14 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.impl.agenda.AbstractOperation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.VariableListenerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,9 +46,11 @@ public class CommandInvoker extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandInvoker.class);
 
     protected AgendaOperationRunner agendaOperationRunner;
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
-    public CommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+    public CommandInvoker(AgendaOperationRunner agendaOperationRunner, Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
         this.agendaOperationRunner = agendaOperationRunner;
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
     }
 
     @Override
@@ -57,6 +63,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
             return (T) command.execute(commandContext);
             
         } else {
+
+            executeExecutionListenersBeforeAll(commandContext);
 
             // Execute the command.
             // This will produce operations that will be put on the agenda.
@@ -92,8 +100,10 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                         }
                         
                         if (!processInstanceIds.contains(variableListenerData.getScopeId())) {
-                            processInstanceIds.add(variableListenerData.getScopeId());
-                            agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                            if (VariableListenerUtil.hasVariableListenerEventDefinitionsForVariableName(variableListenerData.getScopeDefinitionId(), variableName)) {
+                                processInstanceIds.add(variableListenerData.getScopeId());
+                                agenda.planEvaluateVariableListenerEventsOperation(variableListenerData.getScopeDefinitionId(), variableListenerData.getScopeId());
+                            }
                         }
                     }
                 }
@@ -101,6 +111,8 @@ public class CommandInvoker extends AbstractCommandInterceptor {
                 if (!processInstanceIds.isEmpty()) {
                     executeOperations(commandContext);
                 }
+
+                executeExecutionListenersAfterAll(commandContext);
             }
     
             return (T) commandContext.getResult();
@@ -111,13 +123,59 @@ public class CommandInvoker extends AbstractCommandInterceptor {
         FlowableEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            executeOperation(commandContext, runnable);
+            executeExecutionListenersBeforeExecute(commandContext, runnable);
+            try {
+                executeOperation(commandContext, runnable);
+            } catch (Throwable throwable) {
+                executeExecutionListenersAfterException(commandContext, runnable, throwable);
+                ExceptionUtil.sneakyThrow(throwable);
+            }
+            executeExecutionListenersAfterExecute(commandContext, runnable);
+        }
+    }
+
+    protected void executeExecutionListenersBeforeAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersBeforeExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterException(CommandContext commandContext, Runnable runnable, Throwable throwable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecuteException(commandContext, runnable, throwable);
+            }
         }
     }
 
     public void executeOperation(CommandContext commandContext, Runnable runnable) {
-        if (runnable instanceof AbstractOperation) {
-            AbstractOperation operation = (AbstractOperation) runnable;
+        if (runnable instanceof AbstractOperation operation) {
 
             // Execute the operation if the operation has no execution (i.e. it's an operation not working on a process instance)
             // or the operation has an execution and it is not ended

@@ -20,6 +20,11 @@ create table ACT_HI_PROCINST (
     REFERENCE_TYPE_ nvarchar(255),
     PROPAGATED_STAGE_INST_ID_ nvarchar(255),
     BUSINESS_STATUS_ nvarchar(255),
+    DUE_DATE_ datetime,
+    CLAIM_TIME_ datetime,
+    CLAIMED_BY_ nvarchar(255),
+    END_USER_ID_ nvarchar(255),
+    STATE_ nvarchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );
@@ -36,6 +41,7 @@ create table ACT_HI_ACTINST (
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
     ASSIGNEE_ nvarchar(255),
+    COMPLETED_BY_ nvarchar(255),
     START_TIME_ datetime not null,
     END_TIME_ datetime,
     TRANSACTION_ORDER_ int,

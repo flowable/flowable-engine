@@ -22,8 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.job.service.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -123,7 +123,7 @@ public class AsyncHistoryJsonUtil {
     
     public static String getStringFromJson(ObjectNode objectNode, String fieldName) {
         if (objectNode.has(fieldName)) {
-            return objectNode.get(fieldName).asText();
+            return objectNode.get(fieldName).asString();
         }
         return null;
     }

@@ -27,11 +27,11 @@ import org.flowable.cmmn.engine.impl.delegate.CmmnDelegateHelper;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.test.delegate.TestJavaDelegateThrowsException;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -40,7 +40,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Tijs Rademakers
@@ -484,10 +484,12 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 })
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
-                .getCause()
+                .hasMessageStartingWith("Error while evaluating expression: ${testBean.invoke()} with PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task One", "definitionId: serviceTask", "state: active", "elementId: planItem1",
+                        "caseInstanceId: ", "caseDefinitionId: ")
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(FlowableIllegalArgumentException.class)
                 .hasNoCause()
                 .hasMessage("test exception");
@@ -506,10 +508,12 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                 })
                 .start())
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${testBean.invoke()}")
-                .getCause()
+                .hasMessageStartingWith("Error while evaluating expression: ${testBean.invoke()} with PlanItemInstance with id: ")
+                .hasMessageContainingAll("name: Task One", "definitionId: serviceTask", "state: active", "elementId: planItem1",
+                        "caseInstanceId: ", "caseDefinitionId: ")
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasNoCause()
                 .hasMessage("test exception");

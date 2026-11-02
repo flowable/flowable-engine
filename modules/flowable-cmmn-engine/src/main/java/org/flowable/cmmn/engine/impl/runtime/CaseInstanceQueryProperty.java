@@ -32,6 +32,7 @@ public class CaseInstanceQueryProperty implements QueryProperty {
     public static final CaseInstanceQueryProperty CASE_DEFINITION_ID = new CaseInstanceQueryProperty("RES.CASE_DEF_ID_");
     public static final CaseInstanceQueryProperty CASE_START_TIME = new CaseInstanceQueryProperty("RES.START_TIME_");
     public static final CaseInstanceQueryProperty TENANT_ID = new CaseInstanceQueryProperty("RES.TENANT_ID_");
+    public static final CaseInstanceQueryProperty BUSINESS_KEY = new CaseInstanceQueryProperty("RES.BUSINESS_KEY_");
 
     private String name;
 

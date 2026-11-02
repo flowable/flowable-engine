@@ -136,7 +136,7 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
 
             List<ProcessDefinition> processDefinitions = query.list();
             if (processDefinitions.isEmpty()) {
-                throw new FlowableException("Cannot find process definition for key '" + processDefinitionKey + "'");
+                throw new FlowableException("Cannot find process definition for key '" + processDefinitionKey + "' and tenant '" + tenantId + "'");
             }
 
             for (ProcessDefinition processDefinition : processDefinitions) {

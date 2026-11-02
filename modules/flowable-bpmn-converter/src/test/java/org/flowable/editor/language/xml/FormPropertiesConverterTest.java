@@ -49,7 +49,7 @@ class FormPropertiesConverterTest {
 
         List<FormProperty> formProperties = userTask.getFormProperties();
 
-        assertThat(formProperties).as("Invalid form properties list: ").hasSize(8);
+        assertThat(formProperties).as("Invalid form properties list: ").hasSize(11);
 
         for (FormProperty formProperty : formProperties) {
             if ("new_property_1".equals(formProperty.getId())) {
@@ -78,6 +78,15 @@ class FormPropertiesConverterTest {
                 checkFormProperty(formProperty, true, true, false);
             } else if ("new_property_8".equals(formProperty.getId())) {
                 checkFormProperty(formProperty, true, true, true);
+            } else if ("date_property_default".equals(formProperty.getId())) {
+                assertThat(formProperty.getDatePattern()).isEqualTo("dd/MM/yyyy");
+                assertThat(formProperty.getLenientDateParsing()).isNull();
+            } else if ("date_property_lenient".equals(formProperty.getId())) {
+                assertThat(formProperty.getDatePattern()).isEqualTo("dd/MM/yyyy");
+                assertThat(formProperty.getLenientDateParsing()).isTrue();
+            } else if ("date_property_strict".equals(formProperty.getId())) {
+                assertThat(formProperty.getDatePattern()).isEqualTo("dd/MM/yyyy");
+                assertThat(formProperty.getLenientDateParsing()).isFalse();
             }
         }
 

@@ -31,6 +31,8 @@ import org.flowable.common.engine.api.FlowableIllegalArgumentException;
  */
 public class HttpHeaders implements Map<String, List<String>> {
 
+    protected static final String HEADER_VALUE_MASK = "*****";
+
     protected final Map<String, List<String>> headers;
     protected final String rawStringHeaders;
 
@@ -109,7 +111,11 @@ public class HttpHeaders implements Map<String, List<String>> {
     }
 
     public String formatAsString() {
-        if (rawStringHeaders != null) {
+        return formatAsString(false);
+    }
+
+    public String formatAsString(boolean maskValues) {
+        if (rawStringHeaders != null && !maskValues) {
             return rawStringHeaders;
         }
 
@@ -119,7 +125,7 @@ public class HttpHeaders implements Map<String, List<String>> {
             for (String headerValue : entry.getValue()) {
                 sb.append(headerName);
                 if (headerValue != null) {
-                    sb.append(": ").append(headerValue);
+                    sb.append(": ").append(maskValues ? HEADER_VALUE_MASK : headerValue);
                 } else {
                     sb.append(":");
                 }

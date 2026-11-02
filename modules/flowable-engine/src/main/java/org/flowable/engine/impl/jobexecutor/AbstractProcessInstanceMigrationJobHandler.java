@@ -12,19 +12,20 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
-import java.io.IOException;
-
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractProcessInstanceMigrationJobHandler implements JobHandler {
 
     public static final String BATCH_RESULT_STATUS_LABEL = "resultStatus";
     public static final String BATCH_RESULT_MESSAGE_LABEL = "resultMessage";
+    public static final String BATCH_RESULT_STACKTRACE_LABEL = "resultStacktrace";
 
     protected static final String CFG_LABEL_BATCH_ID = "batchId";
     protected static final String CFG_LABEL_BATCH_PART_ID = "batchPartId";
@@ -33,10 +34,10 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
         try {
             JsonNode cfgAsJson = getObjectMapper().readTree(handlerCfg);
             if (cfgAsJson.has(CFG_LABEL_BATCH_ID)) {
-                return cfgAsJson.get(CFG_LABEL_BATCH_ID).asText();
+                return cfgAsJson.get(CFG_LABEL_BATCH_ID).asString();
             }
             return null;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -45,10 +46,10 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
         try {
             JsonNode cfgAsJson = getObjectMapper().readTree(handlerCfg);
             if (cfgAsJson.has(CFG_LABEL_BATCH_PART_ID)) {
-                return cfgAsJson.get(CFG_LABEL_BATCH_PART_ID).asText();
+                return cfgAsJson.get(CFG_LABEL_BATCH_PART_ID).asString();
             }
             return null;
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             return null;
         }
     }
@@ -69,7 +70,7 @@ public abstract class AbstractProcessInstanceMigrationJobHandler implements JobH
         if (CommandContextUtil.getCommandContext() != null) {
             return CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();
         } else {
-            return new ObjectMapper();
+            return JsonMapper.shared();
         }
     }
 }

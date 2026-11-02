@@ -35,12 +35,11 @@ public class RequiredRuleXmlConverter extends CaseElementXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl planItemControl) {
             
             RequiredRule requiredRule = new RequiredRule();
             requiredRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
-            
-            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+
             planItemControl.setRequiredRule(requiredRule);
             
             return requiredRule;

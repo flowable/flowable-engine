@@ -121,6 +121,10 @@ public class CmmnDIExport implements CmmnXmlConstants {
         
         // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        GraphicInfo labelGraphicInfo = model.getLabelGraphicInfo(elementId);
+        if (labelGraphicInfo != null) {
+            addLabelElementContent(labelGraphicInfo, xtw);
+        }
         xtw.writeEndElement();
 
         xtw.writeEndElement();
@@ -166,8 +170,24 @@ public class CmmnDIExport implements CmmnXmlConstants {
         
         // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        GraphicInfo labelGraphicInfo = model.getLabelGraphicInfo(edgeId);
+        if (labelGraphicInfo != null) {
+            addLabelElementContent(labelGraphicInfo, xtw);
+        }
         xtw.writeEndElement();
 
+        xtw.writeEndElement();
+    }
+
+    protected static void addLabelElementContent(GraphicInfo labelGraphicInfo, XMLStreamWriter xtw) throws Exception {
+        if (labelGraphicInfo.getRotation() > 0) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_DI_ROTATION, String.valueOf(labelGraphicInfo.getRotation()));
+        }
+        xtw.writeStartElement(OMGDC_PREFIX, ELEMENT_DI_BOUNDS, OMGDC_NAMESPACE);
+        xtw.writeAttribute(ATTRIBUTE_DI_HEIGHT, String.valueOf(labelGraphicInfo.getHeight()));
+        xtw.writeAttribute(ATTRIBUTE_DI_WIDTH, String.valueOf(labelGraphicInfo.getWidth()));
+        xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(labelGraphicInfo.getX()));
+        xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(labelGraphicInfo.getY()));
         xtw.writeEndElement();
     }
 }

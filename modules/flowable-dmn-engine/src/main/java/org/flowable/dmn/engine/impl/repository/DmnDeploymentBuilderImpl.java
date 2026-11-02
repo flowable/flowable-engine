@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.engine.impl.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.IOUtils;
@@ -36,7 +36,6 @@ import org.flowable.dmn.xml.converter.DmnXMLConverter;
 public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient DmnRepositoryServiceImpl repositoryService;
     protected transient DmnResourceEntityManager resourceEntityManager;
@@ -78,11 +77,15 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
     @Override
     public DmnDeploymentBuilder addClasspathResource(String resource) {
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource);
-        if (inputStream == null) {
-            throw new FlowableException("resource '" + resource + "' not found");
+        try (final InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (inputStream == null) {
+                throw new FlowableException("resource '" + resource + "' not found");
+            }
+            return addInputStream(resource, inputStream);
+            
+        } catch (IOException ex) {
+            throw new FlowableException("Failed to read resource " + resource, ex);
         }
-        return addInputStream(resource, inputStream);
     }
 
     @Override
@@ -93,11 +96,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
 
         DmnResourceEntity resource = resourceEntityManager.create();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get decision table bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }

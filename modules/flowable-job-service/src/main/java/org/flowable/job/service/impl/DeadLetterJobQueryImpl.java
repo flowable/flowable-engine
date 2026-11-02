@@ -14,10 +14,12 @@
 package org.flowable.job.service.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -45,16 +47,20 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String handlerType;
     protected Collection<String> handlerTypes;
     protected String processDefinitionId;
+    protected String processDefinitionKey;
     protected String category;
     protected String categoryLike;
     protected String elementId;
+    protected Collection<String> elementIds;
     protected String elementName;
     protected String scopeId;
+    protected Collection<String> scopeIds;
     protected boolean withoutScopeId;
     protected String subScopeId;
     protected String scopeType;
     protected boolean withoutScopeType;
     protected String scopeDefinitionId;
+    protected String caseDefinitionKey;
     protected String correlationId;
     protected boolean executable;
     protected boolean onlyTimers;
@@ -69,6 +75,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+
+    protected List<DeadLetterJobQueryImpl> orQueryObjects = new ArrayList<>();
+    protected DeadLetterJobQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
 
     public DeadLetterJobQueryImpl() {
     }
@@ -88,7 +98,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("Provided job id is null");
         }
-        this.id = jobId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.id = jobId;
+        } else {
+            this.id = jobId;
+        }
         return this;
     }
 
@@ -97,7 +111,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (jobIds == null) {
             throw new FlowableIllegalArgumentException("Provided job id list is null");
         }
-        this.jobIds = jobIds;
+        if (inOrStatement) {
+            this.currentOrQueryObject.jobIds = jobIds;
+        } else {
+            this.jobIds = jobIds;
+        }
         return this;
     }
 
@@ -106,13 +124,21 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
         }
-        this.processInstanceId = processInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processInstanceId = processInstanceId;
+        } else {
+            this.processInstanceId = processInstanceId;
+        }
         return this;
     }
     
     @Override
     public DeadLetterJobQueryImpl withoutProcessInstanceId() {
-        this.withoutProcessInstanceId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutProcessInstanceId = true;
+        } else {
+            this.withoutProcessInstanceId = true;
+        }
         return this;
     }
 
@@ -121,7 +147,24 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
-        this.processDefinitionId = processDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionId = processDefinitionId;
+        } else {
+            this.processDefinitionId = processDefinitionId;
+        }
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQueryImpl processDefinitionKey(String processDefinitionKey) {
+        if (processDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided process definition key is null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKey = processDefinitionKey;
+        } else {
+            this.processDefinitionKey = processDefinitionKey;
+        }
         return this;
     }
     
@@ -130,7 +173,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (category == null) {
             throw new FlowableIllegalArgumentException("Provided category is null");
         }
-        this.category = category;
+        if (inOrStatement) {
+            this.currentOrQueryObject.category = category;
+        } else {
+            this.category = category;
+        }
         return this;
     }
     
@@ -139,7 +186,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("Provided categoryLike is null");
         }
-        this.categoryLike = categoryLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.categoryLike = categoryLike;
+        } else {
+            this.categoryLike = categoryLike;
+        }
         return this;
     }
     
@@ -148,7 +199,24 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (elementId == null) {
             throw new FlowableIllegalArgumentException("Provided element id is null");
         }
-        this.elementId = elementId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementId = elementId;
+        } else {
+            this.elementId = elementId;
+        }
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery elementIds(Collection<String> elementIds) {
+        if (elementIds == null) {
+            throw new FlowableIllegalArgumentException("Provided element ids are null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementIds = elementIds;
+        } else {
+            this.elementIds = elementIds;
+        }
         return this;
     }
     
@@ -157,7 +225,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (elementName == null) {
             throw new FlowableIllegalArgumentException("Provided element name is null");
         }
-        this.elementName = elementName;
+        if (inOrStatement) {
+            this.currentOrQueryObject.elementName = elementName;
+        } else {
+            this.elementName = elementName;
+        }
         return this;
     }
     
@@ -166,13 +238,34 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (scopeId == null) {
             throw new FlowableIllegalArgumentException("Provided scope id is null");
         }
-        this.scopeId = scopeId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeId = scopeId;
+        } else {
+            this.scopeId = scopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery scopeIds(Collection<String> scopeIds) {
+        if (scopeIds == null) {
+            throw new FlowableIllegalArgumentException("Provided scope ids are null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeIds = scopeIds;
+        } else {
+            this.scopeIds = scopeIds;
+        }
         return this;
     }
     
     @Override
     public DeadLetterJobQueryImpl withoutScopeId() {
-        this.withoutScopeId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeId = true;
+        } else {
+            this.withoutScopeId = true;
+        }
         return this;
     }
     
@@ -181,7 +274,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (subScopeId == null) {
             throw new FlowableIllegalArgumentException("Provided sub scope id is null");
         }
-        this.subScopeId = subScopeId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.subScopeId = subScopeId;
+        } else {
+            this.subScopeId = subScopeId;
+        }
         return this;
     }
     
@@ -190,13 +287,21 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (scopeType == null) {
             throw new FlowableIllegalArgumentException("Provided scope type is null");
         }
-        this.scopeType = scopeType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
         return this;
     }
 
     @Override
     public DeadLetterJobQueryImpl withoutScopeType() {
-        this.withoutScopeType = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutScopeType = true;
+        } else {
+            this.withoutScopeType = true;
+        }
         return this;
     }
 
@@ -205,10 +310,14 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (scopeDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided scope definitionid is null");
         }
-        this.scopeDefinitionId = scopeDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
+        } else {
+            this.scopeDefinitionId = scopeDefinitionId;
+        }
         return this;
     }
-    
+
     @Override
     public DeadLetterJobQuery caseInstanceId(String caseInstanceId) {
         if (caseInstanceId == null) {
@@ -228,6 +337,19 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         scopeType(ScopeTypes.CMMN);
         return this;
     }
+
+    @Override
+    public DeadLetterJobQueryImpl caseDefinitionKey(String caseDefinitionKey) {
+        if (caseDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition key null");
+        }
+        if (inOrStatement) {
+            this.currentOrQueryObject.caseDefinitionKey = caseDefinitionKey;
+        } else {
+            this.caseDefinitionKey = caseDefinitionKey;
+        }
+        return this;
+    }
     
     @Override
     public DeadLetterJobQuery planItemInstanceId(String planItemInstanceId) {
@@ -244,7 +366,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (correlationId == null) {
             throw new FlowableIllegalArgumentException("Provided correlationId is null");
         }
-        this.correlationId = correlationId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.correlationId = correlationId;
+        } else {
+            this.correlationId = correlationId;
+        }
         return this;
     }
 
@@ -253,7 +379,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
         }
-        this.executionId = executionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.executionId = executionId;
+        } else {
+            this.executionId = executionId;
+        }
         return this;
     }
 
@@ -262,7 +392,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
-        this.handlerType = handlerType;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerType = handlerType;
+        } else {
+            this.handlerType = handlerType;
+        }
         return this;
     }
 
@@ -271,13 +405,21 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (handlerTypes == null) {
             throw new FlowableIllegalArgumentException("Provided handlerTypes are null");
         }
-        this.handlerTypes = handlerTypes;
+        if (inOrStatement) {
+            this.currentOrQueryObject.handlerTypes = handlerTypes;
+        } else {
+            this.handlerTypes = handlerTypes;
+        }
         return this;
     }
 
     @Override
     public DeadLetterJobQueryImpl executable() {
-        executable = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.executable = true;
+        } else {
+            this.executable = true;
+        }
         return this;
     }
 
@@ -290,7 +432,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (onlyExternalWorkers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
         }
-        this.onlyTimers = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyTimers = true;
+        } else {
+            this.onlyTimers = true;
+        }
         return this;
     }
 
@@ -304,7 +450,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Cannot combine onlyExternalWorkers() with onlyMessages() in the same query");
         }
 
-        this.onlyMessages = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyMessages = true;
+        } else {
+            this.onlyMessages = true;
+        }
         return this;
     }
 
@@ -318,7 +468,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyExternalWorkers() in the same query");
         }
 
-        this.onlyTimers = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyExternalWorkers = true;
+        } else {
+            this.onlyExternalWorkers = true;
+        }
         return this;
     }
 
@@ -328,7 +482,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
-        this.duedateHigherThan = date;
+        if (inOrStatement) {
+            this.currentOrQueryObject.duedateHigherThan = date;
+        } else {
+            this.duedateHigherThan = date;
+        }
         return this;
     }
 
@@ -337,13 +495,21 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
-        this.duedateLowerThan = date;
+        if (inOrStatement) {
+            this.currentOrQueryObject.duedateLowerThan = date;
+        } else {
+            this.duedateLowerThan = date;
+        }
         return this;
     }
 
     @Override
     public DeadLetterJobQueryImpl withException() {
-        this.withException = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withException = true;
+        } else {
+            this.withException = true;
+        }
         return this;
     }
 
@@ -352,7 +518,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (exceptionMessage == null) {
             throw new FlowableIllegalArgumentException("Provided exception message is null");
         }
-        this.exceptionMessage = exceptionMessage;
+        if (inOrStatement) {
+            this.currentOrQueryObject.exceptionMessage = exceptionMessage;
+        } else {
+            this.exceptionMessage = exceptionMessage;
+        }
         return this;
     }
 
@@ -361,7 +531,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
@@ -370,13 +544,46 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
 
     @Override
     public DeadLetterJobQueryImpl jobWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery or() {
+        if (inOrStatement) {
+            throw new FlowableException("the query is already in an or statement");
+        }
+        inOrStatement = true;
+        if (commandContext != null) {
+            currentOrQueryObject = new DeadLetterJobQueryImpl(commandContext, jobServiceConfiguration);
+        } else {
+            currentOrQueryObject = new DeadLetterJobQueryImpl(commandExecutor, jobServiceConfiguration);
+        }
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public DeadLetterJobQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableException("endOr() can only be called after calling or()");
+        }
+        inOrStatement = false;
+        currentOrQueryObject = null;
         return this;
     }
 
@@ -447,6 +654,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return handlerType;
     }
 
+    public Collection<String> getHandlerTypes() {
+        return handlerTypes;
+    }
+
     public boolean getExecutable() {
         return executable;
     }
@@ -482,6 +693,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
+
+    public String getProcessDefinitionKey() {
+        return processDefinitionKey;
+    }
     
     public String getCategory() {
         return category;
@@ -495,6 +710,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return elementId;
     }
 
+    public Collection<String> getElementIds() {
+        return elementIds;
+    }
+
     public String getElementName() {
         return elementName;
     }
@@ -502,7 +721,11 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
     public String getScopeId() {
         return scopeId;
     }
-    
+
+    public Collection<String> getScopeIds() {
+        return scopeIds;
+    }
+
     public boolean isWithoutScopeId() {
         return withoutScopeId;
     }
@@ -521,6 +744,10 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public String getScopeDefinitionId() {
         return scopeDefinitionId;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
     }
 
     public String getCorrelationId() {
@@ -557,5 +784,9 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
 
     public Date getDuedateLowerThanOrEqual() {
         return duedateLowerThanOrEqual;
+    }
+
+    public List<DeadLetterJobQueryImpl> getOrQueryObjects() {
+        return orQueryObjects;
     }
 }

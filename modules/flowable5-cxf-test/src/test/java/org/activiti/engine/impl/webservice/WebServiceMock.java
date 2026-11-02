@@ -14,9 +14,9 @@ package org.activiti.engine.impl.webservice;
 
 import java.util.Date;
 
-import javax.jws.WebParam;
-import javax.jws.WebResult;
-import javax.jws.WebService;
+import jakarta.jws.WebParam;
+import jakarta.jws.WebResult;
+import jakarta.jws.WebService;
 
 /**
  * A simple WS for unit test purpose

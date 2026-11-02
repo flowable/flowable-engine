@@ -14,12 +14,10 @@ package org.flowable.engine.test.bpmn.event.error;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.FlowableRule;
-import org.junit.Rule;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 
 /**
  * Testcase for error in method 'propagateError' of class
@@ -27,20 +25,17 @@ import org.junit.Test;
  * 
  * @author Fritsche
  */
-public class ErrorPropagationTest {
-
-    @Rule
-    public FlowableRule flowableRule = new FlowableRule();
+public class ErrorPropagationTest extends PluggableFlowableTestCase {
 
     @Test
     @Deployment(resources = { "org/flowable/engine/test/bpmn/event/error/catchError3.bpmn",
                     "org/flowable/engine/test/bpmn/event/error/catchError4.bpmn", 
                     "org/flowable/engine/test/bpmn/event/error/throwError.bpmn" })
     public void test() {
-        ProcessInstance processInstance = flowableRule.getRuntimeService().startProcessInstanceByKey("catchError4");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchError4");
         assertThat(processInstance).isNotNull();
 
-        final org.flowable.task.api.Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         assertThat(task.getName()).isEqualTo("MyErrorTaskNested");
     }

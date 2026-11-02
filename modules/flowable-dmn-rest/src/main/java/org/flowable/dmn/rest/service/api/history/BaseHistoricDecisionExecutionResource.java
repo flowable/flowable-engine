@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.rest.service.api.history;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -51,13 +51,14 @@ public class BaseHistoricDecisionExecutionResource {
 
         DmnHistoricDecisionExecution decisionExecution = historicDecisionExecutionQuery.singleResult();
 
+        if (decisionExecution == null) {
+            throw new FlowableObjectNotFoundException("Could not find a decision execution with id '" + decisionExecutionId + "'");
+        }
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessDecisionHistoryInfoById(decisionExecution);
         }
 
-        if (decisionExecution == null) {
-            throw new FlowableObjectNotFoundException("Could not find a decision execution with id '" + decisionExecutionId + "'");
-        }
         return decisionExecution;
     }
 

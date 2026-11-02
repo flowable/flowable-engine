@@ -12,9 +12,7 @@
  */
 package org.flowable.idm.engine.test;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.slf4j.Logger;
@@ -30,26 +28,21 @@ public abstract class IdmTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, IdmEngine> idmEngines = new HashMap<>();
+    static final EngineTestCache<IdmEngine> idmEngines = new EngineTestCache<>();
 
     public static IdmEngine getIdmEngine(String configurationResource) {
-        IdmEngine idmEngine = idmEngines.get(configurationResource);
-        if (idmEngine == null) {
+        return idmEngines.getOrCreate(configurationResource, resource -> {
             LOGGER.debug("==== BUILDING IDM ENGINE ========================================================================");
-            idmEngine = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(configurationResource)
+            IdmEngine idmEngine = IdmEngineConfiguration.createIdmEngineConfigurationFromResource(resource)
                     .setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
                     .buildIdmEngine();
             LOGGER.debug("==== IDM ENGINE CREATED =========================================================================");
-            idmEngines.put(configurationResource, idmEngine);
-        }
-        return idmEngine;
+            return idmEngine;
+        });
     }
 
     public static void closeIdmEngines() {
-        for (IdmEngine idmEngine : idmEngines.values()) {
-            idmEngine.close();
-        }
-        idmEngines.clear();
+        idmEngines.closeAll();
     }
 
 }

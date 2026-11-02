@@ -18,10 +18,11 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.test.FlowableRule;
-import org.junit.Before;
-import org.junit.Rule;
+import org.flowable.engine.test.FlowableExtension;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+@ExtendWith(FlowableExtension.class)
 public abstract class AbstractFlowable6CompatibilityTest {
 
     protected ProcessEngine processEngine;
@@ -31,17 +32,14 @@ public abstract class AbstractFlowable6CompatibilityTest {
     protected TaskService taskService;
     protected ManagementService managementService;
 
-    @Rule
-    public FlowableRule flowableRule = new FlowableRule();
-
-    @Before
-    public void setupServices() {
-        this.processEngine = flowableRule.getProcessEngine();
-        this.processEngineConfiguration = flowableRule.getProcessEngine().getProcessEngineConfiguration();
-        this.repositoryService = flowableRule.getRepositoryService();
-        this.runtimeService = flowableRule.getRuntimeService();
-        this.taskService = flowableRule.getTaskService();
-        this.managementService = flowableRule.getManagementService();
+    @BeforeEach
+    public void setupServices(ProcessEngine processEngine) {
+        this.processEngine = processEngine;
+        this.processEngineConfiguration = processEngine.getProcessEngineConfiguration();
+        this.repositoryService = processEngine.getRepositoryService();
+        this.runtimeService = processEngine.getRuntimeService();
+        this.taskService = processEngine.getTaskService();
+        this.managementService = processEngine.getManagementService();
     }
 
 }

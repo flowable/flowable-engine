@@ -37,8 +37,8 @@ import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Serializable {
 
@@ -145,11 +145,11 @@ public class GetDataObjectsCmd implements Command<Map<String, DataObject>>, Seri
                     if (languageNode != null) {
                         JsonNode nameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                         if (nameNode != null) {
-                            localizedName = nameNode.asText();
+                            localizedName = nameNode.asString();
                         }
                         JsonNode descriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                         if (descriptionNode != null) {
-                            localizedDescription = descriptionNode.asText();
+                            localizedDescription = descriptionNode.asString();
                         }
                     }
                 }

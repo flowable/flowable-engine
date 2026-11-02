@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="caseCompleteTwo" name="Case complete two">
+        <casePlanModel id="cpm2" name="Case plan model">
+
+            <planItem id="planItemStart2" name="Start" definitionRef="milestoneStart2"/>
+
+            <planItem id="planItemStage" name="Stage" definitionRef="stageTwo">
+                <entryCriterion id="ecStageTwo" flowable:sentryRef="sentryStageTwo"/>
+            </planItem>
+
+            <sentry id="sentryStageTwo">
+                <planItemOnPart id="opStageTwo" sourceRef="planItemStart2">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <milestone id="milestoneStart2" name="Start"/>
+
+            <stage id="stageTwo" name="Stage">
+                <planItem id="planItemTaskTwo" name="Task complete two" definitionRef="taskTwo"/>
+                <planItem id="planItemProcessThree" name="Process complete three" definitionRef="processTaskThree"/>
+
+                <humanTask id="taskTwo" name="Task complete two"/>
+                <processTask id="processTaskThree" name="Process complete three" flowable:fallbackToDefaultTenant="true">
+                    <processRefExpression><![CDATA[processCompleteThree]]></processRefExpression>
+                </processTask>
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

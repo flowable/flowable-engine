@@ -12,6 +12,8 @@
  */
 package org.flowable.common.engine.impl;
 
+import java.util.function.Consumer;
+
 import org.flowable.common.engine.impl.el.ExpressionManager;
 
 /**
@@ -22,4 +24,6 @@ public interface HasExpressionManagerEngineConfiguration {
     ExpressionManager getExpressionManager();
 
     AbstractEngineConfiguration setExpressionManager(ExpressionManager expressionManager);
+
+    AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer);
 }

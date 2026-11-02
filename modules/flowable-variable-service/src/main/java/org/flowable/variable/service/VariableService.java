@@ -14,7 +14,6 @@ package org.flowable.variable.service;
 
 import java.util.List;
 
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -39,27 +38,23 @@ public interface VariableService {
         return createInternalVariableInstanceQuery().subScopeId(subScopeId).scopeType(scopeType).list();
     }
 
-    VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
-
     /**
-     * Create a variable instance without setting the value on it.
-     * <b>IMPORTANT:</b> If you use this method you would have to call {@link VariableInstanceEntity#setValue(Object)}
-     * for setting the value
-     * @param name the name of the variable to create
-     * @param type the type of the created variable
+     * Create a variable instance with the given name and value for the given tenant.
      *
+     * @param name the name of the variable to create
      * @return the {@link VariableInstanceEntity} to be used
      */
-    VariableInstanceEntity createVariableInstance(String name, VariableType type);
+    VariableInstanceEntity createVariableInstance(String name);
 
     void insertVariableInstance(VariableInstanceEntity variable);
 
     /**
-     * Updates variable instance with the new value
-     *
-     * @param variable to update
+     * Inserts a variable instance with the given value.
+     * @param variable the variable instance to insert
+     * @param value the value to set
+     * @param tenantId the tenant id of the variable instance
      */
-    void updateVariableInstance(VariableInstanceEntity variable);
+    void insertVariableInstanceWithValue(VariableInstanceEntity variable, Object value, String tenantId);
 
     void deleteVariableInstance(VariableInstanceEntity variable);
 

@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
@@ -38,6 +41,9 @@ public class CaseInstanceChangeState {
     protected Set<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitions;
     protected Set<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitions;
     protected Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions;
+    protected Set<ChangePlanItemIdMapping> changePlanItemIds;
+    protected Set<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdsWithDefinitionId;
+    protected Set<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIds;
     protected Map<String, Map<String, Object>> childInstanceTaskVariables = new HashMap<>();
     protected Map<String, PlanItemInstanceEntity> createdStageInstances = new HashMap<>();
     protected Map<String, PlanItemInstanceEntity> terminatedPlanItemInstances = new HashMap<>();
@@ -81,16 +87,19 @@ public class CaseInstanceChangeState {
     }
     
     public PlanItemInstanceEntity getRuntimePlanItemInstance(String planItemDefinitionId) {
+        PlanItemInstanceEntity foundPlanItemInstance = null;
         if (currentPlanItemInstances != null && currentPlanItemInstances.containsKey(planItemDefinitionId)) {
             List<PlanItemInstanceEntity> currentPlanItemInstanceList = currentPlanItemInstances.get(planItemDefinitionId);
             for (PlanItemInstanceEntity planItemInstance : currentPlanItemInstanceList) {
-                if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState())) {
-                    return planItemInstance;
+                if (!PlanItemInstanceState.TERMINAL_STATES.contains(planItemInstance.getState()) && 
+                        (foundPlanItemInstance == null || !PlanItemInstanceState.WAITING_FOR_REPETITION.equals(planItemInstance.getState()))) {
+                    
+                    foundPlanItemInstance = planItemInstance;
                 }
             }
         }
         
-        return null;
+        return foundPlanItemInstance;
     }
     
     public Map<String, List<PlanItemInstanceEntity>> getActivePlanItemInstances() {
@@ -185,6 +194,33 @@ public class CaseInstanceChangeState {
 
     public CaseInstanceChangeState setRemoveWaitingForRepetitionPlanItemDefinitions(Set<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitions) {
         this.removeWaitingForRepetitionPlanItemDefinitions = removeWaitingForRepetitionPlanItemDefinitions;
+        return this;
+    }
+
+    public Set<ChangePlanItemIdMapping> getChangePlanItemIds() {
+        return changePlanItemIds;
+    }
+
+    public CaseInstanceChangeState setChangePlanItemIds(Set<ChangePlanItemIdMapping> changePlanItemIds) {
+        this.changePlanItemIds = changePlanItemIds;
+        return this;
+    }
+
+    public Set<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdsWithDefinitionId() {
+        return changePlanItemIdsWithDefinitionId;
+    }
+
+    public CaseInstanceChangeState setChangePlanItemIdsWithDefinitionId(Set<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdsWithDefinitionId) {
+        this.changePlanItemIdsWithDefinitionId = changePlanItemIdsWithDefinitionId;
+        return this;
+    }
+
+    public Set<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIds() {
+        return changePlanItemDefinitionWithNewTargetIds;
+    }
+
+    public CaseInstanceChangeState setChangePlanItemDefinitionWithNewTargetIds(Set<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIds) {
+        this.changePlanItemDefinitionWithNewTargetIds = changePlanItemDefinitionWithNewTargetIds;
         return this;
     }
 

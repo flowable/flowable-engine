@@ -14,11 +14,13 @@ package org.flowable.engine.test.eventregistry;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
@@ -26,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
+ * @author Filip Hrisafov
  */
 public class EventSubscriptionLockingTest extends AbstractBpmnEventRegistryConsumerTest {
 
@@ -72,28 +75,82 @@ public class EventSubscriptionLockingTest extends AbstractBpmnEventRegistryConsu
     @Test
     @Deployment
     public void testConcurrentStarts() throws Exception {
-        ExecutorService executorService = Executors.newFixedThreadPool(32);
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-        for (int i = 0; i < 100; i++) {
-            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
-        }
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
 
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.MINUTES);
 
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").includeProcessVariables().list())
+                .extracting(instance -> instance.getProcessVariables().get("customerId"))
+                .containsExactlyInAnyOrder("testCustomer");
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").count()).isEqualTo(1);
 
-        executorService = Executors.newFixedThreadPool(32);
+        executorService = Executors.newFixedThreadPool(4);
 
-        for (int i = 0; i < 100; i++) {
-            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
-        }
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
 
         executorService.shutdown();
         executorService.awaitTermination(5, TimeUnit.MINUTES);
 
+        assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").includeProcessVariables().list())
+                .extracting(instance -> instance.getProcessVariables().get("customerId"))
+                .containsExactlyInAnyOrder("testCustomer", "otherCustomer");
         assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").count()).isEqualTo(2);
 
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/EventSubscriptionLockingTest.testConcurrentStarts.bpmn20.xml")
+    public void testConcurrentStartsWithoutLocking() throws Exception {
+        // When locking is disabled then in a parallel scenario multi-thread scenario
+        // multiple case instances can be started for the same event, since both threads will see the count as 0
+        boolean originalEventRegistryUniqueProcessInstanceCheckWithLock = processEngineConfiguration.isEventRegistryUniqueProcessInstanceCheckWithLock();
+        try {
+            processEngineConfiguration.setEventRegistryUniqueProcessInstanceCheckWithLock(false);
+
+            ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("testCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+            executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("otherCustomer"));
+
+            executorService.shutdown();
+            executorService.awaitTermination(5, TimeUnit.MINUTES);
+
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").includeProcessVariables().list())
+                    .extracting(instance -> instance.getProcessVariables().get("customerId"))
+                    .containsExactlyInAnyOrder("testCustomer", "testCustomer", "otherCustomer", "otherCustomer");
+            assertThat(runtimeService.createProcessInstanceQuery().processDefinitionKey("eventSubscriptionLocking").count()).isEqualTo(4);
+        } finally {
+            processEngineConfiguration.setEventRegistryUniqueProcessInstanceCheckWithLock(originalEventRegistryUniqueProcessInstanceCheckWithLock);
+        }
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/eventregistry/EventSubscriptionLockingTest.testConcurrentStarts.bpmn20.xml")
+    public void testConcurrentStartsMultipleEvents() throws Exception {
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
+
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("kermit"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("kermit"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("fozzie"));
+        executorService.submit(() -> inboundEventChannelAdapter.triggerTestEvent("fozzie"));
+        executorService.shutdown();
+        executorService.awaitTermination(5, TimeUnit.MINUTES);
+
+        List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery()
+                .processDefinitionKey("eventSubscriptionLocking")
+                .includeProcessVariables()
+                .list();
+
+        assertThat(instances)
+                .extracting(instance -> instance.getProcessVariables().get("customerId"))
+                .containsExactlyInAnyOrder("kermit", "fozzie");
     }
 
 }

@@ -23,7 +23,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
@@ -44,12 +46,12 @@ import org.flowable.eventsubscription.api.EventSubscriptionQuery;
  */
 public abstract class BaseEventRegistryEventConsumer implements EventRegistryEventConsumer {
 
-    protected AbstractEngineConfiguration engingeConfiguration;
+    protected AbstractEngineConfiguration engineConfiguration;
     protected CommandExecutor commandExecutor;
 
-    public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engingeConfiguration) {
-        this.engingeConfiguration = engingeConfiguration;
-        this.commandExecutor = engingeConfiguration.getCommandExecutor();
+    public BaseEventRegistryEventConsumer(AbstractEngineConfiguration engineConfiguration) {
+        this.engineConfiguration = engineConfiguration;
+        this.commandExecutor = engineConfiguration.getCommandExecutor();
     }
 
     @Override
@@ -77,14 +79,52 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
             return Collections.emptySet();
         }
 
-        List<EventPayloadInstance> list = new ArrayList<>(correlationParameterInstances);
-        Collection<CorrelationKey> correlationKeys = new HashSet<>();
-        for (int i = 1; i <= list.size(); i++) {
-            for (int j = 0; j <= list.size() - i; j++) {
-                List<EventPayloadInstance> parameterSubList = list.subList(j, j + i);
-                String correlationKey = generateCorrelationKey(parameterSubList);
-                correlationKeys.add(new CorrelationKey(correlationKey, parameterSubList));
+        int numberOfCorrelationParameters = correlationParameterInstances.size();
+        if (numberOfCorrelationParameters == 1) {
+            // size of 1 is handled in a special way in order to avoid creation of lists
+            String correlationKey = generateCorrelationKey(correlationParameterInstances);
+            return Collections.singleton(new CorrelationKey(correlationKey, correlationParameterInstances));
+        }
+
+        if (numberOfCorrelationParameters == 2) {
+            // size of 2 is handled in a special way in order to avoid creation of additional lists
+            Set<CorrelationKey> correlationKeys = new HashSet<>();
+
+            String allParametersCorrelationKey = generateCorrelationKey(correlationParameterInstances);
+            correlationKeys.add(new CorrelationKey(allParametersCorrelationKey, correlationParameterInstances));
+
+            for (EventPayloadInstance correlationParameterInstance : correlationParameterInstances) {
+                Set<EventPayloadInstance> singleParameterInstance = Collections.singleton(correlationParameterInstance);
+                String correlationKey = generateCorrelationKey(singleParameterInstance);
+                correlationKeys.add(new CorrelationKey(correlationKey, singleParameterInstance));
             }
+            return correlationKeys;
+        }
+
+        // The correlation keys are the power set of the correlation parameter instances minus the empty set.
+        // A power set is a set of all subsets including the empty set and the set itself.
+        // A power set has a size of 2^n where n is the size of the set.
+        // e.g. power set for [A, B] is [ [], [A], [B], [A, B] ]
+        // We are going to compute the correlation keys by iterating from 1 to 2^n and the binary representation of every iteration index
+        // will be used to determine if the index should be included in the set or not
+        // We will start from 1 because we want to skip the empty set
+        // This is an adaptation of https://simonhessner.de/calculate-power-set-set-of-all-subsets-in-python-without-recursion/
+        List<EventPayloadInstance> list = new ArrayList<>(correlationParameterInstances);
+        
+        int correlationKeysSize = Math.toIntExact((long) Math.pow(2, list.size()));
+        Collection<CorrelationKey> correlationKeys = new HashSet<>();
+
+        for (int counter = 1; counter < correlationKeysSize; counter++) {
+            Collection<EventPayloadInstance> subset = new ArrayList<>(list.size());
+            for (int i = 0; i < list.size(); i++) {
+                if ((counter & (1 << i)) > 0) {
+                    // Here we check if the index should be included in the combination
+                    subset.add(list.get(i));
+                }
+            }
+
+            String correlationKey = generateCorrelationKey(subset);
+            correlationKeys.add(new CorrelationKey(correlationKey, subset));
         }
 
         return correlationKeys;
@@ -92,25 +132,23 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
 
     protected String generateCorrelationKey(Collection<EventPayloadInstance> correlationParameterInstances) {
         Map<String, Object> data = new HashMap<>();
+        EventRegistryEngineConfiguration eventRegistryConfiguration = getEventRegistryEngineConfiguration();
         for (EventPayloadInstance correlationParameterInstance : correlationParameterInstances) {
-            data.put(correlationParameterInstance.getDefinitionName(), correlationParameterInstance.getValue());
+            data.put(correlationParameterInstance.getDefinitionName(), eventRegistryConfiguration.getCorrelationValueTransformer().transformValue(correlationParameterInstance));
         }
 
         return getEventRegistry().generateKey(data);
     }
 
-    protected EventRegistry getEventRegistry() {
-        EventRegistryEngineConfiguration eventRegistryEngineConfiguration = (EventRegistryEngineConfiguration) 
-                        engingeConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
-        return eventRegistryEngineConfiguration.getEventRegistry();
-    }
-
-    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys) {
+    protected CorrelationKey getCorrelationKeyWithAllParameters(Collection<CorrelationKey> correlationKeys, EventInstance eventInstance) {
         CorrelationKey result = null;
         for (CorrelationKey correlationKey : correlationKeys) {
             if (result == null || (correlationKey.getParameterInstances().size() >= result.getParameterInstances().size()) ) {
                 result = correlationKey;
             }
+        }
+        if (result == null) {
+            throw new FlowableIllegalStateException(String.format("Event definition %s does not contain correlation parameters. Cannot verify if instance already exists.", eventInstance.getEventKey()));
         }
         return result;
     }
@@ -150,6 +188,71 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                             .tenantId(eventInstance.getTenantId())
                             .withoutTenantId()
                         .endOr();
+                        
+                        List<EventSubscription> cleanedEventSubscriptions = new ArrayList<>();
+                        List<EventSubscription> eventSubscriptions = eventSubscriptionQuery.list();
+                        List<String> tenantProcessDefinitionKeys = new ArrayList<>();
+                        List<String> tenantCaseDefinitionKeys = new ArrayList<>();
+                        List<EventSubscription> defaultTenantEventSubscriptions = new ArrayList<>();
+                        for (EventSubscription eventSubscription : eventSubscriptions) {
+                            if (StringUtils.isNotEmpty(eventSubscription.getProcessInstanceId()) || StringUtils.isNotEmpty(eventSubscription.getScopeId())) {
+                                if (eventInstanceTenantId.equals(eventSubscription.getTenantId())) {
+                                    cleanedEventSubscriptions.add(eventSubscription);
+                                }
+                                
+                            } else {
+                                if (StringUtils.isEmpty(eventSubscription.getTenantId())) {
+                                    defaultTenantEventSubscriptions.add(eventSubscription);
+                                    
+                                } else {
+                                    if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
+                                        tenantCaseDefinitionKeys.add(eventSubscription.getScopeDefinitionKey());
+                                        
+                                    } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
+                                        EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
+                                        String caseDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getScopeDefinitionId());
+                                        if (StringUtils.isNotEmpty(caseDefinitionKey)) {
+                                            tenantCaseDefinitionKeys.add(caseDefinitionKey);
+                                        }
+                                    
+                                    } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
+                                        EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
+                                        String processDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getProcessDefinitionId());
+                                        if (StringUtils.isNotEmpty(processDefinitionKey)) {
+                                            tenantProcessDefinitionKeys.add(processDefinitionKey);
+                                        }
+                                    }
+                                    
+                                    cleanedEventSubscriptions.add(eventSubscription);
+                                }
+                            }
+                        }
+                        
+                        if (!defaultTenantEventSubscriptions.isEmpty()) {
+                            for (EventSubscription eventSubscription : defaultTenantEventSubscriptions) {
+                                if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionKey())) {
+                                    if (!tenantCaseDefinitionKeys.contains(eventSubscription.getScopeDefinitionKey())) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                    
+                                } else if (StringUtils.isNotEmpty(eventSubscription.getScopeDefinitionId())) {
+                                    EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("cmmnEventConsumer");
+                                    String caseDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getScopeDefinitionId());
+                                    if (StringUtils.isNotEmpty(caseDefinitionKey) && !tenantCaseDefinitionKeys.contains(caseDefinitionKey)) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                
+                                } else if (StringUtils.isNotEmpty(eventSubscription.getProcessDefinitionId())) {
+                                    EventRegistryEventConsumer eventRegistryEventConsumer = eventRegistryConfiguration.getEventRegistryEventConsumers().get("bpmnEventConsumer");
+                                    String processDefinitionKey = findDefinitionKeyById(eventRegistryEventConsumer, eventSubscription.getProcessDefinitionId());
+                                    if (StringUtils.isNotEmpty(processDefinitionKey) && !tenantProcessDefinitionKeys.contains(processDefinitionKey)) {
+                                        cleanedEventSubscriptions.add(eventSubscription);
+                                    }
+                                }
+                            }
+                        }
+
+                        return cleanedEventSubscriptions;
 
                     } else {
                         eventSubscriptionQuery.tenantIds(Arrays.asList(eventInstanceTenantId, defaultTenant));
@@ -160,13 +263,29 @@ public abstract class BaseEventRegistryEventConsumer implements EventRegistryEve
                     eventSubscriptionQuery.tenantId(eventInstanceTenantId);
 
                 }
-
             }
-
+            
             return eventSubscriptionQuery.list();
-
         });
     }
+
+    protected String findDefinitionKeyById(EventRegistryEventConsumer eventConsumer, String definitionId) {
+        if (eventConsumer instanceof BaseEventRegistryEventConsumer baseEventRegistryEventConsumer) {
+            return baseEventRegistryEventConsumer.findDefinitionKeyById(definitionId);
+        } else {
+            return null;
+        }
+    }
+    
+    protected EventRegistry getEventRegistry() {
+        return getEventRegistryEngineConfiguration().getEventRegistry();
+    }
+    
+    protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration() {
+        return (EventRegistryEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_EVENT_REGISTRY_CONFIG);
+    }
+
+    public abstract String findDefinitionKeyById(String definitionId);
 
     protected abstract EventSubscriptionQuery createEventSubscriptionQuery();
 

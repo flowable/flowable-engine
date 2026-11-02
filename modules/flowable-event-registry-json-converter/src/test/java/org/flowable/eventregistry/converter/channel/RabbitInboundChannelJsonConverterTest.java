@@ -52,6 +52,8 @@ class RabbitInboundChannelJsonConverterTest extends AbstractChannelConverterTest
 
                 assertThat(model.getDeserializerType()).isEqualTo("json");
 
+                assertThat(model.getEventFilterDelegateExpression()).isEqualTo("testEventFilterExpression");
+
                 ChannelEventKeyDetection eventKeyDetection = model.getChannelEventKeyDetection();
                 assertThat(eventKeyDetection).isNotNull();
                 assertThat(eventKeyDetection.getFixedValue()).isNull();

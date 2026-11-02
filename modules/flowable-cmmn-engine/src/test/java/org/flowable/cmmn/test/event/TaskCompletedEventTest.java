@@ -16,15 +16,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Micha Kiener
@@ -32,13 +32,13 @@ import org.junit.Test;
 public class TaskCompletedEventTest  extends FlowableCmmnTestCase {
     protected CustomEventListener taskListener;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         taskListener = new CustomEventListener();
         cmmnEngineConfiguration.getEventDispatcher().addEventListener(taskListener, FlowableEngineEventType.TASK_COMPLETED);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (taskListener != null) {
             cmmnEngineConfiguration.getEventDispatcher().removeEventListener(taskListener);

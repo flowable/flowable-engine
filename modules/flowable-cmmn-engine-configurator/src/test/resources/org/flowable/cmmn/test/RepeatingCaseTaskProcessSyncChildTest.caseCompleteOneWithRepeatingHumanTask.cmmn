@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="caseCompleteOne" name="Case complete one">
+        <casePlanModel id="cpm" name="Case plan model">
+
+            <planItem id="planItemStart" name="Start" definitionRef="milestoneStart"/>
+
+            <planItem id="planItemStage1" name="Stage one" definitionRef="stage1">
+                <entryCriterion id="ecStage1" flowable:sentryRef="sentryStage1"/>
+            </planItem>
+
+            <planItem id="planItemStage2" name="Stage two" definitionRef="stage2">
+                <entryCriterion id="ecStage2" flowable:sentryRef="sentryStage2"/>
+            </planItem>
+
+            <planItem id="planItemStage3" name="Stage three" definitionRef="stage3">
+                <entryCriterion id="ecStage3" flowable:sentryRef="sentryStage3"/>
+            </planItem>
+
+            <sentry id="sentryStage1">
+                <planItemOnPart id="opStage1" sourceRef="planItemStart">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryStage2">
+                <planItemOnPart id="opStage2" sourceRef="planItemStage1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryStage3">
+                <planItemOnPart id="opStage3" sourceRef="planItemStage2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <milestone id="milestoneStart" name="Start"/>
+
+            <stage id="stage1" name="Stage one">
+                <planItem id="planItemHumanTask" name="Human task" definitionRef="humanTask"/>
+                <humanTask id="humanTask" name="Human task"/>
+            </stage>
+
+            <stage id="stage2" name="Stage two">
+
+                <!-- Blocking process task; its synchronous child process produces 'caseList'. -->
+                <planItem id="planItemProcessOne" name="Process complete one" definitionRef="processTaskOne"/>
+                
+                <planItem id="planItemRepeatingTask" name="Repeating task" definitionRef="repeatingTask">
+                    <itemControl>
+                        <repetitionRule />
+                    </itemControl>
+                    <entryCriterion id="ecRepeatingTask" flowable:sentryRef="sentryRepeatingTask"/>
+                </planItem>
+
+                <!-- Collection-repeating case task, gated by the process task completing. Its child case
+                     completes synchronously. -->
+                <planItem id="planItemCaseTwo" name="Case complete two" definitionRef="caseTaskTwo">
+                    <itemControl>
+                        <repetitionRule flowable:collectionVariable="caseList"
+                                        flowable:elementVariable="caseItem" />
+                    </itemControl>
+                    <entryCriterion id="ecCaseTwo" flowable:sentryRef="sentryCaseTwo"/>
+                </planItem>
+                
+                <sentry id="sentryRepeatingTask">
+                    <planItemOnPart id="opRepeatingTask" sourceRef="planItemProcessOne">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <sentry id="sentryCaseTwo">
+                    <planItemOnPart id="opCaseTwo" sourceRef="planItemRepeatingTask">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <processTask id="processTaskOne" name="Process complete one">
+                    <extensionElements>
+                        <flowable:out source="caseList" target="caseList"/>
+                        <flowable:out source="processOne" target="processOne"/>
+                    </extensionElements>
+                    <processRefExpression><![CDATA[processCompleteOne]]></processRefExpression>
+                </processTask>
+                
+                <humanTask id="repeatingTask" name="Repeating task" />
+
+                <caseTask id="caseTaskTwo" name="Case complete two" caseRef="caseCompleteTwo">
+                    <extensionElements>
+                        <flowable:in source="caseItem" target="caseItem"/>
+                    </extensionElements>
+                </caseTask>
+            </stage>
+
+            <stage id="stage3" name="Stage three">
+                <planItem id="planItemCompleted" name="Completed" definitionRef="completedTask"/>
+                <humanTask id="completedTask" name="Completed"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

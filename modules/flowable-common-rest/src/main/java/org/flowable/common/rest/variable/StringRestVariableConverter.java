@@ -26,6 +26,11 @@ public class StringRestVariableConverter implements RestVariableConverter {
     }
 
     @Override
+    public boolean isVariableTypeSupported(String variableTypeName) {
+        return "string".equals(variableTypeName) || "longString".equals(variableTypeName);
+    }
+
+    @Override
     public Class<?> getVariableType() {
         return String.class;
     }

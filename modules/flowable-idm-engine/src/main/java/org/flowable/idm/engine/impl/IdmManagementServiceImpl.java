@@ -69,7 +69,7 @@ public class IdmManagementServiceImpl extends CommonEngineServiceImpl<IdmEngineC
     @Override
     public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
-        return commandExecutor.execute(config, new Command<String>() {
+        return commandExecutor.execute(config, new Command<>() {
             @Override
             public String execute(CommandContext commandContext) {
                 return CommandContextUtil.getIdmEngineConfiguration().getSchemaManager().schemaUpdate();

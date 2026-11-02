@@ -14,7 +14,7 @@
     <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="usertask"></sequenceFlow>
     <startEvent id="startEvent"></startEvent>
     <sequenceFlow id="flow2" sourceRef="usertask" targetRef="endEvent"></sequenceFlow>
-    <userTask id="usertask" name="User task" flowable:category="Test Category" flowable:async="true" flowable:exclusive="false" flowable:assignee="kermit" flowable:candidateUsers="kermit,fozzie" flowable:candidateGroups="management,sales" flowable:dueDate="2012-11-01" flowable:businessCalendarName="customCalendarName" flowable:formKey="testKey" flowable:priority="40" flowable:taskIdVariableName="myTaskId">
+    <userTask id="usertask" name="User task" flowable:category="Test Category" flowable:async="true" flowable:exclusive="false" flowable:assignee="kermit" flowable:candidateUsers="kermit,fozzie" flowable:candidateGroups="management,sales" flowable:dueDate="2012-11-01" flowable:businessCalendarName="customCalendarName" flowable:formKey="testKey" flowable:priority="40" flowable:taskIdVariableName="myTaskId" flowable:taskCompleterVariableName="completer">
       <extensionElements>
         <flowable:customResource name="businessAdministrator">
          <resourceAssignmentExpression>

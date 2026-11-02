@@ -1,0 +1,11 @@
+{
+    "name": "Another Channel",
+    "key": "another",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "${application.test.another-jms-queue}",
+    "deserializerType": "json",
+    "channelEventKeyDetection": {
+        "fixedValue": "another"
+    }
+}

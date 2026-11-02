@@ -60,13 +60,12 @@ In addition to using the values listed above for deploymentMode, you may want cu
 ## Unit testing
 
 When integrating with Spring, decisions can be tested very easily using the standard [Flowable testing facilities](dmn/ch03-API.md#unit-testing).
-The following examples show how a decision is tested in typical Spring-based JUnit 4 and 5 tests:
+The following examples show how a decision is tested in typical Spring-based JUnit Jupiter tests:
 
-**JUnit 5 test.**
+**JUnit Jupiter test.**
 
     @ExtendWith(FlowableDmnSpringExtension.class)
-    @ExtendWith(SpringExtension.class)
-    @ContextConfiguration(classes = DmnSpringJunitJupiterTest.TestConfiguration.class)
+    @SpringJUnitConfig(DmnSpringJunitJupiterTest.TestConfiguration.class)
     public class SpringJunit4Test {
 
         @Autowired
@@ -87,38 +86,3 @@ The following examples show how a decision is tested in typical Spring-based JUn
             Assertions.assertThat(executionResult).containsEntry("output1", "test1");
         }
     }
-
-**JUnit 4 test.**
-
-    @RunWith(SpringJUnit4ClassRunner.class)
-    @ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
-    public class SpringJunit4Test {
-
-        @Autowired
-        private DmnEngine dmnEngine;
-
-        @Autowired
-        private DmnRuleService ruleService;
-
-        @Autowired
-        @Rule
-        public FlowableDmnRule flowableSpringRule;
-
-        @Test
-        @DmnDeploymentAnnotation
-        public void simpleDecisionTest() {
-            Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
-                    .decisionKey("extensionUsage")
-                    .variable("inputVariable1", 2)
-                    .variable("inputVariable2", "test2")
-                    .executeWithSingleResult();
-
-            Assertions.assertThat(executionResult).containsEntry("output1", "test1");
-        }
-    }
-
-Note that for this to work, you need to define an *org.flowable.dmn.engine.test.FlowableDmnRule* bean in the Spring configuration (which is injected by auto-wiring in the example above).
-
-    <bean id="flowableDmnRule" class="org.flowable.dmn.engine.test.FlowableDmnRule">
-        <property name="dmnEngine" ref="dmnEngine"/>
-    </bean>

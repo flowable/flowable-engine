@@ -29,6 +29,7 @@ import org.flowable.engine.form.AbstractFormType;
 public class FormTypes {
 
     protected Map<String, AbstractFormType> formTypes = new HashMap<>();
+    protected boolean lenientDateParsing;
 
     public void addFormType(AbstractFormType formType) {
         formTypes.put(formType.getName(), formType);
@@ -38,7 +39,8 @@ public class FormTypes {
         AbstractFormType formType = null;
 
         if ("date".equals(formProperty.getType()) && StringUtils.isNotEmpty(formProperty.getDatePattern())) {
-            formType = new DateFormType(formProperty.getDatePattern());
+            boolean lenient = formProperty.getLenientDateParsing() != null ? formProperty.getLenientDateParsing() : lenientDateParsing;
+            formType = new DateFormType(formProperty.getDatePattern(), lenient);
 
         } else if ("enum".equals(formProperty.getType())) {
             // ACT-1023: Using linked hashmap to preserve the order in which the
@@ -56,5 +58,13 @@ public class FormTypes {
             }
         }
         return formType;
+    }
+
+    public boolean isLenientDateParsing() {
+        return lenientDateParsing;
+    }
+
+    public void setLenientDateParsing(boolean lenientDateParsing) {
+        this.lenientDateParsing = lenientDateParsing;
     }
 }

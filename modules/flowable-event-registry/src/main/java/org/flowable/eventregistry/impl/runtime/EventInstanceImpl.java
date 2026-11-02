@@ -15,6 +15,7 @@ package org.flowable.eventregistry.impl.runtime;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -89,5 +90,16 @@ public class EventInstanceImpl implements EventInstance {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("EventInstance[eventKey=").append(eventKey);
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

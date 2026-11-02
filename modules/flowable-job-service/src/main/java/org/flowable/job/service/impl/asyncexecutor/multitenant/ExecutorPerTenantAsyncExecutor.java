@@ -74,11 +74,10 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
 
         tenantExecutor.setJobServiceConfiguration(jobServiceConfiguration);
 
-        if (tenantExecutor instanceof AbstractAsyncExecutor) {
-            AbstractAsyncExecutor defaultAsyncJobExecutor = (AbstractAsyncExecutor) tenantExecutor;
+        if (tenantExecutor instanceof AbstractAsyncExecutor defaultAsyncJobExecutor) {
             defaultAsyncJobExecutor.setAsyncJobsDueRunnable(new TenantAwareAcquireAsyncJobsDueRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
             defaultAsyncJobExecutor.setTimerJobRunnable(new TenantAwareAcquireTimerJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId, defaultAsyncJobExecutor.getMoveTimerExecutorPoolSize()));
-            defaultAsyncJobExecutor.setExecuteAsyncRunnableFactory(new TenantAwareExecuteAsyncRunnableFactory(tenantInfoHolder, tenantId));
+            defaultAsyncJobExecutor.setExecuteAsyncRunnableFactory(new TenantAwareExecuteAsyncRunnableFactory(tenantInfoHolder, tenantId, defaultAsyncJobExecutor.getJobExecutionObservationProvider()));
             defaultAsyncJobExecutor.setResetExpiredJobsRunnable(new TenantAwareResetExpiredJobsRunnable(defaultAsyncJobExecutor, tenantInfoHolder, tenantId));
         }
 
@@ -306,23 +305,6 @@ public class ExecutorPerTenantAsyncExecutor implements TenantAwareAsyncExecutor 
         }
         if (nullTenantIdAsyncExecutor != null) {
             nullTenantIdAsyncExecutor.setMaxTimerJobsPerAcquisition(maxJobs);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public int getRetryWaitTimeInMillis() {
-        return determineAsyncExecutor().getRetryWaitTimeInMillis();
-    }
-
-    @Override
-    @Deprecated
-    public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
-        for (AsyncExecutor asyncExecutor : tenantExecutors.values()) {
-            asyncExecutor.setRetryWaitTimeInMillis(retryWaitTimeInMillis);
-        }
-        if (nullTenantIdAsyncExecutor != null) {
-            nullTenantIdAsyncExecutor.setRetryWaitTimeInMillis(retryWaitTimeInMillis);
         }
     }
 

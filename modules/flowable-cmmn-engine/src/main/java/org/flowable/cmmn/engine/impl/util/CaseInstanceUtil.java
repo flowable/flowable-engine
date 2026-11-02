@@ -74,7 +74,7 @@ public class CaseInstanceUtil {
 
         for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
             PlanItem childPlanItem = childPlanItemInstance.getPlanItem();
-            if (planItemIds.contains(childPlanItem.getId())) {
+            if (childPlanItem != null && planItemIds.contains(childPlanItem.getId())) {
                 if (!result.containsKey(childPlanItem.getId())) {
                     result.put(childPlanItem.getId(), new ArrayList<>());
                 }

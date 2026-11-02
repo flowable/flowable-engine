@@ -20,7 +20,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -30,20 +30,20 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class ExclusiveGatewayValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<ExclusiveGateway> gateways = process.findFlowElementsOfType(ExclusiveGateway.class);
         for (ExclusiveGateway gateway : gateways) {
-            validateExclusiveGateway(process, gateway, errors);
+            validateExclusiveGateway(process, gateway, validationContext);
         }
     }
 
-    public void validateExclusiveGateway(Process process, ExclusiveGateway exclusiveGateway, List<ValidationError> errors) {
+    public void validateExclusiveGateway(Process process, ExclusiveGateway exclusiveGateway, ProcessValidationContext validationContext) {
         if (exclusiveGateway.getOutgoingFlows().isEmpty()) {
-            addError(errors, Problems.EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW, process, exclusiveGateway, "Exclusive gateway has no outgoing sequence flow");
+            validationContext.addError(Problems.EXCLUSIVE_GATEWAY_NO_OUTGOING_SEQ_FLOW, process, exclusiveGateway, "Exclusive gateway has no outgoing sequence flow");
         } else if (exclusiveGateway.getOutgoingFlows().size() == 1) {
             SequenceFlow sequenceFlow = exclusiveGateway.getOutgoingFlows().get(0);
             if (StringUtils.isNotEmpty(sequenceFlow.getConditionExpression())) {
-                addError(errors, Problems.EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW, process, exclusiveGateway,
+                validationContext.addError(Problems.EXCLUSIVE_GATEWAY_CONDITION_NOT_ALLOWED_ON_SINGLE_SEQ_FLOW, process, exclusiveGateway,
                         "Exclusive gateway has only one outgoing sequence flow. This is not allowed to have a condition.");
             }
         } else {
@@ -59,12 +59,12 @@ public class ExclusiveGatewayValidator extends ProcessLevelValidator {
                     flowsWithoutCondition.add(flow);
                 }
                 if (hasCondition && isDefaultFlow) {
-                    addError(errors, Problems.EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW, process, exclusiveGateway, "Default sequenceflow has a condition, which is not allowed");
+                    validationContext.addError(Problems.EXCLUSIVE_GATEWAY_CONDITION_ON_DEFAULT_SEQ_FLOW, process, exclusiveGateway, "Default sequenceflow has a condition, which is not allowed");
                 }
             }
 
             if (!flowsWithoutCondition.isEmpty()) {
-                addWarning(errors, Problems.EXCLUSIVE_GATEWAY_SEQ_FLOW_WITHOUT_CONDITIONS, process, exclusiveGateway,
+                validationContext.addWarning(Problems.EXCLUSIVE_GATEWAY_SEQ_FLOW_WITHOUT_CONDITIONS, process, exclusiveGateway,
                         "Exclusive gateway has at least one outgoing sequence flow without a condition (which isn't the default one)");
             }
 

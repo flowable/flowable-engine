@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
@@ -32,6 +33,10 @@ public interface CmmnDeploymentEntity extends CmmnDeployment, Entity {
     void addDeployedArtifact(Object deployedArtifact);
 
     <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    
+    void addCaseDefinitionCacheEntry(String caseDefinitionId, CaseDefinitionCacheEntry caseDefinitionCacheEntry);
+
+    CaseDefinitionCacheEntry getCaseDefinitionCacheEntry(String caseDefinitionId);
 
     void setName(String name);
 

@@ -10,16 +10,15 @@
     	"bpmn/ch06-Deployment",
     	"bpmn/ch07a-BPMN-Introduction",
     	"bpmn/ch07b-BPMN-Constructs",
-    	"bpmn/ch08-Forms",
-    	"bpmn/ch09-ProcessInstanceMigration",
-    	"bpmn/ch10-JPA",
-    	"bpmn/ch11-History",
-    	"bpmn/ch12-IDM",
-    	"bpmn/ch15-REST",
-    	"bpmn/ch16-Cdi",
-    	"bpmn/ch17-Ldap",
-    	"bpmn/ch18-Advanced",
-    	"bpmn/ch19-tooling"
+    	"bpmn/ch08-ProcessInstanceMigration",
+    	"bpmn/ch09-JPA",
+    	"bpmn/ch10-History",
+    	"bpmn/ch11-IDM",
+    	"bpmn/ch14-REST",
+    	"bpmn/ch15-Cdi",
+    	"bpmn/ch16-Ldap",
+    	"bpmn/ch17-Advanced",
+    	"bpmn/ch18-tooling"
     ],
     "CMMN User Guide": [
     	"cmmn/ch02-Configuration",
@@ -55,10 +54,9 @@
 		"form/ch07-REST"
 	],
     "Applications Guide": [
-    	"bpmn/ch14-Applications",
-    	"bpmn/ch13-Designer"
+    	"bpmn/ch13-Applications",
+    	"bpmn/ch12-Design"
 	],
-    "Migration from v5": ["migration"],
     "Disclaimer": ["disclaimer"]
   }
 }

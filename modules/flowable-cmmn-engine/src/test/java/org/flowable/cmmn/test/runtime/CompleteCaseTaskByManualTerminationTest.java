@@ -22,11 +22,11 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests that a case task is being completed if its referenced case gets manually termianted through the API, rather than an exit sentry.

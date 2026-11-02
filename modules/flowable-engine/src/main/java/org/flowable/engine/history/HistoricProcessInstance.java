@@ -51,6 +51,11 @@ public interface HistoricProcessInstance {
     Integer getProcessDefinitionVersion();
 
     /**
+     * The category of the process definition of the process instance.
+     */
+    String getProcessDefinitionCategory();
+
+    /**
      * The deployment id of the process definition of the process instance.
      */
     String getDeploymentId();
@@ -78,6 +83,19 @@ public interface HistoricProcessInstance {
      * @see IdentityService#setAuthenticatedUserId(String)
      */
     String getStartUserId();
+
+    /**
+     * The state of this process instance.
+     *
+     * @see IdentityService#setAuthenticatedUserId(String)
+     */
+    String getState();
+
+    /**
+     * The authenticated user that ended this process instance.
+     *
+     */
+    String getEndUserId();
 
     /** The start activity. */
     String getStartActivityId();
@@ -132,6 +150,12 @@ public interface HistoricProcessInstance {
      * @return the stage instance id this process instance belongs to or null, if it is not part of a case at all or is not a child element of a stage
      */
     String getPropagatedStageInstanceId();
+
+    Date getDueDate();
+
+    Date getClaimTime();
+
+    String getClaimedBy();
 
     /** Returns the process variables if requested in the process instance query */
     Map<String, Object> getProcessVariables();

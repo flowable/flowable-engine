@@ -26,7 +26,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
@@ -60,11 +59,10 @@ public class GetStartFormModelCmd implements Command<FormInfo>, Serializable {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
         Process process = bpmnModel.getProcessById(processDefinition.getKey());
         FlowElement startElement = process.getInitialFlowElement();
-        if (startElement instanceof StartEvent) {
-            StartEvent startEvent = (StartEvent) startElement;
+        if (startElement instanceof StartEvent startEvent) {
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-                Deployment deployment = CommandContextUtil.getDeploymentEntityManager(commandContext).findById(processDefinition.getDeploymentId());
-                formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), deployment.getParentDeploymentId(), 
+                String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, processEngineConfiguration);
+                formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(startEvent.getFormKey(), parentDeploymentId,
                                 null, processInstanceId, null, processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
             }
         }

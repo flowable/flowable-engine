@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseContext;
 import org.flowable.cmmn.engine.impl.parser.CmmnParseResult;
@@ -30,22 +29,28 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
-import org.flowable.cmmn.engine.impl.util.CmmnCorrelationUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.validation.CaseValidator;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.assignment.CandidateUtil;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
+import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
+import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -83,7 +88,7 @@ public class CmmnDeployer implements EngineDeployer {
         for (EngineResource resource : deployment.getResources().values()) {
             if (isCmmnResource(resource.getName())) {
                 LOGGER.debug("Processing CMMN resource {}", resource.getName());
-                parseResult.merge(cmmnParser.parse(new CmmnParseContextImpl(resource)));
+                parseResult.merge(cmmnParser.parse(new CmmnParseContextImpl(resource, deployment.isNew())));
             }
         }
 
@@ -182,38 +187,67 @@ public class CmmnDeployer implements EngineDeployer {
 
     protected void persistCaseDefinitions(CmmnParseResult parseResult) {
         CaseDefinitionEntityManager caseDefinitionManager = cmmnEngineConfiguration.getCaseDefinitionEntityManager();
+        FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
             caseDefinitionManager.insert(caseDefinition, false);
             addAuthorizationsForNewCaseDefinition(parseResult.getCmmnCaseForCaseDefinition(caseDefinition), caseDefinition);
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(caseDefinition, FlowableEngineEventType.DEFINITION_DEPLOYED),
+                        EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            }
         }
     }
 
     protected void updateEventSubscriptions(CmmnParseResult parseResult, Map<CaseDefinitionEntity, CaseDefinitionEntity> mapOfNewCaseDefinitionToPreviousVersion) {
         EventSubscriptionService eventSubscriptionService = cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService();
+        CommandContext commandContext = Context.getCommandContext();
+
         for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
-
+            Case newCaseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
             CaseDefinitionEntity previousCaseDefinition = mapOfNewCaseDefinitionToPreviousVersion.get(caseDefinition);
+
             if (previousCaseDefinition != null) {
-                eventSubscriptionService.deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(previousCaseDefinition.getId(), ScopeTypes.CMMN);
+                Case previousCaseModel = getCaseModel(parseResult, previousCaseDefinition).getPrimaryCase();
+                Set<String> obsoleteEventTypes = new LinkedHashSet<>();
+
+                for (Object handler : previousCaseModel.getStartLifecycleHandlers()) {
+                    if (handler instanceof CaseDefinitionStartLifecycleHandler lifecycleHandler) {
+                        lifecycleHandler.undeploy(new CaseDefinitionStartUndeployContext(
+                                previousCaseDefinition, caseDefinition, previousCaseModel,
+                                cmmnEngineConfiguration, commandContext, obsoleteEventTypes));
+                    }
+                }
+
+                if (!obsoleteEventTypes.isEmpty()) {
+                    deleteObsoleteEventSubscriptions(previousCaseDefinition, obsoleteEventTypes, eventSubscriptionService);
+                }
             }
 
-            Case caseModel = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
-            String startEventType = caseModel.getStartEventType();
-            if (startEventType != null) {
-                eventSubscriptionService.createEventSubscriptionBuilder()
-                    .eventType(startEventType)
-                    .configuration(getEventCorrelationKey(caseModel))
-                    .scopeDefinitionId(caseDefinition.getId())
-                    .scopeType(ScopeTypes.CMMN)
-                    .tenantId(caseDefinition.getTenantId())
-                    .create();
+            for (Object handler : newCaseModel.getStartLifecycleHandlers()) {
+                if (handler instanceof CaseDefinitionStartLifecycleHandler lifecycleHandler) {
+                    lifecycleHandler.deploy(new CaseDefinitionStartDeployContext(
+                            caseDefinition, newCaseModel, cmmnEngineConfiguration, commandContext));
+                }
             }
-
         }
     }
 
-    protected String getEventCorrelationKey(Case caseModel) {
-        return CmmnCorrelationUtil.getCorrelationKey(CmmnXmlConstants.ELEMENT_EVENT_CORRELATION_PARAMETER, CommandContextUtil.getCommandContext(), caseModel);
+    protected void deleteObsoleteEventSubscriptions(CaseDefinitionEntity previousCaseDefinition, Collection<String> eventTypes,
+            EventSubscriptionService eventSubscriptionService) {
+        List<EventSubscriptionEntity> subscriptionsToDelete = eventSubscriptionService.findEventSubscriptionsByTypesAndScopeDefinitionId(
+                eventTypes, previousCaseDefinition.getId(), ScopeTypes.CMMN, previousCaseDefinition.getTenantId());
+        for (EventSubscriptionEntity subscription : subscriptionsToDelete) {
+            eventSubscriptionService.deleteEventSubscription(subscription);
+        }
+    }
+
+    protected CmmnModel getCaseModel(CmmnParseResult parseResult, CaseDefinitionEntity caseDefinition) {
+        CmmnModel caseModel = parseResult.getCmmnModelForCaseDefinition(caseDefinition);
+        if (caseModel == null) {
+            // if the case model is not contained in the parse result cache, load it manually
+            caseModel = CommandContextUtil.getCmmnEngineConfiguration().getCmmnRepositoryService().getCmmnModel(caseDefinition.getId());
+        }
+        return caseModel;
     }
 
     protected void makeCaseDefinitionsConsistentWithPersistedVersions(CmmnParseResult parseResult) {
@@ -241,12 +275,14 @@ public class CmmnDeployer implements EngineDeployer {
     protected void copyDeploymentValuesToCaseDefinitions(EngineDeployment deployment, List<CaseDefinitionEntity> caseDefinitionEntities) {
         String tenantId = deployment.getTenantId();
         String deploymentId = deployment.getId();
+        String parentDeploymentId = ((CmmnDeploymentEntity) deployment).getParentDeploymentId();
 
         for (CaseDefinitionEntity caseDefinitionEntity : caseDefinitionEntities) {
             if (tenantId != null) {
                 caseDefinitionEntity.setTenantId(tenantId);
             }
             caseDefinitionEntity.setDeploymentId(deploymentId);
+            caseDefinitionEntity.setParentDeploymentId(parentDeploymentId);
         }
     }
 
@@ -298,6 +334,7 @@ public class CmmnDeployer implements EngineDeployer {
             caseDefinitionCache.add(caseDefinitionEntity.getId(), cacheEntry);
 
             deployment.addDeployedArtifact(caseDefinitionEntity);
+            deployment.addCaseDefinitionCacheEntry(caseDefinitionEntity.getId(), cacheEntry);
         }
     }
     
@@ -371,9 +408,11 @@ public class CmmnDeployer implements EngineDeployer {
     protected class CmmnParseContextImpl implements CmmnParseContext {
 
         protected final EngineResource resource;
+        protected final boolean newDeployment;
 
-        public CmmnParseContextImpl(EngineResource resource) {
+        public CmmnParseContextImpl(EngineResource resource, boolean newDeployment) {
             this.resource = resource;
+            this.newDeployment = newDeployment;
         }
 
         @Override
@@ -393,17 +432,24 @@ public class CmmnDeployer implements EngineDeployer {
 
         @Override
         public boolean validateXml() {
-            return !cmmnEngineConfiguration.isDisableCmmnXmlValidation();
+            // On redeploy, we assume it is validated at the first deploy
+            return newDeployment && !cmmnEngineConfiguration.isDisableCmmnXmlValidation();
         }
 
         @Override
         public boolean validateCmmnModel() {
-            return validateXml();
+            // On redeploy, we assume it is validated at the first deploy
+            return newDeployment && validateXml();
         }
 
         @Override
         public CaseValidator caseValidator() {
             return cmmnEngineConfiguration.getCaseValidator();
         }
+    }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
     }
 }

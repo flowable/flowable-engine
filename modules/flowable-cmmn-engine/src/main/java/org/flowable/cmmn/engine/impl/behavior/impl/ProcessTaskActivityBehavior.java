@@ -26,12 +26,16 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.EntityLinkUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -55,7 +59,8 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     protected ProcessTask processTask;
 
     public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, ProcessTask processTask) {
-        super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters());
+        super(processTask.isBlocking(), processTask.getBlockingExpression(), processTask.getInParameters(), processTask.getOutParameters(),
+                processTask.isInheritVariables());
         this.process = process;
         this.processRefExpression = processRefExpression;
         this.processRef = processTask.getProcessRef();
@@ -69,7 +74,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
         if (processInstanceService == null) {
-            throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found");
+            throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found for " + planItemInstanceEntity);
         }
 
         String externalRef = null;
@@ -81,11 +86,13 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
             externalRef = processRef;
         }
         if (StringUtils.isEmpty(externalRef)) {
-            throw new FlowableException("Could not start process instance: no externalRef defined");
+            throw new FlowableException("Could not start process instance: no externalRef defined for " + planItemInstanceEntity);
         }
 
         Map<String, Object> inParametersMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, cmmnEngineConfiguration.getExpressionManager());
+        Map<String, Object> transientVariablesMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, inParametersMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
+        afterInParameters(cmmnEngineConfiguration, planItemInstanceEntity, processTask, inParametersMap, transientVariablesMap);
 
         FormInfo variableFormInfo = null;
         Map<String, Object> variableFormVariables = null;
@@ -118,18 +125,36 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
 
         String parentDeploymentId = getParentDeploymentIfSameDeployment(cmmnEngineConfiguration, planItemInstanceEntity);
 
+        // Resolve the process definition already so we can check its history level for entity links
+        String processDefinitionId = processInstanceService.resolveProcessDefinitionId(externalRef,
+                planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId);
+
         if (blocking) {
 
             if (CommandContextUtil.getCmmnEngineConfiguration(commandContext).isEnableEntityLinks()) {
+                boolean createHistoricEntityLinks = processInstanceService.isHistoryEnabledForProcessDefinitionId(processDefinitionId);
+
                 EntityLinkUtil.createEntityLinks(planItemInstanceEntity.getCaseInstanceId(), planItemInstanceEntity.getId(),
-                        planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration);
+                        planItemInstanceEntity.getPlanItemDefinitionId(), processInstanceId, ScopeTypes.BPMN, cmmnEngineConfiguration, createHistoricEntityLinks);
             }
 
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            try {
+                processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getId(), planItemInstanceEntity.getStageInstanceId(),
+                        planItemInstanceEntity.getTenantId(), inParametersMap, transientVariablesMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            } catch (BusinessError businessError) {
+                // An uncaught BusinessError from the child BPMN process propagates as a fault on this plan item.
+                // Clean up the orphaned child process instance (consistent with BPMN ErrorPropagation.executeCatch
+                // which deletes child processes when an error crosses a call activity boundary).
+                planItemInstanceEntity.setReferenceId(null);
+                planItemInstanceEntity.setReferenceType(null);
+                processInstanceService.deleteProcessInstance(processInstanceId);
+                FaultPropagation.propagateFault(businessError, commandContext, planItemInstanceEntity);
+                return;
+            }
+
         } else {
-            processInstanceService.startProcessInstanceByKey(externalRef, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
-                    planItemInstanceEntity.getTenantId(), fallbackToDefaultTenant, parentDeploymentId, inParametersMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
+            processInstanceService.startProcessInstance(processDefinitionId, processInstanceId, planItemInstanceEntity.getStageInstanceId(),
+                    planItemInstanceEntity.getTenantId(), inParametersMap, transientVariablesMap, businessKey, variableFormVariables, variableFormInfo, variableFormOutcome);
         }
 
         if (!blocking) {
@@ -147,7 +172,7 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
         }
         if (!ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
             throw new FlowableException("Cannot trigger process task plan item instance : reference type '"
-                    + planItemInstance.getReferenceType() + "' not supported");
+                    + planItemInstance.getReferenceType() + "' not supported for " + planItemInstance);
         }
 
         // Need to be set before planning the complete operation
@@ -179,10 +204,21 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
     @Override
     public void deleteChildEntity(CommandContext commandContext, DelegatePlanItemInstance delegatePlanItemInstance, boolean cascade) {
         if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(delegatePlanItemInstance.getReferenceType())) {
-            delegatePlanItemInstance.setState(PlanItemInstanceState.TERMINATED); // This is not the regular termination, but the state still needs to be correct
+            // This is not the regular termination through the agenda, but the historic plan item state still needs to be correct.
+            // The state needs to be set before deleting the process instance, because the process instance deletion triggers
+            // a ChildProcessInstanceStateChangeCallback which re-enters the CMMN engine to terminate the plan item.
+            // With the state already set to TERMINATED, this callback becomes a no-op and avoids re-triggering repetition rules.
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
+            if (!PlanItemInstanceState.TERMINATED.equals(planItemInstanceEntity.getState())) {
+                planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                planItemInstanceEntity.setEndedTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+                planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+            }
+
             deleteProcessInstance(commandContext, delegatePlanItemInstance);
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_PROCESS + " for " + delegatePlanItemInstance);
         }
     }
 
@@ -190,9 +226,21 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                                        CaseInstanceEntity caseInstance,
                                        ProcessInstanceService processInstanceService) {
 
-        if (outParameters == null) {
-            return;
+        if (outParameters != null) {
+            processOutParameters(planItemInstance, caseInstance, processInstanceService);
         }
+
+        CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = CommandContextUtil.getCmmnEngineConfiguration()
+                .getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(planItemInstance, processTask,
+                    processInstanceService.getVariableContainer(planItemInstance.getReferenceId())));
+        }
+    }
+
+    protected void processOutParameters(DelegatePlanItemInstance planItemInstance,
+                                        CaseInstanceEntity caseInstance,
+                                        ProcessInstanceService processInstanceService) {
 
         for (IOParameter outParameter : outParameters) {
 
@@ -219,7 +267,21 @@ public class ProcessTaskActivityBehavior extends ChildTaskActivityBehavior imple
                 variableValue = processInstanceService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
 
             }
-            caseInstance.setVariable(variableName, variableValue);
+
+            String conversionType = null;
+            if (StringUtils.isNotEmpty(outParameter.getTargetType())) {
+                conversionType = outParameter.getTargetType();
+            } else if (StringUtils.isNotEmpty(outParameter.getSourceType())) {
+                conversionType = outParameter.getSourceType();
+            }
+
+            if (conversionType != null && variableValue != null) {
+                var cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
+                variableValue = cmmnEngineConfiguration.getVariableValueConversionHandler()
+                        .convertValue(variableValue, conversionType, cmmnEngineConfiguration.getVariableJsonMapper());
+            }
+
+            planItemInstance.setVariable(variableName, variableValue);
         }
     }
 

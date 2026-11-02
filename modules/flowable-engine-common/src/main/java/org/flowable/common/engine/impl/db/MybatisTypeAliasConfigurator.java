@@ -13,6 +13,7 @@
 package org.flowable.common.engine.impl.db;
 
 import org.apache.ibatis.type.TypeAliasRegistry;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 
 /**
  * This class configures typeAliases in {@link TypeAliasRegistry}
@@ -21,5 +22,5 @@ import org.apache.ibatis.type.TypeAliasRegistry;
  */
 public interface MybatisTypeAliasConfigurator {
 
-    void configure(TypeAliasRegistry typeAliasRegistry);
+    void configure(AbstractEngineConfiguration engineConfiguration, TypeAliasRegistry typeAliasRegistry);
 }

@@ -18,13 +18,14 @@ import java.util.List;
 /**
  * @author Tijs Rademakers
  */
-public class CaseServiceTask extends ServiceTask {
+public class CaseServiceTask extends ServiceTask implements HasOutParameters, HasInParameters {
 
     protected String caseDefinitionKey;
     protected String caseInstanceName;
     protected boolean sameDeployment;
     protected String businessKey;
     protected boolean inheritBusinessKey;
+    protected boolean inheritVariables;
     protected boolean fallbackToDefaultTenant;
     protected String caseInstanceIdVariableName;
     
@@ -71,6 +72,14 @@ public class CaseServiceTask extends ServiceTask {
         this.inheritBusinessKey = inheritBusinessKey;
     }
 
+    public boolean isInheritVariables() {
+        return inheritVariables;
+    }
+
+    public void setInheritVariables(boolean inheritVariables) {
+        this.inheritVariables = inheritVariables;
+    }
+
     public boolean isFallbackToDefaultTenant() {
         return fallbackToDefaultTenant;
     }
@@ -79,18 +88,32 @@ public class CaseServiceTask extends ServiceTask {
         this.fallbackToDefaultTenant = fallbackToDefaultTenant;
     }
 
+    @Override
     public List<IOParameter> getInParameters() {
         return inParameters;
     }
 
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        inParameters.add(inParameter);
+    }
+
+    @Override
     public void setInParameters(List<IOParameter> inParameters) {
         this.inParameters = inParameters;
     }
 
+    @Override
     public List<IOParameter> getOutParameters() {
         return outParameters;
     }
 
+    @Override
+    public void addOutParameter(IOParameter outParameter) {
+        this.outParameters.add(outParameter);
+    }
+
+    @Override
     public void setOutParameters(List<IOParameter> outParameters) {
         this.outParameters = outParameters;
     }
@@ -117,6 +140,7 @@ public class CaseServiceTask extends ServiceTask {
         setCaseInstanceName(otherElement.getCaseInstanceName());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setInheritVariables(otherElement.isInheritVariables());
         setSameDeployment(otherElement.isSameDeployment());
         setFallbackToDefaultTenant(otherElement.isFallbackToDefaultTenant());
         setCaseInstanceIdVariableName(otherElement.getCaseInstanceIdVariableName());

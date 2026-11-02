@@ -28,7 +28,6 @@ import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.api.FormDefinitionQuery;
@@ -103,16 +102,11 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
 
     protected void addFormDefinitionToCollection(List<FormDefinition> formDefinitions, String formKey, ProcessDefinition processDefinition) {
         FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery().formDefinitionKey(formKey);
-        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
-        if (deployment.getParentDeploymentId() != null) {
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
-            
-            if (formDeployments != null && formDeployments.size() > 0) {
-                formDefinitionQuery.deploymentId(formDeployments.get(0).getId());
-            } else {
-                formDefinitionQuery.latestVersion();
-            }
-            
+        String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, CommandContextUtil.getProcessEngineConfiguration());
+        List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().parentDeploymentId(parentDeploymentId).list();
+
+        if (!formDeployments.isEmpty()) {
+            formDefinitionQuery.deploymentId(formDeployments.get(0).getId());
         } else {
             formDefinitionQuery.latestVersion();
         }

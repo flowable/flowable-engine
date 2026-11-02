@@ -1,0 +1,29 @@
+<definitions
+        xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="Examples">
+
+    <process id="executionListenersProcess">
+        <startEvent id="theStart"/>
+
+        <sequenceFlow sourceRef="theStart" targetRef="theTask"/>
+
+        <serviceTask id="theTask" name="The task" flowable:expression="${true}">
+            <extensionElements>
+                <flowable:executionListener class="org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener" event="start">
+                    <flowable:field name="parameter" expression="Start ${execution.multiInstanceRoot ? 'Multi Instance Root' : vars:get(loopCounter)}"/>
+                </flowable:executionListener>
+                <flowable:executionListener class="org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener" event="end">
+                    <flowable:field name="parameter" expression="End ${execution.multiInstanceRoot ? 'Multi Instance Root' : vars:get(loopCounter)}"/>
+                </flowable:executionListener>
+            </extensionElements>
+            <multiInstanceLoopCharacteristics>
+                <loopCardinality>${numberOfIterations}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+        </serviceTask>
+        <sequenceFlow sourceRef="theTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+</definitions>

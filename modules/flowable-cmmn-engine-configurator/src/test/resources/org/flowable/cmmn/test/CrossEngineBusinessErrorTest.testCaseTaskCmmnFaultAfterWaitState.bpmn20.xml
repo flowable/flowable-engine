@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+    <process id="testCaseTaskFaultAfterWait" name="Test CaseTask Fault After Wait" isExecutable="true">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="caseTask" />
+        <serviceTask id="caseTask" name="Case Task" flowable:type="case" flowable:caseDefinitionKey="throwCmmnFaultAfterWaitState" />
+        <boundaryEvent id="boundaryError" attachedToRef="caseTask">
+            <errorEventDefinition />
+        </boundaryEvent>
+        <sequenceFlow id="flow2" sourceRef="caseTask" targetRef="end" />
+        <sequenceFlow id="flow3" sourceRef="boundaryError" targetRef="errorHandler" />
+        <userTask id="errorHandler" name="Error Handler" />
+        <sequenceFlow id="flow4" sourceRef="errorHandler" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+</definitions>

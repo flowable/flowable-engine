@@ -46,6 +46,8 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setFormKey(String formKey);
 
     void setPriority(int priority);
+    
+    void setInProgressStartDueDate(Date inProgressStartDueDate);
 
     void setDueDate(Date dueDate);
 
@@ -54,8 +56,6 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setOwner(String owner);
 
     void setParentTaskId(String parentTaskId);
-
-    void setClaimTime(Date claimTime);
 
     void setTenantId(String tenantId);
     
@@ -82,6 +82,8 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     void setScopeType(String scopeType);
 
     void setScopeDefinitionId(String scopeDefinitionId);
+    
+    void setState(String state);
 
     void setCreateTime(Date createTime);
 
@@ -92,8 +94,22 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     default void setStartTime(Date startTime) {
         setCreateTime(startTime);
     }
+    
+    void setInProgressStartTime(Date inProgressStartTime);
+    
+    void setInProgressStartedBy(String inProgressStartedBy);
+    
+    void setClaimTime(Date claimTime);
+    
+    void setClaimedBy(String claimedBy);
+    
+    void setSuspendedTime(Date suspendedTime);
+    
+    void setSuspendedBy(String suspendedBy);
 
     void setEndTime(Date endTime);
+    
+    void setCompletedBy(String completedBy);
 
     void setDurationInMillis(Long durationInMillis);
 

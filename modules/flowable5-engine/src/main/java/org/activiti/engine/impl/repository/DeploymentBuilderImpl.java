@@ -14,7 +14,6 @@ package org.activiti.engine.impl.repository;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.zip.ZipEntry;
@@ -39,7 +38,6 @@ import org.flowable.bpmn.model.BpmnModel;
 public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
 
     private static final long serialVersionUID = 1L;
-    protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected transient RepositoryServiceImpl repositoryService;
     protected DeploymentEntity deployment = new DeploymentEntity();
@@ -81,11 +79,7 @@ public class DeploymentBuilderImpl implements DeploymentBuilder, Serializable {
         }
         ResourceEntity resource = new ResourceEntity();
         resource.setName(resourceName);
-        try {
-            resource.setBytes(text.getBytes(DEFAULT_ENCODING));
-        } catch (UnsupportedEncodingException e) {
-            throw new ActivitiException("Unable to get process bytes.", e);
-        }
+        resource.setBytes(text.getBytes(StandardCharsets.UTF_8));
         deployment.addResource(resource);
         return this;
     }

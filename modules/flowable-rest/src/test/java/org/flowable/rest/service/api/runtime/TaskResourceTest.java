@@ -16,9 +16,18 @@ package org.flowable.rest.service.api.runtime;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -27,26 +36,33 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
-import org.flowable.form.api.FormInstance;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -55,7 +71,31 @@ import net.javacrumbs.jsonunit.core.Option;
  *
  * @author Frederik Heremans
  */
+@MockitoSettings
 public class TaskResourceTest extends BaseSpringRestTestCase {
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
+
+    @BeforeEach
+    public void initializeMocks() {
+        Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @AfterEach
+    public void resetMocks() {
+        processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
 
     /**
      * Test getting a single task, spawned by a process. GET runtime/tasks/{taskId}
@@ -63,12 +103,12 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment
     public void testGetProcessTask() throws Exception {
-        Calendar now = Calendar.getInstance();
-        processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+        Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-        taskService.setDueDate(task.getId(), now.getTime());
+        taskService.setDueDate(task.getId(), Date.from(now));
         taskService.setOwner(task.getId(), "owner");
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -96,8 +136,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                         + "processInstanceUrl: '" + buildUrl(RestUrls.URL_PROCESS_INSTANCE, task.getProcessInstanceId()) + "',"
                         + "processDefinitionUrl: '" + buildUrl(RestUrls.URL_PROCESS_DEFINITION, task.getProcessDefinitionId()) + "',"
                         + "url: '" + url + "',"
-                        + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                        + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                        + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                        + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                         + "}");
 
         // Set tenant on deployment
@@ -107,7 +147,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
-        assertThat(responseNode.get("tenantId").asText()).isEqualTo("myTenant");
+        assertThat(responseNode.get("tenantId").asString()).isEqualTo("myTenant");
     }
 
     /**
@@ -117,8 +157,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     public void testGetProcessAdhoc() throws Exception {
         try {
 
-            Calendar now = Calendar.getInstance();
-            processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
 
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
@@ -130,7 +170,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -156,8 +196,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
                             + "processDefinitionId: null,"
                             + "url: '" + url + "',"
                             + "parentTaskUrl: '" + buildUrl(RestUrls.URL_TASK, parentTask.getId()) + "',"
-                            + "dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime()))
+                            + "dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + "createTime: '" + getISODateString(task.getCreateTime()) + "'"
                             + "}");
 
         } finally {
@@ -176,7 +216,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     public void testUpdateTaskNoOverrides() throws Exception {
         try {
-            Calendar now = Calendar.getInstance();
+            Instant now = Instant.now().truncatedTo(ChronoUnit.SECONDS);
             Task parentTask = taskService.newTask();
             taskService.saveTask(parentTask);
 
@@ -187,7 +227,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             task.setAssignee("kermit");
             task.setDelegationState(DelegationState.RESOLVED);
             task.setDescription("Description");
-            task.setDueDate(now.getTime());
+            task.setDueDate(Date.from(now));
             task.setOwner("owner");
             task.setPriority(20);
             taskService.saveTask(task);
@@ -206,7 +246,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(now.getTime());
+            assertThat(task.getDueDate()).isEqualTo(Date.from(now));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
@@ -232,8 +272,8 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
 
             ObjectNode requestNode = objectMapper.createObjectNode();
 
-            Calendar dueDate = Calendar.getInstance();
-            String dueDateString = getISODateString(dueDate.getTime());
+            Instant dueDate = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+            String dueDateString = getISODateString(Date.from(dueDate));
 
             requestNode.put("name", "New task name");
             requestNode.put("description", "New task description");
@@ -256,7 +296,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
             assertThat(task.getOwner()).isEqualTo("owner");
             assertThat(task.getPriority()).isEqualTo(20);
             assertThat(task.getDelegationState()).isEqualTo(DelegationState.RESOLVED);
-            assertThat(task.getDueDate()).isEqualTo(dateFormat.parse(dueDateString));
+            assertThat(task.getDueDate()).isEqualTo(getDateFromISOString(dueDateString));
             assertThat(task.getParentTaskId()).isEqualTo(parentTask.getId());
 
         } finally {
@@ -536,86 +576,87 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     @Test
     @Deployment
     public void testCompleteTaskWithForm() throws Exception {
-        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
-        try {
-            formRepositoryService.createDeployment().addClasspathResource("org/flowable/rest/service/api/runtime/simple.form").deploy();
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        String taskId = task.getId();
 
-            FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertThat(formDefinition).isNotNull();
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId("formDefId");
+        formInfo.setKey("formDefKey");
+        formInfo.setName("Form Definition Name");
 
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            String taskId = task.getId();
+        when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+        when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", processInstance.getDeploymentId(), taskId,
+                Collections.emptyMap(), task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant()))
+                .thenReturn(formInfo);
 
-            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_FORM, taskId);
-            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-            closeResponse(response);
-            assertThatJson(responseNode)
-                    .when(Option.IGNORING_EXTRA_FIELDS)
-                    .isEqualTo("{"
-                            + "id : '" + formDefinition.getId() + "',"
-                            + "key: '" + formDefinition.getKey() + "',"
-                            + "name: '" + formDefinition.getName() + "'"
-                            + "}");
-            assertThat(responseNode.get("fields")).hasSize(2);
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_FORM, taskId);
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "id: 'formDefId',"
+                        + "name: 'Form Definition Name',"
+                        + "key: 'formDefKey',"
+                        + "type: 'taskForm',"
+                        + "taskId: '" + taskId + "'"
+                        + "}");
 
-            ObjectNode requestNode = objectMapper.createObjectNode();
-            ArrayNode variablesNode = objectMapper.createArrayNode();
-            requestNode.put("action", "complete");
-            requestNode.put("formDefinitionId", formDefinition.getId());
-            requestNode.set("variables", variablesNode);
+        ObjectNode requestNode = objectMapper.createObjectNode();
+        ArrayNode variablesNode = objectMapper.createArrayNode();
+        requestNode.put("action", "complete");
+        requestNode.put("formDefinitionId", "formDefId");
+        requestNode.set("variables", variablesNode);
 
-            ObjectNode var1 = objectMapper.createObjectNode();
-            variablesNode.add(var1);
-            var1.put("name", "user");
-            var1.put("value", "First value");
-            ObjectNode var2 = objectMapper.createObjectNode();
-            variablesNode.add(var2);
-            var2.put("name", "number");
-            var2.put("value", 789);
+        ObjectNode var1 = objectMapper.createObjectNode();
+        variablesNode.add(var1);
+        var1.put("name", "user");
+        var1.put("value", "First value");
+        ObjectNode var2 = objectMapper.createObjectNode();
+        variablesNode.add(var2);
+        var2.put("name", "number");
+        var2.put("value", 789);
 
-            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
-            httpPost.setEntity(new StringEntity(requestNode.toString()));
-            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+        when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+        when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+        when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+        when(formSubmissionBuilder.extractVariables()).thenReturn(Map.of("user", "First value return", "number", 789L));
 
-            task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            assertThat(task).isNull();
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
 
-            FormInstance formInstance = formEngineFormService.createFormInstanceQuery().taskId(taskId).singleResult();
-            assertThat(formInstance).isNotNull();
-            byte[] valuesBytes = formEngineFormService.getFormInstanceValues(formInstance.getId());
-            assertThat(valuesBytes).isNotNull();
-            JsonNode instanceNode = objectMapper.readTree(valuesBytes);
-            JsonNode valuesNode = instanceNode.get("values");
-            assertThatJson(valuesNode)
-                    .isEqualTo("{"
-                            + "  user: 'First value',"
-                            + "  number: '789'"
-                            + "}");
+        verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+        verify(formSubmissionBuilder).elementType("userTask");
+        verify(formSubmissionBuilder).scopeId(processInstance.getId());
+        verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+        verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+        verify(formSubmissionBuilder).taskId(taskId);
+        verify(formSubmissionBuilder, never()).subScopeId(any());
+        verify(formSubmissionBuilder).formInfo(formInfo);
+        verify(formSubmissionBuilder).values(Map.of("user", "First value", "number", 789));
+        verify(formSubmissionBuilder).outcome(null);
+        verify(formSubmissionBuilder).extractVariables();
 
-            if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
-                assertThat(historicTaskInstance).isNotNull();
-                List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
-                        .list();
-                assertThat(variables).isNotNull();
+        task = taskService.createTaskQuery().taskId(taskId).singleResult();
+        assertThat(task).isNull();
 
-                assertThat(variables)
-                        .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
-                        .containsExactlyInAnyOrder(
-                                tuple("user", "First value"),
-                                tuple("number", 789));
-            }
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+            assertThat(historicTaskInstance).isNotNull();
+            List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId())
+                    .list();
+            assertThat(variables).isNotNull();
 
-        } finally {
-            formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
-
-            List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-            for (FormDeployment formDeployment : formDeployments) {
-                formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-            }
+            assertThat(variables)
+                    .extracting(HistoricVariableInstance::getVariableName, HistoricVariableInstance::getValue)
+                    .containsExactlyInAnyOrder(
+                            tuple("user", "First value return"),
+                            tuple("number", 789L));
         }
+
     }
 
     /**
@@ -684,6 +725,43 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
+    public void testUnclaimTask() throws Exception {
+        try {
+            Task task = taskService.newTask();
+            taskService.saveTask(task);
+            String taskId = task.getId();
+
+            // Claim the task first
+            taskService.claim(taskId, "kermit");
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task.getAssignee()).isEqualTo("kermit");
+
+            // Unclaim the task
+            ObjectNode requestNode = objectMapper.createObjectNode();
+            requestNode.put("action", "unclaim");
+
+            HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
+            httpPost.setEntity(new StringEntity(requestNode.toString()));
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_OK));
+
+            task = taskService.createTaskQuery().taskId(taskId).singleResult();
+            assertThat(task).isNotNull();
+            assertThat(task.getAssignee()).isNull();
+
+        } finally {
+            List<Task> tasks = taskService.createTaskQuery().list();
+            for (Task task : tasks) {
+                taskService.deleteTask(task.getId(), true);
+            }
+
+            List<HistoricTaskInstance> historicTasks = historyService.createHistoricTaskInstanceQuery().list();
+            for (HistoricTaskInstance task : historicTasks) {
+                historyService.deleteHistoricTaskInstance(task.getId());
+            }
+        }
+    }
+
+    @Test
     @Deployment
     public void testReclaimTask() throws Exception {
 
@@ -707,7 +785,7 @@ public class TaskResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "claim");
         requestNode.put("assignee", "kermit");
 
-        String taskId = ((ArrayNode) dataNode).get(0).get("id").asText();
+        String taskId = ((ArrayNode) dataNode).get(0).get("id").asString();
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK, taskId));
         httpPost.setEntity(new StringEntity(requestNode.toString()));

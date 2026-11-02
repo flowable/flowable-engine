@@ -20,6 +20,8 @@ import java.util.function.Supplier;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.util.RestUrlBuilder;
+import org.flowable.common.rest.variable.BigDecimalRestVariableConverter;
+import org.flowable.common.rest.variable.BigIntegerRestVariableConverter;
 import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
@@ -38,7 +40,7 @@ import org.flowable.external.job.rest.service.api.query.ExternalWorkerJobRespons
 import org.flowable.job.api.AcquiredExternalWorkerJob;
 import org.flowable.job.api.ExternalWorkerJob;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -186,6 +188,8 @@ public class ExternalJobRestResponseFactory {
         variableConverters.add(new LongRestVariableConverter());
         variableConverters.add(new ShortRestVariableConverter());
         variableConverters.add(new DoubleRestVariableConverter());
+        variableConverters.add(new BigDecimalRestVariableConverter());
+        variableConverters.add(new BigIntegerRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());
         variableConverters.add(new DateRestVariableConverter());
         variableConverters.add(new InstantRestVariableConverter());

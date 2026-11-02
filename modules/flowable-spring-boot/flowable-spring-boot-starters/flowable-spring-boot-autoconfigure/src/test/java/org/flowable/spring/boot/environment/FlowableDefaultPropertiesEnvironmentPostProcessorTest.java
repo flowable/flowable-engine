@@ -58,7 +58,7 @@ public class FlowableDefaultPropertiesEnvironmentPostProcessorTest {
                 "Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
                 "flowableDefaultConfig: [classpath:/flowable-default.yml]",
-                "flowable-liquibase-override"
+                "applicationInfo"
             );
 
         assertThat(environment.getProperty("foo")).isEqualTo("from-flowable-default-properties");
@@ -88,7 +88,7 @@ public class FlowableDefaultPropertiesEnvironmentPostProcessorTest {
                 "Config resource 'class path resource [application.yml]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
                 "flowableDefaultConfig: [classpath:/flowable-default.yml]",
-                "flowable-liquibase-override",
+                "applicationInfo",
                 "defaultProperties"
             );
 

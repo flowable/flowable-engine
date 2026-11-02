@@ -12,7 +12,7 @@
  */
 package org.activiti.engine.impl.cfg;
 
-import javax.transaction.TransactionManager;
+import jakarta.transaction.TransactionManager;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.jta.JtaTransactionContextFactory;

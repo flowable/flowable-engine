@@ -12,22 +12,32 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.IOParameter;
+import org.flowable.bpmn.model.ScriptTask;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.scripting.ScriptEngineRequest;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
+import org.flowable.common.engine.impl.variable.MapDelegateVariableContainer;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the BPMN 2.0 script task.
@@ -76,7 +86,7 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(scriptTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT)) {
-                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asText();
+                String overrideScript = taskElementProperties.get(DynamicBpmnConstants.SCRIPT_TASK_SCRIPT).asString();
                 if (StringUtils.isNotEmpty(overrideScript) && !overrideScript.equals(script)) {
                     script = overrideScript;
                 }
@@ -92,13 +102,12 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
         try {
             executeScript(execution);
         } catch (FlowableException e) {
-
-            LOGGER.warn("Exception while executing {} : {}", execution.getCurrentFlowElement().getId(), e.getMessage());
+            LOGGER.warn("Exception while executing {} : {}", execution, e.getMessage());
 
             noErrors = false;
             Throwable rootCause = ExceptionUtils.getRootCause(e);
-            if (rootCause instanceof BpmnError) {
-                ErrorPropagation.propagateError((BpmnError) rootCause, execution);
+            if (rootCause instanceof BusinessError) {
+                ErrorPropagation.propagateError((BusinessError) rootCause, execution);
             } else if (rootCause instanceof FlowableException) {
                 throw (FlowableException) rootCause;
             } else {
@@ -112,20 +121,34 @@ public class ScriptTaskActivityBehavior extends TaskActivityBehavior {
 
     protected void executeScript(DelegateExecution execution) {
 
-        ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
-        Object result = scriptingEngines.evaluate(script, language, execution, storeScriptVariables);
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        ScriptingEngines scriptingEngines = processEngineConfiguration.getScriptingEngines();
+        ScriptEngineRequest.Builder builder = ScriptEngineRequest.builder().script(script)
+                .traceEnhancer(trace -> trace.addTraceTag("type", "scriptTask"))
+                .language(language).scopeContainer(execution);
+        builder = storeScriptVariables ? builder.storeScriptVariables() : builder;
+        FlowElement flowElement = execution.getCurrentFlowElement();
+        if (flowElement instanceof ScriptTask scriptTask) {
+            List<IOParameter> inParameters = scriptTask.getInParameters();
+            if (inParameters != null && !inParameters.isEmpty()) {
+                MapDelegateVariableContainer inputVariableContainer = new MapDelegateVariableContainer();
+                IOParameterUtil.processInParameters(inParameters, execution, inputVariableContainer, processEngineConfiguration.getExpressionManager());
+                builder.inputVariableContainer(inputVariableContainer);
+            } else if (scriptTask.isDoNotIncludeVariables()) {
+                builder.inputVariableContainer(VariableContainer.empty());
+            }
+        }
+        ScriptEngineRequest request = builder.build();
+        Object result = scriptingEngines.evaluate(request).getResult();
 
         if (null != result) {
             if ("juel".equalsIgnoreCase(language) && (result instanceof String) && script.equals(result.toString())) {
-                throw new FlowableException(String.format("Error evaluating juel script: \"%s\" of activity id: %s of process definition id: %s",
-                        script, execution.getCurrentActivityId(), execution.getProcessDefinitionId()));
+                throw new FlowableException("Error evaluating juel script: \"" + script + "\" for " + execution);
             }
         }
 
         if (resultVariable != null) {
             execution.setVariable(resultVariable, result);
         }
-
     }
-
 }

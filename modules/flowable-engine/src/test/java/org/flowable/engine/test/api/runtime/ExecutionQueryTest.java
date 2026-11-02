@@ -44,7 +44,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -106,6 +106,26 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         includeIds.add("invalid");
         assertThat(runtimeService.createExecutionQuery().processDefinitionKeys(includeIds).list()).isEmpty();
     }
+    
+    @Test
+    public void testQueryByExcludeProcessDefinitionKeys() {
+        Set<String> excludeKeys = new HashSet<>();
+        excludeKeys.add(CONCURRENT_PROCESS_KEY);
+        excludeKeys.add(SEQUENTIAL_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(0);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add(CONCURRENT_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(2);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add(SEQUENTIAL_PROCESS_KEY);
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(12);
+        
+        excludeKeys = new HashSet<>();
+        excludeKeys.add("invalid");
+        assertThat(runtimeService.createExecutionQuery().excludeProcessDefinitionKeys(excludeKeys).list()).hasSize(14);
+    }
 
     @Test
     public void testQueryByInvalidProcessDefinitionKey() {
@@ -152,6 +172,20 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
             assertThat(query.list()).hasSize(3);
             assertThat(query.count()).isEqualTo(3);
         }
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(sequentialProcessInstanceIds.get(0)).list()).hasSize(2);
+    }
+
+    @Test
+    public void testQueryByProcessInstanceIds() {
+        assertThat(runtimeService.createExecutionQuery().processInstanceIds(Set.of(concurrentProcessInstanceIds.get(0), concurrentProcessInstanceIds.get(1), "someId")).list()).extracting(Execution::getProcessInstanceId, Execution::getActivityId).containsExactlyInAnyOrder(
+                tuple(concurrentProcessInstanceIds.get(0), "shipOrder"),
+                tuple(concurrentProcessInstanceIds.get(0), null),
+                tuple(concurrentProcessInstanceIds.get(0), "receivePayment"),
+                tuple(concurrentProcessInstanceIds.get(1), null),
+                tuple(concurrentProcessInstanceIds.get(1), "receivePayment"),
+                tuple(concurrentProcessInstanceIds.get(1), "shipOrder")
+        );
+
         assertThat(runtimeService.createExecutionQuery().processInstanceId(sequentialProcessInstanceIds.get(0)).list()).hasSize(2);
     }
 

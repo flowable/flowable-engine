@@ -17,9 +17,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import javax.enterprise.context.ConversationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.spi.PassivationCapable;
+import jakarta.enterprise.context.ConversationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.inject.spi.PassivationCapable;
 
 /**
  * Declare a bean to be BusinessProcessScoped. Instances of BusinessProcessScoped beans are stored as process variables in a ProcessInstance.

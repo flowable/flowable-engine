@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.management;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -34,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Database tables" }, description = "Manage Database tables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Database tables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TableCollectionResource {
 
     @Autowired
@@ -51,7 +49,7 @@ public class TableCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the request was successful.")
     })
     @GetMapping(value = "/management/tables", produces = "application/json")
-    public List<TableResponse> getTables(HttpServletRequest request) {
+    public List<TableResponse> getTables() {
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTableInfo();
         }

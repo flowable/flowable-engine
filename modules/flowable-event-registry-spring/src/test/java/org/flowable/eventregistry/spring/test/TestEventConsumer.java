@@ -12,8 +12,8 @@
  */
 package org.flowable.eventregistry.spring.test;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -31,14 +31,14 @@ import org.opentest4j.AssertionFailedError;
  */
 public class TestEventConsumer implements EventRegistryEventConsumer {
 
-    protected final List<EventRegistryEvent> events = new ArrayList<>();
+    protected final List<EventRegistryEvent> events = new CopyOnWriteArrayList<>();
     protected Consumer<EventRegistryEvent> eventConsumer = event -> {};
 
     @Override
     public String getConsumerKey() {
         return "testEventConsumer";
     }
-
+    
     @Override
     public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
         events.add(event);

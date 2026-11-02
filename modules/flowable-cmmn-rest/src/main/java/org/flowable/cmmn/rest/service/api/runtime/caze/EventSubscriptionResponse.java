@@ -17,7 +17,7 @@ import java.util.Date;
 
 import org.flowable.common.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * @author Tijs Rademakers

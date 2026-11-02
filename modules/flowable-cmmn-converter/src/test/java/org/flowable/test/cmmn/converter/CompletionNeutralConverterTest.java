@@ -18,8 +18,10 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.List;
 
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.CompletionNeutralRule;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
@@ -80,5 +82,34 @@ public class CompletionNeutralConverterTest {
         assertThat(extensionElements)
                 .extracting(ExtensionElement::getName, ExtensionElement::getElementText)
                 .containsExactly(tuple("taskTest", "hello"));
+    }
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/completionNeutralRuleWithExtensionElements.cmmn")
+    void customExtensionElements(CmmnModel model) {
+        Stage mainPlanModel = model.getPrimaryCase()
+                .getPlanModel();
+
+        PlanItem planItem = mainPlanModel.getPlanItem("completionNeutralRuleWithExtensionElements");
+        PlanItemControl itemControl = planItem.getItemControl();
+        assertThat(itemControl).isNotNull();
+        CompletionNeutralRule rule = itemControl.getCompletionNeutralRule();
+        assertThat(rule).isNotNull();
+        List<ExtensionElement> testEntryExtensions = rule.getExtensionElements().get("testEntry");
+        assertThat(testEntryExtensions)
+                .extracting(ExtensionElement::getElementText)
+                .containsExactly("Test Entry");
+
+        List<ExtensionElement> nestedTestExtensions = rule.getExtensionElements().get("nestedTest");
+        assertThat(nestedTestExtensions)
+                .hasSize(1)
+                .first()
+                .satisfies(extensionElement -> {
+                    assertThat(extensionElement.getAttributeValue(null, "name"))
+                            .isEqualTo("Test");
+                    assertThat(extensionElement.getChildElements().get("nestedValue"))
+                            .extracting(ExtensionElement::getElementText)
+                            .containsExactly("Test Value");
+                });
+
     }
 }

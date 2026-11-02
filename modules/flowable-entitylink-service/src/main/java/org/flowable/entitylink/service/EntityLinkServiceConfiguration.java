@@ -13,7 +13,6 @@
 package org.flowable.entitylink.service;
 
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.api.EntityLinkService;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.entitylink.service.impl.EntityLinkServiceImpl;
@@ -27,12 +26,12 @@ import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEnti
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.MybatisEntityLinkDataManager;
 import org.flowable.entitylink.service.impl.persistence.entity.data.impl.MybatisHistoricEntityLinkDataManager;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
  */
-public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration {
+public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration<EntityLinkServiceConfiguration> {
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -46,41 +45,31 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     protected HistoricEntityLinkDataManager historicEntityLinkDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    
+
     protected EntityLinkEntityManager entityLinkEntityManager;
     protected HistoricEntityLinkEntityManager historicEntityLinkEntityManager;
-    
-    protected HistoryLevel historyLevel;
-    
+
     protected ObjectMapper objectMapper;
-    
+
     public EntityLinkServiceConfiguration(String engineName) {
         super(engineName);
+    }
+
+    @Override
+    protected EntityLinkServiceConfiguration getService() {
+        return this;
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+
         initDataManagers();
         initEntityManagers();
-    }
-    
-    @Override
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
 
-    @Override
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
+        configuratorsAfterInit();
     }
 
     // Data managers
@@ -110,7 +99,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
     public EntityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return this;
     }
-    
+
     public EntityLinkService getEntityLinkService() {
         return entityLinkService;
     }
@@ -119,7 +108,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkService = entityLinkService;
         return this;
     }
-    
+
     public HistoricEntityLinkService getHistoricEntityLinkService() {
         return historicEntityLinkService;
     }
@@ -137,7 +126,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkDataManager = entityLinkDataManager;
         return this;
     }
-    
+
     public HistoricEntityLinkDataManager getHistoricEntityLinkDataManager() {
         return historicEntityLinkDataManager;
     }
@@ -155,7 +144,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.entityLinkEntityManager = entityLinkEntityManager;
         return this;
     }
-    
+
     public HistoricEntityLinkEntityManager getHistoricEntityLinkEntityManager() {
         return historicEntityLinkEntityManager;
     }
@@ -164,18 +153,7 @@ public class EntityLinkServiceConfiguration extends AbstractServiceConfiguration
         this.historicEntityLinkEntityManager = historicEntityLinkEntityManager;
         return this;
     }
-    
-    @Override
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-    
-    @Override
-    public EntityLinkServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
-        return this;
-    }
-    
+
     @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;

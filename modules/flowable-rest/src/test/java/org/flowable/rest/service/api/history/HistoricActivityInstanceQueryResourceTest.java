@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,11 +30,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to the historic activity instance query resource.
@@ -118,6 +116,11 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
         assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
 
         requestNode = objectMapper.createObjectNode();
+        requestNode.putArray("processInstanceIds").add("someId").add(processInstance2.getId());
+
+        assertResultsPresentInDataResponse(url, requestNode, 3, "theStart", "flow1", "processTask");
+
+        requestNode = objectMapper.createObjectNode();
         requestNode.put("processDefinitionId", processInstance.getProcessDefinitionId());
         assertResultsPresentInDataResponse(url, requestNode, 8, "theStart", "flow1", "processTask", "flow2", "processTask2");
 
@@ -134,7 +137,7 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
         assertResultsPresentInDataResponse(url, requestNode, 0);
     }
 
-    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedActivityIds) throws JsonProcessingException, IOException {
+    protected void assertResultsPresentInDataResponse(String url, ObjectNode body, int numberOfResultsExpected, String... expectedActivityIds) throws IOException {
 
         // Do the actual call
         HttpPost post = new HttpPost(SERVER_URL_PREFIX + url);
@@ -149,9 +152,8 @@ public class HistoricActivityInstanceQueryResourceTest extends BaseSpringRestTes
         // Check presence of ID's
         if (expectedActivityIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String activityId = it.next().get("activityId").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String activityId = jsonNode.get("activityId").stringValue();
                 toBeFound.remove(activityId);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

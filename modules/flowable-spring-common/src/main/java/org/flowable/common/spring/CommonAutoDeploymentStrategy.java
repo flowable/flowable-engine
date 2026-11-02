@@ -13,12 +13,11 @@
 
 package org.flowable.common.spring;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.common.engine.impl.lock.LockManager;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
@@ -123,7 +122,7 @@ public abstract class CommonAutoDeploymentStrategy<E> implements AutoDeploymentS
         } else {
             try {
                 resourceName = resource.getFile().getAbsolutePath();
-            } catch (IOException e) {
+            } catch (Exception e) { // Catching any exception here, as e.g. Graal will throw an UnsupportedException instead of an IOException
                 resourceName = resource.getFilename();
             }
         }

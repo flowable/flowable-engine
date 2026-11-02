@@ -25,9 +25,8 @@ import org.flowable.eventregistry.model.InboundChannelModel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Provides a test channel and test events.
@@ -53,7 +52,7 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
     }
     
     protected TestInboundEventChannelAdapter setupTestChannel() {
-        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter();
+        TestInboundEventChannelAdapter inboundEventChannelAdapter = new TestInboundEventChannelAdapter(processEngineConfiguration.getObjectMapper());
         Map<Object, Object> beans = getEventRegistryEngineConfiguration().getExpressionManager().getBeans();
         beans.put("inboundEventChannelAdapter", inboundEventChannelAdapter);
 
@@ -82,7 +81,11 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
 
         public InboundChannelModel inboundChannelModel;
         public EventRegistry eventRegistry;
-        protected ObjectMapper objectMapper = new ObjectMapper();
+        protected final ObjectMapper objectMapper;
+
+        protected TestInboundEventChannelAdapter(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+        }
 
         @Override
         public void setInboundChannelModel(InboundChannelModel inboundChannelModel) {
@@ -95,7 +98,7 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
         }
 
         public void triggerTestEvent() {
-            triggerTestEvent(null);
+            triggerTestEvent((String) null);
         }
 
         public void triggerTestEvent(String customerId) {
@@ -108,11 +111,11 @@ public abstract class AbstractBpmnEventRegistryConsumerTest extends FlowableEven
 
         public void triggerTestEvent(String customerId, String orderId) {
             ObjectNode eventNode = createTestEventNode(customerId, orderId);
-            try {
-                eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
+            triggerTestEvent(eventNode);
+        }
+
+        public void triggerTestEvent(ObjectNode eventNode) {
+            eventRegistry.eventReceived(inboundChannelModel, objectMapper.writeValueAsString(eventNode));
         }
         
         protected ObjectNode createTestEventNode(String customerId, String orderId) {

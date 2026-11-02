@@ -31,7 +31,7 @@ public class SetCaseInstanceBusinessStatusCmd implements Command<Void>, Serializ
     private final String businessStatus;
 
     public SetCaseInstanceBusinessStatusCmd(String caseInstanceId, String businessStatus) {
-        if (caseInstanceId == null || caseInstanceId.length() < 1) {
+        if (caseInstanceId == null || caseInstanceId.isEmpty()) {
             throw new FlowableIllegalArgumentException("The case instance id is mandatory, but '" + caseInstanceId + "' has not been provided.");
         }
 

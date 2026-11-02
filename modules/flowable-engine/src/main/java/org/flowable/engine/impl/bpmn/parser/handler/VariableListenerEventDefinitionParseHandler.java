@@ -14,7 +14,9 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
@@ -32,13 +34,16 @@ public class VariableListenerEventDefinitionParseHandler extends AbstractBpmnPar
     @Override
     protected void executeParse(BpmnParse bpmnParse, VariableListenerEventDefinition variableListenerEventDefinition) {
 
-        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent intermediateCatchEvent) {
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchVariableListenerEventActivityBehavior(intermediateCatchEvent, variableListenerEventDefinition));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
+        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundaryVariableListenerEventActivityBehavior(boundaryEvent, variableListenerEventDefinition, boundaryEvent.isCancelActivity()));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent
+                && startEvent.getSubProcess() instanceof EventSubProcess) {
+            startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createEventSubProcessVariableListenerlStartEventActivityBehavior(startEvent, variableListenerEventDefinition));
         }
     }
 }

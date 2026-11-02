@@ -50,6 +50,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
 
         // Complete the task and check if the size is count 1
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().taskId(task.getId()).count()).isZero();
         assertThat(task).isNotNull();
         taskService.claim(task.getId(), "test");
         taskService.setOwner(task.getId(), "test");
@@ -66,6 +67,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isZero();
     }
     
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceProcess.bpmn20.xml" })
@@ -79,7 +81,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
-        
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         // Complete the task and check if the size is count 1
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(task).isNotNull();
@@ -103,6 +105,8 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
+
     }
     
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelTaskProcess.bpmn20.xml" })
@@ -140,6 +144,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
     }
     
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelInstanceIncludeTaskProcess.bpmn20.xml" })
@@ -186,6 +191,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         
         assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelActivityProcess.bpmn20.xml" })
@@ -235,6 +241,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
                 );
 
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelAuditProcess.bpmn20.xml" })
@@ -292,6 +299,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
                 );
 
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isZero();
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/history/oneTaskHistoryLevelFullProcess.bpmn20.xml" })
@@ -349,6 +357,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
                 );
 
         assertThat(historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(7);
     }
     
     @Deployment(resources = { "org/flowable/engine/test/api/history/multipleParallelSubProcessesInstanceLevel.bpmn20.xml" })
@@ -396,6 +405,7 @@ public class HistoryLevelServiceTest extends PluggableFlowableTestCase {
         
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskAfter").singleResult();
         taskService.complete(task.getId());
+        assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(14);
     }
     
     @Deployment(resources = { "org/flowable/engine/test/api/history/multipleParallelSubProcessesTaskLevel.bpmn20.xml" })

@@ -24,6 +24,11 @@ import java.util.Date;
 public interface EntityLinkInfo {
 
     /**
+     * The technical id of the entity link
+     */
+    String getId();
+
+    /**
      * Returns the type of link. See for the native supported types.
      */
     String getLinkType();

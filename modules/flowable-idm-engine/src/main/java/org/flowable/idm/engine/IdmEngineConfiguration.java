@@ -18,15 +18,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -41,9 +43,9 @@ import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.event.FlowableIdmEventType;
 import org.flowable.idm.engine.impl.IdmEngineImpl;
+import org.flowable.idm.engine.impl.IdmEnginePostEngineBuildConsumer;
 import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.IdmManagementServiceImpl;
-import org.flowable.idm.engine.impl.SchemaOperationsIdmEngineBuild;
 import org.flowable.idm.engine.impl.authentication.BlankSalt;
 import org.flowable.idm.engine.impl.authentication.ClearTextPasswordEncoder;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
@@ -87,7 +89,7 @@ import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisProperty
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 
-public class IdmEngineConfiguration extends AbstractEngineConfiguration implements IdmEngineConfigurationApi {
+public class IdmEngineConfiguration extends AbstractBuildableEngineConfiguration<IdmEngine> implements IdmEngineConfigurationApi {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/idm/db/mapping/mappings.xml";
 
@@ -159,14 +161,24 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     // buildProcessEngine
     // ///////////////////////////////////////////////////////
 
-    public IdmEngine buildIdmEngine() {
-        init();
+    @Override
+    protected IdmEngine createEngine() {
         return new IdmEngineImpl(this);
+    }
+
+    @Override
+    protected Consumer<IdmEngine> createPostEngineBuildConsumer() {
+        return new IdmEnginePostEngineBuildConsumer();
+    }
+
+    public IdmEngine buildIdmEngine() {
+        return buildEngine();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     protected void init() {
         initEngineConfigurations();
         initClock();
@@ -201,19 +213,8 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        if (this.schemaManager == null) {
-            this.schemaManager = new IdmDbSchemaManager();
-        }
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsIdmEngineBuild();
-            }
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new IdmDbSchemaManager();
     }
 
     // services
@@ -315,7 +316,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration implemen
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER, EntityDependencyOrder.IMMUTABLE_ENTITIES);
     }
 
     public void initPasswordEncoder() {

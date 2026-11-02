@@ -34,7 +34,7 @@ public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
         SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
         ((SpringIdmEngineConfiguration) idmEngineConfiguration).setTransactionManager(springEngineConfiguration.getTransactionManager());
 
-        idmEngineConfiguration.buildIdmEngine();
+        initEngine();
 
         initServiceConfigurations(engineConfiguration, idmEngineConfiguration);
     }

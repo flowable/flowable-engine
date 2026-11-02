@@ -37,8 +37,7 @@ public class AsyncActivatePlanItemInstanceJobHandler implements JobHandler {
 
     @Override
     public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
-        if (variableScope instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+        if (variableScope instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
             if (cmmnEngineConfiguration.isLoggingSessionEnabled()) {
                 CmmnLoggingSessionUtil.addAsyncActivityLoggingData("Executing async job for " + planItemInstanceEntity.getPlanItemDefinitionId() + ", with job id " + job.getId(),

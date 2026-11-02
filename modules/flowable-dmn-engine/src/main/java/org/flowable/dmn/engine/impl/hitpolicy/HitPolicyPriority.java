@@ -73,6 +73,9 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
             }
         });
 
-        executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(0));
+        if (!ruleResults.isEmpty()) {
+            executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(0));
+        }
+
     }
 }

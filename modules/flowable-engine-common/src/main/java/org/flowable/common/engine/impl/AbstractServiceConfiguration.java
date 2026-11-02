@@ -12,6 +12,9 @@
  */
 package org.flowable.common.engine.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -19,55 +22,42 @@ import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
-import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
  */
-public abstract class AbstractServiceConfiguration {
-    
+public abstract class AbstractServiceConfiguration<S> {
+
     protected final Logger logger = LoggerFactory.getLogger(AbstractServiceConfiguration.class);
-    
+
     /** The tenant id indicating 'no tenant' */
     public static final String NO_TENANT_ID = "";
 
     protected String engineName;
+
+    protected Collection<ServiceConfigurator<S>> configurators;
+
     protected boolean enableEventDispatcher = true;
     protected FlowableEventDispatcher eventDispatcher;
     protected List<FlowableEventListener> eventListeners;
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
-    
-    protected HistoryLevel historyLevel;
-    
+
     protected ObjectMapper objectMapper;
 
     protected Clock clock;
     protected IdGenerator idGenerator;
-    
+
     public AbstractServiceConfiguration(String engineName) {
         this.engineName = engineName;
     }
-    
-    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}, level required: {}", historyLevel, level);
-        }
-        // Comparing enums actually compares the location of values declared in the enum
-        return historyLevel.isAtLeast(level);
-    }
 
-    public boolean isHistoryEnabled() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Current history level: {}", historyLevel);
-        }
-        return historyLevel != HistoryLevel.NONE;
-    }
+    protected abstract S getService();
 
     public String getEngineName() {
         return engineName;
@@ -76,7 +66,53 @@ public abstract class AbstractServiceConfiguration {
     public void setEngineName(String engineName) {
         this.engineName = engineName;
     }
-    
+
+    public Collection<ServiceConfigurator<S>> getConfigurators() {
+        return configurators;
+    }
+
+    public void setConfigurators(Collection<ServiceConfigurator<S>> configurators) {
+        initConfigurators();
+        this.configurators.clear();
+        if (configurators != null) {
+            this.configurators.addAll(configurators);
+        }
+    }
+
+    public AbstractServiceConfiguration<S> addConfigurator(ServiceConfigurator<S> configurator) {
+        initConfigurators();
+        this.configurators.add(configurator);
+        return this;
+    }
+
+    protected void initConfigurators() {
+        if (this.configurators == null) {
+            this.configurators = new ArrayList<>();
+        }
+    }
+
+    protected void configuratorsBeforeInit() {
+        if (this.configurators == null || this.configurators.isEmpty()) {
+            return;
+        }
+        final S service = getService();
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
+            logger.info("Executing beforeInit() of {} (priority: {})", c.getClass(), c.getPriority());
+            c.beforeInit(service);
+        });
+    }
+
+    protected void configuratorsAfterInit() {
+        if (this.configurators == null || this.configurators.isEmpty()) {
+            return;
+        }
+        final S service = getService();
+        this.configurators.stream().sorted(Comparator.comparingInt(ServiceConfigurator::getPriority)).forEach(c -> {
+            logger.info("Executing afterInit() of {} (priority: {})", c.getClass(), c.getPriority());
+            c.afterInit(service);
+        });
+    }
+
     public boolean isEventDispatcherEnabled() {
         return getEventDispatcher() != null && getEventDispatcher().isEnabled();
     }
@@ -85,7 +121,7 @@ public abstract class AbstractServiceConfiguration {
         return enableEventDispatcher;
     }
 
-    public AbstractServiceConfiguration setEnableEventDispatcher(boolean enableEventDispatcher) {
+    public AbstractServiceConfiguration<S> setEnableEventDispatcher(boolean enableEventDispatcher) {
         this.enableEventDispatcher = enableEventDispatcher;
         return this;
     }
@@ -94,7 +130,7 @@ public abstract class AbstractServiceConfiguration {
         return eventDispatcher;
     }
 
-    public AbstractServiceConfiguration setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
+    public AbstractServiceConfiguration<S> setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
         return this;
     }
@@ -103,7 +139,7 @@ public abstract class AbstractServiceConfiguration {
         return eventListeners;
     }
 
-    public AbstractServiceConfiguration setEventListeners(List<FlowableEventListener> eventListeners) {
+    public AbstractServiceConfiguration<S> setEventListeners(List<FlowableEventListener> eventListeners) {
         this.eventListeners = eventListeners;
         return this;
     }
@@ -112,34 +148,25 @@ public abstract class AbstractServiceConfiguration {
         return typedEventListeners;
     }
 
-    public AbstractServiceConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
+    public AbstractServiceConfiguration<S> setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;
     }
-    
+
     public List<EventDispatchAction> getAdditionalEventDispatchActions() {
         return additionalEventDispatchActions;
     }
 
-    public AbstractServiceConfiguration setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
+    public AbstractServiceConfiguration<S> setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
         return this;
     }
 
-    public HistoryLevel getHistoryLevel() {
-        return historyLevel;
-    }
-    
-    public AbstractServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
-        this.historyLevel = historyLevel;
-        return this;
-    }
-    
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
-    public AbstractServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
+    public AbstractServiceConfiguration<S> setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         return this;
     }
@@ -148,7 +175,7 @@ public abstract class AbstractServiceConfiguration {
         return clock;
     }
 
-    public AbstractServiceConfiguration setClock(Clock clock) {
+    public AbstractServiceConfiguration<S> setClock(Clock clock) {
         this.clock = clock;
         return this;
     }
@@ -157,7 +184,7 @@ public abstract class AbstractServiceConfiguration {
         return idGenerator;
     }
 
-    public AbstractServiceConfiguration setIdGenerator(IdGenerator idGenerator) {
+    public AbstractServiceConfiguration<S> setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }

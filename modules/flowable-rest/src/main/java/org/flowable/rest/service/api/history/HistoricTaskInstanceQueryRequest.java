@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.history;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -42,6 +43,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected String executionId;
     protected String taskName;
     protected String taskNameLike;
+    protected String taskNameLikeIgnoreCase;
     protected String taskDescription;
     protected String taskDescriptionLike;
     protected String taskDefinitionKey;
@@ -80,6 +82,7 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected List<QueryVariable> processVariables;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected Set<String> scopeIds;
     protected Boolean withoutScopeId;
     protected String scopeType;
     protected String propagatedStageInstanceId;
@@ -89,6 +92,8 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
     protected Boolean withoutDeleteReason;
     protected String taskCandidateGroup;
     protected boolean ignoreTaskAssignee;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     public String getTaskId() {
         return taskId;
@@ -200,6 +205,14 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setTaskNameLike(String taskNameLike) {
         this.taskNameLike = taskNameLike;
+    }
+
+    public String getTaskNameLikeIgnoreCase() {
+        return taskNameLikeIgnoreCase;
+    }
+
+    public void setTaskNameLikeIgnoreCase(String taskNameLikeIgnoreCase) {
+        this.taskNameLikeIgnoreCase = taskNameLikeIgnoreCase;
     }
 
     public String getTaskDescription() {
@@ -578,5 +591,29 @@ public class HistoricTaskInstanceQueryRequest extends PaginateRequest {
 
     public void setIgnoreTaskAssignee(boolean ignoreTaskAssignee) {
         this.ignoreTaskAssignee = ignoreTaskAssignee;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public void setScopeIds(Set<String> scopeIds) {
+        this.scopeIds = scopeIds;
     }
 }

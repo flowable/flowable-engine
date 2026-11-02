@@ -19,6 +19,7 @@ import org.flowable.batch.api.BatchBuilder;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.batch.api.BatchService;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntity;
 import org.flowable.batch.service.impl.persistence.entity.BatchEntityManager;
@@ -113,6 +114,19 @@ public class BatchServiceImpl extends CommonServiceImpl<BatchServiceConfiguratio
     @Override
     public Batch completeBatch(String batchId, String status) {
         return getBatchEntityManager().completeBatch(batchId, status);
+    }
+
+    @Override
+    public BatchSummary calculateBatchSummary(String batchId) {
+        BatchEntity batch = getBatchEntityManager().findById(batchId);
+        BatchSummary batchSummary = getBatchPartEntityManager().findBatchPartCountSummaryByBatchId(batchId);
+        batchSummary.setBatchId(batch.getId());
+        batchSummary.setBatchType(batch.getBatchType());
+        batchSummary.setCreateTime(batch.getCreateTime());
+        batchSummary.setStatus(batch.getStatus());
+        batchSummary.setCompleteTime(batch.getCompleteTime());
+        batchSummary.setTenantId(batch.getTenantId());
+        return batchSummary;
     }
 
     public Batch createBatch(BatchBuilder batchBuilder) {

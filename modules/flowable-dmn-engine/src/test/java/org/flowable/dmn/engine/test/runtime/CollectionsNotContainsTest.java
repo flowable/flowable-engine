@@ -21,19 +21,14 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class CollectionsNotContainsTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class CollectionsNotContainsTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/contains_NOT_IN.dmn")
@@ -51,7 +46,6 @@ public class CollectionsNotContainsTest {
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -80,7 +74,6 @@ public class CollectionsNotContainsTest {
         processVariablesInput.put("collection3", inputVariable3);
         processVariablesInput.put("collection4", inputVariable4);
 
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()

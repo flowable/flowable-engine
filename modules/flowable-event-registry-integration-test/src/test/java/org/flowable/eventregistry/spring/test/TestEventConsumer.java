@@ -33,7 +33,7 @@ public class TestEventConsumer implements EventRegistryEventConsumer {
     public String getConsumerKey() {
         return "testEventConsumer";
     }
-
+    
     @Override
     public EventRegistryProcessingInfo eventReceived(EventRegistryEvent event) {
         events.add(event);

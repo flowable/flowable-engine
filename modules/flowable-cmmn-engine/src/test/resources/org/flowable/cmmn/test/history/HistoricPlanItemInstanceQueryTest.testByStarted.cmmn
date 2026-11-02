@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testByStarted" name="testByStarted">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItemA" name="A" definitionRef="humanTaskA"></planItem>
+      <planItem id="planItemB" name="B" definitionRef="humanTaskB">
+        <entryCriterion id="entryB" sentryRef="sentryB"></entryCriterion>
+      </planItem>
+      <sentry id="sentryB">
+        <ifPart>
+          <condition><![CDATA[${1 == 2}]]></condition>
+        </ifPart>
+      </sentry>
+      <humanTask id="humanTaskA" name="A"></humanTask>
+      <humanTask id="humanTaskB" name="B"></humanTask>
+    </casePlanModel>
+  </case>
+</definitions>

@@ -101,9 +101,15 @@ public class EnsureCleanDbUtils {
             logger.info("dropping and recreating db");
 
             if (dropAndRecreateDbCommand != null) {
-                CommandExecutor commandExecutor = engineConfiguration.getCommandExecutor();
-                CommandConfig config = new CommandConfig().transactionNotSupported();
-                commandExecutor.execute(config, dropAndRecreateDbCommand);
+                String originalDatabaseSchemaUpdate = engineConfiguration.getDatabaseSchemaUpdate();
+                try {
+                    engineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
+                    CommandExecutor commandExecutor = engineConfiguration.getCommandExecutor();
+                    CommandConfig config = new CommandConfig().transactionNotSupported();
+                    commandExecutor.execute(config, dropAndRecreateDbCommand);
+                } finally {
+                    engineConfiguration.setDatabaseSchemaUpdate(originalDatabaseSchemaUpdate);
+                }
             }
 
             if (hasNoException) {

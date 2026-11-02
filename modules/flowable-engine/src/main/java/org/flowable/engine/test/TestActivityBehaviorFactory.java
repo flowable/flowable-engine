@@ -57,6 +57,7 @@ import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.VariableListenerEventDefinition;
 import org.flowable.common.engine.api.delegate.Expression;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -98,10 +99,13 @@ import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowCompensationEvent
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowEscalationEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
-import org.flowable.engine.impl.bpmn.behavior.MailActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ManualTaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneEndEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.EventRegistryStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.MessageStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.NoneStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SignalStartEventActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.TimerStartEventActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelGatewayActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ReceiveEventTaskActivityBehavior;
@@ -123,7 +127,6 @@ import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.bpmn.parser.factory.AbstractBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.test.NoOpServiceTask;
 
 /**
@@ -161,6 +164,26 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public NoneStartEventActivityBehavior createNoneStartEventActivityBehavior(StartEvent startEvent) {
         return wrappedActivityBehaviorFactory.createNoneStartEventActivityBehavior(startEvent);
+    }
+
+    @Override
+    public MessageStartEventActivityBehavior createMessageStartEventActivityBehavior(StartEvent startEvent, MessageEventDefinition messageEventDefinition) {
+        return wrappedActivityBehaviorFactory.createMessageStartEventActivityBehavior(startEvent, messageEventDefinition);
+    }
+
+    @Override
+    public SignalStartEventActivityBehavior createSignalStartEventActivityBehavior(StartEvent startEvent, SignalEventDefinition signalEventDefinition, Signal signal) {
+        return wrappedActivityBehaviorFactory.createSignalStartEventActivityBehavior(startEvent, signalEventDefinition, signal);
+    }
+
+    @Override
+    public TimerStartEventActivityBehavior createTimerStartEventActivityBehavior(StartEvent startEvent, TimerEventDefinition timerEventDefinition) {
+        return wrappedActivityBehaviorFactory.createTimerStartEventActivityBehavior(startEvent, timerEventDefinition);
+    }
+
+    @Override
+    public EventRegistryStartEventActivityBehavior createEventRegistryStartEventActivityBehavior(StartEvent startEvent, String eventDefinitionKey, boolean manualCorrelation) {
+        return wrappedActivityBehaviorFactory.createEventRegistryStartEventActivityBehavior(startEvent, eventDefinitionKey, manualCorrelation);
     }
 
     @Override
@@ -233,12 +256,12 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
+    public ActivityBehavior createMailActivityBehavior(ServiceTask serviceTask) {
         return wrappedActivityBehaviorFactory.createMailActivityBehavior(serviceTask);
     }
 
     @Override
-    public MailActivityBehavior createMailActivityBehavior(SendTask sendTask) {
+    public ActivityBehavior createMailActivityBehavior(SendTask sendTask) {
         return wrappedActivityBehaviorFactory.createMailActivityBehavior(sendTask);
     }
 
@@ -250,16 +273,6 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     @Override
     public ActivityBehavior createDmnActivityBehavior(SendTask sendTask) {
         return wrappedActivityBehaviorFactory.createDmnActivityBehavior(sendTask);
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(ServiceTask serviceTask) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(serviceTask);
-    }
-
-    @Override
-    public ActivityBehavior createMuleActivityBehavior(SendTask sendTask) {
-        return wrappedActivityBehaviorFactory.createMuleActivityBehavior(sendTask);
     }
 
     @Override
@@ -413,10 +426,10 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     
     @Override
     public IntermediateCatchConditionalEventActivityBehavior createIntermediateCatchConditionalEventActivityBehavior(IntermediateCatchEvent intermediateCatchEvent, 
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage) {
         
         return wrappedActivityBehaviorFactory.createIntermediateCatchConditionalEventActivityBehavior(intermediateCatchEvent, 
-                        conditionalEventDefinition, conditionExpression);
+                        conditionalEventDefinition, conditionExpression, conditionLanguage);
     }
 
     @Override
@@ -509,10 +522,10 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     
     @Override
     public BoundaryConditionalEventActivityBehavior createBoundaryConditionalEventActivityBehavior(BoundaryEvent boundaryEvent,
-            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+            ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage, boolean interrupting) {
 
         return wrappedActivityBehaviorFactory.createBoundaryConditionalEventActivityBehavior(boundaryEvent, 
-                        conditionalEventDefinition, conditionExpression, interrupting);
+                        conditionalEventDefinition, conditionExpression, conditionLanguage, interrupting);
     }
 
     @Override

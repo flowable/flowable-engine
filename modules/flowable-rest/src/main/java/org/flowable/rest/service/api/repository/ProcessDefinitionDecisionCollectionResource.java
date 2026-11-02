@@ -14,8 +14,6 @@ package org.flowable.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "List decisions for a process-definition", nickname = "listProcessDefinitionDecisions", tags = { "Process Definitions" })
@@ -43,8 +41,7 @@ public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefi
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decisions", produces = "application/json")
     public List<DecisionResponse> getDecisionsForProcessDefinition(
-        @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-        HttpServletRequest request) {
+        @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
 
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 
@@ -64,9 +61,8 @@ public class ProcessDefinitionDecisionCollectionResource extends BaseProcessDefi
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", produces = "application/json")
     public List<DecisionResponse> getDecisionTablesForProcessDefinition(
-            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-            HttpServletRequest request) {
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
 
-        return getDecisionsForProcessDefinition(processDefinitionId, request);
+        return getDecisionsForProcessDefinition(processDefinitionId);
     }
 }

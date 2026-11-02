@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
@@ -29,24 +30,29 @@ import org.springframework.kafka.core.KafkaOperations;
 /**
  * @author Filip Hrisafov
  */
-public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<String> {
+public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEventChannelAdapter<Object> {
 
     protected KafkaOperations<Object, Object> kafkaOperations;
     protected KafkaPartitionProvider partitionProvider;
+    protected KafkaMessageKeyProvider<?> messageKeyProvider;
     protected String topic;
-    protected String key;
 
+    // backwards compatibility
     public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, String key) {
+        this(kafkaOperations, partitionProvider, topic, (ignore) -> StringUtils.defaultIfEmpty(key, null));
+    }
+
+    public KafkaOperationsOutboundEventChannelAdapter(KafkaOperations<Object, Object> kafkaOperations, KafkaPartitionProvider partitionProvider, String topic, KafkaMessageKeyProvider<?> messageKeyProvider) {
         this.kafkaOperations = kafkaOperations;
         this.partitionProvider = partitionProvider;
+        this.messageKeyProvider = messageKeyProvider;
         this.topic = topic;
-        this.key = key;
     }
 
     @Override
-    public void sendEvent(OutboundEvent<String> event) {
+    public void sendEvent(OutboundEvent<Object> event) {
         try {
-            String rawEvent = event.getBody();
+            Object rawEvent = event.getBody();
             Map<String, Object> headerMap = event.getHeaders();
             List<Header> headers = new ArrayList<>();
             for (String headerKey : headerMap.keySet()) {
@@ -57,6 +63,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
             }
 
             Integer partition = partitionProvider == null ? null : partitionProvider.determinePartition(event);
+            Object key = messageKeyProvider == null ? null : messageKeyProvider.determineMessageKey(event);
 
             ProducerRecord<Object, Object> producerRecord = new ProducerRecord<>(topic, partition, key, rawEvent, headers);
             kafkaOperations.send(producerRecord).get();
@@ -74,7 +81,7 @@ public class KafkaOperationsOutboundEventChannelAdapter implements OutboundEvent
     }
 
     @Override
-    public void sendEvent(String rawEvent, Map<String, Object> headerMap) {
+    public void sendEvent(Object rawEvent, Map<String, Object> headerMap) {
         throw new UnsupportedOperationException("Outbound processor should never call this");
     }
 }

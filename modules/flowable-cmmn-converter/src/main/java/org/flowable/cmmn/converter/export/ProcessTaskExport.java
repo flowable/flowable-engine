@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ProcessTask;
 
@@ -47,8 +48,8 @@ public class ProcessTaskExport extends AbstractChildTaskExport<ProcessTask> {
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, processTask, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, ProcessTask processTask, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, processTask, xtw, options);
         
         if (StringUtils.isNotEmpty(processTask.getProcessRef()) || StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
             xtw.writeStartElement(ELEMENT_PROCESS_REF_EXPRESSION);

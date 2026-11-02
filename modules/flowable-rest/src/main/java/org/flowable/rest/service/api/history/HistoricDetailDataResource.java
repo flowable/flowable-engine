@@ -17,8 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -45,7 +44,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricDetailDataResource extends HistoricDetailBaseResource {
 
     @Autowired
@@ -61,10 +60,10 @@ public class HistoricDetailDataResource extends HistoricDetailBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested historic detail instance was not found or the historic detail instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @GetMapping(value = "/history/historic-detail/{detailId}/data")
     @ResponseBody
-    public byte[] getVariableData(@ApiParam(name = "detailId") @PathVariable("detailId") String detailId, HttpServletRequest request, HttpServletResponse response) {
+    public byte[] getVariableData(@ApiParam(name = "detailId") @PathVariable("detailId") String detailId, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, detailId, request);
+            RestVariable variable = getVariableFromRequest(true, detailId);
             if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -88,7 +87,7 @@ public class HistoricDetailDataResource extends HistoricDetailBaseResource {
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String detailId, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String detailId) {
         Object value = null;
         HistoricVariableUpdate variableUpdate = null;
         HistoricDetail detailObject = historyService.createHistoricDetailQuery().id(detailId).singleResult();

@@ -14,25 +14,37 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.flowable.cmmn.api.StageResponse;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.opentest4j.AssertionFailedError;
+
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Joram Barrez
@@ -783,6 +795,88 @@ public class StageTest extends FlowableCmmnTestCase {
             assertThat(stageMap.get("Stage 2").getEndTime()).isNotNull();
         }
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testGetStageAndMilestoneOverviewExpression() {
+        Date now = new Date();
+        setClockTo(now);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCase")
+                .variable("showInStage", true)
+                .variable("showMilestoneInOverview", true)
+                .variable("milestoneName", "This is a milestone name")
+                .variable("stageName", "This is a stage name")
+                .start();
+
+        List<StageResponse> stages = cmmnRuntimeService.getStageOverview(caseInstance.getId());
+        assertThat(stages).hasSize(5);
+
+        Map<String, StageResponse> stageMap = new HashMap<>();
+        for (StageResponse stageResponse : stages) {
+            stageMap.put(stageResponse.getName(), stageResponse);
+        }
+
+        assertThat(stageMap.get("This is a milestone name").getName()).isEqualTo("This is a milestone name");
+        assertThat(stageMap.get("This is a milestone name").isCurrent()).isFalse();
+        assertThat(stageMap.get("This is a milestone name").isEnded()).isTrue();
+        assertThat(stageMap.get("This is a milestone name").getEndTime()).isNotNull();
+
+        assertThat(stageMap.get("This is a stage name").getName()).isEqualTo("This is a stage name");
+        assertThat(stageMap.get("This is a stage name").isCurrent()).isTrue();
+        assertThat(stageMap.get("This is a stage name").isEnded()).isFalse();
+        assertThat(stageMap.get("This is a stage name").getEndTime()).isNull();
+
+        assertThat(stageMap.get("Stage 2").getName()).isEqualTo("Stage 2");
+        assertThat(stageMap.get("Stage 2").isCurrent()).isFalse();
+        assertThat(stageMap.get("Stage 2").isEnded()).isFalse();
+        assertThat(stageMap.get("Stage 2").getEndTime()).isNull();
+
+        assertThat(stageMap.get("Milestone 2.1").getName()).isEqualTo("Milestone 2.1");
+        assertThat(stageMap.get("Milestone 2.1").isCurrent()).isFalse();
+        assertThat(stageMap.get("Milestone 2.1").isEnded()).isFalse();
+        assertThat(stageMap.get("Milestone 2.1").getEndTime()).isNull();
+
+        assertThat(stageMap.get("Stage 2.1").getName()).isEqualTo("Stage 2.1");
+        assertThat(stageMap.get("Stage 2.1").isCurrent()).isFalse();
+        assertThat(stageMap.get("Stage 2.1").isEnded()).isFalse();
+        assertThat(stageMap.get("Stage 2.1").getEndTime()).isNull();
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            stages = cmmnHistoryService.getStageOverview(caseInstance.getId());
+            assertThat(stages).hasSize(5);
+
+            stageMap = new HashMap<>();
+            for (StageResponse stageResponse : stages) {
+                stageMap.put(stageResponse.getName(), stageResponse);
+            }
+
+            assertThat(stageMap.get("This is a milestone name").getName()).isEqualTo("This is a milestone name");
+            assertThat(stageMap.get("This is a milestone name").isCurrent()).isFalse();
+            assertThat(stageMap.get("This is a milestone name").isEnded()).isTrue();
+            assertThat(stageMap.get("This is a milestone name").getEndTime()).isNotNull();
+
+            assertThat(stageMap.get("This is a stage name").getName()).isEqualTo("This is a stage name");
+            assertThat(stageMap.get("This is a stage name").isCurrent()).isTrue();
+            assertThat(stageMap.get("This is a stage name").isEnded()).isFalse();
+            assertThat(stageMap.get("This is a stage name").getEndTime()).isNull();
+
+            assertThat(stageMap.get("Stage 2").getName()).isEqualTo("Stage 2");
+            assertThat(stageMap.get("Stage 2").isCurrent()).isFalse();
+            assertThat(stageMap.get("Stage 2").isEnded()).isFalse();
+            assertThat(stageMap.get("Stage 2").getEndTime()).isNull();
+
+            assertThat(stageMap.get("Milestone 2.1").getName()).isEqualTo("Milestone 2.1");
+            assertThat(stageMap.get("Milestone 2.1").isCurrent()).isFalse();
+            assertThat(stageMap.get("Milestone 2.1").isEnded()).isFalse();
+            assertThat(stageMap.get("Milestone 2.1").getEndTime()).isNull();
+
+            assertThat(stageMap.get("Stage 2.1").getName()).isEqualTo("Stage 2.1");
+            assertThat(stageMap.get("Stage 2.1").isCurrent()).isFalse();
+            assertThat(stageMap.get("Stage 2.1").isEnded()).isFalse();
+            assertThat(stageMap.get("Stage 2.1").getEndTime()).isNull();
+        }
+    }
 
     @Test
     @CmmnDeployment
@@ -941,5 +1035,76 @@ public class StageTest extends FlowableCmmnTestCase {
 
         cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId(), true);
         assertCaseInstanceEnded(caseInstance);
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testStageBusinessStatus() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageBusinessStatus")
+                .businessStatus("beforeStage").variable("secondStageVar", "secondStage").start();
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isEqualTo("beforeStage");
+
+        Task beforeStageTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("beforeStage").singleResult();
+        cmmnTaskService.complete(beforeStageTask.getId());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(caseInstance.getBusinessStatus()).isEqualTo("firstStage");
+
+        Task insideStageTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("insideStage").singleResult();
+        cmmnTaskService.complete(insideStageTask.getId());
+
+        assertCaseInstanceEnded(caseInstance);
+
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(historicCaseInstance.getBusinessStatus()).isEqualTo("secondStage");
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/StageTest.testStageWithAsyncNonExclusiveChildren.cmmn",
+            "org/flowable/cmmn/test/runtime/StageTest.sleepCase.cmmn"
+    })
+    public void testStageWithAsyncNonExclusiveChildren() {
+        assumeThat(cmmnEngineConfiguration.getDatabaseType()).isNotEqualTo(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL);
+        ArrayNode elementsVar = cmmnEngineConfiguration.getObjectMapper()
+                .createArrayNode();
+        int numberOfJobs = 2;
+        for (int i = 0; i < numberOfJobs; i++) {
+            elementsVar.add("element" + i);
+        }
+        cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("caseWithAsyncNonExclusiveStageChildren")
+                .variable("elementsVar", elementsVar)
+                .start();
+
+        // The stage should not be completable yet, as the async jobs are not completed
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().onlyStages().singleResult().isCompletable()).isFalse();
+
+        List<Job> jobs = cmmnManagementService.createJobQuery().list();
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfJobs);
+        List<Future<?>> jobExecutions = new ArrayList<>(numberOfJobs);
+        for (Job job : jobs) {
+            jobExecutions.add(executorService.submit(() -> {
+                cmmnManagementService.executeJob(job.getId());
+                return null;
+            }));
+        }
+        executorService.shutdown();
+        try {
+            boolean terminated = executorService.awaitTermination(10, TimeUnit.SECONDS);
+            if (!terminated) {
+                throw new AssertionFailedError("Failed to terminate executor service");
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        // Prior to the fix that was done for this, we were having FlowableOptimisticLockException here
+        // The reason for this was the fact that the Stage was initially marked as completable, and then when the jobs run
+        // they marked the stage as not completable again, due to the fact that they were active
+        assertThat(jobExecutions)
+                .extracting(Future::get)
+                .containsOnlyNulls();
     }
 }

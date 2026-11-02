@@ -8,12 +8,12 @@
 
         <startEvent id="theStart"/>
 
-        <scriptTask id="theScriptTaskWithJsvaScriptWithoutFormat" >
+        <scriptTask id="theScriptTaskWithJuel" >
             <script>execution.setVariable("myVar", scriptVar)</script>
         </scriptTask>
 
-        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScriptTaskWithJsvaScriptWithoutFormat"/>
-        <sequenceFlow id="flow2" sourceRef="theScriptTaskWithJsvaScriptWithoutFormat" targetRef="theEnd"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScriptTaskWithJuel"/>
+        <sequenceFlow id="flow2" sourceRef="theScriptTaskWithJuel" targetRef="theEnd"/>
 
         <endEvent id="theEnd"/>
 

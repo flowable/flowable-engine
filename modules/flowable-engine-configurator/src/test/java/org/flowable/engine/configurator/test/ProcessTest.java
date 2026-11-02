@@ -14,13 +14,22 @@ package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.test.FlowableAppExtension;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -30,6 +39,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.HistoryService;
@@ -39,18 +49,56 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.engine.FormEngineConfiguration;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
 /**
  * @author Tijs Rademakers
  */
-public class ProcessTest extends FlowableAppTestCase {
+@ExtendWith(FlowableAppExtension.class)
+@MockitoSettings
+public class ProcessTest {
+
+    protected AppEngineConfiguration appEngineConfiguration;
+    protected AppRepositoryService appRepositoryService;
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @Mock
+    protected FormRepositoryService formRepositoryService;
+
+    @Mock(answer = Answers.RETURNS_SELF)
+    protected FormSubmissionBuilder formSubmissionBuilder;
+
+    @BeforeEach
+    void setUp(AppEngine appEngine) {
+        appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        appRepositoryService = appEngine.getAppRepositoryService();
+        Map engineConfigurations = appEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @AfterEach
+    public void resetMocks() {
+        appEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
     
     @Test
     public void testCompleteTask() throws Exception {
@@ -99,12 +147,10 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
-        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
-        
+
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
-            .addClasspathResource("org/flowable/engine/configurator/test/simple.form").deploy();
+            .deploy();
         
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
@@ -117,12 +163,29 @@ public class ProcessTest extends FlowableAppTestCase {
             assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
             assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
             
-            FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-            assertThat(formDefinition).isNotNull();
-            
             Map<String, Object> variables = new HashMap<>();
             variables.put("input1", "test");
-            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
+
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            FormInfo formInfo = new FormInfo();
+            when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+            when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.emptyMap());
+
+            taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
+
+            verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+            verify(formSubmissionBuilder).elementType("userTask");
+            verify(formSubmissionBuilder).scopeId(processInstance.getId());
+            verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+            verify(formSubmissionBuilder).taskId(task.getId());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(variables);
+            verify(formSubmissionBuilder).outcome(null);
+            verify(formSubmissionBuilder).extractVariables();
 
             assertThatThrownBy(() -> runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()))
                     .isInstanceOf(FlowableObjectNotFoundException.class);
@@ -139,11 +202,6 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
-            formEngineConfiguration.getFormRepositoryService()
-                    .createDeploymentQuery()
-                    .parentDeploymentId(deployment.getId())
-                    .list()
-                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
 
@@ -153,13 +211,10 @@ public class ProcessTest extends FlowableAppTestCase {
                         .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
         TaskService taskService = processEngineConfiguration.getTaskService();
-        FormEngineConfiguration formEngineConfiguration = (FormEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
-                .get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
 
         AppDeployment deployment = appRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/engine/configurator/test/oneTaskWithFormProcess.bpmn20.xml")
-            .addClasspathResource("org/flowable/engine/configurator/test/another.form")
-            .addClasspathResource("org/flowable/engine/configurator/test/simple.form").deploy();
+            .deploy();
 
         try {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTask");
@@ -172,12 +227,28 @@ public class ProcessTest extends FlowableAppTestCase {
             assertThat(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId())).hasSize(2);
             assertThat(taskService.getIdentityLinksForTask(task.getId())).hasSize(1);
 
-            FormDefinition formDefinition = formEngineConfiguration.getFormRepositoryService().createFormDefinitionQuery().formDefinitionKey("anotherForm").singleResult();
-            assertThat(formDefinition).isNotNull();
-
             Map<String, Object> variables = new HashMap<>();
             variables.put("anotherInput", "test");
-            taskService.completeTaskWithForm(task.getId(), formDefinition.getId(), null, variables);
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineConfiguration.getFormRepositoryService()).thenReturn(formRepositoryService);
+            FormInfo formInfo = new FormInfo();
+            when(formRepositoryService.getFormModelById("formDefId")).thenReturn(formInfo);
+            when(formEngineFormService.createFormSubmissionBuilder()).thenReturn(formSubmissionBuilder);
+            when(formSubmissionBuilder.extractVariables()).thenReturn(Collections.emptyMap());
+
+            taskService.completeTaskWithForm(task.getId(), "formDefId", null, variables);
+
+            verify(formSubmissionBuilder).elementId(task.getTaskDefinitionKey());
+            verify(formSubmissionBuilder).elementType("userTask");
+            verify(formSubmissionBuilder).scopeId(processInstance.getId());
+            verify(formSubmissionBuilder).scopeDefinitionId(processInstance.getProcessDefinitionId());
+            verify(formSubmissionBuilder).scopeType(ScopeTypes.BPMN);
+            verify(formSubmissionBuilder).taskId(task.getId());
+            verify(formSubmissionBuilder, never()).subScopeId(any());
+            verify(formSubmissionBuilder).formInfo(formInfo);
+            verify(formSubmissionBuilder).values(variables);
+            verify(formSubmissionBuilder).outcome(null);
+            verify(formSubmissionBuilder).extractVariables();
 
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -189,11 +260,6 @@ public class ProcessTest extends FlowableAppTestCase {
                     .parentDeploymentId(deployment.getId())
                     .list()
                     .forEach(processDeployment -> processEngineConfiguration.getRepositoryService().deleteDeployment(processDeployment.getId(), true));
-            formEngineConfiguration.getFormRepositoryService()
-                    .createDeploymentQuery()
-                    .parentDeploymentId(deployment.getId())
-                    .list()
-                    .forEach(formDeployment -> formEngineConfiguration.getFormRepositoryService().deleteDeployment(formDeployment.getId(), true));
         }
     }
     
@@ -351,11 +417,6 @@ public class ProcessTest extends FlowableAppTestCase {
             
             runtimeService.setVariable(processInstance.getId(), "var1", "test");
             
-            List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
-            for (Execution execution : executions) {
-                System.out.println("execution " + execution.getId() + " " + execution.getActivityId());
-            }
-            
             assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         } finally {
@@ -432,5 +493,54 @@ public class ProcessTest extends FlowableAppTestCase {
                     .list()
                     .forEach(caseDeployment -> cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(caseDeployment.getId(), true));
         }
+    }
+
+    @Test
+    public void deletingAppDeploymentShouldDeleteChildInstances() {
+        AppDeployment appDeployment = appRepositoryService
+                .createDeployment()
+                .addClasspathResource("org/flowable/engine/configurator/test/test.app")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseWithListener.cmmn")
+                .addClasspathResource("org/flowable/engine/configurator/test/caseTaskProcessWithListener.bpmn20.xml")
+                .deploy();
+
+        try {
+            ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
+            RuntimeService runtimeService = processEngineConfiguration.getRuntimeService();
+            TaskService taskService = processEngineConfiguration.getTaskService();
+            HistoryService historyService = processEngineConfiguration.getHistoryService();
+
+            CmmnEngineConfiguration cmmnEngineConfiguration = (CmmnEngineConfiguration) appEngineConfiguration.getEngineConfigurations()
+                    .get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("caseTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+            CaseInstance subCaseInstance = cmmnRuntimeService
+                    .createCaseInstanceQuery()
+                    .caseDefinitionKey("caseWithListener")
+                    .singleResult();
+            assertThat(subCaseInstance).isNotNull();
+
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+
+            assertThat(runtimeService.createProcessInstanceQuery().list()).isEmpty();
+            assertThat(cmmnRuntimeService.createCaseInstanceQuery().list()).isEmpty();
+
+            if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+                assertThat(cmmnEngineConfiguration.getCmmnHistoryService().createHistoricCaseInstanceQuery().list()).isEmpty();
+                assertThat(historyService.createHistoricProcessInstanceQuery().list()).isEmpty();
+            }
+        } finally {
+            appDeployment = appRepositoryService.createDeploymentQuery().deploymentId(appDeployment.getId()).singleResult();
+            if (appDeployment != null) {
+                appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+            }
+
+        }
+
     }
 }

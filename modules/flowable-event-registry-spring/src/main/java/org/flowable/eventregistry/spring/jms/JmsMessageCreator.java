@@ -14,9 +14,9 @@ package org.flowable.eventregistry.spring.jms;
 
 import java.util.Map;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.Session;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.Session;
 
 /**
  * A creator of a JMS {@link Message} from the raw event.
@@ -33,7 +33,7 @@ public interface JmsMessageCreator<T> {
      * @param headerMap the headers for the JMS message
      * @param session the Session to use for creating a JMS Message
      * @return the JMS Message
-     * @throws javax.jms.JMSException if thrown by JMS API methods
+     * @throws jakarta.jms.JMSException if thrown by JMS API methods
      */
     Message toMessage(T event, Map<String, Object> headerMap, Session session) throws JMSException;
 

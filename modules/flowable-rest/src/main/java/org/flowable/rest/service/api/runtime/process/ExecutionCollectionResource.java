@@ -13,11 +13,11 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -40,17 +41,18 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionCollectionResource extends ExecutionBaseResource {
 
     // FIXME naming issue ?
-    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions")
+    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return executions with the given activity id.", paramType = "query"),
-            @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
-            @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return process instances with the given process definition id.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return executions with the given process definition key.", paramType = "query"),
+            @ApiImplicitParam(name = "processDefinitionId", dataType = "string", value = "Only return executions with the given process definition id.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return executions which are part of the process instance with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "processInstanceIds", dataType = "string", value = "Only return executions which are part of the process instances with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "messageEventSubscriptionName", dataType = "string", value = "Only return executions which are subscribed to a message with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "signalEventSubscriptionName", dataType = "string", value = "Only return executions which are subscribed to a signal with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "parentId", dataType = "string", value = "Only return executions which are a direct child of the given execution.", paramType = "query"),
@@ -64,7 +66,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @GetMapping(value = "/runtime/executions", produces = "application/json")
-    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         ExecutionQueryRequest queryRequest = new ExecutionQueryRequest();
 
@@ -74,6 +76,11 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
 
         if (allRequestParams.containsKey("processInstanceId")) {
             queryRequest.setProcessInstanceId(allRequestParams.get("processInstanceId"));
+        }
+
+        if (allRequestParams.containsKey("processInstanceIds")) {
+            String[] list = StringUtils.split(allRequestParams.get("processInstanceIds"), ",");
+            queryRequest.setProcessInstanceIds(new HashSet<>(Arrays.asList(list)));
         }
 
         if (allRequestParams.containsKey("processInstanceBusinessKey")) {
@@ -113,22 +120,23 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         }
 
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 queryRequest.setWithoutTenantId(Boolean.TRUE);
             }
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/runtime/executions", ""));
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 
     //FIXME Documentation ?
-    @ApiOperation(value = "Signal event received", tags = { "Executions" })
+    @ApiOperation(value = "Signal event received", tags = { "Executions" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates request was successful and the executions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @PutMapping(value = "/runtime/executions")
-    public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void executeExecutionAction(@RequestBody ExecutionActionRequest actionRequest) {
         if (restApiInterceptor != null) {
             restApiInterceptor.doExecutionActionRequest(actionRequest);
         }
@@ -146,6 +154,5 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         } else {
             runtimeService.signalEventReceived(actionRequest.getSignalName());
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 }

@@ -75,7 +75,7 @@ All classes that contain the custom expression functions that are used in your E
 
 During deployment of an Event or Channel definition, however, these classes don’t have to be present on the classpath.
 
-When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-ui-app or flowable-app-rest webapp lib. Don’t forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, ${tomcat.home}/lib.
+When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-app-rest webapp lib. Don’t forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, ${tomcat.home}/lib.
 
 ### Creating a single app
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="repeatingCaseTaskSyncChild" name="Repeating case task with synchronous child">
+        <casePlanModel id="cpm" name="Case plan model" flowable:autoComplete="true">
+
+            <!-- Task A: the gate. Completing it fires the on-part that triggers the repeating case task. -->
+            <planItem id="planItem1" name="Task A" definitionRef="humanTask1"/>
+
+            <!-- Task B: a case task that repeats over a collection variable and is gated by an on-part
+                 entry sentry (onComplete Task A). Its child case completes synchronously. -->
+            <planItem id="planItem2" name="Task B" definitionRef="caseTask1">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter"
+                                    flowable:collectionVariable="taskOutputList"
+                                    flowable:elementVariable="item"
+                                    flowable:elementIndexVariable="itemIndex"></repetitionRule>
+                </itemControl>
+                <entryCriterion id="entryCriterion1" flowable:sentryRef="sentry1"></entryCriterion>
+            </planItem>
+
+            <!-- Task C: the human task that should become active once the case task completed. -->
+            <planItem id="planItem3" name="Task C" definitionRef="humanTask3">
+                <entryCriterion id="entryCriterion2" flowable:sentryRef="sentry2"></entryCriterion>
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry2">
+                <planItemOnPart id="sentryOnPart2" sourceRef="planItem2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <humanTask id="humanTask1" name="Task A"/>
+            <caseTask id="caseTask1" name="Task B" caseRef="immediateChildCase" flowable:fallbackToDefaultTenant="true"/>
+            <humanTask id="humanTask3" name="Task C"/>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

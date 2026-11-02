@@ -42,6 +42,7 @@ import org.apache.kafka.clients.admin.RecordsToDelete;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
@@ -63,6 +64,7 @@ import org.flowable.eventregistry.model.EventPayload;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -95,6 +97,12 @@ class KafkaChannelDefinitionProcessorTest {
     @Autowired
     protected ConsumerFactory<Object, Object> consumerFactory;
 
+    @Autowired
+    protected TestKafkaMessageKeyProvider kafkaMessageKeyProvider;
+
+    @Autowired
+    protected TestKafkaPartitionProvider kafkaPartitionProvider;
+
     protected TestEventConsumer testEventConsumer;
 
     protected Collection<String> topicsToDelete = new HashSet<>();
@@ -108,6 +116,8 @@ class KafkaChannelDefinitionProcessorTest {
     @AfterEach
     void tearDown() throws Exception {
         testEventConsumer.clear();
+        kafkaPartitionProvider.clear();
+        kafkaMessageKeyProvider.clear();
 
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
         for (EventDeployment eventDeployment : deployments) {
@@ -118,7 +128,7 @@ class KafkaChannelDefinitionProcessorTest {
 
         Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
         Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(topicsToDelete)
-            .all()
+            .allTopicNames()
             .get(10, TimeUnit.SECONDS);
 
         try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testCleanup")) {
@@ -146,7 +156,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-new-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("eventShouldBeReceivedWhenChannelDefinitionIsRegistered")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("test-new-customer")
             .eventProcessingPipeline()
@@ -201,7 +211,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("test-expression-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("kafkaTopicIsCorrectlyResolvedFromExpression")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("${application.test.kafka-topic}")
             .eventProcessingPipeline()
@@ -256,7 +266,7 @@ class KafkaChannelDefinitionProcessorTest {
         createTopic("inbound-custom-bean-customer");
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("newCustomerChannel")
+            .key("kafkaTopicIsCorrectlyResolvedFromExpressionUsingCustomBean")
             .resourceName("customer.channel")
             .kafkaChannelAdapter("inbound-#{customPropertiesBean.getProperty('custom-bean-customer')}")
             .eventProcessingPipeline()
@@ -457,7 +467,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventShouldBeReceivedAfterChannelDefinitionIsRegistered")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .property(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
@@ -528,7 +538,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventWithSimpleHeader")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -581,7 +591,7 @@ class KafkaChannelDefinitionProcessorTest {
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
-            .key("testChannel")
+            .key("eventWithMultipleHeaders")
             .resourceName("test.channel")
             .kafkaChannelAdapter("test-customer")
             .eventProcessingPipeline()
@@ -660,11 +670,49 @@ class KafkaChannelDefinitionProcessorTest {
                 + "}");
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
 
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .hasSize(1));
+
+        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("name", "Kermit the Frog 1"),
+                    tuple("receivedTopic", "test-customer-multi-partition"),
+                    tuple("receivedPartition", 0),
+                    tuple("receivedOffset", 0L)
+                );
+
         producerRecord = new ProducerRecord<>("test-customer-multi-partition", 1, null, "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog 2\""
                 + "}");
         kafkaTemplate.send(producerRecord).get(2, TimeUnit.SECONDS);
+
+        await("receive events")
+                .atMost(Duration.ofSeconds(5))
+                .pollInterval(Duration.ofMillis(200))
+                .untilAsserted(() -> assertThat(testEventConsumer.getEvents())
+                    .extracting(EventRegistryEvent::getType)
+                    .hasSize(2));
+
+        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
+
+        assertThat(event).isNotNull();
+        assertThat(event.getPayloadInstances())
+                .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
+                .containsExactlyInAnyOrder(
+                    tuple("name", "Kermit the Frog 2"),
+                    tuple("receivedTopic", "test-customer-multi-partition"),
+                    tuple("receivedPartition", 1),
+                    tuple("receivedOffset", 0L)
+                );
 
         producerRecord = new ProducerRecord<>("test-customer-multi-partition", 0, null, "{"
                 + "    \"eventKey\": \"test\","
@@ -679,29 +727,6 @@ class KafkaChannelDefinitionProcessorTest {
                 .extracting(EventRegistryEvent::getType)
                 .hasSize(3));
 
-        EventInstance event = (EventInstance) testEventConsumer.getEvents().get(0).getEventObject();
-
-        assertThat(event).isNotNull();
-        assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 1"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 0),
-                tuple("receivedOffset", 0L)
-            );
-
-        event = (EventInstance) testEventConsumer.getEvents().get(1).getEventObject();
-
-        assertThat(event).isNotNull();
-        assertThat(event.getPayloadInstances())
-            .extracting(EventPayloadInstance::getDefinitionName, EventPayloadInstance::getValue)
-            .containsExactlyInAnyOrder(
-                tuple("name", "Kermit the Frog 2"),
-                tuple("receivedTopic", "test-customer-multi-partition"),
-                tuple("receivedPartition", 1),
-                tuple("receivedOffset", 0L)
-            );
 
         event = (EventInstance) testEventConsumer.getEvents().get(2).getEventObject();
 
@@ -902,7 +927,7 @@ class KafkaChannelDefinitionProcessorTest {
         });
 
         eventRepositoryService.createInboundChannelModelBuilder()
-                .key("newCustomerChannel")
+                .key("eventShouldBeReceivedMultipleTimesAfterAnExceptionIsThrown")
                 .resourceName("customer.channel")
                 .kafkaChannelAdapter("test-throwing-topic")
                 .eventProcessingPipeline()
@@ -1249,9 +1274,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("exponential-backoff-retry-topic-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1259,7 +1285,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1269,11 +1295,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("exponential-backoff-retry-topic-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1282,11 +1309,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("exponential-backoff-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1300,6 +1328,7 @@ class KafkaChannelDefinitionProcessorTest {
     void exponentialBackOffRetryWithDelaySuffixing() throws Exception {
         createTopic("exponential-backoff-delay");
         createTopic("exponential-backoff-delay-retry-topic-100");
+        createTopic("exponential-backoff-delay-retry-topic-200");
         createTopic("exponential-backoff-delay-dlt-topic");
 
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
@@ -1376,9 +1405,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("exponential-backoff-delay-retry-topic-100"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1386,7 +1416,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1396,11 +1426,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("exponential-backoff-delay-retry-topic-200"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1409,11 +1440,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("exponential-backoff-delay-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1426,6 +1458,10 @@ class KafkaChannelDefinitionProcessorTest {
     @Test
     void exponentialRandomBackOffRetry() throws Exception {
         createTopic("random-exponential-backoff");
+        createTopic("random-exponential-backoff-retry-0");
+        createTopic("random-exponential-backoff-retry-1");
+        createTopic("random-exponential-backoff-retry-2");
+        createTopic("random-exponential-backoff-dlt");
 
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {
@@ -1502,9 +1538,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("random-exponential-backoff-retry-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1512,7 +1549,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1522,11 +1559,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("random-exponential-backoff-retry-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1535,11 +1573,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("random-exponential-backoff-retry-2"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1563,147 +1602,10 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
-    void uniformRandomBackOffRetry() throws Exception {
-        createTopic("uniform-random-backoff");
-
-        AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
-        testEventConsumer.setEventConsumer(event -> {
-            EventInstance eventInstance = (EventInstance) event.getEventObject();
-            Object customer = eventInstance.getCorrelationParameterInstances()
-                    .stream()
-                    .filter(pi -> "customer".equals(pi.getDefinitionName()))
-                    .map(EventPayloadInstance::getValue)
-                    .findAny()
-                    .orElse(null);
-
-            if ("kermit".equals(customer)) {
-                throw new RuntimeException("Cannot receive " + customer);
-            } else if ("fozzie".equals(customer)) {
-                if (numberOfTimesFozzieArrived.incrementAndGet() < 2) {
-                    throw new RuntimeException("Cannot receive " + customer);
-                }
-            }
-        });
-
-        eventRepositoryService.createEventModelBuilder()
-                .resourceName("testEvent.event")
-                .key("test")
-                .correlationParameter("customer", EventPayloadTypes.STRING)
-                .payload("name", EventPayloadTypes.STRING)
-                .deploy();
-
-        eventRepositoryService.createDeployment()
-                .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/nonBlockingUniformRandomBackOffRetryKafka.channel")
-                .deploy();
-
-        // Give time for the consumers to register properly in the groups
-        // This is linked to the session timeout property for the consumers
-        Thread.sleep(600);
-
-        kafkaTemplate.send("uniform-random-backoff", "{"
-                        + "    \"eventKey\": \"test\","
-                        + "    \"customer\": \"kermit\","
-                        + "    \"name\": \"Kermit the Frog\""
-                        + "}")
-                .get(5, TimeUnit.SECONDS);
-
-        kafkaTemplate.send("uniform-random-backoff", "{"
-                        + "    \"eventKey\": \"test\","
-                        + "    \"customer\": \"fozzie\","
-                        + "    \"name\": \"Fozzie the Bear\""
-                        + "}")
-                .get(5, TimeUnit.SECONDS);
-
-        await("receive events")
-                .atMost(Duration.ofSeconds(10))
-                .pollInterval(Duration.ofMillis(200))
-                .untilAsserted(() -> assertThat(testEventConsumer.getEventInstancePayloadValues("customer")).hasSize(6));
-
-        assertThat(testEventConsumer.getEventInstancePayloadValues("customer"))
-                .containsExactlyInAnyOrder(
-                        "kermit", "kermit", "kermit", "kermit",
-                        "fozzie", "fozzie"
-                );
-
-        assertThat(numberOfTimesFozzieArrived).hasValue(2);
-
-        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
-            // The first event should land in the dead letter topic
-            consumer.subscribe(Arrays.asList(
-                    "uniform-random-backoff-retry-0",
-                    "uniform-random-backoff-retry-1",
-                    "uniform-random-backoff-retry-2",
-                    "uniform-random-backoff-dlt"
-            ));
-            consumer.poll(Duration.ofSeconds(1));
-            consumer.seekToBeginning(consumer.assignment());
-
-            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
-
-            assertThat(records.records("uniform-random-backoff-retry-0"))
-                    .satisfiesExactly(
-                            record -> {
-                                assertThatJson(record.value())
-                                        .isEqualTo("{"
-                                                + "  eventKey: 'test',"
-                                                + "  customer: 'kermit',"
-                                                + "  name: 'Kermit the Frog'"
-                                                + "}");
-                            },
-                            record -> {
-                                assertThatJson(record.value())
-                                        .isEqualTo("{"
-                                                + "  eventKey: 'test',"
-                                                + "  customer: 'fozzie',"
-                                                + "  name: 'Fozzie the Bear'"
-                                                + "}");
-                            }
-                    );
-
-            assertThat(records.records("uniform-random-backoff-retry-1"))
-                    .hasSize(1)
-                    .first()
-                    .isNotNull()
-                    .satisfies(record -> {
-                        assertThatJson(record.value())
-                                .isEqualTo("{"
-                                        + "  eventKey: 'test',"
-                                        + "  customer: 'kermit',"
-                                        + "  name: 'Kermit the Frog'"
-                                        + "}");
-                    });
-
-            assertThat(records.records("uniform-random-backoff-retry-2"))
-                    .hasSize(1)
-                    .first()
-                    .isNotNull()
-                    .satisfies(record -> {
-                        assertThatJson(record.value())
-                                .isEqualTo("{"
-                                        + "  eventKey: 'test',"
-                                        + "  customer: 'kermit',"
-                                        + "  name: 'Kermit the Frog'"
-                                        + "}");
-                    });
-
-            assertThat(records.records("uniform-random-backoff-dlt"))
-                    .hasSize(1)
-                    .first()
-                    .isNotNull()
-                    .satisfies(record -> {
-                        assertThatJson(record.value())
-                                .isEqualTo("{"
-                                        + "  eventKey: 'test',"
-                                        + "  customer: 'kermit',"
-                                        + "  name: 'Kermit the Frog'"
-                                        + "}");
-                    });
-        }
-    }
-
-    @Test
     void fixedBackOffMultiTopicRetry() throws Exception {
         createTopic("fixed-backoff-multi");
+        createTopic("fixed-backoff-multi-retry-topic-0");
+        createTopic("fixed-backoff-multi-retry-topic-1");
         createTopic("fixed-backoff-multi-dlt-topic");
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {
@@ -1779,9 +1681,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("fixed-backoff-multi-retry-topic-0"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1789,7 +1692,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1799,11 +1702,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("fixed-backoff-multi-retry-topic-1"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1812,11 +1716,12 @@ class KafkaChannelDefinitionProcessorTest {
                     });
 
             assertThat(records.records("fixed-backoff-multi-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -1847,6 +1752,7 @@ class KafkaChannelDefinitionProcessorTest {
     @Test
     void fixedBackOffRetry() throws Exception {
         createTopic("fixed-backoff");
+        createTopic("fixed-backoff-retry-topic");
         createTopic("fixed-backoff-dlt-topic");
         AtomicInteger numberOfTimesFozzieArrived = new AtomicInteger(0);
         testEventConsumer.setEventConsumer(event -> {
@@ -1921,9 +1827,10 @@ class KafkaChannelDefinitionProcessorTest {
             ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
 
             assertThat(records.records("fixed-backoff-retry-topic"))
+                    .extracting(ConsumerRecord::value)
                     .satisfiesExactly(
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1931,7 +1838,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'fozzie',"
@@ -1939,7 +1846,7 @@ class KafkaChannelDefinitionProcessorTest {
                                                 + "}");
                             },
                             record -> {
-                                assertThatJson(record.value())
+                                assertThatJson(record)
                                         .isEqualTo("{"
                                                 + "  eventKey: 'test',"
                                                 + "  customer: 'kermit',"
@@ -1949,11 +1856,12 @@ class KafkaChannelDefinitionProcessorTest {
                     );
 
             assertThat(records.records("fixed-backoff-dlt-topic"))
+                    .extracting(ConsumerRecord::value)
                     .hasSize(1)
                     .first()
                     .isNotNull()
                     .satisfies(record -> {
-                        assertThatJson(record.value())
+                        assertThatJson(record)
                                 .isEqualTo("{"
                                         + "  eventKey: 'test',"
                                         + "  customer: 'kermit',"
@@ -2063,6 +1971,61 @@ class KafkaChannelDefinitionProcessorTest {
             eventRepositoryService.deleteDeployment(deployment.getId());
         }
 
+    }
+
+    @Test
+    void eventShouldBeSendWithoutRecordKeyWhenRecordKeyIsEmptyString() {
+        createTopic("outbound-customer");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testClient")) {
+            consumer.subscribe(Collections.singleton("outbound-customer"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createOutboundChannelModelBuilder()
+                    .key("outboundCustomer")
+                    .resourceName("outboundCustomer.channel")
+                    .kafkaChannelAdapter("outbound-customer")
+                    .recordKey("")
+                    .eventProcessingPipeline()
+                    .jsonSerializer()
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("outboundCustomer");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("outbound-customer", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isNull();
+                        assertThatJson(record.value())
+                                .isEqualTo("{"
+                                        + "  customer: 'kermit',"
+                                        + "  name: 'Kermit the Frog'"
+                                        + "}");
+                    });
+        }
     }
 
     @Test
@@ -2312,6 +2275,111 @@ class KafkaChannelDefinitionProcessorTest {
     }
 
     @Test
+    void kafkaOutboundChannelShouldUseDelegateExpressionForPartition() {
+        createTopic("test-custom-partition-delegate-expression", 5);
+
+        Map<String, Integer> partitionMap = new HashMap<>();
+        partitionMap.put("fozzie", 2);
+        partitionMap.put("kermit", 3);
+        partitionMap.put("piggy", 4);
+        partitionMap.put("gonzo", 1);
+
+        kafkaPartitionProvider.setPartitionProvider(eventPayload -> {
+            String customer = (String) eventPayload.getEventInstance().getPayloadInstances().stream()
+                    .filter(instance -> instance.getDefinitionName().equals("customer")).map(
+                            EventPayloadInstance::getValue).findFirst().orElse(null);
+            return partitionMap.get(customer);
+        });
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testCustomPartitionDelegateExpression",
+                "testClientCustomPartitionDelegateExpression")) {
+            consumer.subscribe(Collections.singleton("test-custom-partition-delegate-expression"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomPartitionDelegateExpression.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("customPartitionDelegateExpression");
+            EventPayloadInstanceImpl customer = new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(customer);
+
+            EventInstance event = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(IntStream.range(0, 5)
+                    .mapToObj(partition -> new TopicPartition("test-custom-partition-delegate-expression", partition))
+                    .collect(Collectors.toList()));
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'kermit' }");
+                        assertThat(record.partition()).isEqualTo(3);
+                    });
+
+            customer.setValue("fozzie");
+
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'fozzie' }");
+                        assertThat(record.partition()).isEqualTo(2);
+                    });
+
+            customer.setValue("piggy");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'piggy' }");
+                        assertThat(record.partition()).isEqualTo(4);
+                    });
+
+            customer.setValue("gonzo");
+            eventRegistry.sendEventOutbound(event, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThatJson(record.value())
+                                .isEqualTo("{ customer: 'gonzo' }");
+                        assertThat(record.partition()).isEqualTo(1);
+                    });
+        }
+    }
+
+    @Test
     void kafkaOutboundChannelShouldUseRoundRobinForPartition() {
         createTopic("test-custom-partition-round-robin", 5);
 
@@ -2489,6 +2557,143 @@ class KafkaChannelDefinitionProcessorTest {
                         assertThatJson(record.value())
                                 .isEqualTo("{ customer: 'gonzo' }");
                         assertThat(record.partition()).isEqualTo(0);
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseFixedValueKeyForMessageKey() {
+        createTopic("test-fixed-value-message-key");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testFixedValueMessageKey", "testClientFixedValueMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-fixed-value-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFixedValue.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKey");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-fixed-value-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("myKey");
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldUseEventFieldForMessageKey() {
+        createTopic("test-event-field-message-key");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testEventFieldMessageKey", "testClientEventFieldMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-event-field-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFromEvent.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyEventField");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-event-field-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("kermit");
+                    });
+        }
+    }
+
+    @Test
+    void kafkaOutboundChannelShouldDelegateExpressionForMessageKey() {
+        createTopic("test-delegate-expression-message-key");
+
+        kafkaMessageKeyProvider.setMessageKeyProvider(ignore -> "testKey");
+
+        try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("testDelegateExpressionMessageKey", "testClientDelegateExpressionMessageKey")) {
+            consumer.subscribe(Collections.singleton("test-delegate-expression-message-key"));
+
+            eventRepositoryService.createEventModelBuilder()
+                    .resourceName("testEvent.event")
+                    .key("customer")
+                    .correlationParameter("customer", EventPayloadTypes.STRING)
+                    .payload("name", EventPayloadTypes.STRING)
+                    .deploy();
+
+            eventRepositoryService.createDeployment()
+                    .addClasspathResource("org/flowable/eventregistry/spring/test/kafka/outboundCustomMessageKeyFromDelegateExpression.channel")
+                    .deploy();
+
+            ChannelModel channelModel = eventRepositoryService.getChannelModelByKey("messageKeyDelegateExpression");
+
+            Collection<EventPayloadInstance> payloadInstances = new ArrayList<>();
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("customer", EventPayloadTypes.STRING), "kermit"));
+            payloadInstances.add(new EventPayloadInstanceImpl(new EventPayload("name", EventPayloadTypes.STRING), "Kermit the Frog"));
+
+            EventInstance kermitEvent = new EventInstanceImpl("customer", payloadInstances);
+
+            ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofSeconds(2));
+            assertThat(records).isEmpty();
+            consumer.commitSync();
+            consumer.seekToBeginning(Collections.singleton(new TopicPartition("test-delegate-expression-message-key", 0)));
+
+            eventRegistry.sendEventOutbound(kermitEvent, Collections.singleton(channelModel));
+
+            records = consumer.poll(Duration.ofSeconds(2));
+
+            assertThat(records)
+                    .hasSize(1)
+                    .first()
+                    .isNotNull()
+                    .satisfies(record -> {
+                        assertThat(record.key()).isEqualTo("testKey");
                     });
         }
     }

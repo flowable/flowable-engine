@@ -18,9 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.UserEventListener;
 
-/**
- * @author Dennis Federico
- */
 public class UserEventListenerXmlConverter extends PlanItemDefinitionXmlConverter {
 
     @Override

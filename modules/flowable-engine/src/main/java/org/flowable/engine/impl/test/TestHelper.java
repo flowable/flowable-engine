@@ -16,21 +16,16 @@ package org.flowable.engine.impl.test;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -54,7 +49,7 @@ public abstract class TestHelper {
 
     public static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = Collections.singletonList("ACT_GE_PROPERTY");
 
-    static Map<String, ProcessEngine> processEngines = new HashMap<>();
+    static final EngineTestCache<ProcessEngine> processEngines = new EngineTestCache<>();
 
     // Assertion methods ///////////////////////////////////////////////////
 
@@ -252,21 +247,16 @@ public abstract class TestHelper {
     // ///////////////////////////////////////////////////
 
     public static ProcessEngine getProcessEngine(String configurationResource) {
-        ProcessEngine processEngine = processEngines.get(configurationResource);
-        if (processEngine == null) {
+        return processEngines.getOrCreate(configurationResource, resource -> {
             LOGGER.debug("==== BUILDING PROCESS ENGINE ========================================================================");
-            processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(configurationResource).buildProcessEngine();
+            ProcessEngine processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource(resource).buildProcessEngine();
             LOGGER.debug("==== PROCESS ENGINE CREATED =========================================================================");
-            processEngines.put(configurationResource, processEngine);
-        }
-        return processEngine;
+            return processEngine;
+        });
     }
 
     public static void closeProcessEngines() {
-        for (ProcessEngine processEngine : processEngines.values()) {
-            processEngine.close();
-        }
-        processEngines.clear();
+        processEngines.closeAll();
     }
 
     /**
@@ -280,15 +270,7 @@ public abstract class TestHelper {
                 processEngine.getProcessEngineConfiguration(),
                 TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK,
                 true,
-                new Command<Void>() {
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                processEngine.getProcessEngineConfiguration().getSchemaManagementCmd()
         );
     }
 

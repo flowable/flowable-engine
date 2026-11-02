@@ -31,12 +31,18 @@ public class XmlTestUtils {
     }
 
     public static CmmnModel exportAndReadXMLFile(CmmnModel model) {
-        byte[] xml = new CmmnXmlConverter().convertToXML(model);
-        return new CmmnXmlConverter().convertToCmmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
+        byte[] xml = getCmmnXmlConverter().convertToXML(model);
+        return getCmmnXmlConverter().convertToCmmnModel(new InputStreamSource(new ByteArrayInputStream(xml)), true, false, "UTF-8");
     }
 
     public static CmmnModel readXMLFile(String resource) {
-        return new CmmnXmlConverter().convertToCmmnModel(new ClasspathStreamResource(resource), true, false);
+        return getCmmnXmlConverter().convertToCmmnModel(new ClasspathStreamResource(resource), true, false);
+    }
+
+    private static CmmnXmlConverter getCmmnXmlConverter() {
+        CmmnXmlConverter converter = new CmmnXmlConverter();
+        converter.getCmmnXmlConverterOptions().setSaveElementNameWithNewLineInExtensionElement(true);
+        return converter;
     }
 
     protected static class ClasspathStreamResource implements InputStreamProvider {

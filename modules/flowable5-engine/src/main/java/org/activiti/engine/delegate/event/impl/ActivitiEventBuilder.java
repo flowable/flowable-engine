@@ -262,7 +262,7 @@ public class ActivitiEventBuilder {
     }
 
     public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId,
-            String executionId, String processInstanceId, String processDefinitionId) {
+            String executionId, String processInstanceId, String processDefinitionId, String variableInstanceId) {
         ActivitiVariableEventImpl newEvent = new ActivitiVariableEventImpl(type);
         newEvent.setVariableName(variableName);
         newEvent.setVariableValue(variableValue);
@@ -271,6 +271,7 @@ public class ActivitiEventBuilder {
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setVariableInstanceId(variableInstanceId);
         return newEvent;
     }
 

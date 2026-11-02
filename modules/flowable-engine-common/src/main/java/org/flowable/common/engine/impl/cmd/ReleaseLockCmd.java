@@ -25,10 +25,12 @@ public class ReleaseLockCmd implements Command<Void> {
 
     protected String lockName;
     protected String engineType;
+    protected boolean delete;
 
-    public ReleaseLockCmd(String lockName, String engineType) {
+    public ReleaseLockCmd(String lockName, String engineType, boolean delete) {
         this.lockName = lockName;
         this.engineType = engineType;
+        this.delete = delete;
     }
 
     @Override
@@ -37,6 +39,9 @@ public class ReleaseLockCmd implements Command<Void> {
         PropertyEntity property = propertyEntityManager.findById(lockName);
         if (property != null) {
             property.setValue(null);
+            if (delete) {
+                propertyEntityManager.delete(property);
+            }
             return null;
         } else {
             throw new FlowableObjectNotFoundException("Lock with name " + lockName + " does not exist");

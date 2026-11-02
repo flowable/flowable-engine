@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -36,6 +33,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -52,13 +50,15 @@ import io.swagger.annotations.Authorization;
  * @author Christopher Welsch
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
+    @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given version.", paramType = "query"),
+            @ApiImplicitParam(name = "taskId", dataType = "string", value = "Only return tasks with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "name", dataType = "string", value = "Only return tasks with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),
+            @ApiImplicitParam(name = "nameLikeIgnoreCase", dataType = "string", value = "Only return tasks with a name like the given name ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "description", dataType = "string", value = "Only return tasks with the given description.", paramType = "query"),
             @ApiImplicitParam(name = "priority", dataType = "string", value = "Only return tasks with the given priority.", paramType = "query"),
             @ApiImplicitParam(name = "minimumPriority", dataType = "string", value = "Only return tasks with a priority greater than the given value.", paramType = "query"),
@@ -85,6 +85,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "planItemInstanceId", dataType = "string", value = "Only return tasks which are associated with the a plan item instance with the given id", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given id.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return tasks which are part of the scope (e.g. case instance) with the given ids.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns tasks without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "subScopeId", dataType = "string", value = "Only return tasks which are part of the sub scope (e.g. plan item instance) with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return tasks which are part of the scope type (e.g. bpmn, cmmn, etc).", paramType = "query"),
@@ -108,23 +109,33 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "categoryIn", dataType = "string", value = "Select tasks for the given categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "categoryNotIn", dataType = "string", value = "Select tasks which are not assigned to the given categories. Does not return tasks without categories. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
             @ApiImplicitParam(name = "withoutCategory", dataType = "string", value = "Select tasks without a category assigned. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).\n", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return tasks which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return tasks which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @GetMapping(value = "/cmmn-runtime/tasks", produces = "application/json")
-    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams) {
         // Create a Task query request
         TaskQueryRequest request = new TaskQueryRequest();
 
         // Populate filter-parameters
+        if (requestParams.containsKey("taskId")) {
+            request.setTaskId(requestParams.get("taskId"));
+        }
+
         if (requestParams.containsKey("name")) {
             request.setName(requestParams.get("name"));
         }
 
         if (requestParams.containsKey("nameLike")) {
             request.setNameLike(requestParams.get("nameLike"));
+        }
+        
+        if (requestParams.containsKey("nameLikeIgnoreCase")) {
+            request.setNameLikeIgnoreCase(requestParams.get("nameLikeIgnoreCase"));
         }
 
         if (requestParams.containsKey("description")) {
@@ -226,6 +237,10 @@ public class TaskCollectionResource extends TaskBaseResource {
         if (requestParams.containsKey("scopeId")) {
             request.setScopeId(requestParams.get("scopeId"));
         }
+
+        if (requestParams.containsKey("scopeIds")) {
+            request.setScopeIds(RequestUtil.parseToSet(requestParams.get("scopeIds")));
+        }
         
         if (requestParams.containsKey("withoutScopeId") && Boolean.valueOf(requestParams.get("withoutScopeId"))) {
             request.setWithoutScopeId(Boolean.TRUE);
@@ -273,6 +288,10 @@ public class TaskCollectionResource extends TaskBaseResource {
 
         if (requestParams.containsKey("dueAfter")) {
             request.setDueAfter(RequestUtil.getDate(requestParams, "dueAfter"));
+        }
+
+        if (requestParams.containsKey("withoutDueDate") && Boolean.parseBoolean(requestParams.get("withoutDueDate"))) {
+            request.setWithoutDueDate(Boolean.TRUE);
         }
 
         if (requestParams.containsKey("active")) {
@@ -323,16 +342,25 @@ public class TaskCollectionResource extends TaskBaseResource {
             request.setCategoryNotIn(csvToList("categoryNotIn", requestParams));
         }
 
+        if (requestParams.containsKey("rootScopeId")) {
+            request.setRootScopeId(requestParams.get("rootScopeId"));
+        }
+
+        if (requestParams.containsKey("parentScopeId")) {
+            request.setParentScopeId(requestParams.get("parentScopeId"));
+        }
+
         return getTasksFromQueryRequest(request, requestParams);
     }
 
-    @ApiOperation(value = "Create Task", tags = { "Tasks" })
+    @ApiOperation(value = "Create Task", tags = { "Tasks" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @PostMapping(value = "/cmmn-runtime/tasks", produces = "application/json")
-    public TaskResponse createTask(@RequestBody TaskRequest taskRequest, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskResponse createTask(@RequestBody TaskRequest taskRequest) {
         Task task = taskService.newTask();
 
         // Populate the task properties based on the request
@@ -347,7 +375,6 @@ public class TaskCollectionResource extends TaskBaseResource {
         
         taskService.saveTask(task);
 
-        response.setStatus(HttpStatus.CREATED.value());
         return restResponseFactory.createTaskResponse(task);
     }
 

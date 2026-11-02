@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author DennisFederico
  */
 @RestController
-@Api(tags = {"History PlanItem"}, description = "Manage History Plan Item Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History PlanItem"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItemInstanceBaseResource {
 
     private static Map<String, BiConsumer<HistoricPlanItemInstanceQueryRequest, String>> mapping = new HashMap<>();
@@ -53,6 +51,9 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
         mapping.put("planItemInstanceState", HistoricPlanItemInstanceQueryRequest::setPlanItemInstanceState);
         mapping.put("caseDefinitionId", HistoricPlanItemInstanceQueryRequest::setCaseDefinitionId);
         mapping.put("caseInstanceId", HistoricPlanItemInstanceQueryRequest::setCaseInstanceId);
+        mapping.put("caseInstanceIds", (req, value) -> {
+            req.setCaseInstanceIds(RequestUtil.parseToSet(value));
+        });
         mapping.put("stageInstanceId", HistoricPlanItemInstanceQueryRequest::setStageInstanceId);
         mapping.put("elementId", HistoricPlanItemInstanceQueryRequest::setElementId);
         mapping.put("planItemDefinitionId", HistoricPlanItemInstanceQueryRequest::setPlanItemDefinitionId);
@@ -84,6 +85,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
         mapping.put("referenceType", HistoricPlanItemInstanceQueryRequest::setReferenceType);
         mapping.put("tenantId", HistoricPlanItemInstanceQueryRequest::setTenantId);
         mapping.put("withoutTenantId", (h, s) -> h.setWithoutTenantId(Boolean.valueOf(s)));
+        mapping.put("started", (h, s) -> h.setStarted(Boolean.valueOf(s)));
     }
 
     @ApiOperation(value = "List of historic plan item instances", tags = {"History PlanItem"}, nickname = "listHistoricPlanItemInstances")
@@ -93,6 +95,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiImplicitParam(name = "planItemInstanceState", dataType = "string", value = "The state of the historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "caseDefinitionId", dataType = "string", value = "The id of the definition of the case were the historic planItem instance is defined.", paramType = "query"),
             @ApiImplicitParam(name = "caseInstanceId", dataType = "string", value = "The id of the case instance were the historic planItem instance existed.", paramType = "query"),
+            @ApiImplicitParam(name = "caseInstanceIds", dataType = "string", value = "The ids of the case instances were the historic planItem instance existed.", paramType = "query"),
             @ApiImplicitParam(name = "stageInstanceId", dataType = "string", value = "The id of the stage were the historic planItem instance was contained.", paramType = "query"),
             @ApiImplicitParam(name = "elementId", dataType = "string", value = "The id of the planItem model of the historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "planItemDefinitionId", dataType = "string", value = "The id of the planItem model definition of the historic planItem instance.", paramType = "query"),
@@ -119,6 +122,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiImplicitParam(name = "exitAfter", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that exit after this date.", paramType = "query"),
             @ApiImplicitParam(name = "endedBefore", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that ended before this date.", paramType = "query"),
             @ApiImplicitParam(name = "endedAfter", dataType = "date-time", format = "date-time", value = "Return only historic planItem instances that ended after this date.", paramType = "query"),
+            @ApiImplicitParam(name = "started", dataType = "boolean", value = "If true, only returns historic planItem instances that have been started (last started time is set). If false, only returns historic planItem instances that have not been started (last started time is null).", paramType = "query"),
             @ApiImplicitParam(name = "startUserId", dataType = "string", format = "date-time", value = "Return only historic planItem instances that were started by this user.", paramType = "query"),
             @ApiImplicitParam(name = "referenceId", dataType = "string", value = "The id of process that was referenced by this historic planItem instance.", paramType = "query"),
             @ApiImplicitParam(name = "referenceType", dataType = "string", value = "The type of reference to the process referenced by this historic planItem instance.", paramType = "query"),
@@ -129,7 +133,7 @@ public class HistoricPlanItemInstanceCollectionResource extends HistoricPlanItem
             @ApiResponse(code = 200, message = "Indicates that historic planItem instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})
     @GetMapping(value = "/cmmn-history/historic-planitem-instances", produces = "application/json")
-    public DataResponse<HistoricPlanItemInstanceResponse> getHistoricPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricPlanItemInstanceResponse> getHistoricPlanItemInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricPlanItemInstanceQueryRequest queryRequest = new HistoricPlanItemInstanceQueryRequest();
         allRequestParams.forEach((key, value) -> Optional.ofNullable(value).ifPresent(v -> mapping.getOrDefault(key, voidConsumer).accept(queryRequest, v)));

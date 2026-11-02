@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-work-process-palette">
+    <process id="multiCorrelationProcess" name="Multi Correlation Process" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+        <extensionElements>
+            <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+            <design:creationdate><![CDATA[2024-01-22T16:23:51.151Z]]></design:creationdate>
+            <design:modificationdate><![CDATA[2024-01-23T07:19:55.580Z]]></design:modificationdate>
+        </extensionElements>
+        <subProcess id="bpmnStructure_8" name="Subprocess">
+            <extensionElements>
+                <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+            </extensionElements>
+            <userTask id="bpmnTask_1" name="User task" flowable:formFieldValidation="false">
+                <extensionElements>
+                    <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                    <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                    <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+                </extensionElements>
+            </userTask>
+            <startEvent id="bpmnStartEvent_9" flowable:initiator="initiator" flowable:formFieldValidation="false">
+                <extensionElements>
+                    <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                    <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+                </extensionElements>
+            </startEvent>
+            <endEvent id="bpmnEndEvent_3">
+                <extensionElements>
+                    <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+                </extensionElements>
+            </endEvent>
+            <sequenceFlow id="bpmnSequenceFlow_4" sourceRef="bpmnTask_1" targetRef="bpmnEndEvent_3">
+                <extensionElements>
+                    <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+                </extensionElements>
+            </sequenceFlow>
+            <sequenceFlow id="bpmnSequenceFlow_10" sourceRef="bpmnStartEvent_9" targetRef="bpmnTask_1">
+                <extensionElements>
+                    <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+                </extensionElements>
+            </sequenceFlow>
+        </subProcess>
+        <userTask id="bpmnTask_20" name="ID" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_22" name="Order ID" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_24" name="First Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_26" name="Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_28" name="ID, Order ID, First Name and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_30" name="ID and Order ID" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_32" name="ID and First Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_34" name="ID and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_37" name="Order ID and First Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_40" name="Order ID and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_43" name="First Name and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_46" name="ID, Order ID and First Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_49" name="ID, Order ID and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_52" name="Order ID, First Name and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <userTask id="bpmnTask_55" name="ID, First Name and Last Name" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+                <design:stencilid><![CDATA[FormTask]]></design:stencilid>
+                <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+            </extensionElements>
+        </userTask>
+        <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+            <extensionElements>
+                <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+                <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </startEvent>
+        <endEvent id="bpmnEndEvent_11">
+            <extensionElements>
+                <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+            </extensionElements>
+        </endEvent>
+        <boundaryEvent id="bpmnBoundaryEvent_13" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_21" sourceRef="bpmnBoundaryEvent_13" targetRef="bpmnTask_20">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_14" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_23" sourceRef="bpmnBoundaryEvent_14" targetRef="bpmnTask_22">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_15" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_25" sourceRef="bpmnBoundaryEvent_15" targetRef="bpmnTask_24">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_16" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_27" sourceRef="bpmnBoundaryEvent_16" targetRef="bpmnTask_26">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_17" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_29" sourceRef="bpmnBoundaryEvent_17" targetRef="bpmnTask_28">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_18" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_31" sourceRef="bpmnBoundaryEvent_18" targetRef="bpmnTask_30">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_19" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_33" sourceRef="bpmnBoundaryEvent_19" targetRef="bpmnTask_32">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_33" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_35" sourceRef="bpmnBoundaryEvent_33" targetRef="bpmnTask_34">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_36" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_38" sourceRef="bpmnBoundaryEvent_36" targetRef="bpmnTask_37">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_39" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_41" sourceRef="bpmnBoundaryEvent_39" targetRef="bpmnTask_40">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_42" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_44" sourceRef="bpmnBoundaryEvent_42" targetRef="bpmnTask_43">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_45" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_47" sourceRef="bpmnBoundaryEvent_45" targetRef="bpmnTask_46">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_48" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_50" sourceRef="bpmnBoundaryEvent_48" targetRef="bpmnTask_49">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_51" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="orderId" value="${orderId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_53" sourceRef="bpmnBoundaryEvent_51" targetRef="bpmnTask_52">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <boundaryEvent id="bpmnBoundaryEvent_54" attachedToRef="bpmnStructure_8" cancelActivity="false">
+            <extensionElements>
+                <flowable:eventType><![CDATA[testEvent]]></flowable:eventType>
+                <flowable:eventCorrelationParameter name="id" value="${customerId}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="firstName" value="${firstName}"></flowable:eventCorrelationParameter>
+                <flowable:eventCorrelationParameter name="lastName" value="${lastName}"></flowable:eventCorrelationParameter>
+                <flowable:startEventCorrelationConfiguration><![CDATA[startNewInstance]]></flowable:startEventCorrelationConfiguration>
+                <design:stencilid><![CDATA[IntermediateEventRegistryEventBoundary]]></design:stencilid>
+            </extensionElements>
+        </boundaryEvent>
+        <sequenceFlow id="bpmnSequenceFlow_56" sourceRef="bpmnBoundaryEvent_54" targetRef="bpmnTask_55">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="bpmnSequenceFlow_12" sourceRef="bpmnStructure_8" targetRef="bpmnEndEvent_11">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+        <sequenceFlow id="bpmnSequenceFlow_2" sourceRef="startnoneevent1" targetRef="bpmnStructure_8">
+            <extensionElements>
+                <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+            </extensionElements>
+        </sequenceFlow>
+    </process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_multiCorrelationProcess">
+        <bpmndi:BPMNPlane bpmnElement="multiCorrelationProcess" id="BPMNPlane_multiCorrelationProcess">
+            <bpmndi:BPMNShape bpmnElement="bpmnStructure_8" id="BPMNShape_bpmnStructure_8">
+                <omgdc:Bounds height="223.0" width="596.0" x="360.0" y="187.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_1" id="BPMNShape_bpmnTask_1">
+                <omgdc:Bounds height="80.0" width="100.0" x="508.0" y="258.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnStartEvent_9" id="BPMNShape_bpmnStartEvent_9">
+                <omgdc:Bounds height="30.0" width="30.0" x="392.0" y="283.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnEndEvent_3" id="BPMNShape_bpmnEndEvent_3">
+                <omgdc:Bounds height="28.0" width="28.0" x="853.0" y="284.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_20" id="BPMNShape_bpmnTask_20">
+                <omgdc:Bounds height="80.0" width="100.0" x="299.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_22" id="BPMNShape_bpmnTask_22">
+                <omgdc:Bounds height="80.0" width="100.0" x="415.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_24" id="BPMNShape_bpmnTask_24">
+                <omgdc:Bounds height="80.0" width="100.0" x="520.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_26" id="BPMNShape_bpmnTask_26">
+                <omgdc:Bounds height="80.0" width="100.0" x="631.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_28" id="BPMNShape_bpmnTask_28">
+                <omgdc:Bounds height="80.0" width="100.0" x="742.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_30" id="BPMNShape_bpmnTask_30">
+                <omgdc:Bounds height="80.0" width="100.0" x="843.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_32" id="BPMNShape_bpmnTask_32">
+                <omgdc:Bounds height="80.0" width="100.0" x="970.0" y="505.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_34" id="BPMNShape_bpmnTask_34">
+                <omgdc:Bounds height="80.0" width="100.0" x="933.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_37" id="BPMNShape_bpmnTask_37">
+                <omgdc:Bounds height="80.0" width="100.0" x="820.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_40" id="BPMNShape_bpmnTask_40">
+                <omgdc:Bounds height="80.0" width="100.0" x="712.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_43" id="BPMNShape_bpmnTask_43">
+                <omgdc:Bounds height="80.0" width="100.0" x="608.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_46" id="BPMNShape_bpmnTask_46">
+                <omgdc:Bounds height="80.0" width="100.0" x="494.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_49" id="BPMNShape_bpmnTask_49">
+                <omgdc:Bounds height="80.0" width="100.0" x="383.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_52" id="BPMNShape_bpmnTask_52">
+                <omgdc:Bounds height="80.0" width="100.0" x="175.0" y="187.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnTask_55" id="BPMNShape_bpmnTask_55">
+                <omgdc:Bounds height="80.0" width="100.0" x="245.0" y="18.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+                <omgdc:Bounds height="30.0" width="30.0" x="164.0" y="283.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnEndEvent_11" id="BPMNShape_bpmnEndEvent_11">
+                <omgdc:Bounds height="28.0" width="28.0" x="1006.0" y="284.5"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_13" id="BPMNShape_bpmnBoundaryEvent_13">
+                <omgdc:Bounds height="30.0" width="30.0" x="345.0" y="370.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_14" id="BPMNShape_bpmnBoundaryEvent_14">
+                <omgdc:Bounds height="30.0" width="30.0" x="449.0" y="395.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_15" id="BPMNShape_bpmnBoundaryEvent_15">
+                <omgdc:Bounds height="30.0" width="30.0" x="555.0" y="395.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_16" id="BPMNShape_bpmnBoundaryEvent_16">
+                <omgdc:Bounds height="30.0" width="30.0" x="667.0" y="395.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_17" id="BPMNShape_bpmnBoundaryEvent_17">
+                <omgdc:Bounds height="30.0" width="30.0" x="777.0" y="395.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_18" id="BPMNShape_bpmnBoundaryEvent_18">
+                <omgdc:Bounds height="30.0" width="30.0" x="878.0" y="395.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_19" id="BPMNShape_bpmnBoundaryEvent_19">
+                <omgdc:Bounds height="30.0" width="30.0" x="941.0" y="349.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_33" id="BPMNShape_bpmnBoundaryEvent_33">
+                <omgdc:Bounds height="30.0" width="30.0" x="941.0" y="197.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_36" id="BPMNShape_bpmnBoundaryEvent_36">
+                <omgdc:Bounds height="30.0" width="30.0" x="851.0" y="172.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_39" id="BPMNShape_bpmnBoundaryEvent_39">
+                <omgdc:Bounds height="30.0" width="30.0" x="752.0" y="172.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_42" id="BPMNShape_bpmnBoundaryEvent_42">
+                <omgdc:Bounds height="30.0" width="30.0" x="656.0" y="172.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_45" id="BPMNShape_bpmnBoundaryEvent_45">
+                <omgdc:Bounds height="30.0" width="30.0" x="544.0" y="172.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_48" id="BPMNShape_bpmnBoundaryEvent_48">
+                <omgdc:Bounds height="30.0" width="30.0" x="453.0" y="172.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_51" id="BPMNShape_bpmnBoundaryEvent_51">
+                <omgdc:Bounds height="30.0" width="30.0" x="345.0" y="245.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape bpmnElement="bpmnBoundaryEvent_54" id="BPMNShape_bpmnBoundaryEvent_54">
+                <omgdc:Bounds height="30.0" width="30.0" x="345.0" y="197.0"></omgdc:Bounds>
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_33" id="BPMNEdge_bpmnSequenceFlow_33" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="956.0" y="379.0"></omgdi:waypoint>
+                <omgdi:waypoint x="956.0" y="442.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1020.0" y="442.0"></omgdi:waypoint>
+                <omgdi:waypoint x="1020.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_44" id="BPMNEdge_bpmnSequenceFlow_44" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="671.0" y="172.0"></omgdi:waypoint>
+                <omgdi:waypoint x="671.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="658.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="658.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_10" id="BPMNEdge_bpmnSequenceFlow_10" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="422.0" y="298.5"></omgdi:waypoint>
+                <omgdi:waypoint x="508.0" y="298.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_21" id="BPMNEdge_bpmnSequenceFlow_21" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="360.0" y="400.0"></omgdi:waypoint>
+                <omgdi:waypoint x="360.0" y="452.5"></omgdi:waypoint>
+                <omgdi:waypoint x="349.0" y="452.5"></omgdi:waypoint>
+                <omgdi:waypoint x="349.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_35" id="BPMNEdge_bpmnSequenceFlow_35" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="956.0" y="197.0"></omgdi:waypoint>
+                <omgdi:waypoint x="956.0" y="147.5"></omgdi:waypoint>
+                <omgdi:waypoint x="983.0" y="147.5"></omgdi:waypoint>
+                <omgdi:waypoint x="983.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_23" id="BPMNEdge_bpmnSequenceFlow_23" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="464.0" y="425.0"></omgdi:waypoint>
+                <omgdi:waypoint x="464.0" y="465.0"></omgdi:waypoint>
+                <omgdi:waypoint x="465.0" y="465.0"></omgdi:waypoint>
+                <omgdi:waypoint x="465.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_56" id="BPMNEdge_bpmnSequenceFlow_56" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="360.0" y="197.0"></omgdi:waypoint>
+                <omgdi:waypoint x="360.0" y="147.5"></omgdi:waypoint>
+                <omgdi:waypoint x="295.0" y="147.5"></omgdi:waypoint>
+                <omgdi:waypoint x="295.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_12" id="BPMNEdge_bpmnSequenceFlow_12" flowable:sourceDockerX="298.0" flowable:sourceDockerY="112.0"
+                             flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+                <omgdi:waypoint x="956.0" y="298.5"></omgdi:waypoint>
+                <omgdi:waypoint x="1006.0" y="298.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_25" id="BPMNEdge_bpmnSequenceFlow_25" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="570.0" y="425.0"></omgdi:waypoint>
+                <omgdi:waypoint x="570.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_47" id="BPMNEdge_bpmnSequenceFlow_47" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="559.0" y="172.0"></omgdi:waypoint>
+                <omgdi:waypoint x="559.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="544.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="544.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_27" id="BPMNEdge_bpmnSequenceFlow_27" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="682.0" y="425.0"></omgdi:waypoint>
+                <omgdi:waypoint x="682.0" y="465.0"></omgdi:waypoint>
+                <omgdi:waypoint x="681.0" y="465.0"></omgdi:waypoint>
+                <omgdi:waypoint x="681.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_38" id="BPMNEdge_bpmnSequenceFlow_38" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="866.0" y="172.0"></omgdi:waypoint>
+                <omgdi:waypoint x="866.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="870.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="870.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_4" id="BPMNEdge_bpmnSequenceFlow_4" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0"
+                             flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+                <omgdi:waypoint x="608.0" y="298.5"></omgdi:waypoint>
+                <omgdi:waypoint x="853.0" y="298.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_29" id="BPMNEdge_bpmnSequenceFlow_29" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="792.0" y="425.0"></omgdi:waypoint>
+                <omgdi:waypoint x="792.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_2" id="BPMNEdge_bpmnSequenceFlow_2" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="298.0" flowable:targetDockerY="112.0">
+                <omgdi:waypoint x="194.0" y="298.5"></omgdi:waypoint>
+                <omgdi:waypoint x="360.0" y="298.5"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_50" id="BPMNEdge_bpmnSequenceFlow_50" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="468.0" y="172.0"></omgdi:waypoint>
+                <omgdi:waypoint x="468.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="433.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="433.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_31" id="BPMNEdge_bpmnSequenceFlow_31" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="893.0" y="425.0"></omgdi:waypoint>
+                <omgdi:waypoint x="893.0" y="505.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_53" id="BPMNEdge_bpmnSequenceFlow_53" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="345.0" y="260.0"></omgdi:waypoint>
+                <omgdi:waypoint x="310.0" y="260.0"></omgdi:waypoint>
+                <omgdi:waypoint x="310.0" y="227.0"></omgdi:waypoint>
+                <omgdi:waypoint x="275.0" y="227.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge bpmnElement="bpmnSequenceFlow_41" id="BPMNEdge_bpmnSequenceFlow_41" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                             flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+                <omgdi:waypoint x="767.0" y="172.0"></omgdi:waypoint>
+                <omgdi:waypoint x="767.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="762.0" y="135.0"></omgdi:waypoint>
+                <omgdi:waypoint x="762.0" y="98.0"></omgdi:waypoint>
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</definitions>

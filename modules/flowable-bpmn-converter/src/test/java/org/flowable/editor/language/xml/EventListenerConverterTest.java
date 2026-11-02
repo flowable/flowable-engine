@@ -86,7 +86,7 @@ class EventListenerConverterTest {
         assertThat(scriptTaskListenerType.getImplementationType()).isEqualTo("script");
         assertThat(scriptTaskListenerType.getImplementation()).isNull();
         assertThat(scriptTaskListenerType.getScriptInfo()).isNotNull();
-        assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains(" task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptTaskListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
         assertThat(scriptTaskListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
         assertThat(scriptTaskListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
     }
@@ -105,7 +105,7 @@ class EventListenerConverterTest {
         assertThat(scriptListenerType.getImplementationType()).isEqualTo("script");
         assertThat(scriptListenerType.getImplementation()).isNull();
         assertThat(scriptListenerType.getScriptInfo()).isNotNull();
-        assertThat(scriptListenerType.getScriptInfo().getScript()).contains(" task.setVariable('scriptTaskListenerType', \"Type\");");
+        assertThat(scriptListenerType.getScriptInfo().getScript()).contains("task.setVariable('scriptTaskListenerType', \"Type\");");
         assertThat(scriptListenerType.getScriptInfo().getLanguage()).isEqualTo("groovy");
         assertThat(scriptListenerType.getScriptInfo().getResultVariable()).isEqualTo("scriptTypeResult");
     }

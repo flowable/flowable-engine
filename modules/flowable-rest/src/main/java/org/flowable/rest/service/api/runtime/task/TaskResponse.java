@@ -22,7 +22,7 @@ import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import io.swagger.annotations.ApiModelProperty;
 

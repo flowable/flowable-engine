@@ -13,58 +13,70 @@
 
 package org.flowable.dmn.engine.impl.db;
 
-import org.flowable.common.engine.impl.db.EngineDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.LiquibaseBasedSchemaManager;
-import org.flowable.common.engine.impl.db.LiquibaseDatabaseConfiguration;
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.common.engine.impl.db.EngineSchemaManagerLockConfiguration;
+import org.flowable.common.engine.impl.db.EngineSqlScriptBasedDbSchemaManager;
+import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 
-public class DmnDbSchemaManager extends LiquibaseBasedSchemaManager {
-    
-    public static final String LIQUIBASE_CHANGELOG = "org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml";
+public class DmnDbSchemaManager extends EngineSqlScriptBasedDbSchemaManager {
+
+    protected static final String DMN_DB_SCHEMA_LOCK_NAME = "dmnDbSchemaLock";
+
+    protected static final Map<String, String> changeLogVersionMap = Map.ofEntries(
+            Map.entry("1", "6.0.0.5"),
+            Map.entry("2", "6.1.1.0"),
+            Map.entry("3", "6.3.0.0"),
+            Map.entry("4", "6.3.1.0"),
+            Map.entry("5", "6.4.0.0"),
+            Map.entry("6", "6.4.1.3"),
+            Map.entry("7", "6.6.0.0"),
+            Map.entry("8", "6.6.0.0"),
+            Map.entry("9", "6.8.0.0"),
+            Map.entry("10", "7.1.0.0")
+    );
 
     public DmnDbSchemaManager() {
-        super("dmn", LIQUIBASE_CHANGELOG, DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX);
+        super("dmn", new EngineSchemaManagerLockConfiguration(CommandContextUtil::getDmnEngineConfiguration));
     }
 
     @Override
-    protected LiquibaseDatabaseConfiguration getDatabaseConfiguration() {
-        return new EngineDatabaseConfiguration(CommandContextUtil.getDmnEngineConfiguration());
-    }
-
-    public void initSchema() {
-        initSchema(CommandContextUtil.getDmnEngineConfiguration().getDatabaseSchemaUpdate());
+    protected String getEngineVersion() {
+        return DmnEngine.VERSION;
     }
 
     @Override
-    public void schemaCreate() {
-        getCommonSchemaManager().schemaCreate();
-        super.schemaCreate();
+    protected String getSchemaVersionPropertyName() {
+        return "dmn.schema.version";
     }
 
     @Override
-    public void schemaDrop() {
-        try {
-            super.schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping dmn engine tables", e);
+    protected String getDbSchemaLockName() {
+        return DMN_DB_SCHEMA_LOCK_NAME;
+    }
+
+    @Override
+    protected String getEngineTableName() {
+        return "ACT_DMN_DECISION";
+    }
+
+    @Override
+    protected String getChangeLogTableName() {
+        return "ACT_DMN_DATABASECHANGELOG";
+    }
+
+    @Override
+    protected String getDbVersionForChangelogVersion(String changeLogVersion) {
+        if (StringUtils.isNotEmpty(changeLogVersion) && changeLogVersionMap.containsKey(changeLogVersion)) {
+            return changeLogVersionMap.get(changeLogVersion);
         }
-
-        try {
-            getCommonSchemaManager().schemaDrop();
-        } catch (Exception e) {
-            logger.info("Error dropping common tables", e);
-        }
+        return "5.99.0.0";
     }
 
     @Override
-    public String schemaUpdate() {
-        getCommonSchemaManager().schemaUpdate();
-        return super.schemaUpdate();
-    }
-
-    protected SchemaManager getCommonSchemaManager() {
-        return CommandContextUtil.getDmnEngineConfiguration().getCommonSchemaManager();
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/dmn/db/";
     }
 }

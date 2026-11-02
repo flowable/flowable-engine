@@ -102,13 +102,16 @@ public class EventModel {
         this.payload.put(payload.getName(), payload);
     }
 
-    public void addCorrelation(String name, String type) {
+    public EventPayload addCorrelation(String name, String type) {
         EventPayload eventPayload = payload.get(name);
         if (eventPayload != null) {
             eventPayload.setCorrelationParameter(true);
         } else {
-            payload.put(name, EventPayload.correlation(name, type));
+            eventPayload = EventPayload.correlation(name, type);
+            payload.put(name, eventPayload);
         }
+        
+        return eventPayload;
     }
     
     public void addFullPayload(String name) {

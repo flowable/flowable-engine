@@ -66,7 +66,7 @@ public class AddCommentCmd implements Command<Comment> {
             }
 
             if (task.isSuspended()) {
-                throw new FlowableException(getSuspendedTaskException());
+                throw new FlowableException("Cannot add a comment to a suspended " + task);
             }
         }
 
@@ -79,7 +79,7 @@ public class AddCommentCmd implements Command<Comment> {
             }
 
             if (execution.isSuspended()) {
-                throw new FlowableException(getSuspendedExceptionMessage());
+                throw new FlowableException("Cannot add a comment to a suspended " + execution);
             }
         }
 
@@ -115,13 +115,5 @@ public class AddCommentCmd implements Command<Comment> {
         processEngineConfiguration.getCommentEntityManager().insert(comment);
 
         return comment;
-    }
-
-    protected String getSuspendedTaskException() {
-        return "Cannot add a comment to a suspended task";
-    }
-
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot add a comment to a suspended execution";
     }
 }

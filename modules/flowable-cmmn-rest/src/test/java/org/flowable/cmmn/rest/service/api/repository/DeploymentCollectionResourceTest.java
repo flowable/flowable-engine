@@ -23,8 +23,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -38,6 +39,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET cmmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -88,6 +90,35 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             // Check without tenantId filtering
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
+
+        } finally {
+            // Always cleanup any created deployments, even if the test failed
+            List<CmmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
+            for (CmmnDeployment deployment : deployments) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
+
+    @Test
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            cmmnEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            CmmnDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+                    .tenantId("acme")
+                    .deploy();
+
+            cmmnEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            CmmnDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
+                    .tenantId("myTenant")
+                    .deploy();
 
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(

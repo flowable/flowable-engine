@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:design="http://flowable.org/design" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://flowable.org/test" design:palette="flowable-process-palette">
+  <process id="errorProcess" name="errorProcess" isExecutable="true" flowable:candidateStarterGroups="flowableUser">
+    <extensionElements>
+      <design:stencilid><![CDATA[BPMNDiagram]]></design:stencilid>
+      <design:language><![CDATA[English]]></design:language>
+      <design:creationdate><![CDATA[2022-10-07T08:20:08.554Z]]></design:creationdate>
+      <design:modificationdate><![CDATA[2022-10-07T08:35:36.611Z]]></design:modificationdate>
+    </extensionElements>
+    <startEvent id="startnoneevent1" flowable:initiator="initiator" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </startEvent>
+    <subProcess id="subprocess" name="Subprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[ExpandedSubProcess]]></design:stencilid>
+        <design:bgcolor><![CDATA[#e6e6e6]]></design:bgcolor>
+      </extensionElements>
+      <startEvent id="startSubProcess" flowable:initiator="initiator" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+          <design:stencilid><![CDATA[StartNoneEvent]]></design:stencilid>
+        </extensionElements>
+      </startEvent>
+      <endEvent id="endNoneEvent1">
+        <extensionElements>
+          <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+        </extensionElements>
+      </endEvent>
+      <scriptTask id="subProcessTask" name="A Task" scriptFormat="groovy" flowable:autoStoreVariables="false">
+        <extensionElements>
+          <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+
+          <flowable:executionListener type="script" event="start">
+            <flowable:script language="groovy">
+              <![CDATA[if (execution.getVariable('throwErrorStartListener') != null){
+                        throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorStartListener'));
+                    }]]>
+            </flowable:script>
+          </flowable:executionListener>
+          <flowable:executionListener type="script" event="end">
+            <flowable:script language="groovy">
+              <![CDATA[if (execution.getVariable('throwErrorEndListener') != null){
+                        throw new org.flowable.engine.delegate.BpmnError(execution.getVariable('throwErrorEndListener'));
+                    }]]>
+            </flowable:script>
+          </flowable:executionListener>
+
+        </extensionElements>
+        <script><![CDATA[execution.setVariable('_script_task', 'executed');]]></script>
+      </scriptTask>
+      <boundaryEvent id="errorBoundaryEventTask" attachedToRef="subProcessTask">
+        <extensionElements>
+          <design:stencilid><![CDATA[IntermediateErrorEventBoundary]]></design:stencilid>
+          <design:bordercolor><![CDATA[#df0000]]></design:bordercolor>
+        </extensionElements>
+        <errorEventDefinition></errorEventDefinition>
+      </boundaryEvent>
+      <scriptTask id="handleErrorTask" name="Handle Error" scriptFormat="groovy" flowable:autoStoreVariables="false">
+        <extensionElements>
+          <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          <design:bgcolor><![CDATA[#feb2b2]]></design:bgcolor>
+        </extensionElements>
+        <script><![CDATA[execution.setVariable('error_handled', 'task_boundary');]]></script>
+      </scriptTask>
+      <sequenceFlow id="sequenceFlow5" sourceRef="startSubProcess" targetRef="subProcessTask">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sequenceFlow6" sourceRef="subProcessTask" targetRef="endNoneEvent1">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sequenceFlow8" sourceRef="errorBoundaryEventTask" targetRef="handleErrorTask">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sequenceFlow9" sourceRef="handleErrorTask" targetRef="endNoneEvent1">
+        <extensionElements>
+          <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+        </extensionElements>
+      </sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="sequenceFlow1" sourceRef="startnoneevent1" targetRef="subprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <boundaryEvent id="errorBoundaryEventParent" attachedToRef="subprocess">
+      <extensionElements>
+        <design:stencilid><![CDATA[IntermediateErrorEventBoundary]]></design:stencilid>
+        <design:bordercolor><![CDATA[#d41809]]></design:bordercolor>
+      </extensionElements>
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <scriptTask id="handleErrorTaskParent" name="Handle Error Parent" scriptFormat="groovy" flowable:autoStoreVariables="false">
+      <extensionElements>
+        <design:stencilid><![CDATA[ScriptTask]]></design:stencilid>
+        <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+      </extensionElements>
+      <script><![CDATA[execution.setVariable('error_handled', 'parent_boundary');]]></script>
+    </scriptTask>
+    <sequenceFlow id="sequenceFlow3" sourceRef="errorBoundaryEventParent" targetRef="handleErrorTaskParent">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow4" sourceRef="subprocess" targetRef="endNoneEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+    <endEvent id="endNoneEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[EndNoneEvent]]></design:stencilid>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="sequenceFlow7" sourceRef="handleErrorTaskParent" targetRef="endNoneEvent2">
+      <extensionElements>
+        <design:stencilid><![CDATA[SequenceFlow]]></design:stencilid>
+      </extensionElements>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_errorProcess">
+    <bpmndi:BPMNPlane bpmnElement="errorProcess" id="BPMNPlane_errorProcess">
+      <bpmndi:BPMNShape bpmnElement="startnoneevent1" id="BPMNShape_startnoneevent1">
+        <omgdc:Bounds height="30.0" width="30.0" x="255.0" y="337.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess" id="BPMNShape_subprocess">
+        <omgdc:Bounds height="285.0" width="285.0" x="360.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startSubProcess" id="BPMNShape_startSubProcess">
+        <omgdc:Bounds height="30.0" width="30.0" x="395.0" y="275.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endNoneEvent1" id="BPMNShape_endNoneEvent1">
+        <omgdc:Bounds height="28.0" width="28.0" x="605.0" y="276.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subProcessTask" id="BPMNShape_subProcessTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="466.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="errorBoundaryEventTask" id="BPMNShape_errorBoundaryEventTask">
+        <omgdc:Bounds height="30.0" width="30.0" x="495.0" y="315.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleErrorTask" id="BPMNShape_handleErrorTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="466.0" y="375.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="errorBoundaryEventParent" id="BPMNShape_errorBoundaryEventParent">
+        <omgdc:Bounds height="30.0" width="30.0" x="394.875" y="480.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleErrorTaskParent" id="BPMNShape_handleErrorTaskParent">
+        <omgdc:Bounds height="80.0" width="100.0" x="466.0" y="525.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endNoneEvent2" id="BPMNShape_endNoneEvent2">
+        <omgdc:Bounds height="28.0" width="28.0" x="705.0" y="338.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="424.9499983738987" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="466.0" y="290.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow6" id="BPMNEdge_sequenceFlow6" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="565.949999999936" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="290.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow3" id="BPMNEdge_sequenceFlow3" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="409.875" y="509.9499960508851"></omgdi:waypoint>
+        <omgdi:waypoint x="409.875" y="563.0"></omgdi:waypoint>
+        <omgdi:waypoint x="464.0" y="563.0"></omgdi:waypoint>
+        <omgdi:waypoint x="466.0" y="563.0769230769231"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow4" id="BPMNEdge_sequenceFlow4" flowable:sourceDockerX="142.5" flowable:sourceDockerY="142.5" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="644.9499999998867" y="352.5"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="352.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow1" id="BPMNEdge_sequenceFlow1" flowable:sourceDockerX="32.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="142.5" flowable:targetDockerY="142.5">
+        <omgdi:waypoint x="318.94999615796377" y="352.5"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="352.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow9" id="BPMNEdge_sequenceFlow9" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="565.949999999936" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="619.0" y="415.0"></omgdi:waypoint>
+        <omgdi:waypoint x="619.0" y="303.94993072319545"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow7" id="BPMNEdge_sequenceFlow7" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0" flowable:targetDockerX="16.0" flowable:targetDockerY="24.0">
+        <omgdi:waypoint x="565.9499999997095" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="721.0" y="565.0"></omgdi:waypoint>
+        <omgdi:waypoint x="721.0" y="386.44991041162484"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow8" id="BPMNEdge_sequenceFlow8" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="44.0" flowable:targetDockerY="19.0">
+        <omgdi:waypoint x="510.0" y="344.94999554221965"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="375.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -18,6 +18,7 @@ package org.flowable.engine.migration;
  */
 public interface ProcessInstanceMigrationDocumentConstants {
 
+    String PROCESS_INSTANCE_IDS_TO_MIGRATE_JSON_PROPERTY = "processInstanceIdsToMigrate";
     String TO_PROCESS_DEFINITION_ID_JSON_PROPERTY = "toProcessDefinitionId";
     String TO_PROCESS_DEFINITION_KEY_JSON_PROPERTY = "toProcessDefinitionKey";
     String TO_PROCESS_DEFINITION_VERSION_JSON_PROPERTY = "toProcessDefinitionVersion";
@@ -27,7 +28,16 @@ public interface ProcessInstanceMigrationDocumentConstants {
     String FROM_ACTIVITY_IDS_JSON_PROPERTY = "fromActivityIds";
     String TO_ACTIVITY_ID_JSON_PROPERTY = "toActivityId";
     String TO_ACTIVITY_IDS_JSON_PROPERTY = "toActivityIds";
+    String NEW_NAME_JSON_PROPERTY = "newName";
+    String NEW_DUE_DATE_JSON_PROPERTY = "newDueDate";
+    String NEW_PRIORITY_JSON_PROPERTY = "newPriority";
+    String NEW_CATEGORY_JSON_PROPERTY = "newCategory";
+    String NEW_FORM_KEY_JSON_PROPERTY = "newFormKey";
     String NEW_ASSIGNEE_JSON_PROPERTY = "newAssignee";
+    String NEW_OWNER_JSON_PROPERTY = "newOwner";
+    String NEW_CANDIDATE_USERS_JSON_PROPERTY = "newCandidateUsers";
+    String NEW_CANDIDATE_GROUPS_JSON_PROPERTY = "newCandidateGroups";
+    String ACTIVITY_ID_JSON_PROPERTY = "activityId";
 
     String IN_SUB_PROCESS_OF_CALL_ACTIVITY_ID_JSON_PROPERTY = "inSubProcessOfCallActivityId";
     String CALL_ACTIVITY_PROCESS_DEFINITION_VERSION_JSON_PROPERTY = "callActivityProcessDefinitionVersion";
@@ -43,6 +53,7 @@ public interface ProcessInstanceMigrationDocumentConstants {
     String SCRIPT = "script";
 
     String ACTIVITY_MAPPINGS_JSON_SECTION = "activityMappings";
+    String ENABLE_ACTIVITY_MAPPINGS_JSON_SECTION = "enableActivityMappings";
     String LOCAL_VARIABLES_JSON_SECTION = "localVariables";
     String PROCESS_INSTANCE_VARIABLES_JSON_SECTION = "processInstanceVariables";
 

@@ -15,6 +15,7 @@ package org.flowable.task.api;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.query.Query;
@@ -32,6 +33,14 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with the given task id (in practice, there will be maximum one of this kind)
      */
     T taskId(String taskId);
+
+    /**
+     * Only select tasks with an id that is in the given list
+     *
+     * @throws FlowableIllegalArgumentException
+     *             When passed id list is empty or <code>null</code> or contains <code>null String</code>.
+     */
+    T taskIds(Collection<String> taskIds);
 
     /** Only select tasks with the given name */
     T taskName(String name);
@@ -261,6 +270,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given scope identifier. 
      */
     T scopeId(String scopeId);
+
+    /**
+     * Only select tasks for the given scope identifiers.
+     */
+    T scopeIds(Set<String> scopeIds);
     
     /**
      * Only select tasks for the given sub scope identifier. 
@@ -306,6 +320,66 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks that are created after the given date.
      */
     T taskCreatedAfter(Date after);
+    
+    /**
+     * Only select tasks that are started in progress on the given date.
+     */
+    T taskInProgressStartTimeOn(Date claimedTime);
+
+    /**
+     * Only select tasks that are started in progress before the given date.
+     */
+    T taskInProgressStartTimeBefore(Date before);
+
+    /**
+     * Only select tasks that are started in progress after the given date.
+     */
+    T taskInProgressStartTimeAfter(Date after);
+    
+    /**
+     * Select all tasks that have an in progress started user reference for the given value.
+     */
+    T taskInProgressStartedBy(String startedBy);
+    
+    /**
+     * Only select tasks that are claimed on the given date.
+     */
+    T taskClaimedOn(Date claimedTime);
+
+    /**
+     * Only select tasks that are claimed before the given date.
+     */
+    T taskClaimedBefore(Date before);
+
+    /**
+     * Only select tasks that are claimed after the given date.
+     */
+    T taskClaimedAfter(Date after);
+    
+    /**
+     * Select all tasks that have a claimed by user reference for the given value.
+     */
+    T taskClaimedBy(String claimedBy);
+    
+    /**
+     * Only select tasks that are suspended on the given date.
+     */
+    T taskSuspendedOn(Date suspendedTime);
+
+    /**
+     * Only select tasks that are suspended before the given date.
+     */
+    T taskSuspendedBefore(Date before);
+
+    /**
+     * Only select tasks that are suspended after the given date.
+     */
+    T taskSuspendedAfter(Date after);
+    
+    /**
+     * Select all tasks that have a suspended by user reference for the given value.
+     */
+    T taskSuspendedBy(String suspendedBy);
 
     /**
      * Only select tasks with the given category.
@@ -367,6 +441,31 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks with the given taskDefinitionKeys. The task definition key is the id of the userTask: &lt;userTask id="xxx" .../&gt;
      **/
     T taskDefinitionKeys(Collection<String> keys);
+    
+    /**
+     * Only select tasks with the given state.
+     **/
+    T taskState(String state);
+    
+    /**
+     * Only select tasks with the given in progress start due date.
+     */
+    T taskInProgressStartDueDate(Date dueDate);
+
+    /**
+     * Only select tasks which have an in progress start due date before the given date.
+     */
+    T taskInProgressStartDueBefore(Date dueDate);
+
+    /**
+     * Only select tasks which have an in progress start due date after the given date.
+     */
+    T taskInProgressStartDueAfter(Date dueDate);
+
+    /**
+     * Only select tasks with no in progress start due date.
+     */
+    T withoutTaskInProgressStartDueDate();
 
     /**
      * Only select tasks with the given due date.
@@ -801,6 +900,16 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T caseVariableNotExists(String name);
 
     /**
+     * Only selects tasks which with the given root scope id
+     */
+    T taskRootScopeId(String parentScopeId);
+
+    /**
+     * Only selects tasks which with the given parent scope id
+     */
+    T taskParentScopeId(String parentScopeId);
+
+    /**
      * Include local task variables in the task query result
      */
     T includeTaskLocalVariables();
@@ -816,11 +925,25 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
     T includeCaseVariables();
 
     /**
-     * Limit task variables
-     * @deprecated no longer needed, this is a noop
+     * Include local task variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
      */
-    @Deprecated
-    T limitTaskVariables(Integer taskVariablesLimit);
+    T includeTaskLocalVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include global process variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    T includeProcessVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include global case variables in the task query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    T includeCaseVariables(boolean excludeVariableInitialization);
 
     /**
      * Include identity links in the task query result

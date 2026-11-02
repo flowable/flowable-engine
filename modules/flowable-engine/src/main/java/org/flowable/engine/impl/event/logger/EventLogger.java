@@ -45,7 +45,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -162,16 +162,14 @@ public class EventLogger extends AbstractFlowableEventListener {
         Class<? extends EventLoggerEventHandler> eventHandlerClass = null;
         if (event.getType().equals(FlowableEngineEventType.ENTITY_INITIALIZED)) {
             Object entity = ((FlowableEntityEvent) event).getEntity();
-            if (entity instanceof ExecutionEntity) {
-                ExecutionEntity executionEntity = (ExecutionEntity) entity;
+            if (entity instanceof ExecutionEntity executionEntity) {
                 if (executionEntity.getProcessInstanceId().equals(executionEntity.getId())) {
                     eventHandlerClass = ProcessInstanceStartedEventHandler.class;
                 }
             }
         } else if (event.getType().equals(FlowableEngineEventType.ENTITY_DELETED)) {
             Object entity = ((FlowableEntityEvent) event).getEntity();
-            if (entity instanceof ExecutionEntity) {
-                ExecutionEntity executionEntity = (ExecutionEntity) entity;
+            if (entity instanceof ExecutionEntity executionEntity) {
                 if (executionEntity.getProcessInstanceId().equals(executionEntity.getId())) {
                     eventHandlerClass = ProcessInstanceEndedEventHandler.class;
                 }
@@ -191,7 +189,7 @@ public class EventLogger extends AbstractFlowableEventListener {
     protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
             Class<? extends EventLoggerEventHandler> eventHandlerClass) {
         try {
-            EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
+            EventLoggerEventHandler eventHandler = eventHandlerClass.getConstructor().newInstance();
             eventHandler.setTimeStamp(clock.getCurrentTime());
             eventHandler.setEvent(event);
             eventHandler.setObjectMapper(objectMapper);

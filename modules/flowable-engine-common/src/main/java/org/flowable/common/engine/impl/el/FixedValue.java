@@ -38,7 +38,7 @@ public class FixedValue implements Expression {
     
     @Override
     public void setValue(Object value, VariableContainer variableContainer) {
-        throw new FlowableException("Cannot change fixed value");
+        throw new FlowableException("Cannot change fixed value with " + variableContainer);
     }
 
     @Override

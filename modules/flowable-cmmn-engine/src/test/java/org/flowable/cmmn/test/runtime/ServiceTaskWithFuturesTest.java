@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -37,15 +39,16 @@ import org.flowable.cmmn.api.delegate.ReadOnlyDelegatePlanItemInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
@@ -223,11 +226,35 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
                     .start();
         })
                 .isExactlyInstanceOf(FlowableException.class)
-                .getCause()
+                .cause()
                 .isInstanceOf(ELException.class)
-                .getCause()
+                .cause()
                 .isExactlyInstanceOf(FlowableException.class)
                 .hasMessage("Countdown latch did not reach 0");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ServiceTaskWithFuturesTest.testExpressionReturnsFuture.cmmn")
+    public void testAgendaFutureMaxWaitTimeoutOperationProvider() {
+
+        AgendaFutureMaxWaitTimeoutProvider originalTimeoutProvider = cmmnEngineConfiguration.getAgendaFutureMaxWaitTimeoutProvider();
+        try {
+            cmmnEngineConfiguration.setAgendaFutureMaxWaitTimeoutProvider(commandContext -> Duration.ofMillis(500));
+            CountDownLatch latch = new CountDownLatch(3);
+            TestBeanReturnsFuture testBean = new TestBeanReturnsFuture(latch, cmmnEngineConfiguration.getAsyncTaskExecutor());
+            assertThatThrownBy(() -> {
+                cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("myCase")
+                        .transientVariable("bean", testBean)
+                        .start();
+            })
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("None of the available futures completed within the max timeout of PT0.5S")
+                    .cause()
+                    .isInstanceOf(TimeoutException.class);
+        } finally {
+            cmmnEngineConfiguration.setAgendaFutureMaxWaitTimeoutProvider(originalTimeoutProvider);
+        }
     }
 
     @Test
@@ -272,14 +299,14 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
             assertThat(historicVariables.get("executionThreadName1"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
-                .startsWith("flowable-async-job-executor-thread-");
+                .startsWith("flowable-async-task-invoker-thread-");
 
             assertThat(historicVariables.get("executionThreadName2"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 // The executions should be done on different threads
                 .isNotEqualTo(historicVariables.get("executionThreadName1"))
-                .startsWith("flowable-async-job-executor-thread-");
+                .startsWith("flowable-async-task-invoker-thread-");
         }
     }
 
@@ -522,14 +549,14 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
             assertThat(historicVariables.get("executionThreadName1"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
-                .startsWith("flowable-async-job-executor-thread-");
+                .startsWith("flowable-async-task-invoker-thread-");
 
             assertThat(historicVariables.get("executionThreadName2"))
                 .asInstanceOf(STRING)
                 .isNotEqualTo(currentThreadName)
                 // The executions should be done on different threads
                 .isNotEqualTo(historicVariables.get("executionThreadName1"))
-                .startsWith("flowable-async-job-executor-thread-");
+                .startsWith("flowable-async-task-invoker-thread-");
         }
     }
 

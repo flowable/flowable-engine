@@ -5,23 +5,23 @@
 <mapper namespace="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
 
   <resultMap id="privilegeResultMap" type="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <insert id="insertPrivilege" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
     insert into ${prefix}ACT_ID_PRIV (ID_, NAME_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      #{name ,jdbcType=VARCHAR}
+      #{id, jdbcType=NVARCHAR},
+      #{name, jdbcType=NVARCHAR}
     )
   </insert>
 
   <insert id="bulkInsertPrivilege" parameterType="java.util.List">
     insert into ${prefix}ACT_ID_PRIV (ID_, NAME_) VALUES 
       <foreach collection="list" item="privilege" index="index" separator=",">
-        (#{privilege.id ,jdbcType=VARCHAR},
-         #{privilege.name ,jdbcType=VARCHAR}
+        (#{privilege.id, jdbcType=NVARCHAR},
+         #{privilege.name, jdbcType=NVARCHAR}
       </foreach>
   </insert>
 
@@ -29,18 +29,18 @@
     INSERT ALL 
       <foreach collection="list" item="privilege" index="index">
         insert into ${prefix}ACT_ID_PRIV (ID_, NAME_) VALUES 
-        (#{privilege.id ,jdbcType=VARCHAR},
-         #{privilege.name ,jdbcType=VARCHAR}
+        (#{privilege.id, jdbcType=NVARCHAR},
+         #{privilege.name, jdbcType=NVARCHAR}
       </foreach>
     SELECT * FROM dual
   </insert>
 
   <delete id="deletePrivilege" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
-    delete from ${prefix}ACT_ID_PRIV where ID_ = #{id}
+    delete from ${prefix}ACT_ID_PRIV where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
 
   <select id="selectPrivilege" parameterType="string" resultMap="privilegeResultMap">
-    select * from ${prefix}ACT_ID_PRIV where ID_ = #{id,jdbcType=VARCHAR}
+    select * from ${prefix}ACT_ID_PRIV where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectPrivilegeByQueryCriteria" parameterType="org.flowable.idm.engine.impl.PrivilegeQueryImpl" resultMap="privilegeResultMap">
@@ -60,20 +60,27 @@
     from ${prefix}ACT_ID_PRIV RES 
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
+      </if>
+      <if test="ids != null &amp;&amp; !ids.empty">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="ids"
+                 open="(" separator="," close=")">
+          #{id, jdbcType=NVARCHAR}
+        </foreach>
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="userId != null">
-        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.USER_ID_ = #{userId})
+        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.USER_ID_ = #{userId, jdbcType=NVARCHAR})
       </if>
       <if test="groupId != null">
-        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ = #{groupId})
+        and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ = #{groupId, jdbcType=NVARCHAR})
       </if>
       <if test="groupIds != null &amp;&amp; !groupIds.empty">
         and exists(select 1 from ${prefix}ACT_ID_PRIV_MAPPING mapping where RES.ID_ = mapping.PRIV_ID_ and mapping.GROUP_ID_ in  
-            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId, jdbcType=NVARCHAR}</foreach>)
       </if>
     </where>
   </sql>

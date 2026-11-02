@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -82,9 +82,10 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
     @Deployment
     public void testScriptThrowsNonFlowableException() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptExecution"))
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("problem evaluating script: javax.script.ScriptException: java.lang.RuntimeException: Illegal argument in listener")
-                .getRootCause()
+                .isExactlyInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessageContaining(
+                        "groovy script evaluation failed: 'javax.script.ScriptException: java.lang.RuntimeException: Illegal argument in listener'")
+                .rootCause()
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Illegal argument in listener");
     }

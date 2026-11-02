@@ -12,9 +12,12 @@
  */
 package org.flowable.common.engine.impl.agenda;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 
 import org.flowable.common.engine.api.FlowableException;
@@ -26,10 +29,18 @@ public class WaitForAnyFutureToFinishOperation implements Runnable {
 
     protected final Agenda agenda;
     protected final List<ExecuteFutureActionOperation<?>> futureOperations;
+    protected final Duration timeout;
 
-    public WaitForAnyFutureToFinishOperation(Agenda agenda, List<ExecuteFutureActionOperation<?>> futureOperations) {
+    public WaitForAnyFutureToFinishOperation(Agenda agenda, List<ExecuteFutureActionOperation<?>> futureOperations, Duration timeout) {
         this.agenda = agenda;
         this.futureOperations = futureOperations;
+        if (timeout == null) {
+            this.timeout = null;
+        } else if (timeout.isNegative() || timeout.isZero()) {
+            throw new FlowableException("max wait timeout has to be positive. It was " + timeout);
+        } else {
+            this.timeout = timeout;
+        }
     }
 
     @Override
@@ -40,8 +51,26 @@ public class WaitForAnyFutureToFinishOperation implements Runnable {
             anyOfFutures[i] = futureOperations.get(i).getFuture();
         }
         try {
-            // This blocks until at least one is future is done
-            CompletableFuture.anyOf(anyOfFutures).get();
+            CompletableFuture<Object> anyOfFuture = CompletableFuture.anyOf(anyOfFutures);
+            if (timeout == null) {
+                // This blocks until at least one is future is done
+                anyOfFuture.get();
+            } else {
+                try {
+                    // This blocks until at least one is future is done or the timeout is reached
+                    anyOfFuture.get(timeout.toMillis(), TimeUnit.MILLISECONDS);
+                } catch (TimeoutException e) {
+                    // When the timeout is reached we need to cancel all the futures that are not done
+                    for (ExecuteFutureActionOperation<?> futureOperation : futureOperations) {
+                        if (!futureOperation.isDone()) {
+                            // If there was a timeout then we need to cancel all the futures that have not completed already
+                            futureOperation.getFuture().cancel(true);
+                        }
+                    }
+                    throw new FlowableException("None of the available futures completed within the max timeout of " + timeout, e);
+                }
+            }
+
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FlowableException("Future was interrupted", e);

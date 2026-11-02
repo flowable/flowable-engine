@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
-import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
@@ -31,8 +30,10 @@ import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.IOParameterUtil;
+import org.flowable.cmmn.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.cmmn.engine.interceptor.CmmnChildInstanceParametersInterceptor;
 import org.flowable.cmmn.model.CaseTask;
-import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalStateException;
@@ -58,7 +59,8 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
     protected CaseTask caseTask;
 
     public CaseTaskActivityBehavior(Expression caseRefExpression, CaseTask caseTask) {
-        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters());
+        super(caseTask.isBlocking(), caseTask.getBlockingExpression(), caseTask.getInParameters(), caseTask.getOutParameters(),
+                caseTask.isInheritVariables());
         this.caseRefExpression = caseRefExpression;
         this.caseRef = caseTask.getCaseRef();
         this.fallbackToDefaultTenant = caseTask.getFallbackToDefaultTenant();
@@ -80,7 +82,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         }
         if (StringUtils.isEmpty(caseDefinitionKey)) {
-            throw new FlowableException("Could not start case instance: no case reference defined");
+            throw new FlowableException("Could not start case instance: no case reference defined in " + planItemInstanceEntity);
         }
 
         CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseDefinitionKey);
@@ -96,7 +98,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
         }
 
         Map<String, Object> finalVariableMap = new HashMap<>();
-        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, cmmnEngineConfiguration.getExpressionManager());
+        Map<String, Object> transientVariablesMap = new HashMap<>();
+        handleInParameters(planItemInstanceEntity, cmmnEngineConfiguration, finalVariableMap, transientVariablesMap, cmmnEngineConfiguration.getExpressionManager());
+        afterInParameters(cmmnEngineConfiguration, planItemInstanceEntity, caseTask, finalVariableMap, transientVariablesMap);
 
         // Needed for the form field handler later
         Map<String, Object> variablesFromFormSubmission = null;
@@ -109,8 +113,17 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                     throw new FlowableIllegalStateException("Form engine is not initialized");
                 }
 
-                variablesFromFormSubmission = formService
-                        .getVariablesFromFormSubmission(variableInfo.formInfo, variableInfo.formVariables, variableInfo.formOutcome);
+                variablesFromFormSubmission = formService.createFormSubmissionBuilder()
+                        .elementId(planItemInstanceEntity.getPlanItemDefinitionId())
+                        .elementType("caseTask")
+                        .scopeId(planItemInstanceEntity.getCaseInstanceId())
+                        .scopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId())
+                        .subScopeId(planItemInstanceEntity.getId())
+                        .scopeType(ScopeTypes.CMMN)
+                        .formInfo(variableInfo.formInfo)
+                        .values(variableInfo.formVariables)
+                        .outcome(variableInfo.formOutcome)
+                        .extractVariables();
 
                 finalVariableMap.putAll(variablesFromFormSubmission);
             }
@@ -122,6 +135,9 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
 
         caseInstanceBuilder.businessKey(getBusinessKey(cmmnEngineConfiguration, planItemInstanceEntity, caseTask));
         caseInstanceBuilder.variables(finalVariableMap);
+        if (!transientVariablesMap.isEmpty()) {
+            caseInstanceBuilder.transientVariables(transientVariablesMap);
+        }
 
         if (sameDeployment) {
             caseInstanceBuilder.caseDefinitionParentDeploymentId(
@@ -173,18 +189,21 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                     + planItemInstance.getReferenceType() + "' not supported");
         }
 
-        // Need to be set before planning the complete operation
-        handleOutParameters(commandContext, planItemInstance);
-
         // load the case instance referenced by this case task plan item to check its current state
         CaseInstanceEntity caseInstance = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstance.getReferenceId());
 
-        // Triggering the plan item from a regular case complete (e.g. the referenced case did complete and hence is triggering its plan item
-        // to complete as well) must not terminate the referenced case as it is already completed
-        if (caseInstance.getState().equals(CaseInstanceState.ACTIVE)) {
-            // Triggering the plan item (as opposed to a regular complete of the referenced case) manually terminates the case instance
-            CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+        if (caseInstance != null) {
+            // Out parameters are handled here only when the case is still active (manual trigger scenario).
+            // When the child case completed normally, out parameters are already handled
+            // in ChildCaseInstanceStateChangeCallback before the child case gets deleted.
+            handleOutParameters(commandContext, planItemInstance);
+
+            if (caseInstance.getState().equals(CaseInstanceState.ACTIVE)) {
+                // Triggering the plan item (as opposed to a regular complete of the referenced case) manually terminates the case instance
+                CommandContextUtil.getAgenda(commandContext).planManualTerminateCaseInstanceOperation(planItemInstance.getReferenceId());
+            }
         }
+
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
 
@@ -230,56 +249,39 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                         caseInstance, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
                 caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
             }
-            
+
+            // This is not the regular termination through the agenda, but the historic plan item state still needs to be correct.
+            // The child case instance needs to be deleted synchronously (not deferred via the agenda) to preserve entity link cleanup ordering.
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
+            if (!PlanItemInstanceState.TERMINATED.equals(planItemInstanceEntity.getState())) {
+                planItemInstanceEntity.setState(PlanItemInstanceState.TERMINATED);
+                planItemInstanceEntity.setEndedTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+                planItemInstanceEntity.setTerminatedTime(planItemInstanceEntity.getEndedTime());
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordPlanItemInstanceTerminated(planItemInstanceEntity);
+            }
+
         } else {
-            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE);
+            throw new FlowableException("Can only delete a child entity for a plan item with reference type " + ReferenceTypes.PLAN_ITEM_CHILD_CASE + " for " + delegatePlanItemInstance);
         }
     }
 
     protected void handleOutParameters(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        CaseInstanceEntity caseInstance = caseInstanceEntityManager.findById(planItemInstance.getCaseInstanceId());
-        handleOutParameters(
-            planItemInstance,
-            caseInstance,
-            cmmnEngineConfiguration.getCmmnRuntimeService(),
-            cmmnEngineConfiguration);
+        handleOutParameters(planItemInstance, cmmnEngineConfiguration);
     }
 
-    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance,
-                                       CaseInstanceEntity caseInstance,
-                                       CmmnRuntimeService cmmnRuntimeService, CmmnEngineConfiguration cmmnEngineConfiguration) {
-        if (outParameters == null) {
-            return;
+    protected void handleOutParameters(DelegatePlanItemInstance planItemInstance, CmmnEngineConfiguration cmmnEngineConfiguration) {
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        CaseInstanceEntity referenceCase = caseInstanceEntityManager.findById(planItemInstance.getReferenceId());
+
+        if (outParameters != null) {
+            IOParameterUtil.processOutParameters(outParameters, referenceCase, planItemInstance, cmmnEngineConfiguration.getExpressionManager());
         }
 
-        for (IOParameter outParameter : outParameters) {
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(outParameter.getTarget())) {
-                variableName = outParameter.getTarget();
-
-            } else if (StringUtils.isNotEmpty(outParameter.getTargetExpression())) {
-                Object variableNameValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getTargetExpression());
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("Out parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                            outParameter.getTargetExpression());
-                }
-
-            }
-
-            Object variableValue = null;
-            if (StringUtils.isNotEmpty(outParameter.getSourceExpression())) {
-                variableValue = resolveExpression(cmmnEngineConfiguration, planItemInstance.getReferenceId(), outParameter.getSourceExpression());
-
-            } else if (StringUtils.isNotEmpty(outParameter.getSource())) {
-                variableValue = cmmnRuntimeService.getVariable(planItemInstance.getReferenceId(), outParameter.getSource());
-
-            }
-            caseInstance.setVariable(variableName, variableValue);
+        // A child case that completed was handed to the interceptor by ChildCaseInstanceStateChangeCallback already
+        CmmnChildInstanceParametersInterceptor childInstanceParametersInterceptor = cmmnEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null && referenceCase != null && !CaseInstanceState.COMPLETED.equals(referenceCase.getState())) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(planItemInstance, caseTask, referenceCase));
         }
     }
 

@@ -28,6 +28,8 @@
                 <ref bean="dataSource"/>
             </list>
         </property>
+        
+        <property name="databaseSchemaUpdate" value="drop-create" />
 
         <property name="enableEventRegistryChangeDetection" value="false" />
         <property name="enableEventRegistryChangeDetectionAfterEngineCreate" value="false" />

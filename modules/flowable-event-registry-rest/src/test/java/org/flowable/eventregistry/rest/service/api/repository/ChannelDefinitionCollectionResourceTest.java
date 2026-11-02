@@ -21,8 +21,9 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -36,6 +37,7 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
     /**
      * Test getting channel definitions. GET event-registry-repository/channel-definitions
      */
+    @Test
     public void testGetChannelDefinitions() throws Exception {
 
         try {
@@ -133,6 +135,7 @@ public class ChannelDefinitionCollectionResourceTest extends BaseSpringRestTestC
         }
     }
 
+    @Test
     @EventDeploymentAnnotation(resources = {
             "org/flowable/eventregistry/rest/service/api/repository/jmsInbound.channel",
             "org/flowable/eventregistry/rest/service/api/repository/jmsOutbound.channel",

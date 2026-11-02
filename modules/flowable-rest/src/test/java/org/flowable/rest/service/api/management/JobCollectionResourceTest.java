@@ -30,11 +30,11 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Job collection and a single job resource.
@@ -63,8 +63,8 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         JsonNode timerJobNode = responseNode.get("data").get(0);
-        assertThat(timerJobNode.get("id").asText()).isEqualTo(timerJob.getId());
-        assertThat(timerJobNode.get("url").asText()).contains("management/timer-jobs/" + timerJob.getId());
+        assertThat(timerJobNode.get("id").asString()).isEqualTo(timerJob.getId());
+        assertThat(timerJobNode.get("url").asString()).contains("management/timer-jobs/" + timerJob.getId());
         
         String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION);
         assertResultsPresentInDataResponse(url, timerJob.getId());
@@ -154,6 +154,18 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?withoutScopeId=true";
         assertResultsPresentInDataResponse(url, timerJob.getId());
 
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerType=trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerTypes=unknown-type,trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_TIMER_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
         Job timerJob2 = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).timers().singleResult();
         for (int i = 0; i < timerJob2.getRetries(); i++) {
             // Force execution of job until retries are exhausted
@@ -181,8 +193,8 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         JsonNode deadletterJobNode = responseNode.get("data").get(0);
-        assertThat(deadletterJobNode.get("id").asText()).isEqualTo(timerJob.getId());
-        assertThat(deadletterJobNode.get("url").asText()).contains("management/deadletter-jobs/" + timerJob.getId());
+        assertThat(deadletterJobNode.get("id").asString()).isEqualTo(timerJob.getId());
+        assertThat(deadletterJobNode.get("url").asString()).contains("management/deadletter-jobs/" + timerJob.getId());
         
         assertResultsPresentInDataResponse(url, timerJob.getId());
 
@@ -301,6 +313,32 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?tenantIdLike=anotherTenant";
         assertResultsPresentInDataResponse(url);
 
+        // Handler type(s)
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerType=async-continuation";
+        assertResultsPresentInDataResponse(url, asyncJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerType=trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerType=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerTypes=unknown-type,async-continuation";
+        assertResultsPresentInDataResponse(url, asyncJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerTypes=unknown-type,trigger-timer";
+        assertResultsPresentInDataResponse(url, timerJob.getId());
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION) + "?handlerTypes=unknown-type";
+        assertResultsPresentInDataResponse(url);
+
+
     }
     @Test
     public void getUnexistingDeadLetterJob() throws Exception {
@@ -346,10 +384,9 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
 
-        waitForJobExecutorToProcessAllJobs(2000, 500);
-
         assertThat(managementService.createDeadLetterJobQuery().list()).hasSize(2);
         assertThat(managementService.createJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -357,16 +394,11 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         assertThat(managementService.createJobQuery().list())
                 .hasSize(2)
                 .extracting(Job::getRetries)
                 .containsOnly(processEngineConfiguration.getAsyncExecutorNumberOfRetries());
-
-        waitForJobExecutorToProcessAllJobs(5000, 500);
-
-        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
-        assertThat(managementService.createJobQuery().list()).isEmpty();
-
     }
 
     @Test
@@ -388,8 +420,6 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
-
-        waitForJobExecutorToProcessAllJobs(2000, 500);
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));

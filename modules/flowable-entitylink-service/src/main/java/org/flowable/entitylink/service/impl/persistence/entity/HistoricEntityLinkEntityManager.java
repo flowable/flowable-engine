@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 
 /**
@@ -23,21 +24,21 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
  */
 public interface HistoricEntityLinkEntityManager extends EntityManager<HistoricEntityLinkEntity> {
 
-    List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
-
     List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
     
     List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType);
 
-    List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
-
-    List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType);
+    InternalEntityLinkQuery<HistoricEntityLinkEntity> createInternalHistoricEntityLinkQuery();
 
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
+    void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String id, String scopeType);
+
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
     
     void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
+
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids);
 
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

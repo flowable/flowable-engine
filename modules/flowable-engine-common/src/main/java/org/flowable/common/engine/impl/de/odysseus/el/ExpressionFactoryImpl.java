@@ -27,8 +27,8 @@ import org.flowable.common.engine.impl.de.odysseus.el.misc.TypeConverter;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.TreeBuilder;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.TreeStore;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Builder;
-import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Cache;
 import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Builder.Feature;
+import org.flowable.common.engine.impl.de.odysseus.el.tree.impl.Cache;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELException;
 import org.flowable.common.engine.impl.javax.el.ExpressionFactory;
@@ -434,7 +434,7 @@ public class ExpressionFactoryImpl extends ExpressionFactory {
 	}
 
 	@Override
-	public final Object coerceToType(Object obj, Class<?> targetType) {
+	public final <T> T coerceToType(Object obj, Class<T> targetType) {
 		return converter.convert(obj, targetType);
 	}
 

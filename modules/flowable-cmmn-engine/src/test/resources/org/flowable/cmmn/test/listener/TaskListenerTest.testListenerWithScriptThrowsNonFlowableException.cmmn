@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+    <case id="testTaskListeners" name="testTaskListeners" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem4" name="ScriptJavascript" definitionRef="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65B"></planItem>
+            <humanTask id="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65B" name="ScriptJavascript">
+                <extensionElements>
+                    <flowable:taskListener event="create" type="script">
+                        <flowable:script language="javascript" resultVariable="javascriptResult">
+                            var scriptLocalVar = "XXXHello World from JavaScript";
+                            x = scriptError;
+                            retVal;
+                        </flowable:script>
+                    </flowable:taskListener>
+                </extensionElements>
+            </humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

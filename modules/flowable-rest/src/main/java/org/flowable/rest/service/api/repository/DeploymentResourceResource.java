@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.resolver.ContentTypeResolver;
@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Deployment" }, description = "Manage Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentResourceResource {
 
     @Autowired

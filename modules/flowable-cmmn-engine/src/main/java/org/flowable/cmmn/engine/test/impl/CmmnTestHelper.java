@@ -15,19 +15,17 @@ package org.flowable.cmmn.engine.test.impl;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 
 import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
-import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.job.api.HistoryJob;
 import org.slf4j.Logger;
@@ -40,10 +38,8 @@ public abstract class CmmnTestHelper {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnTestHelper.class);
 
-    public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { "cmmn11.xml", "cmmn" };
-    
-    static Map<String, CmmnEngine> cmmnEngines = new HashMap<>();
-    
+    static final EngineTestCache<CmmnEngine> cmmnEngines = new EngineTestCache<>();
+
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, String methodName) {
@@ -63,6 +59,10 @@ public abstract class CmmnTestHelper {
     }
 
     public static String annotationDeploymentSetUp(CmmnEngine cmmnEngine, Class<?> testClass, Method method, CmmnDeployment deploymentAnnotation) {
+        return annotationDeploymentSetUp(cmmnEngine.getCmmnRepositoryService(), testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(CmmnRepositoryService cmmnRepositoryService, Class<?> testClass, Method method, CmmnDeployment deploymentAnnotation) {
         String deploymentId = null;
         String methodName = method.getName();
         if (deploymentAnnotation != null) {
@@ -74,7 +74,7 @@ public abstract class CmmnTestHelper {
                 resources = new String[] { resource };
             }
 
-            CmmnDeploymentBuilder deploymentBuilder = cmmnEngine.getCmmnRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+            CmmnDeploymentBuilder deploymentBuilder = cmmnRepositoryService.createDeployment().name(testClass.getSimpleName() + "." + methodName);
 
             for (String resource : resources) {
                 deploymentBuilder.addClasspathResource(resource);
@@ -111,14 +111,12 @@ public abstract class CmmnTestHelper {
     }
     
     public static CmmnEngine getCmmnEngine(String configurationResource) {
-        CmmnEngine cmmnEngine = cmmnEngines.get(configurationResource);
-        if (cmmnEngine == null) {
-            LOGGER.debug("==== BUILDING PROCESS ENGINE ========================================================================");
-            cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromResource(configurationResource).buildCmmnEngine();
-            LOGGER.debug("==== PROCESS ENGINE CREATED =========================================================================");
-            cmmnEngines.put(configurationResource, cmmnEngine);
-        }
-        return cmmnEngine;
+        return cmmnEngines.getOrCreate(configurationResource, resource -> {
+            LOGGER.debug("==== BUILDING CMMN ENGINE ========================================================================");
+            CmmnEngine cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromResource(resource).buildCmmnEngine();
+            LOGGER.debug("==== CMMN ENGINE CREATED =========================================================================");
+            return cmmnEngine;
+        });
     }
 
     /**
@@ -126,8 +124,8 @@ public abstract class CmmnTestHelper {
      * parameter: <code>CMMN_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
      */
     public static String getCmmnCaseDefinitionResource(Class<?> type, String name) {
-        for (String suffix : CMMN_RESOURCE_SUFFIXES) {
-            String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
+        for (String suffix : CmmnDeployer.CMMN_RESOURCE_SUFFIXES) {
+            String resource = type.getName().replace('.', '/') + "." + name + suffix;
             InputStream inputStream = ReflectUtil.getResourceAsStream(resource);
             if (inputStream == null) {
                 continue;
@@ -135,43 +133,26 @@ public abstract class CmmnTestHelper {
                 return resource;
             }
         }
-        return type.getName().replace('.', '/') + "." + name + "." + CMMN_RESOURCE_SUFFIXES[1];
+        return type.getName().replace('.', '/') + "." + name + CmmnDeployer.CMMN_RESOURCE_SUFFIXES[1];
     }
 
     public static void deleteDeployment(CmmnEngineConfiguration cmmnEngineConfiguration, String deploymentId) {
         if (deploymentId != null) {
-            deleteWithoutGeneratingHistoryJobs(cmmnEngineConfiguration,
-                configuration -> configuration.getCmmnRepositoryService().deleteDeployment(deploymentId, true));
+            deleteHistoryJobs(cmmnEngineConfiguration);
+            cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
         }
     }
 
-    public static void deleteWithoutGeneratingHistoryJobs(CmmnEngineConfiguration cmmnEngineConfiguration, Consumer<CmmnEngineConfiguration> consumer) {
-        boolean isAsyncHistoryEnabled = cmmnEngineConfiguration.isAsyncHistoryEnabled();
-        if (isAsyncHistoryEnabled) {
+    /**
+     * Deletes all history jobs when async history is enabled, so that jobs created by a test do not leak into the next one.
+     */
+    public static void deleteHistoryJobs(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        if (cmmnEngineConfiguration.isAsyncHistoryEnabled()) {
             CmmnManagementService cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
             List<HistoryJob> historyJobs = cmmnManagementService.createHistoryJobQuery().list();
             for (HistoryJob historyJob : historyJobs) {
                 cmmnManagementService.deleteHistoryJob(historyJob.getId());
             }
-        }
-
-        CmmnHistoryManager asyncHistoryManager = null;
-        try {
-            if (isAsyncHistoryEnabled) {
-                cmmnEngineConfiguration.setAsyncHistoryEnabled(false);
-                asyncHistoryManager = cmmnEngineConfiguration.getCmmnHistoryManager();
-                cmmnEngineConfiguration.setCmmnHistoryManager(new DefaultCmmnHistoryManager(cmmnEngineConfiguration));
-            }
-
-            consumer.accept(cmmnEngineConfiguration);
-
-        } finally {
-
-            if (isAsyncHistoryEnabled) {
-                cmmnEngineConfiguration.setAsyncHistoryEnabled(true);
-                cmmnEngineConfiguration.setCmmnHistoryManager(asyncHistoryManager);
-            }
-
         }
     }
 

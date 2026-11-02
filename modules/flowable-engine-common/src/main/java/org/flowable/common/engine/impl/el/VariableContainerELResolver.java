@@ -12,13 +12,11 @@
  */
 package org.flowable.common.engine.impl.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
+import org.flowable.common.engine.impl.tenant.CurrentTenant;
 import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
@@ -29,6 +27,7 @@ public class VariableContainerELResolver extends ELResolver {
 
     public static final String VARIABLE_CONTAINER_KEY = "variableContainer";
     public static final String LOGGED_IN_USER_KEY = "authenticatedUserId";
+    public static final String CURRENT_TENANT_ID_KEY = "currentTenantId";
 
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
@@ -39,6 +38,9 @@ public class VariableContainerELResolver extends ELResolver {
                 context.setPropertyResolved(true);
                 return Authentication.getAuthenticatedUserId();
 
+            } else if (CURRENT_TENANT_ID_KEY.equals(property)) {
+                context.setPropertyResolved(true);
+                return CurrentTenant.getTenantContext().getTenantId();
             } else if (variableContainer.hasVariable(variable)) {
                 Object value = null;
                 if (context.getContext(EvaluationState.class) == EvaluationState.WRITE) {
@@ -50,6 +52,10 @@ public class VariableContainerELResolver extends ELResolver {
                             // reviews[0].score, reviews is an aggregated variable which is read only
                             value = variableInstance.getValue();
                         }
+                    } else {
+                        // simple variable container can be written to by default.
+                        // No further checks required.
+                        value = variableContainer.getVariable(variable);
                     }
                 } else {
                     value = variableContainer.getVariable(variable);
@@ -99,11 +105,6 @@ public class VariableContainerELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
-        return null;
     }
 
     @Override

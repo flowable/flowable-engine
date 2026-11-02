@@ -31,7 +31,7 @@ import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class DmnEngineConfigurator extends AbstractEngineConfigurator {
+public class DmnEngineConfigurator extends AbstractEngineConfigurator<DmnEngine> {
 
     protected DmnEngineConfiguration dmnEngineConfiguration;
     
@@ -60,7 +60,7 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
         
         initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);
 
-        initDmnEngine();
+        initEngine();
         
         initServiceConfigurations(engineConfiguration, dmnEngineConfiguration);
     }
@@ -75,7 +75,8 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
         return EntityDependencyOrder.DELETE_ORDER;
     }
 
-    protected synchronized DmnEngine initDmnEngine() {
+    @Override
+    protected DmnEngine buildEngine() {
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("DmnEngineConfiguration is required");
         }

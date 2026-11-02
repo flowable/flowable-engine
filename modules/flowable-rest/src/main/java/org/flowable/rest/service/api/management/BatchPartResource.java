@@ -13,8 +13,7 @@
 
 package org.flowable.rest.service.api.management;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -33,7 +32,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "Batch parts" }, description = "Manage Batch parts", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Batch parts" }, authorizations = { @Authorization(value = "basicAuth") })
 public class BatchPartResource extends BatchPartBaseResource {
 
     @Autowired
@@ -48,7 +47,7 @@ public class BatchPartResource extends BatchPartBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested batch part does not exist.")
     })
     @GetMapping(value = "/management/batch-parts/{batchPartId}", produces = "application/json")
-    public BatchPartResponse getBatchPart(@ApiParam(name = "batchPartId") @PathVariable String batchPartId, HttpServletRequest request) {
+    public BatchPartResponse getBatchPart(@ApiParam(name = "batchPartId") @PathVariable String batchPartId) {
         BatchPart batchPart = getBatchPartById(batchPartId);
         return restResponseFactory.createBatchPartResponse(batchPart);
     }

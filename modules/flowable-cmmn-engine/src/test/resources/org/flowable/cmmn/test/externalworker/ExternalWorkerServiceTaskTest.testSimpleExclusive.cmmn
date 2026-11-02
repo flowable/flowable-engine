@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://flowable.org/cmmn">
+    <case id="simpleExternalWorker" name="Simple External Worker">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="External Worker" definitionRef="externalWorkerTask"/>
+            <planItem id="planItem2" name="After External Worker Complete" definitionRef="afterExternalWorkerCompleteTask">
+                <entryCriterion id="entryCriterion1" sentryRef="sentry1"/>
+            </planItem>
+            <planItem id="planItem3" name="After External Worker Terminate" definitionRef="afterExternalWorkerTerminateTask">
+                <entryCriterion id="entryCriterion2" sentryRef="sentry2"/>
+            </planItem>
+            <sentry id="sentry1">
+                <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentry2">
+                <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+                    <standardEvent>terminate</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="externalWorkerTask" name="External Worker" flowable:type="external-worker" flowable:exclusive="true" flowable:topic="simple"/>
+            <humanTask id="afterExternalWorkerCompleteTask" name="After External Worker Complete"/>
+            <humanTask id="afterExternalWorkerTerminateTask" name="After External Worker Terminate"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_simpleExternalWorker">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+                <dc:Bounds height="80.0" width="100.0" x="136.0" y="256.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+                <dc:Bounds height="80.0" width="100.0" x="391.0" y="136.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion1" cmmnElementRef="entryCriterion1">
+                <dc:Bounds height="28.0" width="18.0" x="382.0" y="162.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+                <dc:Bounds height="80.0" width="100.0" x="391.0" y="406.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion2" cmmnElementRef="entryCriterion2">
+                <dc:Bounds height="28.0" width="18.0" x="382.0" y="450.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector1" cmmnElementRef="planItem1" targetCMMNElementRef="entryCriterion1">
+                <di:waypoint x="186.0" y="256.0"/>
+                <di:waypoint x="186.0" y="176.0"/>
+                <di:waypoint x="382.0" y="176.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+            <cmmndi:CMMNEdge id="CMMNEdge_connector2" cmmnElementRef="planItem1" targetCMMNElementRef="entryCriterion2">
+                <di:waypoint x="186.0" y="335.95000000000005"/>
+                <di:waypoint x="186.0" y="464.0"/>
+                <di:waypoint x="382.0" y="464.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNEdge>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

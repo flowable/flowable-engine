@@ -36,16 +36,16 @@ import org.flowable.task.service.delegate.DelegateTask;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * @author Joram Barrez
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/transaction/SpringIdmTransactionsTest-context.xml")
+@DirtiesContext
 public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
 
     @Autowired
@@ -158,19 +158,15 @@ public class SpringIdmTransactionsTest extends SpringFlowableTestCase {
         final User mat = identityService.newUser("mat");
 
         TransactionTemplate txTemplate = new TransactionTemplate(transactionManager);
-        txTemplate.execute(new TransactionCallbackWithoutResult() {
-
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                // save group
-                identityService.saveGroup(group);
-                // save users
-                identityService.saveUser(tom);
-                identityService.saveUser(mat);
-                // create memberships
-                identityService.createMembership(tom.getId(), group.getId());
-                identityService.createMembership(mat.getId(), group.getId());
-            }
+        txTemplate.executeWithoutResult(status -> {
+            // save group
+            identityService.saveGroup(group);
+            // save users
+            identityService.saveUser(tom);
+            identityService.saveUser(mat);
+            // create memberships
+            identityService.createMembership(tom.getId(), group.getId());
+            identityService.createMembership(mat.getId(), group.getId());
         });
 
         // verify that the group has been created

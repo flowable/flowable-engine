@@ -14,12 +14,14 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -35,6 +37,16 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessParseHandler.class);
 
     public static final String PROPERTYNAME_DOCUMENTATION = "documentation";
+
+    /**
+     * Max length of the database field ACT_RE_PROCDEF.DESCRIPTION_ on Oracle
+     */
+    protected static final int ORACLE_DESCRIPTION_MAX_LENGTH = 2000;
+
+    /**
+     * Max length of the database field ACT_RE_PROCDEF.DESCRIPTION_ on all databases except Oracle
+     */
+    protected static final int DESCRIPTION_MAX_LENGTH = 4000;
 
     @Override
     public Class<? extends BaseElement> getHandledType() {
@@ -63,7 +75,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
         currentProcessDefinition.setKey(process.getId());
         currentProcessDefinition.setName(process.getName());
         currentProcessDefinition.setCategory(bpmnParse.getBpmnModel().getTargetNamespace());
-        currentProcessDefinition.setDescription(process.getDocumentation());
+        currentProcessDefinition.setDescription(getDescription(process));
         currentProcessDefinition.setDeploymentId(bpmnParse.getDeployment().getId());
 
         if (bpmnParse.getDeployment().getEngineVersion() != null) {
@@ -80,6 +92,12 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
         processArtifacts(bpmnParse, process.getArtifacts());
 
         return currentProcessDefinition;
+    }
+
+    protected String getDescription(Process process) {
+        String databaseType = CommandContextUtil.getProcessEngineConfiguration().getDatabaseType();
+        int maxLength = AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType) ? ORACLE_DESCRIPTION_MAX_LENGTH : DESCRIPTION_MAX_LENGTH;
+        return StringUtils.truncate(process.getDocumentation(), maxLength);
     }
 
     protected void createEventListeners(BpmnParse bpmnParse, List<EventListener> eventListeners) {

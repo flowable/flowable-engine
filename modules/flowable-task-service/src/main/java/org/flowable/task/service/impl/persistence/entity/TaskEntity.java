@@ -35,7 +35,23 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     @Override
     List<IdentityLinkEntity> getIdentityLinks();
 
+    boolean isIdentityLinksInitialized();
+    
+    void setState(String state);
+
     void setCreateTime(Date createTime);
+    
+    void setInProgressStartTime(Date inProgressStartTime);
+    
+    void setInProgressStartedBy(String inProgressStartedBy);
+    
+    void setClaimTime(Date claimTime);
+    
+    void setClaimedBy(String claimBy);
+    
+    void setSuspendedTime(Date suspendedTime);
+    
+    void setSuspendedBy(String suspendedBy);
 
     void setTaskDefinitionId(String taskDefinitionId);
     
@@ -70,12 +86,14 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     boolean isCanceled();
 
     void setCanceled(boolean isCanceled);
-
-    void setClaimTime(Date claimTime);
     
     void setAssigneeValue(String assignee);
     
     void setOwnerValue(String owner);
+    
+    String getTempCompletedBy();
+    
+    void setTempCompletedBy(String completedBy);
 
     List<VariableInstanceEntity> getQueryVariables();
 }

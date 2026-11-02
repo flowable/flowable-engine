@@ -23,16 +23,16 @@
   <insert id="insertAttachment" parameterType="org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl">
     insert into ${prefix}ACT_HI_ATTACHMENT (ID_, REV_, USER_ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TIME_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      1, #{userId ,jdbcType=VARCHAR},
-      #{name ,jdbcType=VARCHAR},
-      #{description ,jdbcType=VARCHAR},
-      #{type ,jdbcType=VARCHAR},
-      #{taskId ,jdbcType=VARCHAR},
-      #{processInstanceId ,jdbcType=VARCHAR},
-      #{url ,jdbcType=VARCHAR},
-      #{contentId ,jdbcType=VARCHAR},
-      #{time ,jdbcType=TIMESTAMP}
+      #{id, jdbcType=NVARCHAR},
+      1, #{userId, jdbcType=NVARCHAR},
+      #{name, jdbcType=NVARCHAR},
+      #{description, jdbcType=NVARCHAR},
+      #{type, jdbcType=NVARCHAR},
+      #{taskId, jdbcType=NVARCHAR},
+      #{processInstanceId, jdbcType=NVARCHAR},
+      #{url, jdbcType=NVARCHAR},
+      #{contentId, jdbcType=NVARCHAR},
+      #{time, jdbcType=TIMESTAMP}
     )
   </insert>
 
@@ -40,16 +40,16 @@
     insert into ${prefix}ACT_HI_ATTACHMENT (ID_, REV_, USER_ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TIME_)
     values 
       <foreach collection="list" item="attachment" index="index" separator=","> 
-        (#{attachment.id ,jdbcType=VARCHAR},
-         1, #{attachment.userId ,jdbcType=VARCHAR},
-         #{attachment.name ,jdbcType=VARCHAR},
-         #{attachment.description ,jdbcType=VARCHAR},
-         #{attachment.type ,jdbcType=VARCHAR},
-         #{attachment.taskId ,jdbcType=VARCHAR},
-         #{attachment.processInstanceId ,jdbcType=VARCHAR},
-         #{attachment.url ,jdbcType=VARCHAR},
-         #{attachment.contentId ,jdbcType=VARCHAR},
-         #{attachment.time ,jdbcType=TIMESTAMP})
+        (#{attachment.id, jdbcType=NVARCHAR},
+         1, #{attachment.userId, jdbcType=NVARCHAR},
+         #{attachment.name, jdbcType=NVARCHAR},
+         #{attachment.description, jdbcType=NVARCHAR},
+         #{attachment.type, jdbcType=NVARCHAR},
+         #{attachment.taskId, jdbcType=NVARCHAR},
+         #{attachment.processInstanceId, jdbcType=NVARCHAR},
+         #{attachment.url, jdbcType=NVARCHAR},
+         #{attachment.contentId, jdbcType=NVARCHAR},
+         #{attachment.time, jdbcType=TIMESTAMP})
       </foreach>
   </insert>
 
@@ -57,16 +57,16 @@
     INSERT ALL 
       <foreach collection="list" item="attachment" index="index"> 
         INTO ${prefix}ACT_HI_ATTACHMENT (ID_, REV_, USER_ID_, NAME_, DESCRIPTION_, TYPE_, TASK_ID_, PROC_INST_ID_, URL_, CONTENT_ID_, TIME_) VALUES 
-          (#{attachment.id ,jdbcType=VARCHAR},
-           1, #{attachment.userId ,jdbcType=VARCHAR},
-           #{attachment.name ,jdbcType=VARCHAR},
-           #{attachment.description ,jdbcType=VARCHAR},
-           #{attachment.type ,jdbcType=VARCHAR},
-           #{attachment.taskId ,jdbcType=VARCHAR},
-           #{attachment.processInstanceId ,jdbcType=VARCHAR},
-           #{attachment.url ,jdbcType=VARCHAR},
-           #{attachment.contentId ,jdbcType=VARCHAR},
-           #{attachment.time ,jdbcType=TIMESTAMP})
+          (#{attachment.id, jdbcType=NVARCHAR},
+           1, #{attachment.userId, jdbcType=NVARCHAR},
+           #{attachment.name, jdbcType=NVARCHAR},
+           #{attachment.description, jdbcType=NVARCHAR},
+           #{attachment.type, jdbcType=NVARCHAR},
+           #{attachment.taskId, jdbcType=NVARCHAR},
+           #{attachment.processInstanceId, jdbcType=NVARCHAR},
+           #{attachment.url, jdbcType=NVARCHAR},
+           #{attachment.contentId, jdbcType=NVARCHAR},
+           #{attachment.time, jdbcType=TIMESTAMP})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -78,13 +78,13 @@
     <set>
         REV_ = #{revisionNext, jdbcType=INTEGER},
         <if test="originalPersistentState.name != name">
-          NAME_ = #{name, jdbcType=VARCHAR},
+          NAME_ = #{name, jdbcType=NVARCHAR},
         </if>
         <if test="originalPersistentState.description != description">
-          DESCRIPTION_ = #{description, jdbcType=TIMESTAMP},
+          DESCRIPTION_ = #{description, jdbcType=NVARCHAR},
         </if>
     </set>
-    where ID_ = #{id}
+    where ID_ = #{id, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
@@ -92,22 +92,22 @@
 
   <delete id="deleteAttachment" parameterType="org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl">
     delete from ${prefix}ACT_HI_ATTACHMENT 
-    where ID_ = #{id} and REV_ = #{revision} 
+    where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
   
   <!-- ATTACHMENT RESULTMAP -->
 
   <resultMap id="attachmentResultMap" type="org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="url" column="URL_" jdbcType="VARCHAR" />
-    <result property="contentId" column="CONTENT_ID_" jdbcType="VARCHAR" />
-    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="description" column="DESCRIPTION_" jdbcType="NVARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="NVARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR" />
+    <result property="url" column="URL_" jdbcType="NVARCHAR" />
+    <result property="contentId" column="CONTENT_ID_" jdbcType="NVARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="NVARCHAR" />
     <result property="time" column="TIME_" jdbcType="TIMESTAMP" />
   </resultMap>
   
@@ -116,20 +116,20 @@
   <select id="selectAttachment" parameterType="string" resultMap="attachmentResultMap">
     select *
     from ${prefix}ACT_HI_ATTACHMENT
-    where ID_ = #{id,jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectAttachmentsByTaskId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
     select *
     from ${prefix}ACT_HI_ATTACHMENT
-    where TASK_ID_ = #{parameter,jdbcType=VARCHAR}
+    where TASK_ID_ = #{parameter, jdbcType=NVARCHAR}
     order by TIME_ desc
   </select>
   
   <select id="selectAttachmentsByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="attachmentResultMap">
     select *
     from ${prefix}ACT_HI_ATTACHMENT
-    where PROC_INST_ID_ = #{parameter,jdbcType=VARCHAR}
+    where PROC_INST_ID_ = #{parameter, jdbcType=NVARCHAR}
     order by TIME_ desc
   </select>
 
@@ -144,8 +144,8 @@
             or
             </if>
             ATTACHMENT_.TASK_ID_ in 
-            <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-              #{item}
+            <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+              #{taskId, jdbcType=NVARCHAR}
             </foreach>
         </foreach>
     )
@@ -158,8 +158,8 @@
         or
         </if>
         TASK_ID_ in 
-        <foreach item="item" index="index" collection="listItem" open="(" separator="," close=")">
-          #{item}
+        <foreach item="taskId" index="index" collection="listItem" open="(" separator="," close=")">
+          #{taskId, jdbcType=NVARCHAR}
         </foreach>
     </foreach>
   </delete>

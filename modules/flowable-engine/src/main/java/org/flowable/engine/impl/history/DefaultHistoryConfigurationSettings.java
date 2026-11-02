@@ -20,6 +20,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -27,6 +28,7 @@ import org.flowable.engine.runtime.ActivityInstance;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -282,9 +284,17 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
     }
 
     @Override
+    public boolean isHistoryEnabledForVariables(String processDefinitionId) {
+        return isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processDefinitionId);
+    }
+
+    @Override
     public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLink) {
         String processDefinitionId = getProcessDefinitionId(identityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+        if (identityLink.getTaskId() != null) {
+            return isHistoryEnabledForUserTask(processDefinitionId);
+        }
+        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, processDefinitionId);
     }
 
     protected String getProcessDefinitionId(IdentityLinkEntity identityLink) {
@@ -305,8 +315,52 @@ public class DefaultHistoryConfigurationSettings implements HistoryConfiguration
 
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
-        String processDefinitionId = getProcessDefinitionId(entityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, processDefinitionId);
+        // Check if history is enabled for the source scope
+        String scopeType = entityLink.getScopeType();
+
+        if (ScopeTypes.CMMN.equals(scopeType)) {
+            // Source scope is a CMMN case — delegate to the CMMN engine via CaseInstanceService
+            CaseInstanceService caseInstanceService = processEngineConfiguration.getCaseInstanceService();
+            if (caseInstanceService != null && !caseInstanceService.isHistoryEnabledForCaseInstance(entityLink.getScopeId())) {
+                return false;
+            }
+        } else {
+            String processDefinitionId = getProcessDefinitionId(entityLink);
+            if (!isHistoryEnabled(processDefinitionId)) {
+                return false;
+            }
+        }
+
+        // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
+        String referenceScopeId = entityLink.getReferenceScopeId();
+        String referenceScopeType = entityLink.getReferenceScopeType();
+
+        // No check for CMMN scope type because for a child case instance the entity links are created before the entity (see CaseTaskActivityBehavior)
+        if (referenceScopeId != null && ScopeTypes.BPMN.equals(referenceScopeType)) {
+            ExecutionEntity referenceScopeExecution = processEngineConfiguration.getExecutionEntityManager().findById(referenceScopeId);
+            if (referenceScopeExecution != null) {
+                return isHistoryEnabled(referenceScopeExecution.getProcessDefinitionId());
+            }
+            return false;
+        }
+
+        if (referenceScopeId != null && ScopeTypes.TASK.equals(referenceScopeType)) {
+            TaskEntity task = processEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(referenceScopeId);
+            if (task != null && task.getProcessInstanceId() != null) {
+                ExecutionEntity execution = processEngineConfiguration.getExecutionEntityManager().findById(task.getProcessInstanceId());
+                if (execution != null) {
+                    return isHistoryEnabled(execution.getProcessDefinitionId());
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance) {
+        return processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     protected String getProcessDefinitionId(EntityLinkEntity entityLink) {

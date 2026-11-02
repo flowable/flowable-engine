@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://flowable.org/test">
+
+    <process id="parentProcessOut" name="Parent Process Out" isExecutable="true">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="callActivity" />
+        <callActivity id="callActivity" name="Call activity" calledElement="childProcess" flowable:sameDeployment="true">
+            <extensionElements>
+                <!-- Pass all variables into child -->
+                <flowable:in source="dummy" target="dummy" />
+
+                <!-- Out parameter type conversions -->
+                <flowable:out source="intVar" target="intToString" sourceType="string" />
+                <flowable:out source="doubleVar" target="doubleToString" sourceType="string" />
+                <flowable:out source="stringIntVar" target="stringToInt" sourceType="integer" />
+                <flowable:out source="longVar" target="longToInt" sourceType="integer" />
+                <flowable:out source="stringLongVar" target="stringToLong" sourceType="long" />
+                <flowable:out source="intVar" target="intToLong" sourceType="long" />
+                <flowable:out source="stringDoubleVar" target="stringToDouble" sourceType="double" />
+                <flowable:out source="intVar" target="intToDouble" sourceType="double" />
+                <flowable:out source="stringBooleanVar" target="stringToBoolean" sourceType="boolean" />
+                <flowable:out source="stringDateVar" target="stringToDate" sourceType="date" />
+                <flowable:out source="localDateVar" target="localDateToDate" sourceType="date" />
+                <flowable:out source="stringLocalDateVar" target="stringToLocalDate" sourceType="localdate" />
+                <flowable:out source="dateVar" target="dateToLocalDate" sourceType="localdate" />
+                <flowable:out source="jsonStringVar" target="stringToJson" sourceType="json" />
+                <flowable:out source="arrayStringVar" target="stringToArray" sourceType="array" />
+            </extensionElements>
+        </callActivity>
+        <sequenceFlow id="flow2" sourceRef="callActivity" targetRef="afterCallActivity" />
+        <userTask id="afterCallActivity" name="After call activity" />
+        <sequenceFlow id="flow3" sourceRef="afterCallActivity" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+
+</definitions>

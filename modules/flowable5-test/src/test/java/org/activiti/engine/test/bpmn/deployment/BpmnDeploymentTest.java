@@ -115,7 +115,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
         assertEquals(0, repositoryService.createDeploymentQuery().count());
     }
 
-    public void testViolateProcessDefinitionNameAndDescriptionMaximumLength() {
+    public void testViolateProcessDefinitionNameMaximumLength() {
         try {
             repositoryService.createDeployment()
                     .addClasspathResource("org/activiti/engine/test/bpmn/deployment/processWithLongNameAndDescription.bpmn20.xml")
@@ -123,7 +123,6 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             fail();
         } catch (FlowableException e) {
             assertTextPresent(Problems.PROCESS_DEFINITION_NAME_TOO_LONG, e.getMessage());
-            assertTextPresent(Problems.PROCESS_DEFINITION_DOCUMENTATION_TOO_LONG, e.getMessage());
         }
 
         // Verify that nothing is deployed

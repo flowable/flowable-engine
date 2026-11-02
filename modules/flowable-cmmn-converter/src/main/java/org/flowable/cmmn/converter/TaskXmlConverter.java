@@ -17,9 +17,11 @@ import java.util.Objects;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.util.CmmnXmlUtil;
 import org.flowable.cmmn.model.CasePageTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.ExternalWorkerServiceTask;
+import org.flowable.cmmn.model.FormAwareServiceTask;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -51,7 +53,21 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         if (type != null) {
 
             if (Objects.equals(type, ServiceTask.JAVA_TASK)) {
-                task = convertToJavaServiceTask(xtr, className);
+                String formKey = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_KEY);
+                ServiceTask serviceTask;
+
+                if (StringUtils.isNotEmpty(formKey)) {
+                    FormAwareServiceTask formAwareServiceTask = new FormAwareServiceTask();
+                    formAwareServiceTask.setFormKey(formKey);
+                    formAwareServiceTask.setValidateFormFields(
+                            xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_FIELD_VALIDATION));
+                    serviceTask = formAwareServiceTask;
+                } else {
+                    serviceTask = new ServiceTask();
+                }
+
+                convertToJavaServiceTask(xtr, className, serviceTask);
+                task = serviceTask;
 
             } else if (Objects.equals(type, HttpServiceTask.HTTP_TASK)) {
                 task = convertToHttpTask(xtr, className);
@@ -82,8 +98,7 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         return task;
     }
 
-    protected Task convertToJavaServiceTask(XMLStreamReader xtr, String className) {
-        ServiceTask serviceTask = new ServiceTask();
+    protected void convertToJavaServiceTask(XMLStreamReader xtr, String className, ServiceTask serviceTask) {
         serviceTask.setType(ServiceTask.JAVA_TASK);
 
         String expression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXPRESSION);
@@ -109,7 +124,6 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         serviceTask.setStoreResultVariableAsTransient(
             Boolean.parseBoolean(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_STORE_RESULT_AS_TRANSIENT)));
 
-        return serviceTask;
     }
 
     protected Task convertToHttpTask(XMLStreamReader xtr, String className) {
@@ -167,18 +181,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         
         String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
         if (StringUtils.isNotEmpty(candidateUsersString)) {
-            String[] candidateUsers = candidateUsersString.split(",");
-            for (String candidateUser : candidateUsers) {
-                casePageTask.getCandidateUsers().add(candidateUser);
-            }
+            casePageTask.getCandidateUsers().addAll(CmmnXmlUtil.parseDelimitedList(candidateUsersString));
         }
         
         String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
         if (StringUtils.isNotEmpty(candidateGroupsString)) {
-            String[] candidateGroups = candidateGroupsString.split(",");
-            for (String candidateGroup : candidateGroups) {
-                casePageTask.getCandidateGroups().add(candidateGroup);
-            }
+            casePageTask.getCandidateGroups().addAll(CmmnXmlUtil.parseDelimitedList(candidateGroupsString));
         }
         
         return casePageTask;
@@ -200,6 +208,9 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
             scriptTask.setAutoStoreVariables(Boolean.valueOf(autoStoreVariables));
         }
 
+        scriptTask.setDoNotIncludeVariables(Boolean.parseBoolean(
+                xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TASK_SCRIPT_DO_NOT_INCLUDE_VARIABLES)));
+
         return scriptTask;
     }
 
@@ -209,6 +220,11 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
         String topic = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXTERNAL_WORKER_TOPIC);
         if (topic != null) {
             externalWorkerTask.setTopic(topic);
+        }
+        String doNotIncludeVariables = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_EXTERNAL_WORKER_DO_NOT_INCLUDE_VARIABLES);
+        if (doNotIncludeVariables != null) {
+            externalWorkerTask.setDoNotIncludeVariables(Boolean.parseBoolean(doNotIncludeVariables));
         }
 
         return externalWorkerTask;
@@ -248,6 +264,12 @@ public class TaskXmlConverter extends PlanItemDefinitionXmlConverter {
                 CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE);
         if (StringUtils.isNotEmpty(isAsyncLeaveString)) {
             task.setAsyncLeave(Boolean.valueOf(isAsyncLeaveString.toLowerCase()));
+        }
+        
+        String isAsyncLeaveExclusiveString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE,
+                CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS_LEAVE_EXCLUSIVE);
+        if (StringUtils.isNotEmpty(isAsyncLeaveExclusiveString)) {
+            task.setAsyncLeaveExclusive(Boolean.valueOf(isAsyncLeaveExclusiveString));
         }
     }
 }

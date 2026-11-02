@@ -26,6 +26,7 @@ import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.JobProcessorContextImpl;
 import org.activiti.engine.impl.asyncexecutor.AsyncJobUtil;
 import org.activiti.engine.impl.bpmn.behavior.BpmnActivityBehavior;
+import org.activiti.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -80,7 +81,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -967,6 +968,15 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         try {
             BpmnActivityBehavior bpmnActivityBehavior = new BpmnActivityBehavior();
             bpmnActivityBehavior.performDefaultOutgoingBehavior((ActivityExecution) execution);
+        } catch (org.activiti.engine.ActivitiException e) {
+            handleActivitiException(e);
+        }
+    }
+    
+    @Override
+    public void leaveMIExecution(DelegateExecution execution, Object v5MultiInstanceActivityBehavior) {
+        try {
+            ((MultiInstanceActivityBehavior) v5MultiInstanceActivityBehavior).execute(execution);
         } catch (org.activiti.engine.ActivitiException e) {
             handleActivitiException(e);
         }

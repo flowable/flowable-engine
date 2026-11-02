@@ -27,8 +27,8 @@ import org.activiti.engine.runtime.ExecutionQuery;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -383,12 +383,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             if (languageNode != null) {
                 JsonNode languageNameNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_NAME);
                 if (languageNameNode != null && !languageNameNode.isNull()) {
-                    executionEntity.setLocalizedName(languageNameNode.asText());
+                    executionEntity.setLocalizedName(languageNameNode.asString());
                 }
 
                 JsonNode languageDescriptionNode = languageNode.get(DynamicBpmnConstants.LOCALIZATION_DESCRIPTION);
                 if (languageDescriptionNode != null && !languageDescriptionNode.isNull()) {
-                    executionEntity.setLocalizedDescription(languageDescriptionNode.asText());
+                    executionEntity.setLocalizedDescription(languageDescriptionNode.asString());
                 }
             }
         }

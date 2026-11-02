@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions id="taskAssigneeExample" 
-  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
-  xmlns:activiti="http://activiti.org/bpmn"
-  targetNamespace="Examples">
-  
-  <process id="dueDateExtension">
-  
-    <startEvent id="theStart" />
-    
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
+<definitions id="taskAssigneeExample"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
 
-    <userTask id="theTask" name="my task" activiti:dueDate="${dateVariable}" />
-    
-    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
-    
+  <process id="dueDateExtension">
+
+    <startEvent id="theStart" />
+
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="parallelSplit" />
+
+    <parallelGateway id="parallelSplit"/>
+
+    <sequenceFlow id="flow2" sourceRef="parallelSplit" targetRef="dateTask" />
+    <sequenceFlow id="flow3" sourceRef="parallelSplit" targetRef="localDateTask" />
+    <sequenceFlow id="flow4" sourceRef="parallelSplit" targetRef="instantTask" />
+    <sequenceFlow id="flow5" sourceRef="parallelSplit" targetRef="localDateTimeTask" />
+
+    <userTask id="dateTask" name="my java.util.Date task" flowable:dueDate="${dateVariable}" />
+    <userTask id="localDateTask" name="my java.time.LocalDate task" flowable:dueDate="${localDateVariable}" />
+    <userTask id="instantTask" name="my java.time.Instant task" flowable:dueDate="${instantVariable}" />
+    <userTask id="localDateTimeTask" name="my java.time.LocalDateTime task" flowable:dueDate="${localDateTimeVariable}" />
+
+    <parallelGateway id="parallelJoin"/>
+
+    <sequenceFlow id="flow6" sourceRef="dateTask" targetRef="parallelJoin" />
+    <sequenceFlow id="flow7" sourceRef="localDateTask" targetRef="parallelJoin" />
+    <sequenceFlow id="flow8" sourceRef="instantTask" targetRef="parallelJoin" />
+    <sequenceFlow id="flow9" sourceRef="localDateTimeTask" targetRef="parallelJoin" />
+
     <endEvent id="theEnd" />
     
   </process>

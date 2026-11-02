@@ -26,10 +26,10 @@ import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionService;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.model.DmnElement;
-import org.flowable.dmn.model.InformationRequirement;
-import org.flowable.dmn.model.NamedElement;
 import org.flowable.dmn.model.DmnElementReference;
 import org.flowable.dmn.model.GraphicInfo;
+import org.flowable.dmn.model.InformationRequirement;
+import org.flowable.dmn.model.NamedElement;
 
 /**
  * Class to generate an image based the diagram interchange information in a DMN 1.2 definition.

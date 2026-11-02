@@ -12,17 +12,23 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class ScriptTask extends Task {
+public class ScriptTask extends Task implements HasInParameters {
 
     protected String scriptFormat;
     protected String script;
     protected String resultVariable;
     protected String skipExpression;
     protected boolean autoStoreVariables; // see https://activiti.atlassian.net/browse/ACT-1626
+
+    protected boolean doNotIncludeVariables = false;
+    protected List<IOParameter> inParameters;
 
     public String getScriptFormat() {
         return scriptFormat;
@@ -64,6 +70,32 @@ public class ScriptTask extends Task {
         this.autoStoreVariables = autoStoreVariables;
     }
 
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
+    }
+
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
+    }
+
+    @Override
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        if (inParameters == null) {
+            inParameters = new ArrayList<>();
+        }
+        inParameters.add(inParameter);
+    }
+
+    @Override
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
     @Override
     public ScriptTask clone() {
         ScriptTask clone = new ScriptTask();
@@ -78,5 +110,14 @@ public class ScriptTask extends Task {
         setResultVariable(otherElement.getResultVariable());
         setSkipExpression(otherElement.getSkipExpression());
         setAutoStoreVariables(otherElement.isAutoStoreVariables());
+        setDoNotIncludeVariables(otherElement.isDoNotIncludeVariables());
+
+        inParameters = null;
+        if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {
+            inParameters = new ArrayList<>();
+            for (IOParameter parameter : otherElement.getInParameters()) {
+                inParameters.add(parameter.clone());
+            }
+        }
     }
 }

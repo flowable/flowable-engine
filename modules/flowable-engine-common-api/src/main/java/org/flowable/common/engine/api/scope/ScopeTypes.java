@@ -31,6 +31,9 @@ public interface ScopeTypes {
     String PLAN_ITEM = "planItem";
     String TASK = "task";
     String EXTERNAL_WORKER = "externalWorker";
+    
+    String CMMN_ASYNC_VARIABLES = "cmmnAsyncVariables";
+    String BPMN_ASYNC_VARIABLES = "bpmnAsyncVariables";
 
     String BPMN_VARIABLE_AGGREGATION = "bpmnVariableAggregation";
     String CMMN_VARIABLE_AGGREGATION = "cmmnVariableAggregation";
@@ -38,6 +41,6 @@ public interface ScopeTypes {
     String CMMN_EXTERNAL_WORKER = "cmmnExternalWorker";
     String BPMN_EXTERNAL_WORKER = "bpmnExternalWorker";
 
-    Collection<String> CMMN_DEPENDENT = new HashSet<>(Arrays.asList(CMMN, CMMN_EXTERNAL_WORKER, CMMN_VARIABLE_AGGREGATION));
-    Collection<String> BPMN_DEPENDENT = new HashSet<>(Arrays.asList(BPMN_EXTERNAL_WORKER, BPMN_VARIABLE_AGGREGATION));
+    Collection<String> CMMN_DEPENDENT = new HashSet<>(Arrays.asList(CMMN, CMMN_EXTERNAL_WORKER, CMMN_VARIABLE_AGGREGATION, CMMN_ASYNC_VARIABLES));
+    Collection<String> BPMN_DEPENDENT = new HashSet<>(Arrays.asList(BPMN_EXTERNAL_WORKER, BPMN_VARIABLE_AGGREGATION, BPMN_ASYNC_VARIABLES));
 }

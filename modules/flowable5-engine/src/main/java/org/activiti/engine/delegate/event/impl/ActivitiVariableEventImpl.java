@@ -30,6 +30,7 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Flow
     protected String taskId;
     protected String scopeId;
     protected String scopeType;
+    protected String variableInstanceId;
 
     public ActivitiVariableEventImpl(FlowableEngineEventType type) {
         super(type);
@@ -97,5 +98,14 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Flow
     @Override
     public String getScopeDefinitionId() {
         return ScopeTypes.BPMN.equals(scopeType) ? processDefinitionId : null;
+    }
+
+    @Override
+    public String getVariableInstanceId() {
+        return variableInstanceId;
+    }
+
+    public void setVariableInstanceId(String variableInstanceId) {
+        this.variableInstanceId = variableInstanceId;
     }
 }

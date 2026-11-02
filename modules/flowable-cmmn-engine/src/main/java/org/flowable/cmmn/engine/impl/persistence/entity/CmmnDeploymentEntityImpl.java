@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.common.engine.api.repository.EngineResource;
 
@@ -45,6 +46,7 @@ public class CmmnDeploymentEntityImpl extends AbstractCmmnEngineNoRevisionEntity
      * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
+    protected Map<String, CaseDefinitionCacheEntry> caseDefinitionCache = new HashMap<>();
 
     public CmmnDeploymentEntityImpl() {
 
@@ -106,6 +108,16 @@ public class CmmnDeploymentEntityImpl extends AbstractCmmnEngineNoRevisionEntity
             }
         }
         return null;
+    }
+    
+    @Override
+    public void addCaseDefinitionCacheEntry(String caseDefinitionId, CaseDefinitionCacheEntry caseDefinitionCacheEntry) {
+        caseDefinitionCache.put(caseDefinitionId, caseDefinitionCacheEntry);
+    }
+
+    @Override
+    public CaseDefinitionCacheEntry getCaseDefinitionCacheEntry(String caseDefinitionId) {
+        return caseDefinitionCache.get(caseDefinitionId);
     }
 
     // getters and setters ////////////////////////////////////////////////////////

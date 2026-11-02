@@ -59,6 +59,9 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     // Backwards compatibility
     protected String engineVersion;
 
+    // Not persisted, set by the deployer
+    protected String parentDeploymentId;
+
     @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -310,6 +313,16 @@ public class ProcessDefinitionEntityImpl extends AbstractBpmnEngineEntity implem
     @Override
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
+    }
+
+    @Override
+    public String getParentDeploymentId() {
+        return parentDeploymentId;
+    }
+
+    @Override
+    public void setParentDeploymentId(String parentDeploymentId) {
+        this.parentDeploymentId = parentDeploymentId;
     }
 
     public IOSpecification getIoSpecification() {

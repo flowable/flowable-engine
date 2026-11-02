@@ -19,6 +19,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.ValidatorSet;
@@ -30,6 +31,12 @@ public class ActivitiTestCaseProcessValidator implements ProcessValidator {
 
     @Override
     public List<ValidationError> validate(BpmnModel bpmnModel) {
+        return validate(bpmnModel, null);
+    }
+    
+
+    @Override
+    public List<ValidationError> validate(BpmnModel bpmnModel, ProcessValidationContext validationContext) {
         List<ValidationError> errorList = new ArrayList<ValidationError>();
         CustomParseValidator customParseValidator = new CustomParseValidator();
 
@@ -46,6 +53,7 @@ public class ActivitiTestCaseProcessValidator implements ProcessValidator {
         }
         return errorList;
     }
+
 
     @Override
     public List<ValidatorSet> getValidatorSets() {

@@ -12,11 +12,27 @@
  */
 package org.flowable.common.engine.impl.callback;
 
+import org.flowable.common.engine.api.delegate.BusinessError;
+
 /**
  * @author Joram Barrez
  */
 public interface RuntimeInstanceStateChangeCallback {
-    
+
     void stateChanged(CallbackData callbackData);
-    
+
+    /**
+     * Called when an uncaught {@link BusinessError} occurs in a child instance that has a callback
+     * to a parent instance in another engine. This allows cross-engine error propagation.
+     *
+     * The default implementation re-throws the error (backward compatible).
+     * Implementations can override to propagate the error to the parent engine.
+     *
+     * @param callbackData the callback data identifying the parent instance
+     * @param error the business error that was not caught in the child instance
+     */
+    default void onError(CallbackData callbackData, BusinessError error) {
+        throw error;
+    }
+
 }

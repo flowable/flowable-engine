@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchPartQuery;
+import org.flowable.batch.api.BatchSummary;
 import org.flowable.batch.service.BatchServiceConfiguration;
 import org.flowable.batch.service.impl.BatchPartQueryImpl;
 import org.flowable.batch.service.impl.persistence.entity.data.BatchPartDataManager;
@@ -57,6 +58,11 @@ public class BatchPartEntityManagerImpl
     }
 
     @Override
+    public BatchSummary findBatchPartCountSummaryByBatchId(String batchId) {
+        return dataManager.findBatchPartCountSummaryByBatchId(batchId);
+    }
+
+    @Override
     public BatchPartEntity createBatchPart(BatchEntity parentBatch, String status, String scopeId, String subScopeId, String scopeType) {
         BatchPartEntity batchPartEntity = dataManager.create();
         batchPartEntity.setBatchId(parentBatch.getId());
@@ -70,6 +76,9 @@ public class BatchPartEntityManagerImpl
         batchPartEntity.setBatchSearchKey(parentBatch.getBatchSearchKey());
         batchPartEntity.setBatchSearchKey2(parentBatch.getBatchSearchKey2());
         batchPartEntity.setStatus(status);
+        if (parentBatch.getTenantId() != null) {
+            batchPartEntity.setTenantId(parentBatch.getTenantId());
+        }
         batchPartEntity.setCreateTime(getClock().getCurrentTime());
         insert(batchPartEntity);
         

@@ -13,7 +13,7 @@
 package org.activiti.engine.test.regression;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.drools.core.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 

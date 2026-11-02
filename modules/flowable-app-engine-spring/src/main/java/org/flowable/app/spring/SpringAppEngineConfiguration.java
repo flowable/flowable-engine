@@ -62,8 +62,8 @@ public class SpringAppEngineConfiguration extends AppEngineConfiguration impleme
     }
 
     @Override
-    public AppEngine buildAppEngine() {
-        AppEngine appEngine = super.buildAppEngine();
+    public AppEngine buildEngine() {
+        AppEngine appEngine = super.buildEngine();
         AppEngines.setInitialized(true);
         enginesBuild.add(appEngine.getName());
         return appEngine;

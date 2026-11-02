@@ -26,9 +26,9 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
+import org.flowable.cmmn.engine.impl.eventregistry.CmmnEventInstanceOutParameterHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.util.EventInstanceCmmnUtil;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
 import org.flowable.cmmn.model.ExtensionElement;
@@ -41,6 +41,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventregistry.api.runtime.EventInstance;
+import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.constant.EventConstants;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
@@ -70,7 +71,7 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
         }
 
         if (key == null) {
-            throw new FlowableException("Could not resolve key from expression: " + eventDefinitionKeyExpression);
+            throw new FlowableException("Could not resolve key from expression: " + eventDefinitionKeyExpression + " for " + planItemInstanceEntity);
         }
 
         return key.toString();
@@ -80,19 +81,18 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         EventInstance eventInstance = (EventInstance) planItemInstanceEntity.getTransientVariable(EventConstants.EVENT_INSTANCE);
         if (eventInstance != null) {
-            handleEventInstance(planItemInstanceEntity, eventInstance);
+            handleEventInstance(planItemInstanceEntity, eventInstance, commandContext);
         }
         
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
         if (repetitionRule != null && ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity())) {
             PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-            eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
             agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
             agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
             
             CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
-                    commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
+                    commandContext, planItemInstanceEntity, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.AVAILABLE);
             
         } else {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
@@ -110,10 +110,12 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
         }
     }
 
-    protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance) {
+    protected void handleEventInstance(PlanItemInstanceEntity planItemInstanceEntity, EventInstance eventInstance, CommandContext commandContext) {
         PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
         if (planItemDefinition != null) {
-            EventInstanceCmmnUtil.handleEventInstanceOutParameters(planItemInstanceEntity, planItemDefinition, eventInstance);
+            CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
+            CmmnEventInstanceOutParameterHandler outParameterHandler = cmmnEngineConfiguration.getCmmnEventInstanceOutParameterHandler();
+            outParameterHandler.handleOutParameters(planItemInstanceEntity, planItemDefinition, eventInstance);
         }
     }
 
@@ -162,20 +164,23 @@ public class EventRegistryEventListenerActivityBehaviour extends CoreCmmnTrigger
             if (!eventCorrelations.isEmpty()) {
                 CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                 ExpressionManager expressionManager = cmmnEngineConfiguration.getExpressionManager();
-
+                
+                EventRegistryEngineConfiguration eventRegistryEngineConfiguration = CommandContextUtil.getEventRegistryEngineConfiguration(commandContext);
+                
                 Map<String, Object> correlationParameters = new HashMap<>();
                 for (ExtensionElement eventCorrelation : eventCorrelations) {
                     String name = eventCorrelation.getAttributeValue(null, "name");
                     String valueExpression = eventCorrelation.getAttributeValue(null, "value");
                     if (StringUtils.isNotEmpty(valueExpression)) {
                         Object value = expressionManager.createExpression(valueExpression).getValue(planItemInstanceEntity);
-                        correlationParameters.put(name, value);
+                        correlationParameters.put(name, eventRegistryEngineConfiguration.getCorrelationValueTransformer().transformRawValue(value));
                     } else {
                         correlationParameters.put(name, null);
                     }
                 }
 
-                correlationKey = CommandContextUtil.getEventRegistry().generateKey(correlationParameters);
+                correlationKey = CommandContextUtil.getEventRegistry(commandContext).generateKey(correlationParameters);
+                
             } else {
                 correlationKey = null;
             }

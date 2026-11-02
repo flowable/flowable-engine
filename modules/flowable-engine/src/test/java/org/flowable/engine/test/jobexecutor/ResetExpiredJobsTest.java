@@ -150,8 +150,11 @@ public class ResetExpiredJobsTest extends PluggableFlowableTestCase {
         managementService.executeCommand(new ResetExpiredJobsCmd(jobIds, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration));
         assertThat(managementService.executeCommand(new FindExpiredJobsCmd(expiredJobsPagesSize, jobServiceConfiguration.getJobEntityManager(), jobServiceConfiguration))).isEmpty();
         
-        assertThat(managementService.createJobQuery().jobId(job.getId()).singleResult()).isNull();
-        assertThat(managementService.createJobQuery().singleResult()).isNotNull();
+        JobEntity jobAfterExpiry = (JobEntity) managementService.createJobQuery().singleResult();
+        assertThat(jobAfterExpiry).isNotNull();
+        assertThat(jobAfterExpiry.getId()).isEqualTo(job.getId());
+        assertThat(jobAfterExpiry.getLockExpirationTime()).isNull();
+        assertThat(jobAfterExpiry.getLockOwner()).isNull();
     }
 
     @Test

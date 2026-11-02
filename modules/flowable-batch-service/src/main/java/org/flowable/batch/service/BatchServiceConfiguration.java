@@ -24,12 +24,12 @@ import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatch
 import org.flowable.batch.service.impl.persistence.entity.data.impl.MybatisBatchPartDataManager;
 import org.flowable.common.engine.impl.AbstractServiceConfiguration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
  */
-public class BatchServiceConfiguration extends AbstractServiceConfiguration {
+public class BatchServiceConfiguration extends AbstractServiceConfiguration<BatchServiceConfiguration> {
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////
@@ -52,12 +52,21 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
         super(engineName);
     }
 
+    @Override
+    protected BatchServiceConfiguration getService() {
+        return this;
+    }
+
     // init
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
+        configuratorsBeforeInit();
+        
         initDataManagers();
         initEntityManagers();
+
+        configuratorsAfterInit();
     }
 
     // Data managers
@@ -96,7 +105,7 @@ public class BatchServiceConfiguration extends AbstractServiceConfiguration {
         this.batchService = batchService;
         return this;
     }
-    
+
     public BatchDataManager getBatchDataManager() {
         return batchDataManager;
     }

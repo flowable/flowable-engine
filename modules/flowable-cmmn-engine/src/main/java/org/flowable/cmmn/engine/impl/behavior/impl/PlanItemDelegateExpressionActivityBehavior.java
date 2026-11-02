@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.flowable.cmmn.api.delegate.PlanItemFutureJavaDelegate;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
@@ -50,16 +52,26 @@ public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnTriggera
         Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
         if (delegate instanceof PlanItemActivityBehavior) {
-            ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
+            try {
+                ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
+            } catch (BusinessError fault) {
+                FaultPropagation.propagateFault(fault, commandContext, planItemInstanceEntity);
+            }
 
         } else if (delegate instanceof CmmnActivityBehavior) {
-            ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
+            try {
+                ((CmmnActivityBehavior) delegate).execute(planItemInstanceEntity);
+            } catch (BusinessError fault) {
+                FaultPropagation.propagateFault(fault, commandContext, planItemInstanceEntity);
+            }
 
         } else if (delegate instanceof PlanItemJavaDelegate) {
+            // PlanItemJavaDelegateActivityBehavior already catches CmmnFault internally
             PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
             behavior.execute(planItemInstanceEntity);
 
         } else if (delegate instanceof PlanItemFutureJavaDelegate) {
+            // PlanItemFutureJavaDelegateActivityBehavior already catches CmmnFault internally
             PlanItemFutureJavaDelegateActivityBehavior behavior = new PlanItemFutureJavaDelegateActivityBehavior((PlanItemFutureJavaDelegate<?>) delegate);
             behavior.execute(planItemInstanceEntity);
         } else {

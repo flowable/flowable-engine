@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+
+    <case id="scriptCase">
+        <casePlanModel id="myScriptPlanModel" name="My Script CasePlanModel">
+            <planItem id="returnValueScript" definitionRef="returnValueScriptTask"/>
+            <task id="returnValueScriptTask" name="Script with value" flowable:type="script" flowable:scriptFormat="JavaScript"
+                  flowable:doNotIncludeVariables="true">
+                <extensionElements>
+                    <flowable:field name="script">
+                        <string><![CDATA[
+
+                        var sum = a + b;
+                        planItemInstance.setVariable("sum", sum);
+
+                        ]]></string>
+                    </flowable:field>
+                    <flowable:in target="a" source="aVar"/>
+                    <flowable:in target="b" sourceExpression="${10 + bVar}"/>
+                </extensionElements>
+            </task>
+        </casePlanModel>
+    </case>
+</definitions>

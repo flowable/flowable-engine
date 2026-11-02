@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,8 @@ import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateToActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateVariableEventListenersOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.FailPlanItemInstanceOperation;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitiatePlanItemInstanceOperation;
@@ -40,7 +44,9 @@ import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOpera
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ReactivatePlanModelInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ResumePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.StartPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.SuspendPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
@@ -48,9 +54,11 @@ import org.flowable.cmmn.engine.impl.behavior.impl.ChildTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.common.engine.impl.agenda.AbstractAgenda;
+import org.flowable.common.engine.impl.agenda.AgendaFutureMaxWaitTimeoutProvider;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,15 +70,60 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmmnEngineAgenda.class);
 
+    protected final LinkedList<EvaluateCriteriaOperation> evaluateCriteriaOperations = new LinkedList<>();
+
     public DefaultCmmnEngineAgenda(CommandContext commandContext) {
         super(commandContext);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty() && evaluateCriteriaOperations.isEmpty();
+    }
+
+    @Override
+    public Runnable getNextOperation() {
+        if (operations.isEmpty() && !evaluateCriteriaOperations.isEmpty()) {
+            return pollNextEvaluateCriteriaOperation();
+        }
+        return super.getNextOperation();
+    }
+
+    /**
+     * Returns the next criteria evaluation to execute, giving precedence to evaluations that do not also
+     * evaluate stage/case instance completion. A completion evaluation is planned (with no plan item lifecycle
+     * event) when the agenda is becoming stable. If such a completion evaluation were allowed to run before a
+     * still-pending lifecycle event - for example the 'complete' transition of a case task whose child case
+     * completed synchronously in the same command - it would complete the stage/case before the entry sentry
+     * depending on that event (e.g. a following human task with an onComplete on-part) had a chance to fire.
+     * Because a single-on-part entry sentry only fires on the evaluation that actually carries its lifecycle
+     * event, that activation would be lost and the plan item terminated instead. Deferring completion
+     * evaluations until all other criteria evaluations have been processed keeps completion the last decision.
+     */
+    protected EvaluateCriteriaOperation pollNextEvaluateCriteriaOperation() {
+        for (Iterator<EvaluateCriteriaOperation> it = evaluateCriteriaOperations.iterator(); it.hasNext();) {
+            EvaluateCriteriaOperation evaluateCriteriaOperation = it.next();
+            if (!evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted()) {
+                it.remove();
+                return evaluateCriteriaOperation;
+            }
+        }
+
+        // Only completion evaluations remain: take the first one in planning order.
+        return evaluateCriteriaOperations.poll();
+    }
+
     public void addOperation(CmmnOperation operation) {
+
+        operation.onPlanned();
         
-        int operationIndex = getOperationIndex(operation);
-        if (operationIndex >= 0) {
-            operations.add(operationIndex, operation);
+        // The operation to evaluate the criteria is the most expensive operation.
+        // As such, when it's planned it is always
+        // - moved to the end of the operations list
+        // - other operations are always planned before, as these can trigger new evaluation operations
+
+        if (operation instanceof EvaluateCriteriaOperation evaluateCriteriaOperation) {
+            evaluateCriteriaOperations.addLast(evaluateCriteriaOperation);
         } else {
             operations.addLast(operation);
         }
@@ -80,26 +133,9 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         }
     }
     
-    /**
-     * Returns the index in the list of operations where the {@link CmmnOperation} should be inserted.
-     * Returns a negative value if the element should be added to the end of the list. 
-     */
-    protected int getOperationIndex(CmmnOperation operation) {
-        
-        // The operation to evaluate the criteria is the most expensive operation.
-        // As such, when it's planned it is always 
-        // - moved to the end of the operations list
-        // - checked for duplicates to avoid duplicate evaluations (see the add method for it)
-        // - other operations are always planned before, as these can trigger new evaluation operations
-        
-        if (!operations.isEmpty() && !(operation instanceof EvaluateCriteriaOperation)) {
-            for (int i=0; i<operations.size(); i++) {
-                if (operations.get(i) instanceof EvaluateCriteriaOperation) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+    @Override
+    protected AgendaFutureMaxWaitTimeoutProvider getAgendaFutureMaxWaitTimeoutProvider() {
+        return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getAgendaFutureMaxWaitTimeoutProvider();
     }
 
     @Override
@@ -135,6 +171,14 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planEvaluateCriteriaOperation(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent) {
         internalPlanEvaluateCriteria(caseInstanceEntityId, lifeCycleEvent, false);
+    }
+    
+    @Override
+    public void planEvaluateCriteriaOperation(String caseInstanceEntityId, MigrationContext migrationContext) {
+        EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, null);
+        evaluateCriteriaOperation.setEvaluateStagesAndCaseInstanceCompletion(false);
+        evaluateCriteriaOperation.setMigrationContext(migrationContext);
+        addOperation(evaluateCriteriaOperation);
     }
     
     protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
@@ -238,15 +282,35 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitCriterionId, String exitType, String exitEventType) {
         addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitCriterionId, exitType, exitEventType));
     }
+    
+    @Override
+    public void planSuspendPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new SuspendPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
 
     @Override
     public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, String exitType, String exitEventType) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity, exitType, exitEventType));
     }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
+    }
+
+    @Override
+    public void planFailPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity, BusinessError businessError) {
+        addOperation(new FailPlanItemInstanceOperation(commandContext, planItemInstanceEntity, businessError));
+    }
     
     @Override
     public void planChangePlanItemInstanceToAvailableOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ChangePlanItemInstanceToAvailableOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planResumePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ResumePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override

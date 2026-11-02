@@ -17,21 +17,23 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLinkInfo;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -40,7 +42,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
 
     private static final int NR_CASE_INSTANCES = 5;
 
-    @Before
+    @BeforeEach
     public void createCaseInstance() {
         deployOneHumanTaskCaseModel();
 
@@ -102,6 +104,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         assertThat(cmmnTaskService.createTaskQuery().caseDefinitionKeyLike("oneTask%").list()).hasSize(NR_CASE_INSTANCES);
     }
 
+    @Test
     public void testQueryByCaseDefinitionKeyLikeIgnoreCase() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertThat(caseDefinition).isNotNull();
@@ -334,6 +337,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
     public void testHistoricTaskQueryByCaseDefinitionKeyLikeIgnoreCase() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertThat(caseDefinition).isNotNull();
@@ -372,5 +376,125 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
             
             assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().caseDefinitionKey("oneTaskCase").withoutScopeId().list()).hasSize(0);
         }
+    }
+
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testQueryByRootScopeId() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance oneTaskCasePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+
+        Task oneTaskCaseTask1 = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCasePlanItemInstance.getReferenceId()).singleResult();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        Task caseTaskSimpleCaseWithCaseTasksTask = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId()).singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        List<Task> twoHumanTasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        PlanItemInstance oneTaskCase2PlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskOneTaskCase").singleResult();
+        Task oneTaskCaseTask2 = cmmnTaskService.createTaskQuery().caseInstanceId(oneTaskCase2PlanItemInstance.getReferenceId()).singleResult();
+
+        List<Task> result = cmmnTaskService.createTaskQuery().taskRootScopeId(caseInstance.getId()).list();
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCaseTask1.getId(),
+                        oneTaskCaseTask2.getId(),
+                        twoHumanTasks.get(0).getId(),
+                        twoHumanTasks.get(1).getId(),
+                        caseTaskSimpleCaseWithCaseTasksTask.getId()
+                );
+
+        result = cmmnTaskService.createTaskQuery().or().taskRootScopeId(caseInstance.getId()).endOr().list();
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        oneTaskCaseTask1.getId(),
+                        oneTaskCaseTask2.getId(),
+                        twoHumanTasks.get(0).getId(),
+                        twoHumanTasks.get(1).getId(),
+                        caseTaskSimpleCaseWithCaseTasksTask.getId()
+                );
+    }
+
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void testQueryByParentScopeId() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+
+        PlanItemInstance caseTaskSimpleCaseWithCaseTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("caseTaskSimpleCaseWithCaseTasks").singleResult();
+
+        PlanItemInstance caseTaskWithHumanTasksPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskSimpleCaseWithCaseTasksPlanItemInstance.getReferenceId())
+                .planItemDefinitionId("caseTaskCaseWithHumanTasks").singleResult();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        List<Task> result = cmmnTaskService.createTaskQuery().taskParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).list();
+
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        planItemInstances.get(0).getReferenceId(),
+                        planItemInstances.get(1).getReferenceId()
+                );
+
+        result = cmmnTaskService.createTaskQuery().or().taskParentScopeId(caseTaskWithHumanTasksPlanItemInstance.getReferenceId()).endOr().list();
+
+        assertThat(result)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        planItemInstances.get(0).getReferenceId(),
+                        planItemInstances.get(1).getReferenceId()
+                );
+    }
+
+    @Test
+    @org.flowable.cmmn.engine.test.CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/simpleCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithCaseTasks.cmmn",
+            "org/flowable/cmmn/test/runtime/simpleInnerCaseWithHumanTasksAndCaseTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testQueryByScopeIds() {
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("simpleTestCaseWithCaseTasks").start();
+        cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackId(caseInstance.getId()).list();
+        List<PlanItemInstance> mainCasePlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        Set<String> callbackIds = mainCasePlanItemInstances.stream().map(PlanItemInstance::getId).collect(Collectors.toSet());
+        List<CaseInstance> subCases = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceCallbackIds(callbackIds).list();
+
+        List<Task> taskList = cmmnTaskService.createTaskQuery().scopeIds(subCases.stream().map(CaseInstance::getId).collect(Collectors.toSet())).list();
+
+        assertThat(taskList).extracting(Task::getScopeId, Task::getName, Task::getTaskDefinitionKey).containsExactlyInAnyOrder(
+                tuple(subCases.get(0).getId(), "The Task", "theTask"),
+                tuple(subCases.get(1).getId(), "Human task", "humanTask1")
+        );
     }
 }

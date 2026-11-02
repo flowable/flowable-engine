@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="testCatchErrorThrownByFutureJavaDelegateProvidedByDelegateExpressionOnServiceTask">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"/>
+
+        <serviceTask id="serviceTask" flowable:delegateExpression="#{bpmnErrorBean}" flowable:triggerable="true"/>
+
+        <boundaryEvent id="catchTriggeredError" attachedToRef="serviceTask">
+            <errorEventDefinition errorRef="triggerBpmnError"/>
+        </boundaryEvent>
+
+
+        <sequenceFlow id="flow3" sourceRef="catchTriggeredError" targetRef="escalatedTask"/>
+        <userTask id="escalatedTask" name="Triggered Escalated Task"/>
+
+        <sequenceFlow id="flow6" sourceRef="serviceTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

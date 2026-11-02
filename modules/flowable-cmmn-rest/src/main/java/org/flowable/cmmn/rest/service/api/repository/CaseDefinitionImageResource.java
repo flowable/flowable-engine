@@ -13,6 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -38,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionImageResource extends BaseCaseDefinitionResource {
 
     @ApiOperation(value = "Get a case definition image", tags = { "Case Definitions" })
@@ -49,18 +50,21 @@ public class CaseDefinitionImageResource extends BaseCaseDefinitionResource {
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getImageResource(@ApiParam(name = "caseDefinitionId") @PathVariable String caseDefinitionId) {
         CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
-        InputStream imageStream = repositoryService.getCaseDiagram(caseDefinition.getId());
-
-        if (imageStream != null) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
-            try {
-                return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
-            } catch (Exception e) {
-                throw new FlowableException("Error reading image stream", e);
+        try (final InputStream imageStream = repositoryService.getCaseDiagram(caseDefinition.getId())) {
+            if (imageStream != null) {
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
+                try {
+                    return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
+                } catch (Exception e) {
+                    throw new FlowableException("Error reading image stream", e);
+                }
+            } else {
+                throw new FlowableObjectNotFoundException("Case definition with id '" + caseDefinition.getId() + "' has no image.");
             }
-        } else {
-            throw new FlowableObjectNotFoundException("Case definition with id '" + caseDefinition.getId() + "' has no image.");
+            
+        } catch (IOException e) {
+            throw new FlowableException("Error reading image stream", e);
         }
     }
 

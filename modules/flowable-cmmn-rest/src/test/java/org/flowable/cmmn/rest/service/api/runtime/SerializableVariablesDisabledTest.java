@@ -33,82 +33,25 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.flowable.cmmn.api.CmmnRepositoryService;
-import org.flowable.cmmn.api.CmmnRuntimeService;
-import org.flowable.cmmn.api.CmmnTaskService;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.conf.ObjectVariableSerializationDisabledApplicationConfiguration;
+import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.HttpMultipartHelper;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
-import org.flowable.cmmn.rest.util.TestServerUtil;
-import org.flowable.cmmn.rest.util.TestServerUtil.TestServer;
-import org.flowable.idm.api.Group;
-import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.idm.api.User;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 /**
  * @author Tijs Rademakers
  */
-public class SerializableVariablesDisabledTest {
-
-    private CmmnRepositoryService repositoryService;
-    private CmmnRuntimeService runtimeService;
-    private IdmIdentityService identityService;
-    private CmmnTaskService taskService;
-
-    private String serverUrlPrefix;
-
-    private String testUserId;
-    private String testGroupId;
-
-    @Before
-    public void setupServer() {
-        if (serverUrlPrefix == null) {
-            TestServer testServer = TestServerUtil.createAndStartServer(ObjectVariableSerializationDisabledApplicationConfiguration.class);
-            serverUrlPrefix = testServer.getServerUrlPrefix();
-
-            this.repositoryService = testServer.getApplicationContext().getBean(CmmnRepositoryService.class);
-            this.runtimeService = testServer.getApplicationContext().getBean(CmmnRuntimeService.class);
-            this.identityService = testServer.getApplicationContext().getBean(IdmIdentityService.class);
-            this.taskService = testServer.getApplicationContext().getBean(CmmnTaskService.class);
-
-            User user = identityService.newUser("kermit");
-            user.setFirstName("Kermit");
-            user.setLastName("the Frog");
-            user.setPassword("kermit");
-            identityService.saveUser(user);
-
-            Group group = identityService.newGroup("admin");
-            group.setName("Administrators");
-            identityService.saveGroup(group);
-
-            identityService.createMembership(user.getId(), group.getId());
-
-            this.testUserId = user.getId();
-            this.testGroupId = group.getId();
-        }
-    }
-
-    @After
-    public void removeUsers() {
-        identityService.deleteMembership(testUserId, testGroupId);
-        identityService.deleteGroup(testGroupId);
-        identityService.deleteUser(testUserId);
-
-        for (CmmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeployment(deployment.getId(), true);
-        }
-    }
+@SpringJUnitWebConfig(ObjectVariableSerializationDisabledApplicationConfiguration.class)
+public class SerializableVariablesDisabledTest extends BaseSpringRestTestCase {
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
     public void testCreateSingleSerializableProcessVariable() throws Exception {
-        repositoryService.createDeployment().addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn").deploy();
-
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         TestSerializableVariable serializable = new TestSerializableVariable();
@@ -128,7 +71,7 @@ public class SerializableVariablesDisabledTest {
         additionalFields.put("type", "serializable");
 
         // Upload a valid CMMN-file using multipart-data
-        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_CASE_INSTANCE_VARIABLE_COLLECTION, caseInstance.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 
@@ -137,11 +80,8 @@ public class SerializableVariablesDisabledTest {
     }
 
     @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
     public void testCreateSingleSerializableTaskVariable() throws Exception {
-        repositoryService.createDeployment()
-                .addClasspathResource("org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn")
-                .deploy();
-
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
 
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -162,7 +102,7 @@ public class SerializableVariablesDisabledTest {
         additionalFields.put("name", "serializableVariable");
         additionalFields.put("type", "serializable");
 
-        HttpPost httpPost = new HttpPost(serverUrlPrefix +
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX +
                 CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_VARIABLES_COLLECTION, task.getId()));
         httpPost.setEntity(HttpMultipartHelper.getMultiPartEntity("value", "application/x-java-serialized-object", binaryContent, additionalFields));
 

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://flowable.org/test">
+
+    <process id="parentProcess" name="Parent Process" isExecutable="true">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="callActivity" />
+        <callActivity id="callActivity" name="Call activity" calledElement="childProcess" flowable:sameDeployment="true">
+            <extensionElements>
+                <!-- String conversions -->
+                <flowable:in source="intVar" target="intToString" targetType="string" />
+                <flowable:in source="doubleVar" target="doubleToString" targetType="string" />
+                <flowable:in source="booleanVar" target="booleanToString" targetType="string" />
+
+                <!-- Integer conversions -->
+                <flowable:in source="stringIntVar" target="stringToInt" targetType="integer" />
+                <flowable:in source="longVar" target="longToInt" targetType="integer" />
+                <flowable:in source="doubleVar" target="doubleToInt" targetType="integer" />
+
+                <!-- Long conversions -->
+                <flowable:in source="stringLongVar" target="stringToLong" targetType="long" />
+                <flowable:in source="intVar" target="intToLong" targetType="long" />
+
+                <!-- Double conversions -->
+                <flowable:in source="stringDoubleVar" target="stringToDouble" targetType="double" />
+                <flowable:in source="intVar" target="intToDouble" targetType="double" />
+                <flowable:in source="longVar" target="longToDouble" targetType="double" />
+
+                <!-- Boolean conversions -->
+                <flowable:in source="stringBooleanVar" target="stringToBoolean" targetType="boolean" />
+
+                <!-- Date conversions -->
+                <flowable:in source="stringDateVar" target="stringToDate" targetType="date" />
+                <flowable:in source="localDateVar" target="localDateToDate" targetType="date" />
+                <flowable:in source="instantVar" target="instantToDate" targetType="date" />
+                <flowable:in source="periodVar" target="periodToDate" targetType="date" />
+                <flowable:in source="durationVar" target="durationToDate" targetType="date" />
+
+                <!-- LocalDate conversions -->
+                <flowable:in source="stringLocalDateVar" target="stringToLocalDate" targetType="localdate" />
+                <flowable:in source="dateVar" target="dateToLocalDate" targetType="localdate" />
+                <flowable:in source="instantVar" target="instantToLocalDate" targetType="localdate" />
+                <flowable:in source="periodVar" target="periodToLocalDate" targetType="localdate" />
+                <flowable:in source="durationVar" target="durationToLocalDate" targetType="localdate" />
+
+                <!-- JSON conversions -->
+                <flowable:in source="jsonStringVar" target="stringToJson" targetType="json" />
+
+                <!-- Array conversions -->
+                <flowable:in source="arrayStringVar" target="stringToArray" targetType="array" />
+            </extensionElements>
+        </callActivity>
+        <sequenceFlow id="flow2" sourceRef="callActivity" targetRef="afterCallActivity" />
+        <userTask id="afterCallActivity" name="After call activity" />
+        <sequenceFlow id="flow3" sourceRef="afterCallActivity" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+
+</definitions>

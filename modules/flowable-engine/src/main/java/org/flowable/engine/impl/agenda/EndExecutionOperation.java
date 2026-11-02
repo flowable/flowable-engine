@@ -43,6 +43,7 @@ import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.jobexecutor.AsyncCompleteCallActivityJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.service.JobService;
@@ -148,8 +149,7 @@ public class EndExecutionOperation extends AbstractOperation {
     protected boolean isAsyncCompleteCallActivity(ExecutionEntity superExecution) {
         if (superExecution != null) {
             FlowNode superExecutionFlowNode = (FlowNode) superExecution.getCurrentFlowElement();
-            if (superExecutionFlowNode instanceof CallActivity) {
-                CallActivity callActivity = (CallActivity) superExecutionFlowNode;
+            if (superExecutionFlowNode instanceof CallActivity callActivity) {
                 return callActivity.isCompleteAsync();
             }
         }
@@ -183,6 +183,10 @@ public class EndExecutionOperation extends AbstractOperation {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = processEngineConfiguration.getExecutionEntityManager();
 
+        if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            processEngineConfiguration.getEndProcessInstanceInterceptor().beforeEndProcessInstance(execution, ProcessInstanceState.COMPLETED);
+        }
+
         // There will be a parent execution (or else we would be in the process instance handling method)
         ExecutionEntity parentExecution = executionEntityManager.findById(execution.getParentId());
 
@@ -199,19 +203,17 @@ public class EndExecutionOperation extends AbstractOperation {
 
         // When ending an execution in a multi instance subprocess , special care is needed
         if (isEndEventOrImpliedEndEventInMultiInstanceSubprocess(execution)) {
-            handleMultiInstanceSubProcess(executionEntityManager, parentExecution, execution);
+            handleMultiInstanceSubProcess(processEngineConfiguration, executionEntityManager, parentExecution, execution);
             return;
         }
 
         SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
 
-        if (subProcess instanceof EventSubProcess) {
-            EventSubProcess eventSubProcess = (EventSubProcess) subProcess;
+        if (subProcess instanceof EventSubProcess eventSubProcess) {
 
             boolean hasNonInterruptingStartEvent = false;
             for (FlowElement eventSubElement : eventSubProcess.getFlowElements()) {
-                if (eventSubElement instanceof StartEvent) {
-                    StartEvent subStartEvent = (StartEvent) eventSubElement;
+                if (eventSubElement instanceof StartEvent subStartEvent) {
                     if (!subStartEvent.isInterrupting()) {
                         hasNonInterruptingStartEvent = true;
                         break;
@@ -230,8 +232,7 @@ public class EndExecutionOperation extends AbstractOperation {
 
                 ExecutionEntity subProcessParentExecution = parentExecution.getParent();
                 if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
-                    if (subProcessParentExecution.getCurrentFlowElement() instanceof SubProcess) {
-                        SubProcess parentSubProcess = (SubProcess) subProcessParentExecution.getCurrentFlowElement();
+                    if (subProcessParentExecution.getCurrentFlowElement() instanceof SubProcess parentSubProcess) {
                         if (parentSubProcess.getOutgoingFlows().size() > 0) {
                             ExecutionEntity executionToContinue = handleSubProcessEnd(executionEntityManager, subProcessParentExecution, parentSubProcess);
                             agenda.planTakeOutgoingSequenceFlowsOperation(executionToContinue, true);
@@ -242,7 +243,6 @@ public class EndExecutionOperation extends AbstractOperation {
                     
                     agenda.planEndExecutionOperation(subProcessParentExecution);
                 }
-
                 return;
             }
         }
@@ -305,6 +305,10 @@ public class EndExecutionOperation extends AbstractOperation {
             }
 
         }
+
+        if (processEngineConfiguration.getEndProcessInstanceInterceptor() != null) {
+            processEngineConfiguration.getEndProcessInstanceInterceptor().afterEndProcessInstance(execution.getId(), ProcessInstanceState.COMPLETED);
+        }
     }
 
     protected ExecutionEntity handleSubProcessEnd(ExecutionEntityManager executionEntityManager, ExecutionEntity parentExecution, SubProcess subProcess) {
@@ -320,8 +324,7 @@ public class EndExecutionOperation extends AbstractOperation {
             hasCompensation = true;
         } else {
             for (FlowElement subElement : subProcess.getFlowElements()) {
-                if (subElement instanceof Activity) {
-                    Activity subActivity = (Activity) subElement;
+                if (subElement instanceof Activity subActivity) {
                     if (CollectionUtil.isNotEmpty(subActivity.getBoundaryEvents())) {
                         for (BoundaryEvent boundaryEvent : subActivity.getBoundaryEvents()) {
                             if (CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) &&
@@ -362,8 +365,7 @@ public class EndExecutionOperation extends AbstractOperation {
             parentExecution.setCurrentFlowElement(execution.getCurrentFlowElement());
         }
 
-        if (execution.getCurrentFlowElement() instanceof SubProcess) {
-            SubProcess currentSubProcess = (SubProcess) execution.getCurrentFlowElement();
+        if (execution.getCurrentFlowElement() instanceof SubProcess currentSubProcess) {
             if (currentSubProcess.getOutgoingFlows().size() > 0) {
                 // create a new execution to take the outgoing sequence flows
                 executionToContinue = executionEntityManager.createChildExecution(parentExecution);
@@ -389,13 +391,12 @@ public class EndExecutionOperation extends AbstractOperation {
         return executionToContinue;
     }
 
-    protected void handleMultiInstanceSubProcess(ExecutionEntityManager executionEntityManager,
+    protected void handleMultiInstanceSubProcess(ProcessEngineConfigurationImpl processEngineConfiguration, ExecutionEntityManager executionEntityManager,
             ExecutionEntity parentExecution, ExecutionEntity currentExecution) {
 
         // Special case: will be handled by the ParallelMultiInstanceWithNoWaitStateCompletionJobHandler asynchronously
         Object subProcessBehavior = currentExecution.getCurrentFlowElement().getSubProcess().getBehavior();
-        if (subProcessBehavior instanceof ParallelMultiInstanceBehavior) {
-            ParallelMultiInstanceBehavior parallelMultiInstanceBehavior = (ParallelMultiInstanceBehavior) subProcessBehavior;
+        if (subProcessBehavior instanceof ParallelMultiInstanceBehavior parallelMultiInstanceBehavior) {
             if (parallelMultiInstanceBehavior.isAsyncWithoutWaitStates(CommandContextUtil.getProcessEngineConfiguration())) {
                 parallelMultiInstanceBehavior.leave(currentExecution);
                 return;
@@ -415,10 +416,17 @@ public class EndExecutionOperation extends AbstractOperation {
             // Destroy the current scope (subprocess) and leave via the subprocess
 
             ScopeUtil.createCopyOfSubProcessExecutionForCompensation(parentExecution);
-            agenda.planDestroyScopeOperation(parentExecution);
 
             SubProcess subProcess = execution.getCurrentFlowElement().getSubProcess();
             MultiInstanceActivityBehavior multiInstanceBehavior = (MultiInstanceActivityBehavior) subProcess.getBehavior();
+            
+            // For a parallel multi instance with async leave, the scope will be destroyed during job execution.
+            // The scope shouldn't be destroyed here, or the variable resolvement (e.g. completed instances) won't be correct anymore.
+            if (!(multiInstanceBehavior instanceof ParallelMultiInstanceBehavior)
+                    || !processEngineConfiguration.isParallelMultiInstanceAsyncLeave()) {
+                agenda.planDestroyScopeOperation(parentExecution);
+            }
+            
             parentExecution.setCurrentFlowElement(subProcess);
             multiInstanceBehavior.leave(parentExecution);
         }
@@ -438,8 +446,7 @@ public class EndExecutionOperation extends AbstractOperation {
     }
 
     protected boolean isFlowNodeWithoutOutgoingSequenceFlow(FlowElement flowElement) {
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             return flowNode.getOutgoingFlows() == null || flowNode.getOutgoingFlows().isEmpty();
         }
         return false;

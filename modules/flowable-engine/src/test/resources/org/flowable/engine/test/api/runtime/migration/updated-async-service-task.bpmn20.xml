@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+     xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+     xmlns:flowable="http://flowable.org/bpmn"
+     targetNamespace="Examples">
+
+    <process id="MP" name="MyProcess" isExecutable="true">
+        <documentation>My process documentation</documentation>
+        <startEvent id="startEvent1"/>
+        <sequenceFlow id="seqFlow1Id" sourceRef="startEvent1" targetRef="serviceTask"/>
+        <serviceTask id="serviceTask" flowable:async="true" flowable:expression="${execution.setVariable('migrationVar', 'test')}" />
+        <sequenceFlow id="seqFlow2Id" sourceRef="serviceTask" targetRef="endEvent1"/>
+        <endEvent id="endEvent1"/>
+    </process>
+
+</definitions>

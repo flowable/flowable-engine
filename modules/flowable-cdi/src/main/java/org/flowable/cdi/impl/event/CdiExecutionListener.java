@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.util.Date;
 
-import javax.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.BeanManager;
 
 import org.flowable.cdi.BusinessProcessEvent;
 import org.flowable.cdi.BusinessProcessEventType;
@@ -71,7 +71,7 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
 
         BusinessProcessEvent event = createEvent(execution);
         Annotation[] qualifiers = getQualifiers(event);
-        getBeanManager().fireEvent(event, qualifiers);
+        getBeanManager().getEvent().select(qualifiers).fire(event);
     }
 
     protected BusinessProcessEvent createEvent(DelegateExecution execution) {

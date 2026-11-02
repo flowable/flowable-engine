@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.history;
 import java.util.Arrays;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,10 +35,10 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstanceBaseResource {
 
-    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances")
+    @ApiOperation(value = "List historic task instances", tags = { "History Task" }, nickname = "listHistoricTaskInstances", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taskId", dataType = "string", value = "An id of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic task instance.", paramType = "query"),
@@ -58,6 +56,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskDefinitionKeys", dataType = "string", value = "The task definition key for tasks part of a process", paramType = "query"),
             @ApiImplicitParam(name = "taskName", dataType = "string", value = "The task name of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskNameLike", dataType = "string", value = "The task name with like operator for the historic task instance.", paramType = "query"),
+            @ApiImplicitParam(name = "taskNameLikeIgnoreCase", dataType = "string", value = "The task name with like operator for the historic task instance ignoring case.", paramType = "query"),
             @ApiImplicitParam(name = "taskDescription", dataType = "string", value = "The task description of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskDescriptionLike", dataType = "string", value = "The task description with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskCategory", dataType = "string", value = "Select tasks with the given category. Note that this is the task category, not the category of the process definition (namespace within the BPMN Xml).", paramType = "query"),
@@ -72,7 +71,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "taskOwnerLike", dataType = "string", value = "The owner with like operator for the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "taskInvolvedUser", dataType = "string", value = "An involved user of the historic task instance", paramType = "query"),
             @ApiImplicitParam(name = "taskCandidateGroup", dataType = "string", value = "Only return tasks that can be claimed by a user in the given group.", paramType = "query"),
-            @ApiImplicitParam(name = "taskIgnoreAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)"),
+            @ApiImplicitParam(name = "ignoreTaskAssignee", dataType = "boolean", value = "Allows to select a task (typically in combination with a candidateGroup) and ignore the assignee (as claimed tasks will not be returned when using candidateGroup)", paramType = "query"),
             @ApiImplicitParam(name = "taskPriority", dataType = "string", value = "The priority of the historic task instance.", paramType = "query"),
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic task instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "processFinished", dataType = "boolean", value = "Indication if the process instance of the historic task instance is finished.", paramType = "query"),
@@ -91,19 +90,22 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic task instance global variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "scopeDefinitionId", dataType = "string", value = "Only return historic task instances with the given scopeDefinitionId.", paramType = "query"),
             @ApiImplicitParam(name = "scopeId", dataType = "string", value = "Only return historic task instances with the given scopeId.", paramType = "query"),
+            @ApiImplicitParam(name = "scopeIds", dataType = "string", value = "Only return historic task instances of the given scopeIds.", paramType = "query"),
             @ApiImplicitParam(name = "withoutScopeId", dataType = "boolean", value = "If true, only returns historic task instances without a scope id set. If false, the withoutScopeId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "scopeType", dataType = "string", value = "Only return historic task instances with the given scopeType.", paramType = "query"),
             @ApiImplicitParam(name = "propagatedStageInstanceId", dataType = "string", value = "Only return tasks which have the given id as propagated stage instance id", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic task instances with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic task instances with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns historic task instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "rootScopeId", dataType = "string", value = "Only return case instances which have the given root scope id (that can be a process or case instance ID).", paramType = "query"),
+            @ApiImplicitParam(name = "parentScopeId", dataType = "string", value = "Only return case instances which have the given parent scope id (that can be a process or case instance ID).", paramType = "query"),
 
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @GetMapping(value = "/history/historic-task-instances", produces = "application/json")
-    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Populate query based on request
         HistoricTaskInstanceQueryRequest queryRequest = new HistoricTaskInstanceQueryRequest();
 
@@ -161,6 +163,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("taskNameLike") != null) {
             queryRequest.setTaskNameLike(allRequestParams.get("taskNameLike"));
+        }
+        
+        if (allRequestParams.get("taskNameLikeIgnoreCase") != null) {
+            queryRequest.setTaskNameLikeIgnoreCase(allRequestParams.get("taskNameLikeIgnoreCase"));
         }
 
         if (allRequestParams.get("taskDescription") != null) {
@@ -259,6 +265,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setDueDateBefore(RequestUtil.getDate(allRequestParams, "dueDateBefore"));
         }
 
+        if (allRequestParams.containsKey("withoutDueDate") && Boolean.parseBoolean(allRequestParams.get("withoutDueDate"))) {
+            queryRequest.setWithoutDueDate(Boolean.TRUE);
+        }
+
         if (allRequestParams.get("taskCreatedOn") != null) {
             queryRequest.setTaskCreatedOn(RequestUtil.getDate(allRequestParams, "taskCreatedOn"));
         }
@@ -307,7 +317,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setTaskCandidateGroup(allRequestParams.get("taskCandidateGroup"));
         }
 
-        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.valueOf(allRequestParams.get("ignoreTaskAssignee"))) {
+        if (allRequestParams.containsKey("ignoreTaskAssignee") && Boolean.parseBoolean(allRequestParams.get("ignoreTaskAssignee"))) {
             queryRequest.setIgnoreTaskAssignee(true);
         }
 
@@ -317,6 +327,10 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
 
         if (allRequestParams.get("scopeId") != null) {
             queryRequest.setScopeId(allRequestParams.get("scopeId"));
+        }
+
+        if (allRequestParams.get("scopeIds") != null) {
+            queryRequest.setScopeIds(RequestUtil.parseToSet(allRequestParams.get("scopeIds")));
         }
         
         if (allRequestParams.get("withoutScopeId") != null) {
@@ -331,6 +345,14 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             queryRequest.setPropagatedStageInstanceId(allRequestParams.get("propagatedStageInstanceId"));
         }
 
-        return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/history/historic-task-instances", ""));
+        if (allRequestParams.containsKey("rootScopeId")) {
+            queryRequest.setRootScopeId(allRequestParams.get("rootScopeId"));
+        }
+
+        if (allRequestParams.containsKey("parentScopeId")) {
+            queryRequest.setParentScopeId(allRequestParams.get("parentScopeId"));
+        }
+
+        return getQueryResponse(queryRequest, allRequestParams);
     }
 }

@@ -12,11 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
+import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.VariableEventListener;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -53,8 +60,34 @@ public class SetVariablesCmd implements Command<Void> {
         }
         caseInstanceEntity.setVariables(variables);
         
+        Set<String> variableNames = variables.keySet();
+        
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
-        agenda.planEvaluateVariableEventListenersOperation(caseInstanceId);
+        
+        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+        CaseDefinition caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseInstanceEntity.getCaseDefinitionId());
+        boolean evaluateVariableEventListener = false;
+        if (caseDefinition != null) {
+            CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
+            for (Case caze : cmmnModel.getCases()) {
+                List<VariableEventListener> variableEventListeners = caze.findPlanItemDefinitionsOfType(VariableEventListener.class);
+                for (VariableEventListener variableEventListener : variableEventListeners) {
+                    if (variableNames.contains(variableEventListener.getVariableName())) {
+                        evaluateVariableEventListener = true;
+                        break;
+                    }
+                }
+                
+                if (evaluateVariableEventListener) {
+                    break;
+                }
+            }
+        }
+        
+        if (evaluateVariableEventListener) {
+            agenda.planEvaluateVariableEventListenersOperation(caseInstanceId);
+        }
+        
         agenda.planEvaluateCriteriaOperation(caseInstanceId);
         
         return null;

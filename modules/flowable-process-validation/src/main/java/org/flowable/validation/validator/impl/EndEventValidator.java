@@ -18,10 +18,11 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.EndEvent;
 import org.flowable.bpmn.model.EventDefinition;
+import org.flowable.bpmn.model.EventDefinitionLocation;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.Transaction;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -31,23 +32,23 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class EndEventValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<EndEvent> endEvents = process.findFlowElementsOfType(EndEvent.class);
         for (EndEvent endEvent : endEvents) {
-            if (endEvent.getEventDefinitions() != null && !endEvent.getEventDefinitions().isEmpty()) {
+            if (endEvent.getEventDefinitions() == null || endEvent.getEventDefinitions().isEmpty()) {
+                continue;
+            }
+            EventDefinition eventDefinition = endEvent.getEventDefinitions().get(0);
 
-                EventDefinition eventDefinition = endEvent.getEventDefinitions().get(0);
+            if (!eventDefinition.getSupportedLocations().contains(EventDefinitionLocation.END_EVENT)) {
+                validationContext.addError(Problems.END_EVENT_INVALID_EVENT_DEFINITION, process, endEvent, eventDefinition, "Invalid or unsupported event definition");
+            }
 
-                // Error end event
-                if (eventDefinition instanceof CancelEventDefinition) {
-
-                    FlowElementsContainer parent = process.findParent(endEvent);
-                    if (!(parent instanceof Transaction)) {
-                        addError(errors, Problems.END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION, process, endEvent, "end event with cancelEventDefinition only supported inside transaction subprocess");
-                    }
-
+            if (eventDefinition instanceof CancelEventDefinition) {
+                FlowElementsContainer parent = process.findParent(endEvent);
+                if (!(parent instanceof Transaction)) {
+                    validationContext.addError(Problems.END_EVENT_CANCEL_ONLY_INSIDE_TRANSACTION, process, endEvent, "end event with cancelEventDefinition only supported inside transaction subprocess");
                 }
-
             }
         }
     }

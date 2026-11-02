@@ -12,9 +12,12 @@
  */
 package org.flowable.dmn.converter.util;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.xml.stream.XMLStreamReader;
@@ -134,6 +137,37 @@ public class DmnXMLUtil implements DmnXMLConstants {
             extensionElement.setNamespacePrefix(xtr.getPrefix());
         }
 
+        parseAttributes(extensionElement, xtr);
+
+        boolean readyWithExtensionElement = false;
+        while (!readyWithExtensionElement && xtr.hasNext()) {
+            xtr.next();
+            if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
+                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
+                    if (extensionElement.getElementText() != null) {
+                        extensionElement.setElementText(extensionElement.getElementText() + xtr.getText().trim());
+                        
+                    } else {
+                        extensionElement.setElementText(xtr.getText().trim());
+                    }
+                }
+                
+            } else if (xtr.isStartElement()) {
+                DmnExtensionElement childExtensionElement = parseExtensionElement(xtr);
+                extensionElement.addChildElement(childExtensionElement);
+                
+            } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
+                readyWithExtensionElement = true;
+            }
+        }
+        return extensionElement;
+    }
+
+    public static void parseAttributes(DmnElement dmnElement, XMLStreamReader xtr) {
+        parseAttributes(dmnElement, xtr, Collections.emptyList());
+    }
+
+    public static void parseAttributes(DmnElement dmnElement, XMLStreamReader xtr, Collection<DmnExtensionAttribute> attributesToIgnore) {
         for (int i = 0; i < xtr.getAttributeCount(); i++) {
             DmnExtensionAttribute extensionAttribute = new DmnExtensionAttribute();
             extensionAttribute.setName(xtr.getAttributeLocalName(i));
@@ -144,24 +178,28 @@ public class DmnXMLUtil implements DmnXMLConstants {
             if (StringUtils.isNotEmpty(xtr.getAttributePrefix(i))) {
                 extensionAttribute.setNamespacePrefix(xtr.getAttributePrefix(i));
             }
-            extensionElement.addAttribute(extensionAttribute);
-        }
 
-        boolean readyWithExtensionElement = false;
-        while (!readyWithExtensionElement && xtr.hasNext()) {
-            xtr.next();
-            if (xtr.isCharacters() || XMLStreamReader.CDATA == xtr.getEventType()) {
-                if (StringUtils.isNotEmpty(xtr.getText().trim())) {
-                    extensionElement.setElementText(xtr.getText().trim());
-                }
-            } else if (xtr.isStartElement()) {
-                DmnExtensionElement childExtensionElement = parseExtensionElement(xtr);
-                extensionElement.addChildElement(childExtensionElement);
-            } else if (xtr.isEndElement() && extensionElement.getName().equalsIgnoreCase(xtr.getLocalName())) {
-                readyWithExtensionElement = true;
+            if (isAttributedIncluded(extensionAttribute, attributesToIgnore)) {
+                dmnElement.addAttribute(extensionAttribute);
             }
         }
-        return extensionElement;
+    }
+
+    protected static boolean isAttributedIncluded(DmnExtensionAttribute attribute, Collection<DmnExtensionAttribute> attributesToIgnore) {
+        if (attributesToIgnore.isEmpty()) {
+            return true;
+        }
+
+        for (DmnExtensionAttribute attributeToIgnore : attributesToIgnore) {
+            if (Objects.equals(attributeToIgnore.getName(), attribute.getName())) {
+                if (Objects.equals(attributeToIgnore.getNamespace(), attribute.getNamespace())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+
     }
 
     public static void writeElementDescription(DmnElement dmnElement, XMLStreamWriter xtw) throws Exception {
@@ -173,6 +211,10 @@ public class DmnXMLUtil implements DmnXMLConstants {
     }
 
     public static void writeExtensionElements(DmnElement dmnElement, XMLStreamWriter xtw) throws Exception {
+        writeExtensionElements(dmnElement, null, xtw);
+    }
+
+    public static void writeExtensionElements(DmnElement dmnElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (writeExtensionElements(dmnElement, false, xtw)) {
             xtw.writeEndElement();
         }
@@ -223,7 +265,32 @@ public class DmnXMLUtil implements DmnXMLConstants {
                 xtw.writeStartElement(extensionElement.getName());
             }
 
-            for (List<DmnExtensionAttribute> attributes : extensionElement.getAttributes().values()) {
+            writeAttributes(extensionElement, namespaceMap, xtw);
+
+            if (extensionElement.getElementText() != null) {
+                xtw.writeCharacters(extensionElement.getElementText());
+            } else {
+                for (List<DmnExtensionElement> childElements : extensionElement.getChildElements().values()) {
+                    for (DmnExtensionElement childElement : childElements) {
+                        writeExtensionElement(childElement, namespaceMap, xtw);
+                    }
+                }
+            }
+
+            for (String prefix : localNamespaceMap.keySet()) {
+                namespaceMap.remove(prefix);
+            }
+
+            xtw.writeEndElement();
+        }
+    }
+
+    public static void writeAttributes(DmnElement dmnElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
+        if (!dmnElement.getAttributes().isEmpty()) {
+            if (namespaceMap == null) {
+                namespaceMap = new HashMap<>();
+            }
+            for (List<DmnExtensionAttribute> attributes : dmnElement.getAttributes().values()) {
                 for (DmnExtensionAttribute attribute : attributes) {
                     if (StringUtils.isNotEmpty(attribute.getName()) && attribute.getValue() != null) {
                         if (StringUtils.isNotEmpty(attribute.getNamespace())) {
@@ -246,22 +313,6 @@ public class DmnXMLUtil implements DmnXMLConstants {
                     }
                 }
             }
-
-            if (extensionElement.getElementText() != null) {
-                xtw.writeCharacters(extensionElement.getElementText());
-            } else {
-                for (List<DmnExtensionElement> childElements : extensionElement.getChildElements().values()) {
-                    for (DmnExtensionElement childElement : childElements) {
-                        writeExtensionElement(childElement, namespaceMap, xtw);
-                    }
-                }
-            }
-
-            for (String prefix : localNamespaceMap.keySet()) {
-                namespaceMap.remove(prefix);
-            }
-
-            xtw.writeEndElement();
         }
     }
 

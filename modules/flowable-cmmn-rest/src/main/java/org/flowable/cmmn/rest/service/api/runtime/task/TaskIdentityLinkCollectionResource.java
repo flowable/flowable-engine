@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.task.api.Task;
@@ -26,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -39,7 +37,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Identity Links" }, description = "Manage Tasks Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List identity links for a task", tags = { "Task Identity Links" }, nickname = "listTasksInstanceIdentityLinks")
@@ -48,21 +46,27 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, HttpServletRequest request) {
-        Task task = getTaskFromRequest(taskId);
+    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId) {
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessTaskIdentityLinks(task);
+        }
+
         return restResponseFactory.createRestIdentityLinks(taskService.getIdentityLinksForTask(task.getId()));
     }
 
     @ApiOperation(value = "Create an identity link on a task", tags = { "Task Identity Links" }, nickname = "createTaskInstanceIdentityLinks",
-            notes = "It is possible to add either a user or a group.")
+            notes = "It is possible to add either a user or a group.", code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the task was found and the identity link was created."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have the requested identityLink. The status contains additional information about this error.")
     })
     @PostMapping(value = "/cmmn-runtime/tasks/{taskId}/identitylinks", produces = "application/json")
-    public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public RestIdentityLink createIdentityLink(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @RequestBody RestIdentityLink identityLink) {
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (identityLink.getGroup() == null && identityLink.getUser() == null) {
             throw new FlowableIllegalArgumentException("A group or a user is required to create an identity link.");
@@ -76,13 +80,15 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
         }
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createTaskIdentityLink(task, identityLink);
+        }
+
         if (identityLink.getGroup() != null) {
             taskService.addGroupIdentityLink(task.getId(), identityLink.getGroup(), identityLink.getType());
         } else {
             taskService.addUserIdentityLink(task.getId(), identityLink.getUser(), identityLink.getType());
         }
-
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), task.getId(), null, null);
     }

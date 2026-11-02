@@ -54,6 +54,7 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     protected boolean withoutScopeId;
     protected String scopeDefinitionId;
     protected boolean withoutScopeDefinitionId;
+    protected String scopeDefinitionKey;
     protected String scopeType;
     protected Date createdBefore;
     protected Date createdAfter;
@@ -328,6 +329,21 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     }
     
     @Override
+    public EventSubscriptionQueryImpl scopeDefinitionKey(String scopeDefinitionKey) {
+        if (scopeDefinitionKey == null) {
+            throw new FlowableIllegalArgumentException("Provided scope definition key is null");
+        }
+
+        if (inOrStatement) {
+            this.currentOrQueryObject.scopeDefinitionKey = scopeDefinitionKey;
+        } else {
+            this.scopeDefinitionKey = scopeDefinitionKey;
+        }
+
+        return this;
+    }
+    
+    @Override
     public EventSubscriptionQueryImpl scopeType(String scopeType) {
         if (scopeType == null) {
             throw new FlowableIllegalArgumentException("Provided scope type is null");
@@ -579,6 +595,10 @@ public class EventSubscriptionQueryImpl extends AbstractQuery<EventSubscriptionQ
     
     public boolean isWithoutScopeDefinitionId() {
         return withoutScopeDefinitionId;
+    }
+    
+    public String getScopeDefinitionKey() {
+        return scopeDefinitionKey;
     }
 
     public String getScopeType() {

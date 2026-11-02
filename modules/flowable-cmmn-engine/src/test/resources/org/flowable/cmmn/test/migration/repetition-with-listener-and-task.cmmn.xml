@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+  <case id="repetitionTaskCase" name="RepetitionTaskCase">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItemEventListener" name="eventListener1" definitionRef="userEventListener1">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter" />
+        </itemControl>
+      </planItem>
+      <planItem id="planItemrepeatableTask" name="repeatableTask" definitionRef="repeatableTask">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter" />
+        </itemControl>
+        <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1" />
+      </planItem>
+      <planItem id="planItemcmmnStage_1" name="Stage 1" definitionRef="cmmnStage1">
+        <entryCriterion id="entryCriterion2" sentryRef="entryStageSentry1" />
+      </planItem>
+      <sentry id="sentryentryCriterion1">
+        <planItemOnPart id="sentryOnPartentryCriterion1" sourceRef="planItemEventListener">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="entryStageSentry1">
+        <ifPart>
+            <condition><![CDATA[${true}]]></condition>
+        </ifPart>
+      </sentry>
+      <userEventListener id="userEventListener1" name="eventListener1" />
+      <task id="repeatableTask" flowable:type="java" flowable:expression="${true}" />
+      <stage id="cmmnStage1" name="Stage 1">
+        <planItem id="stagePlanItem1" name="Stage task" definitionRef="stageTask"/>
+        <task id="stageTask" name="Stage task" flowable:expression="${true}" flowable:async="true" />
+     </stage>
+    </casePlanModel>
+  </case>
+</definitions>

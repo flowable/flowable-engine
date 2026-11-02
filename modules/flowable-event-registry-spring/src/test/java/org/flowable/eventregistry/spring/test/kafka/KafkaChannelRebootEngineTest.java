@@ -42,6 +42,7 @@ import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.api.runtime.EventPayloadInstance;
 import org.flowable.eventregistry.spring.test.TestEventConsumer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.DisposableBean;
@@ -214,7 +215,7 @@ public class KafkaChannelRebootEngineTest {
         public void destroy() throws Exception {
             Map<TopicPartition, RecordsToDelete> recordsToDelete = new HashMap<>();
             Map<String, TopicDescription> topicDescriptions = adminClient.describeTopics(Arrays.asList("testListener", "test-customer"))
-                    .all()
+                    .allTopicNames()
                     .get(10, TimeUnit.SECONDS);
 
             try (Consumer<Object, Object> consumer = consumerFactory.createConsumer("test", "testCleanup")) {

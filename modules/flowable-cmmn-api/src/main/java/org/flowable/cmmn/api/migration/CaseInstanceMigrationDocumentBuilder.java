@@ -15,17 +15,22 @@ package org.flowable.cmmn.api.migration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Valentin Zickner
  */
 public interface CaseInstanceMigrationDocumentBuilder {
 
+    CaseInstanceMigrationDocumentBuilder setCaseInstanceIdsToMigrate(Set<String> caseInstanceIds);
+
     CaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionId);
 
     CaseInstanceMigrationDocumentBuilder setCaseDefinitionToMigrateTo(String caseDefinitionKey, Integer caseDefinitionVersion);
 
     CaseInstanceMigrationDocumentBuilder setTenantId(String caseDefinitionTenantId);
+    
+    CaseInstanceMigrationDocumentBuilder setEnableAutomaticPlanItemInstanceCreation(Boolean automaticValue);
 
     CaseInstanceMigrationDocumentBuilder addActivatePlanItemDefinitionMappings(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings);
 
@@ -47,9 +52,25 @@ public interface CaseInstanceMigrationDocumentBuilder {
 
     CaseInstanceMigrationDocumentBuilder addRemoveWaitingForRepetitionPlanItemDefinitionMapping(RemoveWaitingForRepetitionPlanItemDefinitionMapping planItemDefinitionMapping);
 
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMapping(ChangePlanItemIdMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdMappings(List<ChangePlanItemIdMapping> mappings);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMapping(ChangePlanItemIdWithDefinitionIdMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> mappings);
+    
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMapping(ChangePlanItemDefinitionWithNewTargetIdsMapping mapping);
+
+    CaseInstanceMigrationDocumentBuilder addChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> mappings);
+
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariable(String variableName, Object variableValue);
 
     CaseInstanceMigrationDocumentBuilder addCaseInstanceVariables(Map<String, Object> caseInstanceVariables);
+
+    CaseInstanceMigrationDocumentBuilder preUpgradeExpression(String preUpgradeExpression);
+
+    CaseInstanceMigrationDocumentBuilder postUpgradeExpression(String postUpgradeExpression);
 
     CaseInstanceMigrationDocument build();
 

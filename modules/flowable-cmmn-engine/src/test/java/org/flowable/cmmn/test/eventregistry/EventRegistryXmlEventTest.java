@@ -24,9 +24,9 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
 import org.flowable.eventregistry.model.InboundChannelModel;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -35,7 +35,7 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
 
     protected TestInboundEventChannelAdapter inboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         inboundEventChannelAdapter = setupTestChannel();
 
@@ -64,7 +64,7 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         return inboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
@@ -99,11 +99,12 @@ public class EventRegistryXmlEventTest extends FlowableEventRegistryCmmnTestCase
         }
 
         public void testSendXmlEvent() {
-            String event = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                    + "<customerEvent>\n"
-                    + "    <customerId>12345</customerId>\n"
-                    + "    <name>Customer name</name>\n"
-                    + "</customerEvent>";
+            String event = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <customerEvent>
+                        <customerId>12345</customerId>
+                        <name>Customer name</name>
+                    </customerEvent>""";
 
             eventRegistry.eventReceived(inboundChannelModel, event);
         }

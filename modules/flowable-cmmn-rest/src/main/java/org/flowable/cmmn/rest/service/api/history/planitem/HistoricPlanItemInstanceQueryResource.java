@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.history.planitem;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -35,16 +35,19 @@ import io.swagger.annotations.Authorization;
  * @author Dennis Federico
  */
 @RestController
-@Api(tags = {"History PlanItem"}, description = "Manage History Plan Item Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History PlanItem"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricPlanItemInstanceQueryResource extends HistoricPlanItemInstanceBaseResource {
 
     @ApiOperation(value = "Query for historic plan item instances", tags = {"History PlanItem", "Query"}, nickname = "queryHistoricPlanItemInstance",
             notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic plan item instances, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "sort", dataType = "string", value = "The field to sort by. Defaults to 'createTime'.", allowableValues = "createTime,endedTime,name", paramType = "body"),
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the plan item instances are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})
     @PostMapping(value = "/cmmn-query/historic-planitem-instances", produces = "application/json")
-    public DataResponse<HistoricPlanItemInstanceResponse> queryPlanItemInstances(@RequestBody HistoricPlanItemInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricPlanItemInstanceResponse> queryPlanItemInstances(@RequestBody HistoricPlanItemInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         return getQueryResponse(queryRequest, allRequestParams);
     }
 }

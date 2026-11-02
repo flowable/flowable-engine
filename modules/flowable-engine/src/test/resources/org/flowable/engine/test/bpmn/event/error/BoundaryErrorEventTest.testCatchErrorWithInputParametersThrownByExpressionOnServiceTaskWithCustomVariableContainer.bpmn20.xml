@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             targetNamespace="Examples">
+
+    <process id="errorProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="serviceTask"/>
+
+        <serviceTask id="serviceTask"
+                     flowable:expression="#{bpmnErrorBean.get()}"/>
+
+        <boundaryEvent id="catchError" attachedToRef="serviceTask">
+            <extensionElements>
+                <flowable:in target="handledErrorCodeVar" source="errorCode"/>
+                <flowable:in target="handledErrorCodeVarWithExpression" sourceExpression="${errorCode.concat('-testing')}"/>
+                <flowable:in target="handledErrorMessage" source="errorMessage"/>
+                <flowable:in target="handledCustomParameter" source="customErrorProperty"/>
+                <flowable:in target="handledTransientVar" source="customErrorProperty" transient="true"/>
+            </extensionElements>
+            <errorEventDefinition/>
+        </boundaryEvent>
+
+        <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask"/>
+
+        <userTask id="escalatedTask" name="Escalated Task">
+            <extensionElements>
+                <flowable:taskListener event="create" expression="${execution.setVariable('fromTransientHandledVar', handledTransientVar)}"/>
+            </extensionElements>
+        </userTask>
+        <sequenceFlow id="flow4" sourceRef="serviceTask" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

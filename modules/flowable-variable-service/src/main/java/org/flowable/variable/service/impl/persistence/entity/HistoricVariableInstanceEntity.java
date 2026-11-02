@@ -36,6 +36,8 @@ public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVar
 
     void setProcessInstanceId(String processInstanceId);
 
+    void setProcessDefinitionId(String processDefinitionId);
+
     void setTaskId(String taskId);
 
     void setCreateTime(Date createTime);
@@ -50,6 +52,10 @@ public interface HistoricVariableInstanceEntity extends ValueFields, HistoricVar
     
     void setScopeType(String scopeType);
 
+    void setScopeDefinitionId(String scopeDefinitionId);
+
     ByteArrayRef getByteArrayRef();
+
+    void setMetaInfo(String metaInfo);
 
 }

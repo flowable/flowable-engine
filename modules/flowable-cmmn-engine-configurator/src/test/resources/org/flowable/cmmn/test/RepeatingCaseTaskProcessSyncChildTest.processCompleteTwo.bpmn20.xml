@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+    <!-- Synchronous child process of a process task in caseCompleteTwo. No wait state. -->
+    <process id="processCompleteTwo" name="Process complete two">
+        <startEvent id="theStart"/>
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="initVariables"/>
+        <scriptTask id="initVariables" name="Initialize variables" scriptFormat="groovy">
+            <script>
+                execution.setVariable("processTwo", true)
+            </script>
+        </scriptTask>
+        <sequenceFlow id="flow2" sourceRef="initVariables" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+    </process>
+</definitions>

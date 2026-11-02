@@ -13,8 +13,10 @@
 
 package org.flowable.engine.delegate;
 
-import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import java.util.HashMap;
+
+import org.flowable.common.engine.api.delegate.BusinessError;
+import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.engine.impl.bpmn.parser.Error;
 
 /**
@@ -27,33 +29,27 @@ import org.flowable.engine.impl.bpmn.parser.Error;
  * 
  * @author Tijs Rademakers
  */
-public class BpmnError extends FlowableException {
+public class BpmnError extends BusinessError {
 
     private static final long serialVersionUID = 1L;
 
-    private String errorCode;
-
     public BpmnError(String errorCode) {
-        super("");
-        setErrorCode(errorCode);
+        super(errorCode);
     }
 
     public BpmnError(String errorCode, String message) {
-        super(message);
-        setErrorCode(errorCode);
+        super(errorCode, message);
     }
 
-    protected void setErrorCode(String errorCode) {
-        if (errorCode == null) {
-            throw new FlowableIllegalArgumentException("Error Code must not be null.");
-        }
-        if (errorCode.length() < 1) {
-            throw new FlowableIllegalArgumentException("Error Code must not be empty.");
-        }
-        this.errorCode = errorCode;
+    public BpmnError(String errorCode, String message, Throwable cause) {
+        super(errorCode, message, cause);
     }
 
-    public String getErrorCode() {
-        return errorCode;
+    @Override
+    public void addAdditionalData(String name, Object value) {
+        if (this.getAdditionalDataContainer() == null) {
+            this.setAdditionalDataContainer(new VariableContainerWrapper(new HashMap<>()));
+        }
+        this.getAdditionalDataContainer().setVariable(name, value);
     }
 }

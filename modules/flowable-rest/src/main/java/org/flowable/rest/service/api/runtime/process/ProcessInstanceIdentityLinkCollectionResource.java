@@ -15,9 +15,7 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -39,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Identity Links" }, description = "Manage Process Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Identity Links" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessInstanceResource {
 
     @ApiOperation(value = "Get involved people for process instance", tags = {"Process Instance Identity Links" }, nickname = "listProcessInstanceIdentityLinks",
@@ -49,38 +48,52 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
-    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+    public List<RestIdentityLink> getIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId) {
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessProcessInstanceIdentityLinks(processInstance);
+        }
+
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()));
     }
 
     @ApiOperation(value = "Add an involved user to a process instance", tags = {"Process Instance Identity Links" }, nickname = "createProcessInstanceIdentityLinks",
-            notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a process-instance.")
+            notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a process-instance.",
+            code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process instance was found and the link is created."),
             @ApiResponse(code = 400, message = "Indicates the requested body did not contain a userId or a type."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/identitylinks", produces = "application/json")
-    public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public RestIdentityLink createIdentityLink(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody RestIdentityLink identityLink) {
 
-        ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
+        ProcessInstance processInstance = getProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
 
-        if (identityLink.getGroup() != null) {
-            throw new FlowableIllegalArgumentException("Only user identity links are supported on a process instance.");
+        if (identityLink.getGroup() == null && identityLink.getUser() == null) {
+            throw new FlowableIllegalArgumentException("User or group are required.");
         }
-
-        if (identityLink.getUser() == null) {
-            throw new FlowableIllegalArgumentException("The user is required.");
+        
+        if (StringUtils.isEmpty(identityLink.getGroup()) && StringUtils.isEmpty(identityLink.getUser())) {
+            throw new FlowableIllegalArgumentException("Only one value of user or group is supported.");
         }
 
         if (identityLink.getType() == null) {
             throw new FlowableIllegalArgumentException("The identity link type is required.");
         }
 
-        runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());
+        if (restApiInterceptor != null) {
+            restApiInterceptor.createProcessInstanceIdentityLink(processInstance, identityLink);
+        }
 
-        response.setStatus(HttpStatus.CREATED.value());
+        if (StringUtils.isNotEmpty(identityLink.getGroup())) {
+            runtimeService.addGroupIdentityLink(processInstance.getId(), identityLink.getGroup(), identityLink.getType());
+            
+        } else {
+            runtimeService.addUserIdentityLink(processInstance.getId(), identityLink.getUser(), identityLink.getType());
+        }
 
         return restResponseFactory.createRestIdentityLink(identityLink.getType(), identityLink.getUser(), identityLink.getGroup(), null, null, processInstance.getId());
     }

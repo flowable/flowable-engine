@@ -19,9 +19,12 @@ import org.flowable.bpmn.model.CaseServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.CaseTaskActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -35,8 +38,13 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
     
     protected String executionId;
     protected Map<String, Object> variables;
+    protected transient VariableContainer childCaseInstance;
 
     public TriggerCaseTaskCmd(String executionId, Map<String, Object> variables) {
+        this(executionId, variables, null);
+    }
+
+    public TriggerCaseTaskCmd(String executionId, Map<String, Object> variables, VariableContainer childCaseInstance) {
         this.executionId = executionId;
 
         if (executionId == null) {
@@ -44,6 +52,7 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         }
         
         this.variables = variables;
+        this.childCaseInstance = childCaseInstance;
     }
 
     @Override
@@ -55,15 +64,25 @@ public class TriggerCaseTaskCmd implements Command<Void>, Serializable {
         }
         
         FlowElement flowElement = execution.getCurrentFlowElement();
-        if (!(flowElement instanceof CaseServiceTask)) {
-            throw new FlowableException("No execution could be found with a case service task for id " + executionId);
+        if (!(flowElement instanceof CaseServiceTask caseServiceTask)) {
+            throw new FlowableException("No execution could be found with a case service task for " + execution);
         }
-        
-        CaseServiceTask caseServiceTask = (CaseServiceTask) flowElement;
-        
-        CaseTaskActivityBehavior caseTaskActivityBehavior = (CaseTaskActivityBehavior) caseServiceTask.getBehavior();
-        caseTaskActivityBehavior.triggerCaseTask(execution, variables);
-        
+
+        Object behavior = caseServiceTask.getBehavior();
+        if (behavior instanceof CaseTaskActivityBehavior) {
+            ((CaseTaskActivityBehavior) behavior).triggerCaseTaskAndLeave(execution, variables, childCaseInstance);
+        } else if (behavior instanceof MultiInstanceActivityBehavior) {
+            AbstractBpmnActivityBehavior innerActivityBehavior = ((MultiInstanceActivityBehavior) behavior).getInnerActivityBehavior();
+            if (innerActivityBehavior instanceof CaseTaskActivityBehavior) {
+                ((CaseTaskActivityBehavior) innerActivityBehavior).triggerCaseTask(execution, variables, childCaseInstance);
+            } else {
+                throw new FlowableException("Multi instance inner behavior " + innerActivityBehavior + " is not supported for " + execution);
+            }
+            ((MultiInstanceActivityBehavior) behavior).leave(execution);
+        } else {
+                throw new FlowableException("Behavior " + behavior + " is not supported for a case task for " + execution);
+        }
+
         return null;
     }
 }

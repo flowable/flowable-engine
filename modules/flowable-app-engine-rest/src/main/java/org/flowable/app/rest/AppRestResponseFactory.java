@@ -15,7 +15,6 @@ package org.flowable.app.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.ContentType;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.service.api.repository.AppDefinitionResponse;
@@ -70,12 +69,7 @@ public class AppRestResponseFactory {
         // Add additional metadata to the artifact-strings before returning
         List<AppDeploymentResourceResponse> responseList = new ArrayList<>(resourceList.size());
         for (String resourceId : resourceList) {
-            String contentType = null;
-            if (resourceId.toLowerCase().endsWith(".app")) {
-                contentType = ContentType.APPLICATION_JSON.getMimeType();
-            } else {
-                contentType = contentTypeResolver.resolveContentType(resourceId);
-            }
+            String contentType = contentTypeResolver.resolveContentType(resourceId);
             responseList.add(createDeploymentResourceResponse(deploymentId, resourceId, contentType, urlBuilder));
         }
         return responseList;

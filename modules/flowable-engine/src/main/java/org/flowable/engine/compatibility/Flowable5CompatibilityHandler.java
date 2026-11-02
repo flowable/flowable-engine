@@ -39,7 +39,7 @@ import org.flowable.job.api.Job;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -177,6 +177,8 @@ public interface Flowable5CompatibilityHandler {
     void deleteJob(String jobId);
 
     void leaveExecution(DelegateExecution execution);
+    
+    void leaveMIExecution(DelegateExecution execution, Object v5MultiInstanceActivityBehavior);
 
     void propagateError(BpmnError bpmnError, DelegateExecution execution);
 

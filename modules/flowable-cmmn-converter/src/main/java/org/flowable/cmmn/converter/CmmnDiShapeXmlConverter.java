@@ -42,5 +42,10 @@ public class CmmnDiShapeXmlConverter extends BaseCmmnXmlConverter {
         
         return diShape;
     }
+
+    @Override
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        conversionHelper.setCurrentDiShape(null);
+    }
     
 }

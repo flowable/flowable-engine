@@ -23,6 +23,7 @@ public class InboundChannelModel extends ChannelModel {
 
     protected String contextExtractorDelegateExpression;
     protected String deserializerDelegateExpression;
+    protected String eventFilterDelegateExpression;
     protected String payloadExtractorDelegateExpression;
     protected String headerExtractorDelegateExpression;
     protected String eventTransformerDelegateExpression;
@@ -46,6 +47,14 @@ public class InboundChannelModel extends ChannelModel {
 
     public void setDeserializerType(String deserializerType) {
         this.deserializerType = deserializerType;
+    }
+
+    public String getEventFilterDelegateExpression() {
+        return eventFilterDelegateExpression;
+    }
+
+    public void setEventFilterDelegateExpression(String eventFilterDelegateExpression) {
+        this.eventFilterDelegateExpression = eventFilterDelegateExpression;
     }
 
     public String getContextExtractorDelegateExpression() {

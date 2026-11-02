@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="interceptorCaseTaskCase">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItemChild" definitionRef="childTask"/>
+            <planItem id="planItemWait" definitionRef="wait"/>
+            <caseTask id="childTask" caseRef="interceptorChildCase">
+                <extensionElements>
+                    <flowable:in source="orderId" target="orderId"/>
+                    <flowable:out source="reviewer" target="reviewer"/>
+                </extensionElements>
+            </caseTask>
+            <humanTask id="wait" isBlocking="true"/>
+        </casePlanModel>
+    </case>
+</definitions>

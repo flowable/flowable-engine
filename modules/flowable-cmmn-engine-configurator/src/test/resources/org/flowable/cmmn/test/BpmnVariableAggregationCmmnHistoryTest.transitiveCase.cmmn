@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="transitiveCase">
+        <casePlanModel id="transitiveCasePlanModel" name="Transitive case">
+            <planItem id="planItemOuterProcess" definitionRef="outerProcessTask" />
+            <processTask id="outerProcessTask" name="Run outer process">
+                <processRefExpression>outerProcess</processRefExpression>
+            </processTask>
+        </casePlanModel>
+    </case>
+</definitions>

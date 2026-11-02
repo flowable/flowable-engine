@@ -18,6 +18,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.io.InputStreamSource;
 import org.flowable.common.engine.impl.util.io.StreamSource;
@@ -48,6 +49,11 @@ import org.slf4j.LoggerFactory;
 public class DmnParse implements DmnXMLConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnParse.class);
+
+    /**
+     * Max length of the database field ACT_DMN_DECISION.DESCRIPTION_
+     */
+    protected static final int DESCRIPTION_MAX_LENGTH = 4000;
 
     protected String name;
 
@@ -93,7 +99,7 @@ public class DmnParse implements DmnXMLConstants {
                     decisionEntity.setName(decisionService.getName());
                     decisionEntity.setResourceName(name);
                     decisionEntity.setDeploymentId(deployment.getId());
-                    decisionEntity.setDescription(decisionService.getDescription());
+                    decisionEntity.setDescription(StringUtils.truncate(decisionService.getDescription(), DESCRIPTION_MAX_LENGTH));
                     decisionEntity.setDecisionType(DecisionTypes.DECISION_SERVICE);
                     decisions.add(decisionEntity);
                 }
@@ -104,7 +110,7 @@ public class DmnParse implements DmnXMLConstants {
                         decisionEntity.setName(decision.getName());
                         decisionEntity.setResourceName(name);
                         decisionEntity.setDeploymentId(deployment.getId());
-                        decisionEntity.setDescription(decision.getDescription());
+                        decisionEntity.setDescription(StringUtils.truncate(decision.getDescription(), DESCRIPTION_MAX_LENGTH));
                         decisionEntity.setDecisionType(DecisionTypes.DECISION_TABLE);
                         decisions.add(decisionEntity);
                     }

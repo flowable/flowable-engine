@@ -12,7 +12,13 @@
  */
 package org.flowable.http.common.api;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 
 /**
  * @author Harsha Teja Kanna.
@@ -22,18 +28,30 @@ public class HttpRequest {
     protected String method;
     protected String url;
     protected HttpHeaders httpHeaders;
+    /**
+     * Additional headers to {@link #httpHeaders} that which can be used and won't be saved in plain text.
+     */
+    protected HttpHeaders secureHttpHeaders;
     protected String body;
     protected String bodyEncoding;
+    /**
+     * Raw binary body to be sent in the request. Mutually exclusive with {@link #body}, {@link #multiValueParts}
+     * and {@link #formParameters}. Use this for a raw binary payload that must not go through the textual
+     * {@link #body}, which would corrupt it.
+     */
+    protected byte[] bodyBytes;
+    /**
+     * Multi-value parts to be sent in the request.
+     * This is used for multipart/form-data requests and will be encoded as such.
+     */
+    protected Collection<MultiValuePart> multiValueParts;
+    /**
+     * Form parameters to be sent in the request.
+     * This is used for form submissions and will be encoded as application/x-www-form-urlencoded.
+     */
+    protected Map<String, List<String>> formParameters;
     protected int timeout;
     protected boolean noRedirects;
-    protected Set<String> failCodes;
-    protected Set<String> handleCodes;
-    protected boolean ignoreErrors;
-    protected boolean saveRequest;
-    protected boolean saveResponse;
-    protected boolean saveResponseTransient;
-    protected boolean saveResponseAsJson;
-    protected String prefix;
 
     public String getMethod() {
         return method;
@@ -64,11 +82,30 @@ public class HttpRequest {
         this.httpHeaders = httpHeaders;
     }
 
+    public HttpHeaders getSecureHttpHeaders() {
+        return secureHttpHeaders;
+    }
+
+    public String getSecureHttpHeadersAsString() {
+        return secureHttpHeaders != null ? secureHttpHeaders.formatAsString(true) : null;
+    }
+
+    public void setSecureHttpHeaders(HttpHeaders secureHttpHeaders) {
+        this.secureHttpHeaders = secureHttpHeaders;
+    }
+
     public String getBody() {
         return body;
     }
 
     public void setBody(String body) {
+        if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and body bytes");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        } else if (formParameters != null && !formParameters.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body and form parameters");
+        }
         this.body = body;
     }
 
@@ -78,6 +115,57 @@ public class HttpRequest {
 
     public void setBodyEncoding(String bodyEncoding) {
         this.bodyEncoding = bodyEncoding;
+    }
+
+    public byte[] getBodyBytes() {
+        return bodyBytes;
+    }
+
+    public void setBodyBytes(byte[] bodyBytes) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and body bytes");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and multi value parts");
+        } else if (formParameters != null && !formParameters.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and form parameters");
+        }
+        this.bodyBytes = bodyBytes;
+    }
+
+    public Collection<MultiValuePart> getMultiValueParts() {
+        return multiValueParts;
+    }
+
+    public void addMultiValuePart(MultiValuePart part) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and multi value parts");
+        } else if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and multi value parts");
+        } else if (formParameters != null && !formParameters.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both form parameters and multi value parts");
+        }
+        if (multiValueParts == null) {
+            multiValueParts = new ArrayList<>();
+        }
+        multiValueParts.add(part);
+    }
+
+    public Map<String, List<String>> getFormParameters() {
+        return formParameters;
+    }
+
+    public void addFormParameter(String key, String value) {
+        if (body != null) {
+            throw new FlowableIllegalStateException("Cannot set both body and form parameters");
+        } else if (bodyBytes != null) {
+            throw new FlowableIllegalStateException("Cannot set both body bytes and form parameters");
+        } else if (multiValueParts != null && !multiValueParts.isEmpty()) {
+            throw new FlowableIllegalStateException("Cannot set both multi value parts and form parameters");
+        }
+        if (formParameters == null) {
+            formParameters = new LinkedHashMap<>();
+        }
+        formParameters.computeIfAbsent(key, k -> new ArrayList<>()).add(value);
     }
 
     public int getTimeout() {
@@ -96,67 +184,4 @@ public class HttpRequest {
         this.noRedirects = noRedirects;
     }
 
-    public Set<String> getFailCodes() {
-        return failCodes;
-    }
-
-    public void setFailCodes(Set<String> failCodes) {
-        this.failCodes = failCodes;
-    }
-
-    public Set<String> getHandleCodes() {
-        return handleCodes;
-    }
-
-    public void setHandleCodes(Set<String> handleCodes) {
-        this.handleCodes = handleCodes;
-    }
-
-    public boolean isIgnoreErrors() {
-        return ignoreErrors;
-    }
-
-    public void setIgnoreErrors(boolean ignoreErrors) {
-        this.ignoreErrors = ignoreErrors;
-    }
-
-    public boolean isSaveRequest() {
-        return saveRequest;
-    }
-
-    public void setSaveRequest(boolean saveRequest) {
-        this.saveRequest = saveRequest;
-    }
-
-    public boolean isSaveResponse() {
-        return saveResponse;
-    }
-
-    public void setSaveResponse(boolean saveResponse) {
-        this.saveResponse = saveResponse;
-    }
-    
-    public boolean isSaveResponseTransient() {
-        return saveResponseTransient;
-    }
-
-    public void setSaveResponseTransient(boolean saveResponseTransient) {
-        this.saveResponseTransient = saveResponseTransient;
-    }
-    
-    public boolean isSaveResponseAsJson() {
-        return saveResponseAsJson;
-    }
-
-    public void setSaveResponseAsJson(boolean saveResponseAsJson) {
-        this.saveResponseAsJson = saveResponseAsJson;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
-    }
 }

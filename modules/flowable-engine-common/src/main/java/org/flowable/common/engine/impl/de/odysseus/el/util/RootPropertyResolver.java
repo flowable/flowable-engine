@@ -15,10 +15,8 @@
  */
 package org.flowable.common.engine.impl.de.odysseus.el.util;
 
-import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.flowable.common.engine.impl.javax.el.ELContext;
@@ -67,11 +65,6 @@ public class RootPropertyResolver extends ELResolver {
 	@Override
 	public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		return isResolvable(context) ? String.class : null;
-	}
-
-	@Override
-	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-		return null;
 	}
 
 	@Override

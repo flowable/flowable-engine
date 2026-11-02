@@ -9,8 +9,8 @@
   <insert id="insertMembership" parameterType="map">
     insert into ${prefix}ACT_ID_MEMBERSHIP (USER_ID_, GROUP_ID_)
     values (
-      #{userId ,jdbcType=VARCHAR},
-      #{groupId ,jdbcType=VARCHAR}
+      #{userId, jdbcType=NVARCHAR},
+      #{groupId, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -18,8 +18,8 @@
     INSERT INTO ${prefix}ACT_ID_MEMBERSHIP (USER_ID_, GROUP_ID_)
     VALUES 
     <foreach collection="list" item="membership" index="index" separator=","> 
-      (#{membership.userId ,jdbcType=VARCHAR},
-       #{membership.groupId ,jdbcType=VARCHAR})
+      (#{membership.userId, jdbcType=NVARCHAR},
+       #{membership.groupId, jdbcType=NVARCHAR})
     </foreach>
   </insert>
 
@@ -27,8 +27,8 @@
     INSERT ALL 
     <foreach collection="list" item="membership" index="index">
       INTO ${prefix}ACT_ID_MEMBERSHIP (USER_ID_, GROUP_ID_) VALUES  
-        (#{membership.userId ,jdbcType=VARCHAR},
-         #{membership.groupId ,jdbcType=VARCHAR})
+        (#{membership.userId, jdbcType=NVARCHAR},
+         #{membership.groupId, jdbcType=NVARCHAR})
     </foreach>
     SELECT * FROM dual
   </insert>
@@ -39,13 +39,13 @@
 
   <delete id="deleteMembershipsByUserId" parameterType="string">
     delete from ${prefix}ACT_ID_MEMBERSHIP 
-    where USER_ID_ = #{userId} 
+    where USER_ID_ = #{userId, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteMembership" parameterType="map">
     delete from ${prefix}ACT_ID_MEMBERSHIP 
-    where USER_ID_ = #{userId}
-      and GROUP_ID_ = #{groupId} 
+    where USER_ID_ = #{userId, jdbcType=NVARCHAR}
+      and GROUP_ID_ = #{groupId, jdbcType=NVARCHAR}
   </delete>
 
   <!-- MEMBERSHIP RESULTMAP -->
@@ -54,7 +54,7 @@
 
   <delete id="deleteMembershipsByGroupId" parameterType="string">
     delete from ${prefix}ACT_ID_MEMBERSHIP 
-    where GROUP_ID_ = #{groupId} 
+    where GROUP_ID_ = #{groupId, jdbcType=NVARCHAR}
   </delete>
   
 </mapper>

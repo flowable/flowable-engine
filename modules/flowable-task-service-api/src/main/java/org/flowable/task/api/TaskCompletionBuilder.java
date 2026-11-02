@@ -15,76 +15,72 @@ package org.flowable.task.api;
 import java.util.Map;
 
 /**
+ * This builder is an alternative to using any of the complete methods on the TaskService.
+ *
  * @author Ievgenii Bespal
+ * @author Joram Barrez
  */
 public interface TaskCompletionBuilder {
 
 
     /**
-     * Sets a variables before the task is completed.
-     * The variables will be stored on the plan item instance.
+     * Sets variables that are added on the instance level.
      */
     TaskCompletionBuilder variables(Map<String, Object> variables);
 
     /**
-     * Sets a local variables before the task is completed.
-     * The variables will be stored locally on the plan item instance.
+     * Sets task-local variables instead of instance-level variables.
      */
     TaskCompletionBuilder variablesLocal(Map<String, Object> variablesLocal);
 
     /**
-     * Sets a non-persisted variables before the task is completed.
-     * The transient variables will not be persisted at the end of the database transaction.
+     * Sets non-persisted instance variables.
      */
     TaskCompletionBuilder transientVariables(Map<String, Object> transientVariables);
 
     /**
-     * Sets a non-persisted local variables before the task is completed.
-     * The local transient variables will not be persisted at the end of the database transaction.
+     * Sets non-persisted task-local variables.
      */
     TaskCompletionBuilder transientVariablesLocal(Map<String, Object> transientVariablesLocal);
 
     /**
-     * Sets a variable before the task is completed.
-     * The variable will be stored on the process instance.
+     * Sets one instance-level variable.
      */
     TaskCompletionBuilder variable(String variableName, Object variableValue);
 
     /**
-     * Sets a local variable before the task is completed.
-     * The local variable will be stored on the process instance.
+     * Sets one task-local variables instead of instance-level variables.
      */
     TaskCompletionBuilder variableLocal(String variableName, Object variableValue);
 
     /**
-     * Sets a non-persisted transient variable before the task is completed.
-     * The transient variable will not be persisted at the end of the database transaction.
+     * Sets one non-persisted instance variables.
      */
     TaskCompletionBuilder transientVariable(String variableName, Object variableValue);
 
     /**
-     * Sets a non-persisted transient local variable before the task is completed.
-     * The transient local variable will not be persisted at the end of the database transaction.
+     * Sets one non-persisted instance variables.
      */
     TaskCompletionBuilder transientVariableLocal(String variableName, Object variableValue);
 
     /**
-     * Sets a task id
+     * Sets the id of the task which is completed.
      */
     TaskCompletionBuilder taskId(String id);
 
     /**
-     * Sets a form definition id
+     * Sets a form definition id. Only needed when there's a form associated with the task.
      */
     TaskCompletionBuilder formDefinitionId(String formDefinitionId);
 
     /**
-     * Sets an outcome
+     * Sets an outcome for the form.
      */
     TaskCompletionBuilder outcome(String outcome);
 
     /**
-     * Completes a task
+     * Completes the task.
      */
     void complete();
+
 }

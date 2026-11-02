@@ -26,11 +26,10 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -199,13 +198,13 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
                             + "metaInfo: 'Model metainfo',"
                             + "deploymentId: '" + deploymentId + "',"
                             + "tenantId: 'myTenant',"
-                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").textValue()) + "',"
+                            + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, responseNode.get("id").stringValue()) + "',"
                             + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime()))
+                            + "createTime: '" + getISODateString(createTime.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(createTime.getTime()) + "'"
                             + "}");
 
-            model = repositoryService.createModelQuery().modelId(responseNode.get("id").textValue()).singleResult();
+            model = repositoryService.createModelQuery().modelId(responseNode.get("id").stringValue()).singleResult();
             assertThat(model).isNotNull();
             assertThat(model.getCategory()).isEqualTo("Model category");
             assertThat(model.getName()).isEqualTo("Model name");

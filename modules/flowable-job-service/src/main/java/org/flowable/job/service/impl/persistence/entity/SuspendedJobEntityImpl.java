@@ -21,9 +21,4 @@ public class SuspendedJobEntityImpl extends AbstractJobEntityImpl implements Sus
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    public String toString() {
-        return "SuspendedJobEntity [id=" + id + "]";
-    }
-
 }

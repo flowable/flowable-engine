@@ -69,7 +69,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
             taskFormHandler.submitFormProperties(properties, executionEntity);
 
             if (completeTask) {
-                TaskHelper.completeTask(task, null, null, null, null,  commandContext);
+                TaskHelper.completeTask(task, null, null, null, null, null, commandContext);
             }
         }
 
@@ -77,8 +77,8 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
     }
 
     @Override
-    protected String getSuspendedTaskException() {
-        return "Cannot submit a form to a suspended task";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot submit a form to";
     }
 
 }

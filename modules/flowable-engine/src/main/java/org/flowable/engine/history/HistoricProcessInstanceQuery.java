@@ -14,6 +14,7 @@
 package org.flowable.engine.history;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -56,17 +57,44 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select historic process instances that are defined by a process definition with one of the given process definition keys.
      */
     HistoricProcessInstanceQuery processDefinitionKeyIn(List<String> processDefinitionKeys);
+    
+    /**
+     * Only select historic process instances that are defined by a process definition that doesn't match one of the given process definition keys.
+     */
+    HistoricProcessInstanceQuery excludeProcessDefinitionKeys(List<String> processDefinitionKeys);
 
     /**
      * Only select historic process instances that don't have a process-definition of which the key is present in the given list
      */
     HistoricProcessInstanceQuery processDefinitionKeyNotIn(List<String> processDefinitionKeys);
+    
+    /**
+     * Select historic process instances whose process definition key is like the given value
+     */
+    HistoricProcessInstanceQuery processDefinitionKeyLike(String processDefinitionKeyLike);
+    
+    /**
+     * Select historic process instances whose process definition key is like the given value, ignoring upper/lower case.
+     */
+    HistoricProcessInstanceQuery processDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase);
 
     /** Only select historic process instances whose process definition category is processDefinitionCategory. */
     HistoricProcessInstanceQuery processDefinitionCategory(String processDefinitionCategory);
+    
+    /** Only select historic process instances whose process definition category is like the given value. */
+    HistoricProcessInstanceQuery processDefinitionCategoryLike(String processDefinitionCategoryLike);
+    
+    /** Only select historic process instances whose process definition category is like the given value, ignoring upper/lower case. */
+    HistoricProcessInstanceQuery processDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase);
 
     /** Select process historic instances whose process definition name is processDefinitionName */
     HistoricProcessInstanceQuery processDefinitionName(String processDefinitionName);
+    
+    /** Select process historic instances whose process definition name is like the given value */
+    HistoricProcessInstanceQuery processDefinitionNameLike(String processDefinitionNameLike);
+    
+    /** Select process historic instances whose process definition name is like the given value, ignoring upper/lower case */
+    HistoricProcessInstanceQuery processDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase);
 
     /**
      * Only select historic process instances with a certain process definition version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
@@ -81,6 +109,11 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      */
     HistoricProcessInstanceQuery processInstanceBusinessKeyLike(String businessKeyLike);
     
+    /**
+     * Only select historic process instances with a business key like the given value, ignoring upper/lower case.
+     */
+    HistoricProcessInstanceQuery processInstanceBusinessKeyLikeIgnoreCase(String businessKeyLikeIgnoreCase);
+    
     /** Only select historic process instances with the given business status */
     HistoricProcessInstanceQuery processInstanceBusinessStatus(String businessStatus);
 
@@ -88,6 +121,31 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Only select historic process instances with a business status like the given value.
      */
     HistoricProcessInstanceQuery processInstanceBusinessStatusLike(String businessStatusLike);
+    
+    /**
+     * Only select historic process instances with a business status like the given value, ignoring upper/lower case.
+     */
+    HistoricProcessInstanceQuery processInstanceBusinessStatusLikeIgnoreCase(String businessStatusLikeIgnoreCase);
+
+    /**
+     * Only select historic process instances with a root instance with a name like the given value.
+     */
+    HistoricProcessInstanceQuery processInstanceRootScopeId(String rootScopeId);
+
+    /**
+     * Only select historic process instances with one of the given root scope ids.
+     */
+    HistoricProcessInstanceQuery processInstanceRootScopeIds(Set<String> rootScopeIds);
+
+    /**
+     * Only select historic process instances with the given parent process instance id.
+     */
+    HistoricProcessInstanceQuery processInstanceParentScopeId(String parentScopeId);
+
+    /**
+     * Only select historic process instances with one of the given parent scope ids.
+     */
+    HistoricProcessInstanceQuery processInstanceParentScopeIds(Set<String> parentScopeIds);
 
     /**
      * Only select historic process instances that are defined by a process definition with the given deployment identifier.
@@ -414,11 +472,24 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      */
     HistoricProcessInstanceQuery startedBy(String userId);
 
+    /**
+     * Only select historic process instances that are ended by the provided user identifier.
+     */
+    HistoricProcessInstanceQuery finishedBy(String userId);
+
+    /**
+     * Only select historic process instances that have a state that is equal to the provided value.
+     */
+    HistoricProcessInstanceQuery state(String state);
+
     /** Only select process instances that have the given tenant id. */
     HistoricProcessInstanceQuery processInstanceTenantId(String tenantId);
 
     /** Only select process instances with a tenant id like the given one. */
     HistoricProcessInstanceQuery processInstanceTenantIdLike(String tenantIdLike);
+    
+    /** Only select process instances with a tenant id like the given one, ignoring upper/lower case. */
+    HistoricProcessInstanceQuery processInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
 
     /** Only select process instances that do not have a tenant id. */
     HistoricProcessInstanceQuery processInstanceWithoutTenantId();
@@ -484,11 +555,23 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery includeProcessVariables();
 
     /**
-     * Limit process instance variables
-     * @deprecated no longer needed, this is a noop
+     * Include the process variables with the given names into the query result.
      */
-    @Deprecated
-    HistoricProcessInstanceQuery limitProcessInstanceVariables(Integer processInstanceVariablesLimit);
+    HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames);
+
+    /**
+     * Include process variables in the process query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the process variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    HistoricProcessInstanceQuery includeProcessVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
 
     /**
      * Only select process instances that failed due to an exception happening during a job execution.
@@ -511,14 +594,24 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
     HistoricProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
     
     /**
-     * Only select process instances with the given callback identifier. 
+     * Only select process instances with the given callback identifier.
      */
     HistoricProcessInstanceQuery processInstanceCallbackId(String callbackId);
-    
+
+    /**
+     * Only select process instances with the given callback identifiers.
+     */
+    HistoricProcessInstanceQuery processInstanceCallbackIds(Set<String> callbackIds);
+
     /**
      * Only select process instances with the given callback type. 
      */
     HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType);
+    
+    /**
+     * Only select process instances with the given parent case instance id. 
+     */
+    HistoricProcessInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
 
     /**
      * Only select process instances that do not have a callback identifier.
@@ -544,4 +637,14 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     HistoricProcessInstanceQuery withLocalizationFallback();
+    
+    /**
+     * Perform the query without applying sorting parameters. By default sorting will be applied.
+     */
+    HistoricProcessInstanceQuery withoutSorting();
+    
+    /**
+     * Return only the id value of the process instances, to reduce any additional instance data to be returned.
+     */
+    HistoricProcessInstanceQuery returnIdsOnly();
 }

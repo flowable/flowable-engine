@@ -24,7 +24,7 @@ import org.flowable.task.service.impl.BaseHistoricTaskLogEntryBuilderImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -37,7 +37,7 @@ public class IdentityLinkUtil {
         IdentityLinkEntity identityLinkEntity = processEngineConfiguration.getIdentityLinkServiceConfiguration().getIdentityLinkService(
                 ).createProcessInstanceIdentityLink(processInstanceExecution.getId(), userId, groupId, type);
         
-        CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
+        CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(processInstanceExecution, identityLinkEntity);
         processInstanceExecution.getIdentityLinks().add(identityLinkEntity);
         
         return identityLinkEntity;
@@ -79,8 +79,16 @@ public class IdentityLinkUtil {
 
         logTaskIdentityLinkEvent(HistoricTaskLogEntryType.USER_TASK_IDENTITY_LINK_ADDED.name(), taskEntity, identityLinkEntity);
 
-        taskEntity.getIdentityLinks().add(identityLinkEntity);
-        
+
+        if (taskEntity.isIdentityLinksInitialized()) {
+            /*
+             * If the links have been initialized prior to creating the link, it would not have been added to the list and that is why we need to add it.
+             * If the list is not initialized then the link will be fetched from the cache when we fetch the links from the DB
+             */
+            List<IdentityLinkEntity> identityLinks = taskEntity.getIdentityLinks();
+            identityLinks.add(identityLinkEntity);
+        }
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration.getIdentityLinkInterceptor() != null) {
             processEngineConfiguration.getIdentityLinkInterceptor().handleAddIdentityLinkToTask(taskEntity, identityLinkEntity);

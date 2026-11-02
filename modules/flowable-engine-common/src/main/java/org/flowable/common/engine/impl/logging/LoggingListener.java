@@ -14,7 +14,7 @@ package org.flowable.common.engine.impl.logging;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public interface LoggingListener {
 

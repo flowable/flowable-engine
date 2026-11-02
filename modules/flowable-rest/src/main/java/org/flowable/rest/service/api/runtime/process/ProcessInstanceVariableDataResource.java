@@ -13,10 +13,10 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,8 +34,12 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableDataResource extends BaseExecutionVariableResource {
+
+    public ProcessInstanceVariableDataResource() {
+        super(RestResponseFactory.VARIABLE_PROCESS);
+    }
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariableData")
     @ApiResponses(value = {
@@ -46,9 +50,9 @@ public class ProcessInstanceVariableDataResource extends BaseExecutionVariableRe
     @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}/data")
     public byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            HttpServletResponse response) {
 
-        Execution execution = getProcessInstanceFromRequest(processInstanceId);
+        Execution execution = getExecutionFromRequestWithoutAccessCheck(processInstanceId);
         return getVariableDataByteArray(execution, variableName, scope, response);
     }
 }

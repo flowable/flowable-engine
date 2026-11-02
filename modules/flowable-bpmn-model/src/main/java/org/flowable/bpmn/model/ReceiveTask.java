@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,6 +16,8 @@ package org.flowable.bpmn.model;
  * @author Tijs Rademakers
  */
 public class ReceiveTask extends Task {
+    
+    protected String skipExpression;
 
     @Override
     public ReceiveTask clone() {
@@ -23,8 +25,17 @@ public class ReceiveTask extends Task {
         clone.setValues(this);
         return clone;
     }
+    
+    public String getSkipExpression() {
+        return skipExpression;
+    }
 
-    public void setValues(ManualTask otherElement) {
+    public void setSkipExpression(String skipExpression) {
+        this.skipExpression = skipExpression;
+    }
+
+    public void setValues(ReceiveTask otherElement) {
         super.setValues(otherElement);
+        setSkipExpression(otherElement.getSkipExpression());
     }
 }

@@ -28,6 +28,7 @@ public class FlowableVariableEventImpl extends FlowableEngineEventImpl implement
     protected Object variableValue;
     protected VariableType variableType;
     protected String taskId;
+    protected String variableInstanceId;
 
     public FlowableVariableEventImpl(FlowableEngineEventType type) {
         super(type);
@@ -69,4 +70,12 @@ public class FlowableVariableEventImpl extends FlowableEngineEventImpl implement
         this.taskId = taskId;
     }
 
+    @Override
+    public String getVariableInstanceId() {
+        return variableInstanceId;
+    }
+
+    public void setVariableInstanceId(String variableInstanceId) {
+        this.variableInstanceId = variableInstanceId;
+    }
 }

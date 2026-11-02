@@ -22,7 +22,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.EventRegistryEventListenerAct
 import org.flowable.cmmn.engine.impl.behavior.impl.ExternalWorkerTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.GenericEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.MailActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.IntentEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -36,6 +36,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBeh
 import org.flowable.cmmn.engine.impl.behavior.impl.UserEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.VariableEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.behavior.impl.http.DefaultCmmnHttpActivityDelegate;
+import org.flowable.cmmn.engine.impl.behavior.impl.mail.CmmnMailActivityDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CasePageTask;
@@ -45,6 +46,7 @@ import org.flowable.cmmn.model.ExternalWorkerServiceTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GenericEventListener;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.IntentEventListener;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
@@ -82,7 +84,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         } else if (StringUtils.isNotEmpty(milestone.getName())) {
             name = milestone.getName();
         }
-        return new MilestoneActivityBehavior(expressionManager.createExpression(name), milestone.getMilestoneVariable());
+        return new MilestoneActivityBehavior(expressionManager.createExpression(name), milestone.getMilestoneVariable(), milestone.getBusinessStatus());
     }
 
     @Override
@@ -153,6 +155,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
+    public IntentEventListenerActivityBehaviour createIntentEventListenerActivityBehaviour(PlanItem planItem, IntentEventListener intentEventListener) {
+        return new IntentEventListenerActivityBehaviour(intentEventListener);
+    }
+
+    @Override
     public DecisionTaskActivityBehavior createDecisionTaskActivityBehavior(PlanItem planItem, DecisionTask decisionTask) {
         return new DecisionTaskActivityBehavior(createExpression(decisionTask.getDecisionRefExpression()), decisionTask);
     }
@@ -197,8 +204,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
-    public MailActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return (MailActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(MailActivityBehavior.class, task, true); // MailActivityBehavior only has expression fields
+    public CmmnActivityBehavior createEmailActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return classDelegateFactory.create(CmmnMailActivityDelegate.class.getName(), task.getFieldExtensions());
     }
 
     @Override

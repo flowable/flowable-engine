@@ -45,8 +45,7 @@ public class ParallelMultiInstanceActivityCompletionJobHandler  implements JobHa
             FlowElement currentFlowElement = completingExecution.getCurrentFlowElement();
             if (currentFlowElement instanceof Activity) {
                 Object behavior = ((Activity) currentFlowElement).getBehavior();
-                if (behavior instanceof ParallelMultiInstanceBehavior) {
-                    ParallelMultiInstanceBehavior parallelMultiInstanceBehavior = (ParallelMultiInstanceBehavior) behavior;
+                if (behavior instanceof ParallelMultiInstanceBehavior parallelMultiInstanceBehavior) {
                     parallelMultiInstanceBehavior.leaveAsync(completingExecution);
                 }
             }

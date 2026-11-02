@@ -68,9 +68,38 @@ public interface DelegateTask extends VariableScope {
      * Reference to the process definition or null if it is not related to a process.
      */
     String getProcessDefinitionId();
+    
+    /**
+     * The current state of the task.
+     */
+    String getState();
 
     /** The date/time when this task was created */
     Date getCreateTime();
+    
+    /** The date/time when this task was put in progress */
+    Date getInProgressStartTime();
+    
+    /**
+     * The user reference that started the task.
+     */
+    String getInProgressStartedBy();
+    
+    /** The date/time when this task was claimed */
+    Date getClaimTime();
+    
+    /**
+     * The user reference that claimed the task.
+     */
+    String getClaimedBy();
+    
+    /** The date/time when this task was suspended */
+    Date getSuspendedTime();
+    
+    /**
+     * The user reference that suspended the task.
+     */
+    String getSuspendedBy();
 
     /**
      * The id of the activity in the process defining this task or null if this is not related to a process
@@ -133,6 +162,12 @@ public interface DelegateTask extends VariableScope {
      */
     void setAssignee(String assignee);
 
+    /** Due date of the in progress start of the task. */
+    Date getInProgressStartDueDate();
+
+    /** Change the in progress start due date of the task. */
+    void setInProgressStartDueDate(Date inProgressStartDueDate);
+    
     /** Due date of the task. */
     Date getDueDate();
 

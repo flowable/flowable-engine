@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
@@ -35,6 +35,7 @@ import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
@@ -69,13 +70,13 @@ import org.flowable.spring.job.service.SpringAsyncHistoryExecutor;
 import org.flowable.test.spring.boot.util.CustomUserEngineConfigurerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.task.TaskExecutionAutoConfiguration;
-import org.springframework.boot.autoconfigure.transaction.TransactionAutoConfiguration;
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
+import org.springframework.boot.transaction.autoconfigure.TransactionAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,7 +84,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * @author Filip Hrisafov
@@ -445,7 +446,8 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(dbIdGenerator.getIdBlockSize()).isEqualTo(engineConfiguration.getIdBlockSize());
                         assertThat(dbIdGenerator.getCommandExecutor()).isEqualTo(engineConfiguration.getCommandExecutor());
                         assertThat(dbIdGenerator.getCommandConfig())
-                            .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
+                            .usingRecursiveComparison()
+                            .isEqualTo(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
                     });
             });
     }
@@ -466,7 +468,8 @@ public class ProcessEngineAutoConfigurationTest {
                         assertThat(dbIdGenerator.getIdBlockSize()).isEqualTo(engineConfiguration.getIdBlockSize());
                         assertThat(dbIdGenerator.getCommandExecutor()).isEqualTo(engineConfiguration.getCommandExecutor());
                         assertThat(dbIdGenerator.getCommandConfig())
-                            .isEqualToComparingFieldByField(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
+                            .usingRecursiveComparison()
+                            .isEqualTo(engineConfiguration.getDefaultCommandConfig().transactionRequiresNew());
                     })
                     .isEqualTo(context.getBean(IdGenerator.class));
             });
@@ -581,7 +584,8 @@ public class ProcessEngineAutoConfigurationTest {
                 .run(context -> {
                     assertThat(context)
                             .hasSingleBean(ProcessEngineConfigurationImpl.class)
-                            .hasSingleBean(TaskExecutor.class);
+                            .hasSingleBean(TaskExecutor.class)
+                            .hasBean("flowableAsyncTaskInvokerTaskExecutor");
 
                     ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
 
@@ -594,6 +598,18 @@ public class ProcessEngineAutoConfigurationTest {
                     assertThat(configuration.getAsyncHistoryTaskExecutor()).isEqualTo(asyncTaskExecutor);
                     assertThat(((SpringAsyncTaskExecutor) asyncTaskExecutor).getAsyncTaskExecutor())
                             .isEqualTo(context.getBean(TaskExecutor.class));
+
+                    AsyncTaskExecutor taskInvokerTaskExecutor = context.getBean("flowableAsyncTaskInvokerTaskExecutor", AsyncTaskExecutor.class);
+                    assertThat(configuration.getAsyncTaskInvokerTaskExecutor())
+                            .isNotEqualTo(asyncTaskExecutor)
+                            .isEqualTo(taskInvokerTaskExecutor)
+                            .isInstanceOfSatisfying(DefaultAsyncTaskExecutor.class, taskExecutor -> {
+                                assertThat(taskExecutor.getCorePoolSize()).isEqualTo(8);
+                                assertThat(taskExecutor.getMaxPoolSize()).isEqualTo(8);
+                                assertThat(taskExecutor.getQueueSize()).isEqualTo(100);
+                                assertThat(taskExecutor.getThreadPoolNamingPattern()).isEqualTo("flowable-async-task-invoker-%d");
+                                assertThat(taskExecutor.submit(() -> true).join()).isTrue();
+                            });
                 });
     }
 
@@ -826,6 +842,35 @@ public class ProcessEngineAutoConfigurationTest {
                 });
     }
 
+    @Test
+    void taskInvokerWithCustomProperties() {
+        contextRunner
+                .withConfiguration(AutoConfigurations.of(TaskExecutionAutoConfiguration.class))
+                .withPropertyValues(
+                        "flowable.task-invoker.core-pool-size=2",
+                        "flowable.task-invoker.max-pool-size=3",
+                        "flowable.task-invoker.queue-size=15",
+                        "flowable.task-invoker.thread-name-prefix=test-"
+                )
+                .run(context -> {
+                    assertThat(context)
+                            .hasSingleBean(ProcessEngineConfigurationImpl.class)
+                            .hasSingleBean(TaskExecutor.class)
+                            .hasBean("flowableAsyncTaskInvokerTaskExecutor");
+
+                    ProcessEngineConfigurationImpl configuration = context.getBean(ProcessEngineConfigurationImpl.class);
+
+                    AsyncTaskExecutor taskInvokerTaskExecutor = context.getBean("flowableAsyncTaskInvokerTaskExecutor", AsyncTaskExecutor.class);
+                    assertThat(configuration.getAsyncTaskInvokerTaskExecutor())
+                            .isEqualTo(taskInvokerTaskExecutor)
+                            .isInstanceOfSatisfying(DefaultAsyncTaskExecutor.class, taskExecutor -> {
+                                assertThat(taskExecutor.getCorePoolSize()).isEqualTo(2);
+                                assertThat(taskExecutor.getMaxPoolSize()).isEqualTo(3);
+                                assertThat(taskExecutor.getQueueSize()).isEqualTo(15);
+                                assertThat(taskExecutor.getThreadPoolNamingPattern()).isEqualTo("test-%d");
+                            });
+                });
+    }
 
     private void assertAllServicesPresent(ApplicationContext context, ProcessEngine processEngine) {
         List<Method> methods = Stream.of(ProcessEngine.class.getDeclaredMethods())

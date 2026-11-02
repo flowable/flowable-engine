@@ -9,9 +9,9 @@
   <insert id="insertGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
     insert into ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      1, #{name ,jdbcType=VARCHAR},
-      #{type ,jdbcType=VARCHAR}
+      #{id, jdbcType=NVARCHAR},
+      1, #{name, jdbcType=NVARCHAR},
+      #{type, jdbcType=NVARCHAR}
     )
   </insert>
 
@@ -19,9 +19,9 @@
     insert into ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_)
     values 
       <foreach collection="list" item="group" index="index" separator=",">
-        (#{group.id ,jdbcType=VARCHAR},
-         1, #{group.name ,jdbcType=VARCHAR},
-         #{group.type ,jdbcType=VARCHAR})
+        (#{group.id, jdbcType=NVARCHAR},
+         1, #{group.name, jdbcType=NVARCHAR},
+         #{group.type, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -29,9 +29,9 @@
     INSERT ALL 
       <foreach collection="list" item="group" index="index">
         INTO ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_) VALUES 
-            (#{group.id ,jdbcType=VARCHAR},
-             1, #{group.name ,jdbcType=VARCHAR},
-             #{group.type ,jdbcType=VARCHAR})
+            (#{group.id, jdbcType=NVARCHAR},
+             1, #{group.name, jdbcType=NVARCHAR},
+             #{group.type, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -41,49 +41,49 @@
   <update id="updateGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
     update ${prefix}ACT_ID_GROUP
     <set>
-      REV_ = #{revisionNext ,jdbcType=INTEGER},
-      NAME_ = #{name ,jdbcType=VARCHAR},
-      TYPE_ = #{type ,jdbcType=VARCHAR},
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      NAME_ = #{name, jdbcType=NVARCHAR},
+      TYPE_ = #{type, jdbcType=NVARCHAR},
     </set>
-    where ID_ = #{id}
-       and REV_ = #{revision}
+    where ID_ = #{id, jdbcType=NVARCHAR}
+       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
   
   <!-- GROUP DELETE -->
 
   <delete id="deleteGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
-    delete from ${prefix}ACT_ID_GROUP where ID_ = #{id} and REV_ = #{revision} 
+    delete from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <!-- GROUP RESULTMAP -->
 
   <resultMap id="groupResultMap" type="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="NVARCHAR" />
   </resultMap>
   
   <!-- GROUP SELECT -->
 
   <select id="selectGroup" parameterType="string" resultMap="groupResultMap">
-    select * from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
     
   <select id="selectGroupsByUserId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_
-      and membership.USER_ID_ = #{parameter}
+      and membership.USER_ID_ = #{parameter, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectGroupsByUserIdAndGroupType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
     select g.*
     from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
     where g.ID_ = membership.GROUP_ID_
-      and membership.USER_ID_ = #{parameter.userId}
+      and membership.USER_ID_ = #{parameter.userId, jdbcType=NVARCHAR}
       <if test="groupType != null">
-         and g.TYPE_ = #{parameter.groupType}
+         and g.TYPE_ = #{parameter.groupType, jdbcType=NVARCHAR}
       </if>
   </select>
   
@@ -104,33 +104,33 @@
     from ${prefix}ACT_ID_GROUP RES
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids" 
                  open="(" separator="," close=")">
-          #{id}
+          #{id, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="nameLikeIgnoreCase != null">
-        and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.NAME_) like #{nameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="type != null">
-        and RES.TYPE_ = #{type}
+        and RES.TYPE_ = #{type, jdbcType=NVARCHAR}
       </if>
       <if test="userId != null">
-        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.GROUP_ID_ = RES.ID_ and M.USER_ID_ = #{userId})
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.GROUP_ID_ = RES.ID_ and M.USER_ID_ = #{userId, jdbcType=NVARCHAR})
       </if>
       <if test="userIds != null &amp;&amp; !userIds.empty">
         and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.GROUP_ID_ = RES.ID_ and M.USER_ID_ in  
-            <foreach item="userId" index="index" collection="userIds" open="(" separator="," close=")">#{userId}</foreach>)
+            <foreach item="userId" index="index" collection="userIds" open="(" separator="," close=")">#{userId, jdbcType=NVARCHAR}</foreach>)
       </if>
     </where>
   </sql>
@@ -147,7 +147,7 @@
     select RES.* from ${prefix}ACT_ID_GROUP RES
     inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on MAPPING.GROUP_ID_ = RES.ID_
     inner join ${prefix}ACT_ID_PRIV PRIV on PRIV.ID_ = MAPPING.PRIV_ID_
-    where PRIV.ID_ = #{parameter}
+    where PRIV.ID_ = #{parameter, jdbcType=NVARCHAR}
     order by RES.NAME_
   </select>
   

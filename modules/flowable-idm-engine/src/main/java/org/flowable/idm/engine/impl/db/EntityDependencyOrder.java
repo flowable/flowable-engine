@@ -13,6 +13,7 @@
 package org.flowable.idm.engine.impl.db;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,6 +33,7 @@ public class EntityDependencyOrder {
 
     public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
     public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
+    public static Collection<Class<? extends Entity>> IMMUTABLE_ENTITIES = new ArrayList<>();
 
     static {
 
@@ -48,6 +50,10 @@ public class EntityDependencyOrder {
         
         INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);
+
+        IMMUTABLE_ENTITIES.add(MembershipEntityImpl.class);
+        IMMUTABLE_ENTITIES.add(PrivilegeEntityImpl.class);
+        IMMUTABLE_ENTITIES.add(PrivilegeMappingEntityImpl.class);
 
     }
     

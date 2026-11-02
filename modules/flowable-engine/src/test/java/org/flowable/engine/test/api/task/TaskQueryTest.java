@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -34,6 +35,7 @@ import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLinkInfo;
@@ -43,13 +45,14 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -133,6 +136,21 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         TaskQuery query = taskService.createTaskQuery().taskIds(testIdList);
         assertThat(query.list()).hasSize(testIdList.size() - 1);
         assertThat(query.count()).isEqualTo(testIdList.size() - 1);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.TASK, processEngineConfiguration)) {
+            HistoricTaskInstanceQuery historyQuery = historyService.createHistoricTaskInstanceQuery().taskIds(Arrays.asList(taskIds.get(0), "dummy"));
+            assertThat(historyQuery.singleResult()).isNotNull();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0));
+            assertThat(historyQuery.count()).isEqualTo(1);
+
+            historyQuery = historyService.createHistoricTaskInstanceQuery().taskIds(Arrays.asList(taskIds.get(0), taskIds.get(1)));
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+            assertThat(historyQuery.count()).isEqualTo(2);
+        }
     }
 
     @Test
@@ -145,6 +163,37 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
         assertThatThrownBy(() -> taskService.createTaskQuery().taskIds(null))
                 .isExactlyInstanceOf(FlowableIllegalArgumentException.class);
+    }
+
+    @Test
+    public void testQueryByTaskIdsOr() {
+        TaskQuery query = taskService.createTaskQuery().or().taskIds(Arrays.asList(taskIds.get(0), "dummy")).taskName("INVALID NAME").endOr();
+        assertThat(query.singleResult()).isNotNull();
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0));
+        assertThat(query.count()).isEqualTo(1);
+
+        query = taskService.createTaskQuery().or().taskIds(Arrays.asList(taskIds.get(0), taskIds.get(1))).taskName("INVALID NAME").endOr();
+        assertThat(query.list())
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+        assertThat(query.count()).isEqualTo(2);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.TASK, processEngineConfiguration)) {
+            HistoricTaskInstanceQuery historyQuery = historyService.createHistoricTaskInstanceQuery().or().taskIds(Arrays.asList(taskIds.get(0), "dummy")).taskName("INVALID NAME").endOr();
+            assertThat(historyQuery.singleResult()).isNotNull();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0));
+            assertThat(historyQuery.count()).isEqualTo(1);
+
+            historyQuery = historyService.createHistoricTaskInstanceQuery().or().taskIds(Arrays.asList(taskIds.get(0), taskIds.get(1))).taskName("INVALID NAME").endOr();
+            assertThat(historyQuery.list())
+                    .extracting(HistoricTaskInstance::getId)
+                    .containsExactlyInAnyOrder(taskIds.get(0), taskIds.get(1));
+            assertThat(historyQuery.count()).isEqualTo(2);
+        }
     }
 
     @Test
@@ -849,6 +898,52 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 assertThat(
                         historyService.createHistoricTaskInstanceQuery().or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr()
                                 .count()).isEqualTo(2);
+            }
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    @Test
+    public void testQueryByOrInvolvedUserOrInvolvedGroups() {
+        try {
+            Task userLinkTask = taskService.newTask();
+            taskService.saveTask(userLinkTask);
+            taskService.addUserIdentityLink(userLinkTask.getId(), "involvedUser", IdentityLinkType.PARTICIPANT);
+            Task groupLinkTask = taskService.newTask();
+            taskService.saveTask(groupLinkTask);
+            taskService.addGroupIdentityLink(groupLinkTask.getId(), "involvedGroup2", IdentityLinkType.CANDIDATE);
+            Task assigneeTask = taskService.newTask();
+            assigneeTask.setAssignee("involvedUser");
+            taskService.saveTask(assigneeTask);
+            Task ownerTask = taskService.newTask();
+            ownerTask.setOwner("involvedUser");
+            taskService.saveTask(ownerTask);
+            Task otherTask = taskService.newTask();
+            taskService.saveTask(otherTask);
+            taskService.addUserIdentityLink(otherTask.getId(), "otherUser", IdentityLinkType.PARTICIPANT);
+            taskService.addGroupIdentityLink(otherTask.getId(), "otherGroup", IdentityLinkType.CANDIDATE);
+
+            Set<String> groups = Set.of("involvedGroup1", "involvedGroup2");
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().list())
+                    .extracting(Task::getId)
+                    .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId());
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().count())
+                    .isEqualTo(4);
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).taskId(otherTask.getId()).endOr().list())
+                    .extracting(Task::getId)
+                    .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId(), otherTask.getId());
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("unknownUser").taskInvolvedGroups(Set.of("unknownGroup")).endOr().count())
+                    .isZero();
+
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().list())
+                        .extracting(HistoricTaskInstance::getId)
+                        .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId());
+                assertThat(historyService.createHistoricTaskInstanceQuery().or().taskInvolvedUser("unknownUser").taskInvolvedGroups(Set.of("unknownGroup"))
+                        .endOr().count())
+                        .isZero();
             }
 
         } finally {
@@ -1823,12 +1918,12 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         taskService.setAssignee(kermitAssigneeTask.getId(), "kermit");
         createdTasks.add(kermitAssigneeTask.getId());
 
-        Task magementTask = taskService.newTask();
-        magementTask.setName("new management task");
-        taskService.saveTask(magementTask);
-        taskService.setAssignee(magementTask.getId(), "gozzie");
-        taskService.addCandidateGroup(magementTask.getId(), "management");
-        createdTasks.add(magementTask.getId());
+        Task managementTask = taskService.newTask();
+        managementTask.setName("new management task");
+        taskService.saveTask(managementTask);
+        taskService.setAssignee(managementTask.getId(), "gozzie");
+        taskService.addCandidateGroup(managementTask.getId(), "management");
+        createdTasks.add(managementTask.getId());
 
 
         List<Task> kermitCandidateTasks = taskService.createTaskQuery()
@@ -1850,6 +1945,31 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .ignoreAssigneeValue()
                 .list();
         assertThat(tasks).hasSize(12);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("management")
+                .ignoreAssigneeValue()
+                .list();
+        assertThat(tasks).hasSize(4);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("management")
+                .list();
+        assertThat(tasks).hasSize(3);
+        
+        List<String> candidateGroups = new ArrayList<>();
+        candidateGroups.add("management");
+        candidateGroups.add("accountancy");
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroupIn(candidateGroups)
+                .ignoreAssigneeValue()
+                .list();
+        assertThat(tasks).hasSize(6);
+        
+        tasks = taskService.createTaskQuery()
+                .taskCandidateGroupIn(candidateGroups)
+                .list();
+        assertThat(tasks).hasSize(5);
 
         tasks = taskService.createTaskQuery()
                 .taskCandidateOrAssigned("kermit")
@@ -4720,6 +4840,95 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 .extracting(Task::getName, Task::getProcessInstanceId)
                 .containsExactlyInAnyOrder(
                         tuple("my task", processWithStringValue.getId())
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
+
+        Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
+        Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        List<Task> taskList = taskService.createTaskQuery().taskRootScopeId(processInstance.getId()).list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+
+        taskList = taskService.createTaskQuery().or().taskRootScopeId(processInstance.getId()).endOr().list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        task1.getId(),
+                        task2.getId(),
+                        task3.getId(),
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/engine/test/api/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/engine/test/api/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        List<Task> taskList = taskService.createTaskQuery().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        formTask1.getId(),
+                        formTask2.getId()
+                );
+
+        taskList = taskService.createTaskQuery().or().taskParentScopeId(taskForm2Execution.getProcessInstanceId()).endOr().list();
+
+        assertThat(taskList)
+                .extracting(Task::getId)
+                .containsExactlyInAnyOrder(
+                        formTask1.getId(),
+                        formTask2.getId()
                 );
     }
 

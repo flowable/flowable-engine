@@ -13,12 +13,20 @@ package org.flowable.rest.app;/* Licensed under the Apache License, Version 2.0 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import jakarta.jms.ConnectionFactory;
+
+import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.actuate.metrics.AutoConfigureMetrics;
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertySource;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 
 /**
  * @author Filip Hrisafov
@@ -29,6 +37,9 @@ public class FlowableRestApplicationTest {
 
     @Autowired
     private ConfigurableEnvironment environment;
+
+    @Autowired
+    protected ApplicationContext applicationContext;
 
     @Test
     public void contextShouldLoadPropertiesInACorrectOrder() {
@@ -46,9 +57,35 @@ public class FlowableRestApplicationTest {
                 "class path resource [engine.properties]",
                 "Config resource 'class path resource [application.properties]' via location 'optional:classpath:/'",
                 "flowableDefaultConfig: [classpath:/flowable-default.properties]",
-                "flowable-liquibase-override",
+                "applicationInfo",
                 "Management Server"
             );
+
+        assertThat(applicationContext.getBeanProvider(JmsTemplate.class).getIfAvailable())
+                .as("JmsTemplate Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeanProvider(ConnectionFactory.class).getIfAvailable())
+                .as("Jms ConnectionFactory Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeanProvider(org.springframework.amqp.rabbit.connection.ConnectionFactory.class).getIfAvailable())
+                .as("Rabbit ConnectionFactory Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeanProvider(RabbitTemplate.class).getIfAvailable())
+                .as("RabbitTemplate Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeanProvider(ConsumerFactory.class).getIfAvailable())
+                .as("Kafka ConsumerFactory Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeanProvider(KafkaTemplate.class).getIfAvailable())
+                .as("KafkaTemplate Bean")
+                .isNull();
+
+        assertThat(applicationContext.getBeansOfType(ChannelModelProcessor.class)).isEmpty();
     }
 
 }

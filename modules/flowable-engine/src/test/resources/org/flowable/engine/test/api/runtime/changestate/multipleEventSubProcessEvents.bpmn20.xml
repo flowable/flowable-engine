@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <signal id="mySignal" name="mySignal" flowable:scope="global"/>
+    <message id="myMessage" name="myMessage"/>
+    <process id="changeStateForEventSubProcess">
+
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="processTask"/>
+        <userTask id="processTask"/>
+        <sequenceFlow sourceRef="processTask" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+        <subProcess id="eventSubProcess" triggeredByEvent="true">
+            <startEvent id="eventSubProcessStart" isInterrupting="true">
+                <signalEventDefinition signalRef="mySignal" />
+            </startEvent>
+            <sequenceFlow sourceRef="eventSubProcessStart" targetRef="eventSubProcessTask" />
+            <userTask id="eventSubProcessTask"/>
+            <sequenceFlow sourceRef="eventSubProcessTask" targetRef="eventSubProcessEnd" />
+            <endEvent id="eventSubProcessEnd" />
+            
+            <startEvent id="messageEventSubProcessStart" isInterrupting="true">
+                <messageEventDefinition messageRef="myMessage"/>
+            </startEvent>
+            <sequenceFlow id="subProcessFlow3" sourceRef="messageEventSubProcessStart" targetRef="messageEventSubProcessTask" />
+            <userTask id="messageEventSubProcessTask"/>
+            <sequenceFlow id="subProcessFlow4" sourceRef="messageEventSubProcessTask" targetRef="messageEventSubProcessEnd" />
+            <endEvent id="messageEventSubProcessEnd" />
+        </subProcess>
+    </process>
+
+</definitions>

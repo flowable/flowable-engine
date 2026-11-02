@@ -31,12 +31,21 @@ public class InternalFlowableSpringExtension extends InternalFlowableExtension {
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(ProcessEngine.class),
+            .computeIfAbsent(context.getRequiredTestClass(), key -> SpringExtension.getApplicationContext(context).getBean(ProcessEngine.class),
                 ProcessEngine.class);
     }
 
     @Override
     protected ExtensionContext.Store getStore(ExtensionContext context) {
         return context.getRoot().getStore(NAMESPACE);
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) throws Exception {
+        try {
+            super.afterAll(context);
+        } finally {
+            getStore(context).remove(context.getRequiredTestClass());
+        }
     }
 }

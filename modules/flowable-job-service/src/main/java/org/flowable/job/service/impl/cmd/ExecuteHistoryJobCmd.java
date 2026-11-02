@@ -60,7 +60,7 @@ public class ExecuteHistoryJobCmd implements Command<Void> {
             jobServiceConfiguration.getJobManager().execute(historyJobEntity);
         } catch (Throwable exception) {
             // Finally, Throw the exception to indicate the failure
-            throw new FlowableException("HistoryJob " + historyJobId + " failed", exception);
+            throw new FlowableException(historyJobEntity + " failed", exception);
         }
 
         return null;

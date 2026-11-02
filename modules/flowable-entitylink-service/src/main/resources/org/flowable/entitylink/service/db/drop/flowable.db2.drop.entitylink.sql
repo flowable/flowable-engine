@@ -1,4 +1,0 @@
-drop index ACT_IDX_ENT_LNK_SCOPE;
-drop index ACT_IDX_ENT_LNK_SCOPE_DEF;
-
-drop table ACT_RU_ENTITYLINK;

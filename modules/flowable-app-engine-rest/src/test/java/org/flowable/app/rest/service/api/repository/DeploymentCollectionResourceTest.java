@@ -23,8 +23,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestUrls;
 import org.flowable.app.rest.service.BaseSpringRestTestCase;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -38,6 +39,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET app-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -87,6 +89,34 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             // Check without tenantId filtering
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
+        } finally {
+            // Always cleanup any created deployments, even if the test failed
+            List<AppDeployment> deployments = repositoryService.createDeploymentQuery().list();
+            for (AppDeployment deployment : deployments) {
+                repositoryService.deleteDeployment(deployment.getId(), true);
+            }
+        }
+    }
+
+    @Test
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            appEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            AppDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/app/rest/service/api/repository/oneApp.app")
+                    .tenantId("acme")
+                    .deploy();
+
+            appEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            AppDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/app/rest/service/api/repository/oneApp.app")
+                    .tenantId("myTenant")
+                    .deploy();
 
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(

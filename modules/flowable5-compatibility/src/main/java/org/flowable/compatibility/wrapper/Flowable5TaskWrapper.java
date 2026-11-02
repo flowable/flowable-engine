@@ -115,6 +115,41 @@ public class Flowable5TaskWrapper implements Task {
     }
 
     @Override
+    public String getState() {
+        return null;
+    }
+
+    @Override
+    public Date getInProgressStartTime() {
+        return null;
+    }
+
+    @Override
+    public String getInProgressStartedBy() {
+        return null;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return null;
+    }
+
+    @Override
+    public Date getSuspendedTime() {
+        return null;
+    }
+
+    @Override
+    public String getSuspendedBy() {
+        return null;
+    }
+
+    @Override
+    public Date getInProgressStartDueDate() {
+        return null;
+    }
+
+    @Override
     public String getTaskDefinitionKey() {
         return activiti5Task.getTaskDefinitionKey();
     }

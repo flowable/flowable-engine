@@ -14,7 +14,9 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -40,8 +42,20 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         if (planItemInstanceEntity.getName() == null && planItemInstanceEntity.getPlanItem().getName() != null) {
             Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+            Object nameExpressionValue = nameExpression.getValue(planItemInstanceEntity);
+            if (nameExpressionValue != null) {
+                planItemInstanceEntity.setName(nameExpressionValue.toString());
+            }
         }
+
+        if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {
+            Expression businessStatusExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(stage.getBusinessStatus());
+            String actualBusinessStatus = (String) businessStatusExpression.getValue(planItemInstanceEntity);
+            if (StringUtils.isNotEmpty(actualBusinessStatus)) {
+                CommandContextUtil.getCmmnRuntimeService().updateBusinessStatus(planItemInstanceEntity.getCaseInstanceId(), actualBusinessStatus);
+            }
+        }
+
         CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planItemInstanceEntity);
     }
     
@@ -79,6 +93,10 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
                         CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance, null, null, null);
                     }
+                
+                } else if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+                    CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
+                            .executeLifecycleListeners(commandContext, childPlanItemInstance, childPlanItemInstance.getState(), PlanItemInstanceState.TERMINATED);
                 }
             }
         }

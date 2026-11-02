@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
@@ -44,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Historic Decision Executions" }, description = "Query Historic Decision Executions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Historic Decision Executions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoryDecisionExecutionCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();
@@ -64,7 +62,7 @@ public class HistoryDecisionExecutionCollectionResource {
     @Autowired(required=false)
     protected DmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of historic decision executions", nickname ="listHistoricDecisionExecutions", tags = { "Historic Decision Executions" })
+    @ApiOperation(value = "List of historic decision executions", nickname ="listHistoricDecisionExecutions", tags = { "Historic Decision Executions" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return historic decision executions with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "decisionDefinitionId", dataType = "string", value = "Only return historic decision executions with the given definition id.", paramType = "query"),
@@ -81,13 +79,16 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return historic decision executions with the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return historic decision executions like the given tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "startTime,endTime,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the historic decision executions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
     @GetMapping(value = "/dmn-history/historic-decision-executions", produces = "application/json")
-    public DataResponse<HistoricDecisionExecutionResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricDecisionExecutionResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         DmnHistoricDecisionExecutionQuery historicDecisionExecutionQuery = dmnHistoryService.createHistoricDecisionExecutionQuery();
 
         // Populate filter-parameters

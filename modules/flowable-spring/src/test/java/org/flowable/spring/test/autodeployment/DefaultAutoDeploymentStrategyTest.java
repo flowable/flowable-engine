@@ -26,22 +26,22 @@ import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.core.io.Resource;
 
 /**
  * @author Tiese Barrell
  */
-@RunWith(MockitoJUnitRunner.Silent.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStrategyTest {
 
     private DefaultAutoDeploymentStrategy classUnderTest;
 
     @Override
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         super.before();
         classUnderTest = new DefaultAutoDeploymentStrategy();

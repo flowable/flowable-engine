@@ -20,14 +20,16 @@ import java.util.HashSet;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
-import org.flowable.dmn.engine.impl.test.PluggableFlowableDmnTestCase;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Filip Hrisafov
  */
-public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
+class HistoryDataDeleteTest extends BaseFlowableDmnTest {
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteById() {
         ruleService.createExecuteDecisionBuilder()
@@ -72,6 +74,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-2");
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByIds() {
         ruleService.createExecuteDecisionBuilder()
@@ -109,6 +112,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-3");
     }
 
+    @Test
     @DmnDeployment(resources = {
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn",
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple2.dmn"
@@ -158,6 +162,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-4", "execution-5");
     }
 
+    @Test
     @DmnDeployment(resources = {
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn",
             "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple2.dmn"
@@ -205,6 +210,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-4", "execution-5");
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByInstanceIdAndScopeType() {
         ruleService.createExecuteDecisionBuilder()
@@ -252,6 +258,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-3", "execution-4");
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByInstanceIdAndWithoutScopeType() {
         ruleService.createExecuteDecisionBuilder()
@@ -291,6 +298,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-1", "execution-3", "execution-4");
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByActivityId() {
         ruleService.createExecuteDecisionBuilder()
@@ -325,6 +333,7 @@ public class HistoryDataDeleteTest extends PluggableFlowableDmnTestCase {
                 .containsExactlyInAnyOrder("execution-1", "execution-3");
     }
 
+    @Test
     @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HistoryDataDeleteTest.simple.dmn")
     public void testDeleteByTenantId() {
         ruleService.createExecuteDecisionBuilder()

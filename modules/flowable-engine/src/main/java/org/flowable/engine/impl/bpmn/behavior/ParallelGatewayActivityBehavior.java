@@ -64,7 +64,9 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         if (flowElement instanceof ParallelGateway) {
             parallelGateway = (ParallelGateway) flowElement;
         } else {
-            throw new FlowableException("Programmatic error: parallel gateway behaviour can only be applied" + " to a ParallelGateway instance, but got an instance of " + flowElement);
+            throw new FlowableException(
+                    "Programmatic error: parallel gateway behaviour can only be applied to a ParallelGateway instance, but got an instance of " + flowElement
+                            + " for " + execution);
         }
 
         lockFirstParentScope(execution);
@@ -168,8 +170,7 @@ public class ParallelGatewayActivityBehavior extends GatewayActivityBehavior {
         DelegateExecution parentExecution = execution.getParent();
         if (parentExecution != null && parentExecution.getCurrentFlowElement() != null) {
             FlowElement flowElement = parentExecution.getCurrentFlowElement();
-            if (flowElement instanceof Activity) {
-                Activity activity = (Activity) flowElement;
+            if (flowElement instanceof Activity activity) {
                 if (activity.getLoopCharacteristics() != null) {
                     multiInstanceExecution = parentExecution;
                 }

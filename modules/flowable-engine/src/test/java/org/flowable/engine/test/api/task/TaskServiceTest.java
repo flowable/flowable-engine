@@ -72,6 +72,7 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.TaskPostProcessor;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
@@ -150,6 +151,38 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         } finally {
             this.taskService.deleteTask(parentTask.getId(), true);
         }
+    }
+
+    @Test
+    public void testTaskIdentityLinkCountWithDeletionOfSameLink() {
+        task = taskService.createTaskBuilder().
+                name("testName").
+                identityLinks(getDefaultIdentityLinks()).
+                create();
+
+        TaskEntityImpl updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(2);
+
+        processEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    taskService.deleteUserIdentityLink(task.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+                    taskService.deleteUserIdentityLink(task.getId(), "testUserBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(1);
+
+        processEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    taskService.deleteGroupIdentityLink(task.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+                    taskService.deleteGroupIdentityLink(task.getId(), "testGroupBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) taskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(0);
+
     }
 
     @Test
@@ -967,7 +1000,8 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskParams.put("${execution.myParam}", "myValue");
         assertThatThrownBy(() -> taskService.complete(task.getId(), taskParams))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessage("Error while evaluating expression: ${execution.myParam}");
+                .hasMessageStartingWith("Error while evaluating expression: ${execution.myParam} with Execution[")
+                .hasMessageContainingAll(" - definition 'twoTasksProcess:1:", " - activity 'firstTask'");
     }
 
     @Test
@@ -2056,31 +2090,33 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertThat(task).isNotNull();
+        String taskErrorString = "Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "]";
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId()))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId(), true))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTask(task.getId(), "test"))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         String idLists[] = { task.getId() };
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists)))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists), true))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
 
         assertThatThrownBy(() -> taskService.deleteTasks(Arrays.asList(idLists), "test"))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("The task cannot be deleted because is part of a running process");
+                .hasMessage("The " + taskErrorString + " cannot be deleted because is part of a running process");
     }
 
     @Test

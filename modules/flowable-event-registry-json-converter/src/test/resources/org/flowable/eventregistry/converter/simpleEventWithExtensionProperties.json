@@ -1,0 +1,31 @@
+{
+    "key": "myEvent",
+    "name": "My event",
+    "correlationParameters": [
+        {
+            "name": "customerId",
+            "type": "string",
+            "extensionProperties": {
+                "prop1": "test1",
+                "prop2": "num2"
+            }
+        }
+    ],
+    "payload": [
+        {
+            "name": "payload1",
+            "type": "string",
+            "extensionProperties": {
+                "payload1Prop1": "test3",
+                "payload1Prop2": "num4"
+            }
+        },
+        {
+            "name": "payload2",
+            "type": "integer",
+            "extensionProperties": {
+                "payload2Prop1": "test5"
+            }
+        }
+    ]
+}

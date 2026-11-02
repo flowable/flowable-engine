@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.util.Set;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,5 +25,25 @@ public class VariableListenerUtil {
     public static boolean hasVariableListenerEventDefinitions(String processDefinitionId) {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
         return bpmnModel.hasVariableListeners();
+    }
+    
+    public static boolean hasVariableListenerEventDefinitionsForVariableName(String processDefinitionId, String variableName) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        if (bpmnModel.containsVariableListenerForVariableName(variableName)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public static boolean hasVariableListenerEventDefinitionsForVariableNames(String processDefinitionId, Set<String> variableNames) {
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinitionId);
+        for (String variableName : variableNames) {
+            if (bpmnModel.containsVariableListenerForVariableName(variableName)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

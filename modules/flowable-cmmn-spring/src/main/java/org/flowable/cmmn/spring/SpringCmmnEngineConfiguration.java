@@ -68,8 +68,8 @@ public class SpringCmmnEngineConfiguration extends CmmnEngineConfiguration imple
     }
 
     @Override
-    public CmmnEngine buildCmmnEngine() {
-        CmmnEngine cmmnEngine = super.buildCmmnEngine();
+    public CmmnEngine buildEngine() {
+        CmmnEngine cmmnEngine = super.buildEngine();
         CmmnEngines.setInitialized(true);
         enginesBuild.add(cmmnEngine.getName());
         return cmmnEngine;

@@ -7,6 +7,10 @@
         <sequenceFlow sourceRef="start" targetRef="externalWorkerServiceTask"/>
         <serviceTask id="externalWorkerServiceTask" flowable:type="external-worker" name="External worker task" flowable:skipExpression="skipExpression"
                      flowable:topic="topic">
+            <extensionElements>
+                <flowable:externalWorkerInParameter source="description" target="theDescription"/>
+                <flowable:externalWorkerOutParameter source="theResult" target="result"/>
+            </extensionElements>
         </serviceTask>
         <sequenceFlow sourceRef="externalWorkerServiceTask" targetRef="end"/>
         <endEvent id="end"/>

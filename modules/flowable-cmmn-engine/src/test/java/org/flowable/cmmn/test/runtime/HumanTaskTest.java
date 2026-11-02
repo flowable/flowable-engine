@@ -13,25 +13,34 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.flowable.common.engine.api.FlowableIllegalStateException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkType;
 import org.flowable.entitylink.api.HierarchyType;
@@ -39,11 +48,15 @@ import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tijs Rademakers
@@ -132,7 +145,7 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                     .caseInstanceId(caseInstance.getId())
                     .variableName("var1")
                     .singleResult().getValue()).isEqualTo("JohnDoe");
-            
+
             List<HistoricEntityLink> historicEntityLinks = cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(caseInstance.getId());
             for (HistoricEntityLink historicEntityLink : historicEntityLinks) {
                 assertThat(historicEntityLink.getLinkType()).isEqualTo(EntityLinkType.CHILD);
@@ -419,4 +432,299 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertThat(myExpressionTaskId).isEqualTo(actualTaskId);
     }
 
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testHumanTaskCompleterVariableName.cmmn")
+    public void testHumanTaskCompleterVariableName() {
+        Authentication.setAuthenticatedUserId("JohnDoe");
+
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("dynamicVariable", "myDynamicVariable")
+                .start();
+
+        // Normal string
+        Task firstTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task1").singleResult();
+        assertThat(firstTask).isNotNull();
+        cmmnTaskService.complete(firstTask.getId());
+        String completerTask1 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask1");
+        assertThat(completerTask1).isEqualTo("JohnDoe");
+
+        // No authenticated user
+        Authentication.setAuthenticatedUserId(null);
+        Task secondTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task2").singleResult();
+        assertThat(secondTask).isNotNull();
+        cmmnTaskService.complete(secondTask.getId());
+        String completerTask2 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "completerTask2");
+        assertThat(completerTask2).isNull();
+
+        // Expression
+        Authentication.setAuthenticatedUserId("DynamicDoe");
+        Task thirdTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskDefinitionKey("task3").singleResult();
+        assertThat(thirdTask).isNotNull();
+        cmmnTaskService.complete(thirdTask.getId());
+        String completerTask3 = (String)cmmnRuntimeService.getVariable(caseInstance.getId(), "myDynamicVariable");
+        assertThat(completerTask3).isEqualTo("DynamicDoe");
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testFillTaskLifecycleValues() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("oneHumanTaskCase")
+                        .start();
+        assertThat(caseInstance).isNotNull();
+
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getName()).isEqualTo("Sub task");
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.CREATED);
+            assertThat(historicTaskInstance.getCreateTime()).isNotNull();
+        }
+        
+        cmmnTaskService.claim(task.getId(), "kermit");
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getState()).isEqualTo(Task.CLAIMED);
+        assertThat(task.getClaimTime()).isNotNull();
+        assertThat(task.getClaimedBy()).isEqualTo("kermit");
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.CLAIMED);
+            assertThat(historicTaskInstance.getClaimTime()).isNotNull();
+            assertThat(historicTaskInstance.getClaimedBy()).isEqualTo("kermit");
+        }
+        
+        cmmnTaskService.startProgress(task.getId(), "fozzie");
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getState()).isEqualTo(Task.IN_PROGRESS);
+        assertThat(task.getInProgressStartTime()).isNotNull();
+        assertThat(task.getInProgressStartedBy()).isEqualTo("fozzie");
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.IN_PROGRESS);
+            assertThat(historicTaskInstance.getInProgressStartTime()).isNotNull();
+            assertThat(historicTaskInstance.getInProgressStartedBy()).isEqualTo("fozzie");
+        }
+        
+        cmmnTaskService.suspendTask(task.getId(), "gonzo");
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getState()).isEqualTo(Task.SUSPENDED);
+        assertThat(task.getSuspendedTime()).isNotNull();
+        assertThat(task.getSuspendedBy()).isEqualTo("gonzo");
+        
+        PlanItemInstance taskPlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask").singleResult();
+        assertThat(taskPlanItemInstance).isNotNull();
+        assertThat(taskPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+        assertThat(taskPlanItemInstance.getLastSuspendedTime()).isNotNull();
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.SUSPENDED);
+            assertThat(historicTaskInstance.getSuspendedTime()).isNotNull();
+            assertThat(historicTaskInstance.getSuspendedBy()).isEqualTo("gonzo");
+            
+            HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceReferenceId(task.getId()).singleResult();
+            assertThat(historicPlanItemInstance).isNotNull();
+            assertThat(historicPlanItemInstance.getState()).isEqualTo(PlanItemInstanceState.SUSPENDED);
+            assertThat(historicPlanItemInstance.getLastSuspendedTime()).isNotNull();
+        }
+        
+        final String taskId = task.getId();
+        assertThatThrownBy(() -> {
+            cmmnTaskService.complete(taskId, "kermit");
+        }).isInstanceOf(FlowableIllegalStateException.class)
+            .hasMessageContaining("Can only trigger a plan item that is in the ACTIVE state");
+        
+        cmmnTaskService.activateTask(task.getId(), "kermit");
+        task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getState()).isEqualTo(Task.IN_PROGRESS);
+        assertThat(task.getSuspendedTime()).isNull();
+        assertThat(task.getSuspendedBy()).isNull();
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.IN_PROGRESS);
+            assertThat(historicTaskInstance.getClaimTime()).isNotNull();
+            assertThat(historicTaskInstance.getClaimedBy()).isEqualTo("kermit");
+            assertThat(historicTaskInstance.getInProgressStartTime()).isNotNull();
+            assertThat(historicTaskInstance.getInProgressStartedBy()).isEqualTo("fozzie");
+        }
+        
+        cmmnTaskService.complete(task.getId(), "kermit");
+        assertCaseInstanceEnded(caseInstance.getId());
+        
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(task.getId()).singleResult();
+            assertThat(historicTaskInstance.getState()).isEqualTo(Task.COMPLETED);
+            assertThat(historicTaskInstance.getEndTime()).isNotNull();
+            assertThat(historicTaskInstance.getCompletedBy()).isEqualTo("kermit");
+        }
+    }
+    
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn")
+    public void testTaskWithTimerJob() {
+        Map<String, JobHandler> existingJobHandlers = cmmnEngineConfiguration.getJobHandlers();
+        Map<String, JobHandler> updatedJobHandlers = new HashMap<>(existingJobHandlers);
+        TestCmmnTaskTimerJobHandler testTimerJobHandler = new TestCmmnTaskTimerJobHandler();
+        updatedJobHandlers.put(testTimerJobHandler.getType(), testTimerJobHandler);
+        cmmnEngineConfiguration.setJobHandlers(updatedJobHandlers);
+        cmmnEngineConfiguration.getJobServiceConfiguration().setJobHandlers(updatedJobHandlers);
+        
+        try {
+            final CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneHumanTaskCase")
+                    .start();
+    
+            final org.flowable.task.api.Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(task.getName()).isEqualTo("Sub task");
+            assertThat(task.getPriority()).isEqualTo(50);
+            
+            cmmnEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    TimerJobService timerJobService = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobService();
+                    TimerJobEntity timerJob = timerJobService.createTimerJob();
+                    timerJob.setJobType(JobEntity.JOB_TYPE_TIMER);
+                    timerJob.setJobHandlerType(testTimerJobHandler.getType());
+                    timerJob.setScopeId(caseInstance.getId());
+                    timerJob.setSubScopeId(task.getId());
+                    timerJob.setScopeType(ScopeTypes.CMMN);
+                    
+                    Calendar calendar = cmmnEngineConfiguration.getClock().getCurrentCalendar();
+                    calendar.add(Calendar.MINUTE, -60);
+                    timerJob.setDuedate(calendar.getTime());
+                    
+                    timerJobService.scheduleTimerJob(timerJob);
+                    
+                    return null;
+                }
+            });
+            
+            CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000, 200, true);
+            
+            Task updatedTask = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertThat(updatedTask.getPriority()).isEqualTo(100);
+            
+        } finally {
+            cmmnEngineConfiguration.setJobHandlers(existingJobHandlers);
+            cmmnEngineConfiguration.getJobServiceConfiguration().setJobHandlers(existingJobHandlers);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTaskNonBlockingWithEntryAndExitCriterion() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionId("task1").list()).hasSize(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateEnabled().list()).hasSize(1);
+        
+        cmmnRuntimeService.startPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateEnabled().singleResult().getId());
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("task1")
+                .planItemInstanceStateActive().list()).hasSize(0);
+        
+        assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()).hasSize(0);
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery().count()).isZero();
+    }
+
+    @Test
+    @CmmnDeployment
+    public void testTaskAssigneeSyncedWithPlanItemInstance() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("assigneeVar", "kermit")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getAssignee()).isEqualTo("kermit");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .singleResult();
+        assertThat(planItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(planItemInstance.getCompletedBy()).isNull();
+
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstance.getId()).singleResult();
+        assertThat(historicPlanItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(historicPlanItemInstance.getCompletedBy()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testTaskAssigneeSyncedWithPlanItemInstance.cmmn")
+    public void testTaskAssigneeChangeSyncedToPlanItemInstance() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("assigneeVar", "kermit")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertThat(task.getAssignee()).isEqualTo("kermit");
+
+        cmmnTaskService.setAssignee(task.getId(), "gonzo");
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .singleResult();
+        assertThat(planItemInstance.getAssignee()).isEqualTo("gonzo");
+        assertThat(planItemInstance.getCompletedBy()).isNull();
+
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstance.getId())
+                .singleResult();
+        assertThat(historicPlanItemInstance.getAssignee()).isEqualTo("gonzo");
+        assertThat(historicPlanItemInstance.getCompletedBy()).isNull();
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/HumanTaskTest.testTaskAssigneeSyncedWithPlanItemInstance.cmmn")
+    public void testTaskCompletionSyncedToPlanItemInstance() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("assigneeVar", "kermit")
+                .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .singleResult();
+        assertThat(planItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(planItemInstance.getCompletedBy()).isNull();
+
+        HistoricPlanItemInstance historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstance.getId())
+                .singleResult();
+        assertThat(historicPlanItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(historicPlanItemInstance.getCompletedBy()).isNull();
+
+        cmmnTaskService.complete(task.getId(), "gonzo");
+
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateCompleted()
+                .includeEnded()
+                .singleResult();
+        assertThat(planItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(planItemInstance.getCompletedBy()).isEqualTo("gonzo");
+
+        historicPlanItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .planItemInstanceId(planItemInstance.getId())
+                .singleResult();
+        assertThat(historicPlanItemInstance.getAssignee()).isEqualTo("kermit");
+        assertThat(historicPlanItemInstance.getCompletedBy()).isEqualTo("gonzo");
+    }
 }

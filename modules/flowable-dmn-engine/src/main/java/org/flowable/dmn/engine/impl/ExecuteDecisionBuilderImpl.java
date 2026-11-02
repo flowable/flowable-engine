@@ -38,6 +38,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
     protected String tenantId;
     protected Map<String, Object> variables;
     protected boolean fallbackToDefaultTenant;
+    protected boolean disableHistory;
 
     public ExecuteDecisionBuilderImpl(DmnDecisionService decisionService) {
         this.decisionService = decisionService;
@@ -110,6 +111,12 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
             this.variables = new HashMap<>();
         }
         this.variables.put(variableName, value);
+        return this;
+    }
+
+    @Override
+    public ExecuteDecisionBuilder disableHistory() {
+        this.disableHistory = true;
         return this;
     }
 
@@ -211,6 +218,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         executeDecisionContext.setVariables(variables);
         executeDecisionContext.setTenantId(tenantId);
         executeDecisionContext.setFallbackToDefaultTenant(fallbackToDefaultTenant);
+        executeDecisionContext.setDisableHistory(disableHistory);
 
         return executeDecisionContext;
     }

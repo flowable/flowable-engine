@@ -19,26 +19,19 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.DateTime;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyOutputOrderTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyOutputOrderTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void outputOrderHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -52,10 +45,21 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/runtime/HitPolicyOutputOrderTest.outputOrderHitPolicy.dmn")
+    public void outputOrderHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .execute();
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
     @DmnDeployment
     public void outputOrderHitPolicyNumberAsString() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -71,8 +75,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyNumber() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -88,8 +90,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyDate() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -105,8 +105,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyBoolean() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -122,7 +120,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyNoOutputValuesStrictModeDisabled() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
 
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
@@ -146,8 +143,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyNoOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         DecisionExecutionAuditContainer result = dmnRuleService.createExecuteDecisionBuilder()
@@ -165,8 +160,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyCompound() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -186,8 +179,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyCompoundOtherTypes() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -207,8 +198,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyCompoundFirstOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -228,8 +217,6 @@ public class HitPolicyOutputOrderTest {
     @Test
     @DmnDeployment
     public void outputOrderHitPolicyCompoundSecondOutputValues() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         List<Map<String, Object>> result = dmnRuleService.createExecuteDecisionBuilder()

@@ -41,8 +41,7 @@ public class ProcessInstanceStartedEventHandler extends AbstractDatabaseEventLog
         putInMapIfNotNull(data, Fields.NAME, processInstanceEntity.getName());
         putInMapIfNotNull(data, Fields.CREATE_TIME, timeStamp);
 
-        if (event instanceof FlowableEntityWithVariablesEvent) {
-            FlowableEntityWithVariablesEvent eventWithVariables = (FlowableEntityWithVariablesEvent) event;
+        if (event instanceof FlowableEntityWithVariablesEvent eventWithVariables) {
             if (eventWithVariables.getVariables() != null && !eventWithVariables.getVariables().isEmpty()) {
                 Map<String, Object> variableMap = new HashMap<>();
                 for (Object variableName : eventWithVariables.getVariables().keySet()) {

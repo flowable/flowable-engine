@@ -12,6 +12,7 @@
  */
 package org.flowable.entitylink.service.impl.persistence.entity.data.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -19,22 +20,19 @@ import java.util.Map;
 
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
+import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.api.history.HistoricEntityLink;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.HistoricEntityLinkEntityImpl;
 import org.flowable.entitylink.service.impl.persistence.entity.data.HistoricEntityLinkDataManager;
-import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher;
-import org.flowable.entitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricEntityLinksByScopeIdAndTypeMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<HistoricEntityLinkEntity> implements HistoricEntityLinkDataManager {
-
-    protected CachedEntityMatcher<HistoricEntityLinkEntity> historicEntityLinksByScopeIdAndTypeMatcher = new HistoricEntityLinksByScopeIdAndTypeMatcher();
-    protected CachedEntityMatcher<HistoricEntityLinkEntity> entityLinksWithSameRootByScopeIdAndTypeMatcher = new EntityLinksWithSameRootScopeForScopeIdAndScopeTypeMatcher<>();
 
     protected EntityLinkServiceConfiguration entityLinkServiceConfiguration;
     
@@ -52,16 +50,6 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         return new HistoricEntityLinkEntityImpl();
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeId", scopeId);
-        parameters.put("scopeType", scopeType);
-        parameters.put("linkType", linkType);
-        return (List) getList("selectHistoricEntityLinksByScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
-    }
-
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
@@ -70,38 +58,39 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
         
-        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters, entityLinksWithSameRootByScopeIdAndTypeMatcher, true);
+        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdAndType", parameters);
     }
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType) {
+        // We are using 2 queries here (first find all the root scope ids and then find all the entity links for those root scope ids)
+        // The reason for using 2 queries is due to the fact that some DBs are going to do a full table scan if we nest the queries into a single query
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("scopeIds", createSafeInValuesList(scopeIds));
         parameters.put("scopeType", scopeType);
         parameters.put("linkType", linkType);
-        
-        return (List) getList("selectHistoricEntityLinksWithSameRootScopeByScopeIdsAndType", parameters);
-    }
+        List rootScopeIds = getDbSqlSession().selectList("selectRootScopeIdsByScopeIdsAndType", parameters);
+        if (rootScopeIds.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    @Override
-    public List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("referenceScopeId", referenceScopeId);
-        parameters.put("referenceScopeType", scopeType);
-        parameters.put("linkType", linkType);
-        return (List) getList("selectHistoricEntityLinksByReferenceScopeIdAndType", parameters, historicEntityLinksByScopeIdAndTypeMatcher, true);
+        parameters.put("rootScopeIds", createSafeInValuesList(rootScopeIds));
+        parameters.remove("scopeIds");
+
+        return (List) getList("selectHistoricEntityLinksByRootScopeIdsAndType", parameters);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("scopeDefinitionId", scopeDefinitionId);
-        parameters.put("scopeType", scopeType);
-        parameters.put("linkType", linkType);
-        return getDbSqlSession().selectList("selectHistoricEntityLinksByScopeDefinitionIdAndType", parameters);
+    public List<HistoricEntityLinkEntity> findHistoricEntityLinksByQuery(InternalEntityLinkQuery<HistoricEntityLinkEntity> query) {
+        return getList("selectHistoricEntityLinksByQuery", query, (CachedEntityMatcher<HistoricEntityLinkEntity>) query, true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public HistoricEntityLinkEntity findHistoricEntityLinkByQuery(InternalEntityLinkQuery<HistoricEntityLinkEntity> query) {
+        return getEntity("selectHistoricEntityLinksByQuery", query, (SingleCachedEntityMatcher<HistoricEntityLinkEntity>) query, true);
     }
     
     @Override
@@ -112,6 +101,14 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         getDbSqlSession().delete("deleteHistoricEntityLinksByScopeIdAndScopeType", parameters, HistoricEntityLinkEntityImpl.class);
     }
     
+    @Override
+    public void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndType(String id, String scopeType) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("id", id);
+        parameters.put("scopeType", scopeType);
+        getDbSqlSession().delete("deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType", parameters, HistoricEntityLinkEntityImpl.class);
+    }
+
     @Override
     public void deleteHistoricEntityLinksByScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType) {
         Map<String, String> parameters = new HashMap<>();
@@ -126,6 +123,14 @@ public class MybatisHistoricEntityLinkDataManager extends AbstractDataManager<Hi
         parameters.put("scopeType", scopeType);
         parameters.put("scopeIds", createSafeInValuesList(scopeIds));
         getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
+    }
+
+    @Override
+    public void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("scopeType", scopeType);
+        parameters.put("ids", createSafeInValuesList(ids));
+        getDbSqlSession().delete("bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds", parameters, HistoricEntityLinkEntityImpl.class);
     }
 
     @Override

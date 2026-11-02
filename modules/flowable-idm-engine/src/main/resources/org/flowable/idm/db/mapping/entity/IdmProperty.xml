@@ -12,8 +12,8 @@
         VALUE_,
         REV_
       ) values (
-        #{name ,jdbcType=VARCHAR},
-        #{value, jdbcType=VARCHAR},
+        #{name, jdbcType=NVARCHAR},
+        #{value, jdbcType=NVARCHAR},
         1
       )
   </insert>
@@ -21,8 +21,8 @@
   <insert id="bulkInsertIdmProperty" parameterType="java.util.List">
       INSERT INTO ${prefix}ACT_ID_PROPERTY (NAME_, VALUE_, REV_) VALUES 
       <foreach collection="list" item="property" index="index" separator=","> 
-        (#{property.name ,jdbcType=VARCHAR},
-         #{property.value, jdbcType=VARCHAR},
+        (#{property.name, jdbcType=NVARCHAR},
+         #{property.value, jdbcType=NVARCHAR},
          1)
       </foreach>
   </insert>
@@ -31,8 +31,8 @@
     INSERT ALL 
     <foreach collection="list" item="property" index="index">
       INTO ${prefix}ACT_ID_PROPERTY (NAME_, VALUE_, REV_) VALUES
-      (#{property.name ,jdbcType=VARCHAR},
-       #{property.value, jdbcType=VARCHAR},
+      (#{property.name, jdbcType=NVARCHAR},
+       #{property.value, jdbcType=NVARCHAR},
        1)
     </foreach>
     SELECT * FROM dual
@@ -44,24 +44,24 @@
     update ${prefix}ACT_ID_PROPERTY
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      VALUE_ = #{value, jdbcType=VARCHAR},
+      VALUE_ = #{value, jdbcType=NVARCHAR},
     </set>
-    where NAME_ = #{name, jdbcType=VARCHAR}
+    where NAME_ = #{name, jdbcType=NVARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- PROPERTY DELETE -->
   
   <delete id="deleteIdmProperty" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
-    delete from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name} and REV_ = #{revision}
+    delete from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
 
   <!-- PROPERTY SELECT -->
   
   <resultMap id="idmPropertyResultMap" type="org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl">
-    <id property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="value" column="VALUE_" jdbcType="VARCHAR" />
+    <id property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="value" column="VALUE_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
   </resultMap>
   
@@ -70,7 +70,7 @@
   </select>
 
   <select id="selectIdmProperty" parameterType="string" resultMap="idmPropertyResultMap">
-    select * from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_ID_PROPERTY where NAME_ = #{name, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectIdmProperties" resultMap="idmPropertyResultMap">

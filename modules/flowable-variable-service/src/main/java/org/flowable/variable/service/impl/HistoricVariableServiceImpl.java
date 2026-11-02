@@ -70,7 +70,7 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
         }
 
         if (historicVariable != null) {
-            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity, updateTime);
+            historicVariableInstanceEntityManager.copyVariableFields(historicVariable, variableInstanceEntity, updateTime);
         } else {
             historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity, updateTime);
         }
@@ -109,6 +109,11 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
     }
     
     @Override
+    public void deleteHistoricVariableInstancesByScopeIdAndScopeTypes(String scopeId, Collection<String> scopeTypes) {
+        getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByScopeIdAndScopeTypes(scopeId, scopeTypes);
+    }
+
+    @Override
     public void bulkDeleteHistoricVariableInstancesByProcessInstanceIds(Collection<String> processInstanceIds) {
         getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByProcessInstanceIds(processInstanceIds);
     }
@@ -116,6 +121,11 @@ public class HistoricVariableServiceImpl extends CommonServiceImpl<VariableServi
     @Override
     public void bulkDeleteHistoricVariableInstancesByTaskIds(Collection<String> taskIds) {
         getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByTaskIds(taskIds);
+    }
+
+    @Override
+    public void bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(Collection<String> scopeIds, Collection<String> scopeTypes) {
+        getHistoricVariableInstanceEntityManager().bulkDeleteHistoricVariableInstancesByScopeIdsAndScopeTypes(scopeIds, scopeTypes);
     }
 
     @Override

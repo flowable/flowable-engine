@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <!-- OSS extraction of the Design 'getAvisProcess' sub process: start -> user task -> end -->
+    <process id="avisChild" name="Avis child">
+
+        <startEvent id="subStart" />
+        <sequenceFlow id="subFlow1" sourceRef="subStart" targetRef="subTask" />
+
+        <userTask id="subTask" name="Sub task" />
+        <sequenceFlow id="subFlow2" sourceRef="subTask" targetRef="subEnd" />
+
+        <endEvent id="subEnd" />
+
+    </process>
+
+</definitions>

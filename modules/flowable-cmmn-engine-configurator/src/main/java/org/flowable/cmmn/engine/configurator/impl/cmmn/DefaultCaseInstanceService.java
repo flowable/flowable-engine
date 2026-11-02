@@ -18,6 +18,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CallbackTypes;
 import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
@@ -51,25 +52,21 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     }
 
     @Override
-    public String startCaseInstanceByKey(String caseDefinitionKey, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
-            String executionId,
-            String tenantId, boolean fallbackToDefaultTenant, String parentDeploymentId, Map<String, Object> inParametersMap) {
-        
-        CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();
-        caseInstanceBuilder.caseDefinitionKey(caseDefinitionKey);
+    public String startCaseInstance(String caseDefinitionId, String predefinedCaseInstanceId, String caseInstanceName, String businessKey,
+            String executionId, String tenantId, Map<String, Object> inParametersMap, Map<String, Object> transientVariablesMap) {
 
-        if (parentDeploymentId != null) {
-            caseInstanceBuilder.caseDefinitionParentDeploymentId(parentDeploymentId);
-        }
-        
+        CaseInstanceBuilder caseInstanceBuilder = cmmnEngineConfiguration.getCmmnRuntimeService().createCaseInstanceBuilder();
+        caseInstanceBuilder.caseDefinitionId(caseDefinitionId);
+
         if (predefinedCaseInstanceId != null) {
             caseInstanceBuilder.predefinedCaseInstanceId(predefinedCaseInstanceId);
         }
-        
+
         if (tenantId != null) {
             caseInstanceBuilder.tenantId(tenantId);
+            caseInstanceBuilder.overrideCaseDefinitionTenantId(tenantId);
         }
-        
+
         if (executionId != null) {
             caseInstanceBuilder.callbackId(executionId);
             caseInstanceBuilder.callbackType(CallbackTypes.EXECUTION_CHILD_CASE);
@@ -79,8 +76,8 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
             caseInstanceBuilder.variable(target, inParametersMap.get(target));
         }
 
-        if (fallbackToDefaultTenant) {
-            caseInstanceBuilder.fallbackToDefaultTenant();
+        if (transientVariablesMap != null && !transientVariablesMap.isEmpty()) {
+            caseInstanceBuilder.transientVariables(transientVariablesMap);
         }
 
         if (businessKey != null) {
@@ -90,7 +87,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         if (caseInstanceName != null) {
             caseInstanceBuilder.name(caseInstanceName);
         }
-        
+
         CaseInstance caseInstance = caseInstanceBuilder.start();
         return caseInstance.getId();
     }
@@ -98,7 +95,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     @Override
     public void handleSignalEvent(EventSubscriptionEntity eventSubscription, Map<String, Object> variables) {
         if (StringUtils.isEmpty(eventSubscription.getSubScopeId())) {
-            throw new FlowableException("Plan item instance for event subscription can not be found with empty sub scope id value");
+            throw new FlowableException("Plan item instance for " + eventSubscription + " can not be found with empty sub scope id value");
         }
         
         CmmnRuntimeService cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
@@ -107,7 +104,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
                         .singleResult();
         
         if (planItemInstance == null) {
-            throw new FlowableException("Plan item instance for event subscription can not be found with sub scope id " + eventSubscription.getSubScopeId());
+            throw new FlowableException("Plan item instance for " + eventSubscription + " can not be found with sub scope id " + eventSubscription.getSubScopeId());
         }
 
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId())
@@ -119,7 +116,7 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
     public void deleteCaseInstance(String caseInstanceId) {
         cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
-            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted()) {
+            if (caseInstanceEntity == null || caseInstanceEntity.isDeleted() || CaseInstanceState.isInTerminalState(caseInstanceEntity)) {
                 return null;
             }
 
@@ -139,6 +136,29 @@ public class DefaultCaseInstanceService implements CaseInstanceService {
         for (CaseInstance caseInstance : caseInstances) {
             deleteCaseInstance(caseInstance.getId());
         }
+    }
+
+    @Override
+    public String resolveCaseDefinitionId(String caseDefinitionKey, String tenantId,
+            boolean fallbackToDefaultTenant, String parentDeploymentId) {
+        CaseDefinition caseDefinition = cmmnEngineConfiguration.getCaseInstanceHelper()
+                .resolveCaseDefinition(caseDefinitionKey, tenantId,
+                        fallbackToDefaultTenant || cmmnEngineConfiguration.isFallbackToDefaultTenant(), parentDeploymentId);
+        return caseDefinition.getId();
+    }
+
+    @Override
+    public boolean isHistoryEnabledForCaseDefinitionId(String caseDefinitionId) {
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabled(caseDefinitionId);
+    }
+
+    @Override
+    public boolean isHistoryEnabledForCaseInstance(String caseInstanceId) {
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(caseInstanceId);
+        if (caseInstance != null) {
+            return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabled(caseInstance.getCaseDefinitionId());
+        }
+        return cmmnEngineConfiguration.getCmmnHistoryConfigurationSettings().isHistoryEnabled();
     }
 
     @Override

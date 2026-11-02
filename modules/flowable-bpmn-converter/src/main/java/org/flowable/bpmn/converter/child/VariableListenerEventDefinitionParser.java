@@ -34,7 +34,7 @@ public class VariableListenerEventDefinitionParser extends BaseChildElementParse
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof Event)) {
+        if (!(parentElement instanceof Event event)) {
             throw new FlowableException("variableListenerEventDefinition is only supported for events, not for activity id " + parentElement.getId());
         }
         
@@ -43,14 +43,13 @@ public class VariableListenerEventDefinitionParser extends BaseChildElementParse
         
         String variableName = xtr.getAttributeValue(null, ATTRIBUTE_VARIABLE_NAME);
         if (StringUtils.isEmpty(variableName)) {
-            throw new FlowableException("variable name is required for variable listener with activity id " + parentElement.getId());
+            LOGGER.warn("variable name is required for variable listener with activity id {}", parentElement.getId());
         }
         eventDefinition.setVariableName(variableName);
         
         String variableChangeType = xtr.getAttributeValue(null, ATTRIBUTE_VARIABLE_CHANGE_TYPE);
         eventDefinition.setVariableChangeType(variableChangeType);
-        
-        Event event = (Event) parentElement;
+
         event.addEventDefinition(eventDefinition);
         
         model.addActivityIdForVariableListenerName(variableName, parentElement.getId());

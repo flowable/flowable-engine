@@ -104,7 +104,7 @@ public class ProcessInstanceHistoryLogImpl implements ProcessInstanceHistoryLog 
     }
 
     public void orderHistoricData() {
-        historicData.sort(new Comparator<HistoricData>() {
+        historicData.sort(new Comparator<>() {
 
             @Override
             public int compare(HistoricData data1, HistoricData data2) {

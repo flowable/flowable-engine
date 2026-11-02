@@ -13,10 +13,10 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,21 +39,25 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CaseInstanceUtil;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
+import org.flowable.cmmn.engine.impl.util.CmmnFaultVariableContainer;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.util.FaultPropagation;
 import org.flowable.cmmn.engine.impl.util.CompletionEvaluationResult;
 import org.flowable.cmmn.engine.impl.util.ExpressionUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceContainerUtil;
 import org.flowable.cmmn.engine.impl.util.PlanItemInstanceUtil;
+import org.flowable.cmmn.engine.interceptor.MigrationContext;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.ParentCompletionRule;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -98,8 +102,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // repetition
 
             // evaluate the repetition rule, if any, will also create new child plan items and add them to the result, if necessary
-            boolean activatePlanItemInstance = evaluateRepetitionRule(planItemInstanceEntity, satisfiedEntryCriterion, planItemInstanceContainer,
-                evaluationResult);
+            boolean activatePlanItemInstance = PlanItemInstanceUtil.evaluateRepetitionRule(planItemInstanceEntity, satisfiedEntryCriterion, 
+                    planItemInstanceContainer, evaluationResult, commandContext);
 
             if (planItem.getPlanItemDefinition() instanceof EventListener) {
                 activatePlanItemInstance = false; // event listeners occur, they don't become active
@@ -108,92 +112,12 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             // if we need to activate the plan item, mark the result as some criteria changed and plan the activation of the plan item by adding
             // this as an operation to the agenda
             if (activatePlanItemInstance) {
+                planItemInstanceEntity.setPlannedForActivationInMigration(true);
                 evaluationResult.markCriteriaChanged();
                 CommandContextUtil.getAgenda(commandContext)
                     .planActivatePlanItemInstanceOperation(planItemInstanceEntity, satisfiedEntryCriterion != null ? satisfiedEntryCriterion.getId() : null);
             }
         }
-    }
-
-    /**
-     * Evaluates an optional repetition rule on the given plan item and handles it. This might also include handling of a repetition condition or repetition
-     * based on a collection variable with optional local item and item index variables to be set on the newly created plan item instances for repetition.
-     *
-     * @param planItemInstanceEntity the plan item instance to test for a repetition rule
-     * @param satisfiedEntryCriterion the optional, satisfied entry criterion activating the plan item, might be null
-     * @param planItemInstanceContainer the parent container of the given plan item
-     * @param evaluationResult the evaluation result used to collect information during the evaluation of a list of plan items, will be modified inside this
-     *          method to reflect gained information about further evaluation as well as any newly created plan item instances for repetition
-     * @return true, if the plan item must be activated, false otherwise
-     */
-    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity, Criterion satisfiedEntryCriterion,
-        PlanItemInstanceContainer planItemInstanceContainer, PlanItemEvaluationResult evaluationResult) {
-
-        PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        boolean activatePlanItemInstance = true;
-
-        // check for a repetition rule on the plan item
-        if (ExpressionUtil.hasRepetitionRule(planItemInstanceEntity)) {
-            boolean noEntryCriteria = planItem.getEntryCriteria().isEmpty();
-
-            // first check, if we run on a collection variable for repetition and if so, we ignore the max instance count and any other repetition
-            // condition and just use the collection to create plan item instances accordingly
-            if (ExpressionUtil.hasRepetitionOnCollection(planItemInstanceEntity)) {
-                // the plan item should be repeated based on a collection variable
-                // evaluate the variable content and check, if we need to start creating instances accordingly
-                Iterable<Object> collection = ExpressionUtil.evaluateRepetitionCollectionVariableValue(commandContext, planItemInstanceEntity);
-
-                // if the collection is null (meaning it is not yet available) and we don't have any on-part criteria (e.g an on-part or even combined with
-                // an if-part), we don't handle the repetition yet, but wait for its collection to become available
-                // but if we have an on-part, we always handle the collection, even if it is null or empty
-                if (collection == null && !ExpressionUtil.hasOnParts(planItem)) {
-                    // keep this plan item in its current state and don't activate it or handle the repetition collection yet as it is not available yet
-                    activatePlanItemInstance = false;
-                    
-                } else {
-
-                    if (collection != null) {
-                        RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
-                        int index = 0;
-                        for (Object item : collection) {
-                            // create and activate a new plan item instance for each item in the collection
-                            PlanItemInstanceEntity childPlanItemInstanceEntity = createPlanItemInstanceDuplicateForCollectionRepetition(
-                                repetitionRule, planItemInstanceEntity, null, item, index++);
-
-                            evaluationResult.addChildPlanItemInstance(childPlanItemInstanceEntity);
-                        }
-                    }
-
-                    // we handled the collection, now we need to make sure that evaluation does not trigger again as it might get evaluated again
-                    // before it is terminated or made available again, so we remove the sentry related data of the plan item
-                    CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteSentryRelatedData(planItemInstanceEntity.getId());
-
-                    // don't activate this plan item instance, but keep it in available or waiting for repetition state for the next on-part triggering,
-                    // if there is an on-part, otherwise we will directly terminate it without having activated it, it was only used to wait in available
-                    // state until all criteria was satisfied, including having the collection variable
-                    activatePlanItemInstance = false;
-
-                    // if there is an on-part, we keep the current plan item instance for further triggering the on-part and evaluating the collection again
-                    // otherwise we terminate the plan item
-                    if (!ExpressionUtil.hasOnParts(planItem)) {
-                        // if there is no on-part, we don't need this plan item instance anymore, so terminate it
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity, null, null);
-                    }
-                }
-                
-            } else if (!noEntryCriteria) {
-                // check the plan item to be repeating by evaluating its repetition rule
-                if (ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceContainer)) {
-                    // create a new duplicated plan item instance in waiting for repetition as this one is becoming active
-                    evaluationResult.addChildPlanItemInstance(createPlanItemInstanceDuplicateForRepetition(planItemInstanceEntity));
-                } else {
-                    // the repetition rule does not evaluate to true, so we keep this instance in its current state and don't activate it
-                    activatePlanItemInstance = false;
-                }
-            }
-        }
-
-        return activatePlanItemInstance;
     }
 
     /**
@@ -223,20 +147,25 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity, satisfiedExitCriterion.getId(),
                 satisfiedExitCriterion.getExitType(), satisfiedExitCriterion.getExitEventType());
 
-        } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+        } else if (planItem.getPlanItemDefinition() instanceof Stage stage) {
 
             if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity);
-                if (criteriaChangeOrActiveChildrenForStage) {
-                    evaluationResult.markCriteriaChanged();
-                    planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
-                } else {
-                    Stage stage = (Stage) planItem.getPlanItemDefinition();
-                    if (isStageCompletable(planItemInstanceEntity, stage)) {
+
+                if (!planItemInstanceEntity.isStateChangeUnprocessed()) { // when the stage plan item instance state is not stable yet, don't evaluate yet
+                    boolean criteriaChangeOrActiveChildrenForStage = evaluatePlanItemsCriteria(planItemInstanceEntity, null);
+                    if (criteriaChangeOrActiveChildrenForStage) {
                         evaluationResult.markCriteriaChanged();
-                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        planItemInstanceEntity.setCompletable(false); // an active child = stage cannot be completed anymore
+                    } else {
+                        if (isStageCompletable(planItemInstanceEntity, stage)) {
+                            evaluationResult.markCriteriaChanged();
+                            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        }
                     }
+                } else {
+                    planItemInstanceEntity.setCompletable(false);
                 }
+
             }
         } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
             // check, if the plan item can be ignored for further processing and if so, immediately return
@@ -257,6 +186,8 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             }
 
             evaluationResult.increaseActiveChildren();
+        } else if (PlanItemInstanceState.ACTIVE_STATES.contains(state)) {
+            evaluationResult.increaseActiveChildren();
         }
         return false;
     }
@@ -271,15 +202,20 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
      * Returns false if no sentry changes happened and none of the passed plan item instances are active.
      * This means that the parent of these plan item instances also now can change its state.
      */
-    protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer) {
+    protected boolean evaluatePlanItemsCriteria(PlanItemInstanceContainer planItemInstanceContainer, MigrationContext migrationContext) {
         List<PlanItemInstanceEntity> planItemInstances = planItemInstanceContainer.getChildPlanItemInstances();
         
         // needed because when doing case instance migration the child plan item instances can be null
-        if (planItemInstances == null && planItemInstanceContainer instanceof CaseInstanceEntity) {
+        if ((planItemInstances == null || (migrationContext != null && migrationContext.isFetchPlanItemInstances())) &&
+                planItemInstanceContainer instanceof CaseInstanceEntity caseInstance) {
+            
             PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-            CaseInstanceEntity caseInstance = (CaseInstanceEntity) planItemInstanceContainer;
             planItemInstances = planItemInstanceEntityManager.findByCaseInstanceId(caseInstance.getId());
             planItemInstanceContainer.setChildPlanItemInstances(planItemInstances);
+            
+            if (migrationContext != null && migrationContext.isFetchPlanItemInstances()) {
+                migrationContext.setFetchPlanItemInstances(false);
+            }
         }
 
         // create an evaluation result object, holding all evaluation results as well as a list of newly created child plan items, as to avoid concurrent
@@ -294,7 +230,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             String state = planItemInstanceEntity.getState();
 
             // check, if the plan item is in an evaluation state (e.g. available or waiting for repetition) to check for its activation
-            if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
+            if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state) && !planItemInstanceEntity.isPlannedForActivationInMigration()) {
                 evaluateForActivation(planItemInstanceEntity, planItemInstanceContainer, evaluationResult);
             }
 
@@ -418,7 +354,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         // Special care needed in case the plan item instance is repeating
                         if (!entryDependentPlanItem.getEntryCriteria().isEmpty() && ExpressionUtil.hasRepetitionRule(entryDependentPlanItemInstance)) {
                             if (ExpressionUtil.evaluateRepetitionRule(commandContext, entryDependentPlanItemInstance, (PlanItemInstanceContainer) null)) {
-                                createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance);
+                                PlanItemInstanceUtil.createPlanItemInstanceDuplicateForRepetition(entryDependentPlanItemInstance, commandContext);
                             }
                         }
 
@@ -543,7 +479,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             if (sentry.getOnParts().size() == 1 && sentry.getSentryIfPart() == null) { // Only one on part and no if part: no need to fetch the previously satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
-                    if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+                    if (sentryOnPartMatchesCurrentLifeCycleEvent(entityWithSentryPartInstances, sentryOnPart)) {
 
                         if (LOGGER.isDebugEnabled()) {
                             LOGGER.debug("{}: single onPart matches life cycle event: [{}]", criterion, planItemLifeCycleEvent);
@@ -585,6 +521,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
 
                     } else if (sentryPartInstanceEntity.getIfPartId() != null
+                        && sentry.getSentryIfPart() != null
                         && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
 
                         sentryIfPartSatisfied = true;
@@ -594,7 +531,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
                 // Verify if the onParts which are not yet satisfied, become satisfied due to the new event
                 for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
                     if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
-                        if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+                        if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(entityWithSentryPartInstances, sentryOnPart)) {
 
                             if (LOGGER.isDebugEnabled()) {
                                 LOGGER.debug("{}: onPart matches life cycle event [{}]", criterion, planItemLifeCycleEvent);
@@ -690,9 +627,49 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         return true;
     }
 
-    public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {
-        return planItemLifeCycleEvent.getPlanItem().getId().equals(sentryOnPart.getSourceRef())
+    public boolean sentryOnPartMatchesCurrentLifeCycleEvent(EntityWithSentryPartInstances entityWithSentryPartInstances, SentryOnPart sentryOnPart) {
+
+        // Sentries match based on the planItemLifeCycleEvent comparing the transition and the plan item involved.
+        // When dealing with repetition of parent stages however, an additional check is needed: the plan item instance that is associated
+        // with the sentry and the plan item associated with the planItemLifeCycleEvent need to be part of the same scope (=stage).
+        // Otherwise, a sentry would fire for all repeated plan item instances.
+        //
+        // See CmmnEventRegistryConsumerTest#testEventListenerInRepeatableStage: without the code below all plan item instances
+        // would match and be terminated by the exit sentry.
+
+        // Setting it by default to true for backwards compatibility,
+        // as this check wasn't done earlier and might break old instances otherwise
+        boolean parentMatches = true;
+        if (hasSameParentInModel(entityWithSentryPartInstances, sentryOnPart)) {
+            parentMatches = Objects.equals(planItemLifeCycleEvent.getPlanItemInstanceEntity().getStageInstanceId(),
+                ((PlanItemInstanceEntity) entityWithSentryPartInstances).getStageInstanceId());
+        }
+
+        return parentMatches
+            && planItemLifeCycleEvent.getPlanItem().getId().equals(sentryOnPart.getSourceRef())
             && planItemLifeCycleEvent.getTransition().equals(sentryOnPart.getStandardEvent());
+    }
+
+    protected boolean hasSameParentInModel(EntityWithSentryPartInstances entityWithSentryPartInstances, SentryOnPart sentryOnPart) {
+        if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
+
+            PlanItem evaluatedPlanItem = ((PlanItemInstanceEntity) entityWithSentryPartInstances).getPlanItem();
+            if (evaluatedPlanItem != null) {
+
+                Stage evaluatedPlanItemParenStage = evaluatedPlanItem.getParentStage();
+
+                PlanItem sentrySourcePlanItem = sentryOnPart.getSource();
+                if (sentrySourcePlanItem != null) {
+                    Stage sentrySourcePlanItemParenStage = sentrySourcePlanItem.getParentStage();
+                    if (sentrySourcePlanItemParenStage != null && evaluatedPlanItemParenStage != null) {
+                        return Objects.equals(sentrySourcePlanItemParenStage.getId(), evaluatedPlanItemParenStage.getId());
+                    }
+                }
+
+            }
+
+        }
+        return false;
     }
 
     protected List<PlanItemInstanceEntity> findChangedEventListenerInstances(PlanItemInstanceContainer planItemInstanceContainer, String state, boolean conditionValueToChange) {
@@ -719,8 +696,7 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
         if (entityWithSentryPartInstances instanceof CaseInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(((CaseInstanceEntity) entityWithSentryPartInstances).getId());
             sentryPartInstanceEntity.setCaseDefinitionId(((CaseInstanceEntity) entityWithSentryPartInstances).getCaseDefinitionId());
-        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) entityWithSentryPartInstances;
+        } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             sentryPartInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             sentryPartInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             sentryPartInstanceEntity.setPlanItemInstanceId(planItemInstanceEntity.getId());
@@ -744,9 +720,27 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
 
     protected boolean evaluateSentryIfPart(EntityWithSentryPartInstances entityWithSentryPartInstances, Sentry sentry, VariableContainer variableContainer) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
-        try { 
+
+        // When a fault is being propagated, wrap the variable container with CmmnFaultVariableContainer
+        // so that fault-specific variables (faultCode, faultMessage, error) are available for if-part expression
+        // resolution without polluting the actual variable scope. This is analogous to BPMN's BpmnErrorVariableContainer.
+        // The error is normally carried on the current lifecycle event, but a fault sentry's if-part can be
+        // re-evaluated in a later agenda operation whose event no longer carries it (e.g. another matching sentry
+        // activated and triggered a new evaluation cycle while this fault sentry was still pending). For sentries
+        // with a fault on-part we therefore fall back to the command-context-scoped error so the re-evaluation
+        // resolves consistently instead of throwing a PropertyNotFoundException.
+        VariableContainer resolveContainer = variableContainer;
+        BusinessError businessError = planItemLifeCycleEvent != null ? planItemLifeCycleEvent.getBusinessError() : null;
+        if (businessError == null && sentryHasFaultOnPart(sentry)) {
+            businessError = FaultPropagation.getCurrentBusinessError(commandContext);
+        }
+        if (businessError != null) {
+            resolveContainer = new CmmnFaultVariableContainer(businessError, variableContainer);
+        }
+
+        try {
             Expression conditionExpression = cmmnEngineConfiguration.getExpressionManager().createExpression(sentry.getSentryIfPart().getCondition());
-            Object result = conditionExpression.getValue(variableContainer);
+            Object result = conditionExpression.getValue(resolveContainer);
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Evaluation of sentry if condition {} for {} results in '{}'", sentry.getSentryIfPart().getCondition(), entityWithSentryPartInstances, result);
@@ -762,6 +756,15 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
             }
 
             throw e;
+        }
+        return false;
+    }
+
+    protected boolean sentryHasFaultOnPart(Sentry sentry) {
+        for (SentryOnPart onPart : sentry.getOnParts()) {
+            if (PlanItemTransition.FAULT.equals(onPart.getStandardEvent())) {
+                return true;
+            }
         }
         return false;
     }
@@ -787,51 +790,6 @@ public abstract class AbstractEvaluationCriteriaOperation extends AbstractCaseIn
     protected boolean planItemsShareDirectParentStage(PlanItem planItemOne, PlanItem planItemTwo) {
         Stage parentStage = planItemOne.getParentStage();
         return parentStage.findPlanItemInPlanFragmentOrDownwards(planItemTwo.getId()) != null;
-    }
-
-    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForRepetition(PlanItemInstanceEntity planItemInstanceEntity) {
-        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-
-        String oldState = childPlanItemInstanceEntity.getState();
-        String newState = PlanItemInstanceState.WAITING_FOR_REPETITION;
-        childPlanItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, childPlanItemInstanceEntity, oldState, newState);
-
-        // createPlanItemInstance operations will also sync planItemInstance history
-        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceForRepetitionOperation(childPlanItemInstanceEntity);
-        return childPlanItemInstanceEntity;
-    }
-
-    protected PlanItemInstanceEntity createPlanItemInstanceDuplicateForCollectionRepetition(RepetitionRule repetitionRule,
-        PlanItemInstanceEntity planItemInstanceEntity, String entryCriterionId, Object item, int index) {
-
-        // check, if we need to set local variables as the item or item index
-        Map<String, Object> localVariables = new HashMap<>(2);
-        if (repetitionRule.hasElementVariable()) {
-            localVariables.put(repetitionRule.getElementVariableName(), item);
-        }
-        if (repetitionRule.hasElementIndexVariable()) {
-            localVariables.put(repetitionRule.getElementIndexVariableName(), index);
-        }
-
-        PlanItemInstanceEntity childPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, localVariables, false, false);
-
-        // record the plan item being created based on the collection, so it gets synchronized to the history as well
-        CommandContextUtil.getAgenda(commandContext).planCreateRepeatedPlanItemInstanceOperation(childPlanItemInstanceEntity);
-
-        // The repetition counter is 1 based
-        setRepetitionCounter(childPlanItemInstanceEntity, index + 1);
-
-        String oldState = childPlanItemInstanceEntity.getState();
-        String newState = PlanItemInstanceState.ACTIVE;
-        childPlanItemInstanceEntity.setState(newState);
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper()
-            .executeLifecycleListeners(commandContext, planItemInstanceEntity, oldState, newState);
-
-        // createPlanItemInstance operations will also sync planItemInstance history
-        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(childPlanItemInstanceEntity, entryCriterionId);
-        return childPlanItemInstanceEntity;
     }
 
     public PlanItemLifeCycleEvent getPlanItemLifeCycleEvent() {

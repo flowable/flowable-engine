@@ -72,12 +72,6 @@ public class CmmnEngineImpl implements CmmnEngine {
         LOGGER.info("CmmnEngine {} created", name);
         
         CmmnEngines.registerCmmnEngine(this);
-
-        if (cmmnEngineConfiguration.getEngineLifecycleListeners() != null) {
-            for (EngineLifecycleListener engineLifecycleListener : cmmnEngineConfiguration.getEngineLifecycleListeners()) {
-                engineLifecycleListener.onEngineBuilt(this);
-            }
-        }
     }
     
     @Override

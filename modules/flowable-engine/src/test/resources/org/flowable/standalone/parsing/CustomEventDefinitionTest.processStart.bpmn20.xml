@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+  <process id="customEventDefinitionProcessStart" isExecutable="true">
+
+    <startEvent id="customProcessStart">
+      <extensionElements>
+        <flowable:myTestEventDefinition customKey="proc-start-1"/>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow1" sourceRef="customProcessStart" targetRef="theTask"/>
+
+    <userTask id="theTask" name="The task"/>
+
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+
+  </process>
+
+</definitions>

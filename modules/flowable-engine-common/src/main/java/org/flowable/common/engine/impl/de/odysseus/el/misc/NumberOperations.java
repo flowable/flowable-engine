@@ -17,6 +17,7 @@ package org.flowable.common.engine.impl.de.odysseus.el.misc;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 import org.flowable.common.engine.impl.javax.el.ELException;
 
@@ -122,7 +123,7 @@ public class NumberOperations {
 			return LONG_ZERO;
 		}
 		if (isBigDecimalOrBigInteger(o1) || isBigDecimalOrBigInteger(o2)) {
-			return converter.convert(o1, BigDecimal.class).divide(converter.convert(o2, BigDecimal.class), BigDecimal.ROUND_HALF_UP);
+			return converter.convert(o1, BigDecimal.class).divide(converter.convert(o2, BigDecimal.class), RoundingMode.HALF_UP);
 		}
 		return converter.convert(o1, Double.class) / converter.convert(o2, Double.class);
 	}

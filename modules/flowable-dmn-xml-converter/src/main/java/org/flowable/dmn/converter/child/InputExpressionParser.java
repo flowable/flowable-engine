@@ -31,11 +31,10 @@ public class InputExpressionParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, Decision decision) throws Exception {
-        if (!(parentElement instanceof InputClause)) {
+        if (!(parentElement instanceof InputClause clause)) {
             return;
         }
 
-        InputClause clause = (InputClause) parentElement;
         LiteralExpression inputExpression = new LiteralExpression();
         inputExpression.setId(xtr.getAttributeValue(null, ATTRIBUTE_ID));
         inputExpression.setTypeRef(xtr.getAttributeValue(null, ATTRIBUTE_TYPE_REF));

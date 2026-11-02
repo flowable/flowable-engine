@@ -16,8 +16,6 @@ package org.flowable.cmmn.rest.service.api.history.task;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -38,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Task" }, description = "Manage History Task Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Task" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricTaskInstanceIdentityLinkCollectionResource extends HistoricTaskInstanceBaseResource {
 
     @Autowired
@@ -52,8 +50,12 @@ public class HistoricTaskInstanceIdentityLinkCollectionResource extends Historic
             @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the task instance could not be found.") })
     @GetMapping(value = "/cmmn-history/historic-task-instances/{taskId}/identitylinks", produces = "application/json")
-    public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        HistoricTaskInstance task = getHistoricTaskInstanceFromRequest(taskId);
+    public List<HistoricIdentityLinkResponse> getTaskIdentityLinks(@ApiParam(name = "taskId") @PathVariable String taskId) {
+        HistoricTaskInstance task = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricTaskIdentityLinks(task);
+        }
         
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
 

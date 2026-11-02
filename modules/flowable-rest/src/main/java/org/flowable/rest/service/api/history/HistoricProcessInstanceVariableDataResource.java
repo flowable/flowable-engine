@@ -17,8 +17,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -27,6 +26,8 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +46,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceVariableDataResource extends HistoricProcessInstanceBaseResource {
 
     @Autowired
@@ -62,10 +63,10 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/variables/{variableName}/data")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, 
-                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request, HttpServletResponse response) {
+                    @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletResponse response) {
         try {
             byte[] result = null;
-            RestVariable variable = getVariableFromRequest(true, processInstanceId, variableName, request);
+            RestVariable variable = getVariableFromRequest(true, processInstanceId, variableName);
             if (RestResponseFactory.BYTE_ARRAY_VARIABLE_TYPE.equals(variable.getType())) {
                 result = (byte[]) variable.getValue();
                 response.setContentType("application/octet-stream");
@@ -89,9 +90,15 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
         }
     }
 
-    public RestVariable getVariableFromRequest(boolean includeBinary, String processInstanceId, String variableName, HttpServletRequest request) {
+    public RestVariable getVariableFromRequest(boolean includeBinary, String processInstanceId, String variableName) {
+        // Only the value of the requested variable is resolved, in the same command as the query
+        return managementService.executeCommand(commandContext -> readVariable(includeBinary, processInstanceId, variableName));
+    }
 
-        HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).includeProcessVariables().singleResult();
+    protected RestVariable readVariable(boolean includeBinary, String processInstanceId, String variableName) {
+        HistoricProcessInstance processObject = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId)
+                .includeProcessVariables(true)
+                .singleResult();
 
         if (processObject == null) {
             throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' could not be found.", HistoricProcessInstanceEntity.class);
@@ -101,7 +108,13 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
             restApiInterceptor.accessHistoryProcessInfoById(processObject);
         }
 
-        Object value = processObject.getProcessVariables().get(variableName);
+        HistoricVariableInstance variableInstance = null;
+        for (HistoricVariableInstanceEntity queryVariable : ((HistoricProcessInstanceEntity) processObject).getQueryVariables()) {
+            if (queryVariable.getId() != null && queryVariable.getTaskId() == null && variableName.equals(queryVariable.getName())) {
+                variableInstance = queryVariable;
+            }
+        }
+        Object value = variableInstance != null ? variableInstance.getValue() : null;
 
         if (value == null) {
             throw new FlowableObjectNotFoundException("Historic process instance '" + processInstanceId + "' variable value for " + variableName + " could not be found.", VariableInstanceEntity.class);

@@ -26,7 +26,7 @@ public class SecureJavascriptTaskListener extends ScriptTaskListener {
     public void notify(DelegateTask delegateTask) {
         validateParameters();
         if (SecureJavascriptTaskParseHandler.LANGUAGE_JAVASCRIPT.equalsIgnoreCase(language.getValue(delegateTask).toString())) {
-            Object result = SecureJavascriptUtil.evaluateScript(delegateTask, script.getExpressionText());
+            Object result = SecureJavascriptUtil.evaluateScript(delegateTask, getScript());
             if (resultVariable != null) {
                 delegateTask.setVariable(resultVariable.getExpressionText(), result);
             }

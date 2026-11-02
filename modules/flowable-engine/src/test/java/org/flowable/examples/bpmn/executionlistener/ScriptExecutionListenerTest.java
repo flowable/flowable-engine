@@ -65,8 +65,8 @@ public class ScriptExecutionListenerTest extends PluggableFlowableTestCase {
     public void testThrowNonFlowableException() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("scriptExecutionListenerProcess"))
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("problem evaluating script: java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 28")
-                .getRootCause()
+                .hasMessageContaining("java.lang.RuntimeException: Illegal argument in listener in <eval> at line number 2 at column number 28")
+                .rootCause()
                 .isExactlyInstanceOf(RuntimeException.class)
                 .hasMessage("Illegal argument in listener");
     }

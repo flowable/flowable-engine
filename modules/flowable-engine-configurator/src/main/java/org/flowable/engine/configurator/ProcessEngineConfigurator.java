@@ -37,7 +37,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 /**
  * @author Tijs Rademakers
  */
-public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
+public class ProcessEngineConfigurator extends AbstractEngineConfigurator<ProcessEngine> {
 
     protected ProcessEngineConfiguration processEngineConfiguration;
 
@@ -64,7 +64,7 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
 
         initialiseCommonProperties(engineConfiguration, processEngineConfiguration);
 
-        initProcessEngine();
+        initEngine();
 
         JobServiceConfiguration engineJobServiceConfiguration = getJobServiceConfiguration(engineConfiguration);
         if (engineJobServiceConfiguration != null) {
@@ -113,7 +113,8 @@ public class ProcessEngineConfigurator extends AbstractEngineConfigurator {
         return EntityDependencyOrder.DELETE_ORDER;
     }
 
-    protected synchronized ProcessEngine initProcessEngine() {
+    @Override
+    protected ProcessEngine buildEngine() {
         if (processEngineConfiguration == null) {
             throw new FlowableException("ProcessEngineConfiguration is required");
         }

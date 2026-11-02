@@ -57,7 +57,8 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
 
     @Override
     public CmmnDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<CmmnDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
+
             @Override
             public CmmnDeploymentBuilder execute(CommandContext commandContext) {
                 return new CmmnDeploymentBuilderImpl();
@@ -149,12 +150,6 @@ public class CmmnRepositoryServiceImpl extends CommonEngineServiceImpl<CmmnEngin
         return commandExecutor.execute(new GetDecisionsForCaseDefinitionCmd(caseDefinitionId));
     }
 
-    @Override
-    @Deprecated
-    public List<DmnDecision> getDecisionTablesForCaseDefinition(String caseDefinitionId) {
-        return getDecisionsForCaseDefinition(caseDefinitionId);
-    }
-    
     @Override
     public List<FormDefinition> getFormDefinitionsForCaseDefinition(String caseDefinitionId) {
         return commandExecutor.execute(new GetFormDefinitionsForCaseDefinitionCmd(caseDefinitionId));

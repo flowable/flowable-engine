@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity.data;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -61,7 +62,9 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     
     List<EventSubscriptionEntity> findEventSubscriptionsBySubScopeId(final String subScopeId);
 
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
+
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId, String scopeType, String tenantId);
     
     List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(final String scopeId, final String type);
 
@@ -72,6 +75,10 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
     MessageEventSubscriptionEntity findMessageStartEventSubscriptionByName(String messageName, String tenantId);
 
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
+
+    void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration);
+
+    void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration);
 
     boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime);
 
@@ -85,6 +92,8 @@ public interface EventSubscriptionDataManager extends DataManager<EventSubscript
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
-    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
+    void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
+
+    void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration);
 
 }

@@ -136,8 +136,7 @@ public class PlanFragment extends PlanItemDefinition {
                 planItemIterator.remove();
 
                 PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-                if (planItemDefinition instanceof PlanFragment) {
-                    PlanFragment planFragment = (PlanFragment) planItemDefinition;
+                if (planItemDefinition instanceof PlanFragment planFragment) {
 
                     for (PlanItem planFragmentPlanItem : planFragment.getPlanItems()) {
                         planItemIterator.add(planFragmentPlanItem);

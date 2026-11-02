@@ -136,8 +136,7 @@ public class BaseDynamicSubProcessInjectUtil {
             }
 
             for (FlowElement flowElement : duplicateFlowElement.getParentContainer().getFlowElements()) {
-                if (flowElement instanceof SequenceFlow) {
-                    SequenceFlow sequenceFlow = (SequenceFlow) flowElement; 
+                if (flowElement instanceof SequenceFlow sequenceFlow) {
                     if (sequenceFlow.getSourceRef().equals(originalFlowElementId)) {
                         sequenceFlow.setSourceRef(newFlowElementId);
                     }
@@ -145,16 +144,14 @@ public class BaseDynamicSubProcessInjectUtil {
                         sequenceFlow.setTargetRef(newFlowElementId);
                     }
 
-                } else if (flowElement instanceof BoundaryEvent) {
-                    BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+                } else if (flowElement instanceof BoundaryEvent boundaryEvent) {
                     if (boundaryEvent.getAttachedToRefId().equals(originalFlowElementId)) {
                         boundaryEvent.setAttachedToRefId(newFlowElementId);
                     }
                     if (boundaryEvent.getEventDefinitions() != null 
                             && boundaryEvent.getEventDefinitions().size() > 0
-                            && (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition)) {
-                        
-                        CompensateEventDefinition compensateEventDefinition = (CompensateEventDefinition) boundaryEvent.getEventDefinitions().get(0);
+                            && (boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition compensateEventDefinition)) {
+
                         if (compensateEventDefinition.getActivityRef().equals(originalFlowElementId)) {
                             compensateEventDefinition.setActivityRef(newFlowElementId);
                         }
@@ -165,8 +162,7 @@ public class BaseDynamicSubProcessInjectUtil {
             
         }
 
-        if (duplicateFlowElement instanceof FlowElementsContainer) {
-            FlowElementsContainer flowElementsContainer = (FlowElementsContainer) duplicateFlowElement;
+        if (duplicateFlowElement instanceof FlowElementsContainer flowElementsContainer) {
             for (FlowElement childFlowElement : flowElementsContainer.getFlowElements()) {
                 generateIdForDuplicateFlowElement(prefix, process, bpmnModel, subProcessBpmnModel, childFlowElement, generatedIds, includeDiInfo);
             }
@@ -176,10 +172,9 @@ public class BaseDynamicSubProcessInjectUtil {
     protected static void processUserTask(FlowElement flowElement, ProcessDefinition originalProcessDefinitionEntity, 
                     DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
-        if (flowElement instanceof UserTask) {
+        if (flowElement instanceof UserTask userTask) {
             FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService();
             if (formRepositoryService != null) {
-                UserTask userTask = (UserTask) flowElement;
                 if (StringUtils.isNotEmpty(userTask.getFormKey())) {
                     Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(originalProcessDefinitionEntity.getDeploymentId());
                     if (deployment.getParentDeploymentId() != null) {
@@ -205,11 +200,10 @@ public class BaseDynamicSubProcessInjectUtil {
     protected static void processDecisionTask(FlowElement flowElement, ProcessDefinition originalProcessDefinitionEntity, 
                     DeploymentEntity newDeploymentEntity, CommandContext commandContext) {
         
-        if (flowElement instanceof ServiceTask && ServiceTask.DMN_TASK.equals(((ServiceTask) flowElement).getType())) {
+        if (flowElement instanceof ServiceTask serviceTask && ServiceTask.DMN_TASK.equals(serviceTask.getType())) {
                     
             DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
             if (dmnRepositoryService != null) {
-                ServiceTask serviceTask = (ServiceTask) flowElement;
                 if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
                     String decisionTableReferenceKey = null;
                     for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {

@@ -66,8 +66,8 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     }
 
     @Override
-    public DmnEngine buildDmnEngine() {
-        DmnEngine dmnEngine = super.buildDmnEngine();
+    public DmnEngine buildEngine() {
+        DmnEngine dmnEngine = super.buildEngine();
         DmnEngines.setInitialized(true);
         enginesBuild.add(dmnEngine.getName());
         return dmnEngine;

@@ -20,6 +20,7 @@ import java.util.List;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ScriptServiceTask;
@@ -81,6 +82,74 @@ public class ScriptServiceTaskCmmnXmlConverterTest {
                     assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
                     assertThat(scriptServiceTask.getScript()).isEqualTo("var b = 5;");
                     assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+                    assertThat(scriptServiceTask.isDoNotIncludeVariables()).isFalse();
+                });
+    }
+
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/script-task-expression-field.cmmn")
+    public void scriptTaskWithExpressionField(CmmnModel cmmnModel) {
+        assertThat(cmmnModel).isNotNull();
+
+        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.getScriptFormat()).isEqualTo("javascript");
+                    assertThat(scriptTask.getScript()).isEqualTo("var a = '${testA}';");
+                    assertThat(scriptTask.getResultVariableName()).isEqualTo("scriptResult");
+                    assertThat(scriptTask.isAutoStoreVariables()).isFalse();
+                    assertThat(scriptTask.isBlocking()).isTrue();
+                    assertThat(scriptTask.isAsync()).isFalse();
+                });
+
+        PlanItem planItemTaskB = cmmnModel.findPlanItem("planItemTaskB");
+        planItemDefinition = planItemTaskB.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptServiceTask -> {
+                    assertThat(scriptServiceTask.getScriptFormat()).isEqualTo("groovy");
+                    assertThat(scriptServiceTask.getScript()).isEqualTo("var b = '${testB}';");
+                    assertThat(scriptServiceTask.isAutoStoreVariables()).isTrue();
+                });
+    }
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/script-task-input-parameters.cmmn")
+    public void scriptTaskWithInputParameters(CmmnModel cmmnModel) {
+        assertThat(cmmnModel).isNotNull();
+
+        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.isDoNotIncludeVariables()).isFalse();
+                    assertThat(scriptTask.getInParameters())
+                            .extracting(IOParameter::getSource, IOParameter::getSourceExpression, IOParameter::getTarget, IOParameter::getTargetExpression)
+                            .containsExactlyInAnyOrder(
+                                    tuple("aVar", null, "targetAVar", null),
+                                    tuple("aVar", null, null, "${targetVarName}"),
+                                    tuple(null, "${'test'}", "targetVar", null)
+                            );
+                });
+    }
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/script-task-do-not-include-variables.cmmn")
+    public void scriptTaskWithDoNotIncludeVariables(CmmnModel cmmnModel) {
+        assertThat(cmmnModel).isNotNull();
+
+        PlanItem planItemTaskA = cmmnModel.findPlanItem("planItemTaskA");
+        assertThat(planItemTaskA.getEntryCriteria()).isEmpty();
+
+        PlanItemDefinition planItemDefinition = planItemTaskA.getPlanItemDefinition();
+        assertThat(planItemDefinition)
+                .isInstanceOfSatisfying(ScriptServiceTask.class, scriptTask -> {
+                    assertThat(scriptTask.getType()).isEqualTo(ScriptServiceTask.SCRIPT_TASK);
+                    assertThat(scriptTask.isDoNotIncludeVariables()).isTrue();
                 });
     }
 

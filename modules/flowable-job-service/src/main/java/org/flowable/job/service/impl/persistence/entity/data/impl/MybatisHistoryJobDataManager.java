@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.common.engine.impl.Direction;
 import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
@@ -60,7 +59,6 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         // Needed for db2/sqlserver (see limitBetween in mssql.properties), otherwise ordering will be incorrect
         params.setFirstResult(page.getFirstResult());
         params.setMaxResults(page.getMaxResults());
-        params.addOrder("CREATE_TIME_", Direction.ASCENDING.getName(), null);
         return getDbSqlSession().selectList("selectHistoryJobsToExecute", params);
     }
 
@@ -83,11 +81,6 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
 
-        // The max timeout only is relevant for the message queue based executor, the threadpool one picks up anything without a lock owner.
-        if (jobServiceConfiguration.isAsyncHistoryExecutorMessageQueueMode()) {
-            Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
-            params.put("maxTimeout", maxTimeout);
-        }
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }
 

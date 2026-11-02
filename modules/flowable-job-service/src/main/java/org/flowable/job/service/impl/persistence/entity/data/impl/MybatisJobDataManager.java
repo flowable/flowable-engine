@@ -21,6 +21,7 @@ import org.flowable.common.engine.impl.Page;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.DbSqlSession;
+import org.flowable.common.engine.impl.db.ListQueryParameterObject;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
@@ -66,7 +67,10 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
         }
-        return getDbSqlSession().selectList("selectJobsToExecute", params, page);
+        
+        ListQueryParameterObject listQueryParameterObject = new ListQueryParameterObject(params, page.getFirstResult(), page.getMaxResults());
+        listQueryParameterObject.setIgnoreOrderBy();
+        return getDbSqlSession().selectList("selectJobsToExecute", listQueryParameterObject);
     }
 
     @Override
@@ -100,16 +104,13 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         Date now = jobServiceConfiguration.getClock().getCurrentTime();
         params.put("now", now);
 
-        // The max timeout only is relevant for the message queue based executor, the threadpool one picks up anything without a lock owner.
-        if (jobServiceConfiguration.isAsyncHistoryExecutorMessageQueueMode()) {
-            Date maxTimeout = new Date(now.getTime() - jobServiceConfiguration.getAsyncExecutorResetExpiredJobsMaxTimeout());
-            params.put("maxTimeout", maxTimeout);
-        }
-        
         if (enabledCategories != null && enabledCategories.size() > 0) {
             params.put("enabledCategories", enabledCategories);
         }
-        return getDbSqlSession().selectList("selectExpiredJobs", params, page);
+        
+        ListQueryParameterObject listQueryParameterObject = new ListQueryParameterObject(params, page.getFirstResult(), page.getMaxResults());
+        listQueryParameterObject.setIgnoreOrderBy();
+        return getDbSqlSession().selectList("selectExpiredJobs", listQueryParameterObject);
     }
 
     @Override

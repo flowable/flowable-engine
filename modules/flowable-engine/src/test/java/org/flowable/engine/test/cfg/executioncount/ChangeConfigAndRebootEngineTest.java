@@ -111,7 +111,7 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
     }
 
     protected void assertConfigProperty(boolean expectedValue) {
-        PropertyEntity propertyEntity = managementService.executeCommand(new Command<PropertyEntity>() {
+        PropertyEntity propertyEntity = managementService.executeCommand(new Command<>() {
             @Override
             public PropertyEntity execute(CommandContext commandContext) {
                 return CommandContextUtil.getPropertyEntityManager(commandContext).findById(

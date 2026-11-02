@@ -19,7 +19,9 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceTransitionBuilder;
 import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.ResumePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.SuspendPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminatePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -194,6 +196,18 @@ public class PlanItemInstanceTransitionBuilderImpl implements PlanItemInstanceTr
         commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId, variables, formVariables, formOutcome, 
                 formInfo, localVariables, transientVariables, childTaskVariables, childTaskFormVariables, 
                 childTaskFormOutcome, childTaskFormInfo));
+    }
+    
+    @Override
+    public void suspend() {
+        validateChildTaskVariablesNotSet();
+        commandExecutor.execute(new SuspendPlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void resume() {
+        validateChildTaskVariablesNotSet();
+        commandExecutor.execute(new ResumePlanItemInstanceCmd(planItemInstanceId));
     }
 
     @Override

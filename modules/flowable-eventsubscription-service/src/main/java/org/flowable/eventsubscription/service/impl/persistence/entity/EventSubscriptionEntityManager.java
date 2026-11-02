@@ -12,6 +12,7 @@
  */
 package org.flowable.eventsubscription.service.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
@@ -42,6 +43,10 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void updateEventSubscriptionTenantId(String oldTenantId, String newTenantId);
 
+    void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId, String scopeDefinitionKey, String configuration);
+
+    void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration);
+
     boolean lockEventSubscription(String eventSubscriptionId);
 
     void unlockEventSubscription(String eventSubscriptionId);
@@ -56,7 +61,9 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     void deleteEventSubscriptionsForScopeDefinitionIdAndType(String scopeDefinitionId, String scopeType);
 
-    void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType);
+    void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration);
+
+    void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration);
 
     /* Find (generic) */
 
@@ -74,7 +81,9 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
 
     List<EventSubscriptionEntity> findEventSubscriptionsByProcessInstanceAndActivityId(String processInstanceId, String activityId, String type);
 
-    List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId);
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId);
+
+    List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId, String scopeType, String tenantId);
 
     List<EventSubscriptionEntity> findEventSubscriptionsByScopeIdAndType(String scopeId, String type);
     

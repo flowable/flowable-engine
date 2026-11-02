@@ -24,11 +24,11 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -39,8 +39,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
 
     private AbstractTestLifecycleListener testLifeCycleListener;
 
-
-    @Before
+    @BeforeEach
     public void addListeners() {
         this.originalLifeCycleListeners = cmmnEngineConfiguration.getPlanItemInstanceLifecycleListeners();
 
@@ -49,7 +48,7 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
             .deploy());
     }
 
-    @After
+    @AfterEach
     public void removeListeners() {
         cmmnEngineConfiguration.setPlanItemInstanceLifecycleListeners(originalLifeCycleListeners);
     }
@@ -404,6 +403,43 @@ public class PlanItemInstanceLifecycleListenerTest extends FlowableCmmnTestCase 
         assertThat(events).hasSize(2);
         
         assertThat(cmmnRuntimeService.createUserEventListenerInstanceQuery().caseInstanceId(caseInstance.getId()).count()).isZero();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstance() {
+        setTestLifeCycleListener(null, new TestTerminateLifecycleListener());
+
+        // Start case instance
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testManualActivation")
+                .start();
+        
+        assertThat(testLifeCycleListener.getEvents()).isEmpty();
+
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).list();
+        assertThat(planItemInstances).hasSize(3);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceElementId("planItemTaskA").singleResult();
+        assertThat(planItemInstance.getState()).isEqualTo(PlanItemInstanceState.ENABLED);
+        
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        
+        List<TestLifeCycleEvent> lifeCycleEvents = testLifeCycleListener.getEvents();
+        assertThat(lifeCycleEvents).hasSize(2);
+        
+        for (TestLifeCycleEvent lifeCycleEvent : lifeCycleEvents) {
+            if ("planItemTaskA".equals(lifeCycleEvent.getPlanItemInstance().getElementId())) {
+                assertThat(lifeCycleEvent.getPlanItemInstance().getElementId()).isEqualTo("planItemTaskA");
+                assertThat(lifeCycleEvent.getOldState()).isEqualTo(PlanItemInstanceState.ENABLED);
+                assertThat(lifeCycleEvent.getNewState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+                
+            } else {
+                assertThat(lifeCycleEvent.getPlanItemInstance().getElementId()).isEqualTo("planItemTaskB");
+                assertThat(lifeCycleEvent.getOldState()).isEqualTo(PlanItemInstanceState.ENABLED);
+                assertThat(lifeCycleEvent.getNewState()).isEqualTo(PlanItemInstanceState.TERMINATED);
+            }
+        }
     }
 
     private void setTestLifeCycleListener(String planItemDefinitionType, AbstractTestLifecycleListener testLifeCycleListener) {

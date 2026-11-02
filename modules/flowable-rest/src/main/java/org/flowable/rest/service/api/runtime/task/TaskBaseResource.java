@@ -25,6 +25,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.TaskService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -68,6 +69,9 @@ public class TaskBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
@@ -142,11 +146,17 @@ public class TaskBaseResource {
         TaskQuery taskQuery = taskService.createTaskQuery();
 
         // Populate filter-parameters
+        if (request.getTaskId() != null) {
+            taskQuery.taskId(request.getTaskId());
+        }
         if (request.getName() != null) {
             taskQuery.taskName(request.getName());
         }
         if (request.getNameLike() != null) {
             taskQuery.taskNameLike(request.getNameLike());
+        }
+        if (request.getNameLikeIgnoreCase() != null) {
+            taskQuery.taskNameLikeIgnoreCase(request.getNameLikeIgnoreCase());
         }
         if (request.getDescription() != null) {
             taskQuery.taskDescription(request.getDescription());
@@ -264,12 +274,12 @@ public class TaskBaseResource {
 
         if (request.getIncludeTaskLocalVariables() != null) {
             if (request.getIncludeTaskLocalVariables()) {
-                taskQuery.includeTaskLocalVariables();
+                taskQuery.includeTaskLocalVariables(true);
             }
         }
         if (request.getIncludeProcessVariables() != null) {
             if (request.getIncludeProcessVariables()) {
-                taskQuery.includeProcessVariables();
+                taskQuery.includeProcessVariables(true);
             }
         }
 
@@ -311,6 +321,10 @@ public class TaskBaseResource {
         
         if (request.getScopeId() != null) {
             taskQuery.scopeId(request.getScopeId());
+        }
+        
+        if (request.getScopeIds() != null && !request.getScopeIds().isEmpty()) {
+            taskQuery.scopeIds(request.getScopeIds());
         }
         
         if (Boolean.TRUE.equals(request.getWithoutScopeId())) {
@@ -357,11 +371,20 @@ public class TaskBaseResource {
             taskQuery.taskWithoutCategory();
         }
 
+        if (request.getRootScopeId() != null) {
+            taskQuery.taskRootScopeId(request.getRootScopeId());
+        }
+        if (request.getParentScopeId() != null) {
+            taskQuery.taskParentScopeId(request.getParentScopeId());
+        }
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoWithQuery(taskQuery, request);
         }
 
-        return paginateList(requestParams, request, taskQuery, "id", properties, restResponseFactory::createTaskResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return managementService.executeCommand(commandContext -> paginateList(requestParams, request, taskQuery, "id", properties,
+                restResponseFactory::createTaskResponseList));
     }
 
     protected void addTaskvariables(TaskQuery taskQuery, List<QueryVariable> variables) {
@@ -370,8 +393,10 @@ public class TaskBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -444,6 +469,15 @@ public class TaskBaseResource {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
                 break;
+
+            case EXISTS:
+                taskQuery.taskVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskQuery.taskVariableNotExists(variable.getName());
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
@@ -455,8 +489,10 @@ public class TaskBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -530,6 +566,14 @@ public class TaskBaseResource {
                 }
                 break;
 
+            case EXISTS:
+                taskQuery.processVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskQuery.processVariableNotExists(variable.getName());
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
@@ -537,14 +581,12 @@ public class TaskBaseResource {
     }
 
     /**
-     * Get valid task from request. Throws exception if task does not exist or if task id is not provided.
+     * Returns the {@link Task} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
      */
     protected Task getTaskFromRequest(String taskId) {
-        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-        if (task == null) {
-            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
-        }
-        
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessTaskInfoById(task);
         }
@@ -553,16 +595,40 @@ public class TaskBaseResource {
     }
 
     /**
-     * Get valid history task from request. Throws exception if task does not exist or if task id is not provided.
+     * Returns the {@link Task} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
      */
-    protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
-        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+    protected Task getTaskFromRequestWithoutAccessCheck(String taskId) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
+
+        return task;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskFromRequest(String taskId) {
+        HistoricTaskInstance task = getHistoricTaskFromRequestWithoutAccessCheck(taskId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoById(task);
+        }
+        
+        return task;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskFromRequestWithoutAccessCheck(String taskId) {
+        HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
+        if (task == null) {
+            throw new FlowableObjectNotFoundException("Could not find a task with id '" + taskId + "'.", Task.class);
         }
         
         return task;

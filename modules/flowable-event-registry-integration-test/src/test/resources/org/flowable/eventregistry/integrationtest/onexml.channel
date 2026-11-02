@@ -3,7 +3,7 @@
     "key": "one",
     "channelType": "inbound",
     "type": "jms",
-    "destination": "test-queue",
+    "destination": "${application.test.jms-queue}-xml",
     "deserializerType": "xml",
     "channelEventKeyDetection": {
         "fixedValue": "one"

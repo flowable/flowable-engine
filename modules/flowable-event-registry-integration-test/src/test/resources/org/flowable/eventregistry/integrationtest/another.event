@@ -1,0 +1,24 @@
+{
+    "key": "another",
+    "name": "My first another event",
+    "payload": [
+    	{
+            "name": "headerProperty1",
+            "type": "string",
+            "header": true
+        },
+        {
+            "name": "headerProperty2",
+            "type": "string",
+            "header": true
+        },
+        {
+            "name": "payload1",
+            "type": "string"
+        },
+        {
+            "name": "payload2",
+            "type": "integer"
+        }
+    ]
+}

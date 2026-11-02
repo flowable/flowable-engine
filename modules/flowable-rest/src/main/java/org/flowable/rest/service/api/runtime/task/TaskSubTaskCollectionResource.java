@@ -15,8 +15,6 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.task.api.Task;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskSubTaskCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "List of sub tasks for a task", nickname="listTaskSubtasks", tags = { "Tasks" })
@@ -42,7 +40,7 @@ public class TaskSubTaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/subtasks", produces = "application/json")
-    public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public List<TaskResponse> getSubTasks(@ApiParam(name = "taskId") @PathVariable String taskId) {
         Task task = getTaskFromRequest(taskId);
         return restResponseFactory.createTaskResponseList(taskService.getSubTasks(task.getId()));
     }

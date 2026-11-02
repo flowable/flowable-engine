@@ -24,8 +24,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -39,6 +40,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single deployment. GET cmmn-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResources() throws Exception {
 
         try {
@@ -57,12 +59,18 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
             // Check URL's for the resource
             assertThatJson(responseNode)
                     .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                    .isEqualTo("[ {"
+                    .isEqualTo("["
+                            + "  {"
+                            + "    id: 'org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn',"
+                            + "    mediaType: 'text/xml',"
+                            + "    type: 'caseDefinition'"
+                            + "  },"
+                            + "  {"
                             + " url: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE, deployment.getId(), "test.txt") + "',"
                             + " contentUrl: '" + SERVER_URL_PREFIX + CmmnRestUrls
                             .createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCE_CONTENT, deployment.getId(), "test.txt") + "',"
-                            + " mediaType: null,"
+                            + " mediaType: 'text/plain',"
                             + " type: 'resource'"
                             + "} ]");
 
@@ -78,6 +86,7 @@ public class DeploymentResourcesResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all resources for a single unexisting deployment. GET cmmn-repository/deployments/{deploymentId}/resources
      */
+    @Test
     public void testGetDeploymentResourcesUnexistingDeployment() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEPLOYMENT_RESOURCES, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));

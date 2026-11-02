@@ -23,7 +23,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
@@ -87,7 +87,7 @@ public class AbstractAutoDeploymentStrategyTest {
     protected final String resourceName4 = "/opt/processes/resourceName4.zip";
     protected final String resourceName5 = "/opt/processes/resourceName5.jar";
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
 
         when(processEngineMock.getRepositoryService()).thenReturn(repositoryServiceMock);

@@ -14,7 +14,7 @@ package org.flowable.eventregistry.spring.jms;
 
 import java.util.Map;
 
-import javax.jms.TextMessage;
+import jakarta.jms.TextMessage;
 
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.springframework.jms.core.JmsOperations;

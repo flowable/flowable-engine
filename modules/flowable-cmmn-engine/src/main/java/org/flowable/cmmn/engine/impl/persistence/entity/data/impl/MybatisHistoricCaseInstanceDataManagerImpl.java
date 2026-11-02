@@ -82,6 +82,12 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
         return getDbSqlSession().selectList("selectHistoricCaseInstancesWithVariablesByQueryCriteria", historicCaseInstanceQuery, getManagedEntityClass());
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricCaseInstance> findIdsByCriteria(HistoricCaseInstanceQueryImpl query) {
+        setSafeInValueLists(query);
+        return getDbSqlSession().selectList("selectHistoricCaseInstanceIdsByQueryCriteria", query, getManagedEntityClass());
+    }
 
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
@@ -99,10 +105,22 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     }
 
     protected void setSafeInValueLists(HistoricCaseInstanceQueryImpl caseInstanceQuery) {
+        if (caseInstanceQuery.getCaseInstanceIds() != null) {
+            caseInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(caseInstanceQuery.getCaseInstanceIds()));
+        }
+
         if (caseInstanceQuery.getInvolvedGroups() != null) {
             caseInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(caseInstanceQuery.getInvolvedGroups()));
         }
-        
+
+        if (caseInstanceQuery.getRootScopeIds() != null) {
+            caseInstanceQuery.setSafeRootScopeIds(createSafeInValuesList(caseInstanceQuery.getRootScopeIds()));
+        }
+
+        if (caseInstanceQuery.getParentScopeIds() != null) {
+            caseInstanceQuery.setSafeParentScopeIds(createSafeInValuesList(caseInstanceQuery.getParentScopeIds()));
+        }
+
         if (caseInstanceQuery.getOrQueryObjects() != null && !caseInstanceQuery.getOrQueryObjects().isEmpty()) {
             for (HistoricCaseInstanceQueryImpl orCaseInstanceQuery : caseInstanceQuery.getOrQueryObjects()) {
                 setSafeInValueLists(orCaseInstanceQuery);

@@ -33,9 +33,10 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for REST-operation related to get historic milestone
@@ -44,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCase {
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithOneMilestone.cmmn" })
     public void testHistoricMilestoneInstanceResource() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithOneMilestone").start();
@@ -70,6 +72,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertCaseEnded(caseInstance.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceCollectionResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
@@ -124,7 +127,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance1.getId()));
 
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl + "?caseInstanceId=" + caseInstance2.getId());
         response = executeRequest(httpGet, HttpStatus.SC_OK);
@@ -134,7 +137,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in general
         httpGet = new HttpGet(SERVER_URL_PREFIX + baseUrl);
@@ -167,12 +170,13 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
+                .forEach(n -> assertThat(n.get("elementId").asString()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/history/caseWithTwoMilestones.cmmn" })
     public void testHistoricMilestoneInstanceQueryResource() throws Exception {
         CaseInstance caseInstance1 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("caseWithTwoMilestones").start();
@@ -230,7 +234,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance1.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance1.getId()));
 
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
         requestNode = objectMapper.createObjectNode();
@@ -243,7 +247,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("caseInstanceId").asText()).isEqualTo(caseInstance2.getId()));
+                .forEach(n -> assertThat(n.get("caseInstanceId").asString()).isEqualTo(caseInstance2.getId()));
 
         //There should be 4 milestones in the history
         httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE_QUERY));
@@ -279,7 +283,7 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
         assertThat(responseNode).isNotNull();
         assertThat(responseNode.get("data")).hasSize(2);
         StreamSupport.stream(responseNode.get("data").spliterator(), false)
-                .forEach(n -> assertThat(n.get("elementId").asText()).isEqualTo("milestonePlanItem2"));
+                .forEach(n -> assertThat(n.get("elementId").asString()).isEqualTo("milestonePlanItem2"));
 
         assertCaseEnded(caseInstance1.getId());
         assertCaseEnded(caseInstance2.getId());
@@ -296,30 +300,30 @@ public class HistoricMilestoneInstanceResourcesTest extends BaseSpringRestTestCa
 
     private void assertHistoricMilestoneValues(HistoricMilestoneInstance expected, JsonNode actual) {
         assertThat(actual).isNotNull();
-        assertThat(actual.get("id").textValue()).isEqualTo(expected.getId());
-        assertThat(actual.get("name").textValue()).isEqualTo(expected.getName());
-        assertThat(actual.get("elementId").textValue()).isEqualTo(expected.getElementId());
-        assertThat(actual.get("timestamp").asText()).isEqualTo(getISODateStringWithTZ(expected.getTimeStamp()));
-        assertThat(actual.get("caseInstanceId").textValue()).isEqualTo(expected.getCaseInstanceId());
-        assertThat(actual.get("caseDefinitionId").textValue()).isEqualTo(expected.getCaseDefinitionId());
+        assertThat(actual.get("id").stringValue()).isEqualTo(expected.getId());
+        assertThat(actual.get("name").stringValue()).isEqualTo(expected.getName());
+        assertThat(actual.get("elementId").stringValue()).isEqualTo(expected.getElementId());
+        assertThat(actual.get("timestamp").asString()).isEqualTo(getISODateString(expected.getTimeStamp()));
+        assertThat(actual.get("caseInstanceId").stringValue()).isEqualTo(expected.getCaseInstanceId());
+        assertThat(actual.get("caseDefinitionId").stringValue()).isEqualTo(expected.getCaseDefinitionId());
 
         assertThatCode(() -> {
-            assertThat(actual.get("url").textValue()).isNotNull();
+            assertThat(actual.get("url").stringValue()).isNotNull();
             String url = URI.create(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_MILESTONE_INSTANCE, expected.getId()))
                     .toURL().toString();
-            assertThat(actual.get("url").textValue()).isEqualTo(url);
+            assertThat(actual.get("url").stringValue()).isEqualTo(url);
         }).doesNotThrowAnyException();
 
         assertThatCode(() -> {
-            assertThat(actual.get("historicCaseInstanceUrl").textValue()).isNotNull();
-            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").textValue())), HttpStatus.SC_OK);
+            assertThat(actual.get("historicCaseInstanceUrl").stringValue()).isNotNull();
+            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("historicCaseInstanceUrl").stringValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         }).doesNotThrowAnyException();
 
         assertThatCode(() -> {
-            assertThat(actual.get("caseDefinitionUrl").textValue()).isNotNull();
-            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").textValue())), HttpStatus.SC_OK);
+            assertThat(actual.get("caseDefinitionUrl").stringValue()).isNotNull();
+            CloseableHttpResponse response = executeRequest(new HttpGet(new URI(actual.get("caseDefinitionUrl").stringValue())), HttpStatus.SC_OK);
             assertThat(response.getStatusLine().getStatusCode()).isEqualTo(HttpStatus.SC_OK);
             closeResponse(response);
         }).doesNotThrowAnyException();

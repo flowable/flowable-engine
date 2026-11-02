@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ScriptTask;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -28,11 +28,11 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class ScriptTaskValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<ScriptTask> scriptTasks = process.findFlowElementsOfType(ScriptTask.class);
         for (ScriptTask scriptTask : scriptTasks) {
             if (StringUtils.isEmpty(scriptTask.getScript())) {
-                addError(errors, Problems.SCRIPT_TASK_MISSING_SCRIPT, process, scriptTask, "No script provided for script task");
+                validationContext.addError(Problems.SCRIPT_TASK_MISSING_SCRIPT, process, scriptTask, "No script provided for script task");
             }
         }
     }

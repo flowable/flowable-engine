@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.common.engine.impl.db.BulkDeleteOperation;
+import org.flowable.common.engine.impl.db.BulkUpdateOperation;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.common.engine.impl.persistence.cache.EntityCache;
@@ -119,14 +120,20 @@ public class ProfilingDbSqlSession extends DbSqlSession {
     // UPDATES
 
     @Override
-    protected void flushUpdates() {
+    protected void flushUpdateEntity(Entity updatedObject) {
         if (getCurrentCommandExecution() != null) {
-            for (Entity persistentObject : updatedObjects) {
-                getCurrentCommandExecution().addDbUpdate(persistentObject.getClass().getName());
-            }
+            getCurrentCommandExecution().addDbUpdate(updatedObject.getClass().getName());
         }
+        super.flushUpdateEntity(updatedObject);
+    }
 
-        super.flushUpdates();
+    @Override
+    protected void flushBulkUpdate(BulkUpdateOperation bulkUpdateOperation) {
+        // Bulk update
+        if (getCurrentCommandExecution() != null) {
+            getCurrentCommandExecution().addDbUpdate("Bulk-update-" + bulkUpdateOperation.getStatement());
+        }
+        super.flushBulkUpdate(bulkUpdateOperation);
     }
 
     // DELETES

@@ -267,6 +267,15 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
 
     @Override
     @SuppressWarnings("unchecked")
+    public List<ProcessInstance> findProcessInstanceIdsByQueryCriteria(ProcessInstanceQueryImpl processInstanceQuery) {
+        // Not going through the cache: the entities only have their id populated
+        // and must never be returned by later lookups in the same command context as a fully loaded execution
+        setSafeInValueLists(processInstanceQuery);
+        return getDbSqlSession().selectListNoCacheLoadAndStore("selectProcessInstanceIdsByQueryCriteria", processInstanceQuery, getManagedEntityClass());
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public List<Execution> findExecutionsByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectExecutionByNativeQuery", parameterMap);
     }
@@ -335,6 +344,10 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
         if (executionQuery.getInvolvedGroups() != null) {
             executionQuery.setSafeInvolvedGroups(createSafeInValuesList(executionQuery.getInvolvedGroups()));
         }
+
+        if (executionQuery.getProcessInstanceIds() != null) {
+            executionQuery.setSafeProcessInstanceIds(createSafeInValuesList(executionQuery.getProcessInstanceIds()));
+        }
         
         if (executionQuery.getOrQueryObjects() != null && !executionQuery.getOrQueryObjects().isEmpty()) {
             for (ExecutionQueryImpl orExecutionQuery : executionQuery.getOrQueryObjects()) {
@@ -344,10 +357,22 @@ public class MybatisExecutionDataManager extends AbstractProcessDataManager<Exec
     }
     
     protected void setSafeInValueLists(ProcessInstanceQueryImpl processInstanceQuery) {
+        if (processInstanceQuery.getProcessInstanceIds() != null) {
+            processInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(processInstanceQuery.getProcessInstanceIds()));
+        }
+
         if (processInstanceQuery.getInvolvedGroups() != null) {
             processInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(processInstanceQuery.getInvolvedGroups()));
         }
-        
+
+        if (processInstanceQuery.getRootScopeIds() != null) {
+            processInstanceQuery.setSafeRootScopeIds(createSafeInValuesList(processInstanceQuery.getRootScopeIds()));
+        }
+
+        if (processInstanceQuery.getParentScopeIds() != null) {
+            processInstanceQuery.setSafeParentScopeIds(createSafeInValuesList(processInstanceQuery.getParentScopeIds()));
+        }
+
         if (processInstanceQuery.getOrQueryObjects() != null && !processInstanceQuery.getOrQueryObjects().isEmpty()) {
             for (ProcessInstanceQueryImpl orProcessInstanceQuery : processInstanceQuery.getOrQueryObjects()) {
                 setSafeInValueLists(orProcessInstanceQuery);

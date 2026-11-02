@@ -15,9 +15,12 @@ package org.flowable.rest.service.api.history;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
-import java.util.Calendar;
-import java.util.HashMap;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -26,27 +29,49 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.common.engine.impl.history.HistoryLevel;
-import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.form.api.FormDefinition;
-import org.flowable.form.api.FormDeployment;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormService;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoSettings;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a single Historic task instance resource.
  */
+@MockitoSettings
 public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
+
+    @Mock
+    protected FormEngineConfigurationApi formEngineConfiguration;
+
+    @Mock
+    protected FormService formEngineFormService;
+
+    @BeforeEach
+    public void initializeMocks() {
+        Map engineConfigurations = processEngineConfiguration.getEngineConfigurations();
+        engineConfigurations.put(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG, formEngineConfiguration);
+    }
+
+    @AfterEach
+    public void resetMocks() {
+        processEngineConfiguration.getEngineConfigurations().remove(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
 
     /**
      * Test getting a single task, spawned by a process. GET history/historic-task-instances/{taskId}
@@ -55,12 +80,12 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Deployment
     public void testGetProcessTask() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Calendar now = Calendar.getInstance();
-            processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+            Date now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+            processEngineConfiguration.getClock().setCurrentTime(now);
 
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-            taskService.setDueDate(task.getId(), now.getTime());
+            taskService.setDueDate(task.getId(), now);
             taskService.setOwner(task.getId(), "owner");
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertThat(task).isNotNull();
@@ -81,8 +106,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                             + " executionId: '" + task.getExecutionId() + "',"
                             + " description: '" + task.getDescription() + "',"
                             + " name: '" + task.getName() + "',"
-                            + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                            + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                            + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                            + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                             + " priority: " + task.getPriority() + ","
                             + " endTime: null,"
                             + " parentTaskId: null,"
@@ -102,8 +127,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
             try {
 
-                Calendar now = Calendar.getInstance();
-                processEngineConfiguration.getClock().setCurrentTime(now.getTime());
+                Date now = Date.from(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+                processEngineConfiguration.getClock().setCurrentTime(now);
 
                 Task parentTask = taskService.newTask();
                 taskService.saveTask(parentTask);
@@ -115,7 +140,7 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                 task.setAssignee("kermit");
                 task.setDelegationState(DelegationState.RESOLVED);
                 task.setDescription("Description");
-                task.setDueDate(now.getTime());
+                task.setDueDate(now);
                 task.setOwner("owner");
                 task.setPriority(20);
                 taskService.saveTask(task);
@@ -134,8 +159,8 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
                                 + " owner: '" + task.getOwner() + "',"
                                 + " description: '" + task.getDescription() + "',"
                                 + " name: '" + task.getName() + "',"
-                                + " dueDate: " + new TextNode(getISODateStringWithTZ(task.getDueDate())) + ","
-                                + " startTime: " + new TextNode(getISODateStringWithTZ(task.getCreateTime())) + ","
+                                + " dueDate: '" + getISODateString(task.getDueDate()) + "',"
+                                + " startTime: '" + getISODateString(task.getCreateTime()) + "',"
                                 + " priority: " + task.getPriority() + ","
                                 + " parentTaskId: '" + task.getParentTaskId() + "',"
                                 + " executionId: null,"
@@ -214,67 +239,33 @@ public class HistoricTaskInstanceResourceTest extends BaseSpringRestTestCase {
     @Deployment
     public void testCompletedTaskForm() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
-            try {
-                formRepositoryService.createDeployment().addClasspathResource("org/flowable/rest/service/api/runtime/simple.form").deploy();
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            String taskId = task.getId();
 
-                FormDefinition formDefinition = formRepositoryService.createFormDefinitionQuery().formDefinitionKey("form1").singleResult();
-                assertThat(formDefinition).isNotNull();
+            FormInfo formInfo = new FormInfo();
+            formInfo.setId("formDefId");
+            formInfo.setKey("formDefKey");
+            formInfo.setName("Form Definition Name");
 
-                ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-                Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
-                String taskId = task.getId();
+            when(formEngineConfiguration.getFormService()).thenReturn(formEngineFormService);
+            when(formEngineFormService.getFormModelWithVariablesByKeyAndParentDeploymentId("form1", processInstance.getDeploymentId(), taskId,
+                    Collections.emptyMap(), task.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant()))
+                    .thenReturn(formInfo);
 
-                String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
-                CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                        .isEqualTo("{"
-                                + "id: '" + formDefinition.getId() + "',"
-                                + "name: '" + formDefinition.getName() + "',"
-                                + "key: '" + formDefinition.getKey() + "',"
-                                + "fields: [ {  },"
-                                + "          {  }"
-                                + "        ]"
-                                + "}");
-
-                Map<String, Object> variables = new HashMap<>();
-                variables.put("user", "First value");
-                variables.put("number", 789);
-                taskService.completeTaskWithForm(taskId, formDefinition.getId(), null, variables);
-
-                assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult()).isNull();
-
-                response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
-                responseNode = objectMapper.readTree(response.getEntity().getContent());
-                closeResponse(response);
-                assertThatJson(responseNode)
-                        .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
-                        .isEqualTo("{"
-                                + "id: '" + formDefinition.getId() + "',"
-                                + "name: '" + formDefinition.getName() + "',"
-                                + "key: '" + formDefinition.getKey() + "',"
-                                + "fields: [ { "
-                                + "            id: 'user',"
-                                + "            value: 'First value'"
-                                + "          },"
-                                + "          { "
-                                + "            id: 'number',"
-                                + "            value: '789'"
-                                + "          }"
-                                + "        ]"
-                                + "}");
-
-            } finally {
-                formEngineFormService.deleteFormInstancesByProcessDefinition(processDefinition.getId());
-
-                List<FormDeployment> formDeployments = formRepositoryService.createDeploymentQuery().list();
-                for (FormDeployment formDeployment : formDeployments) {
-                    formRepositoryService.deleteDeployment(formDeployment.getId(), true);
-                }
-            }
+            String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_FORM, taskId);
+            CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+            JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+            closeResponse(response);
+            assertThatJson(responseNode)
+                    .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_EXTRA_ARRAY_ITEMS)
+                    .isEqualTo("{"
+                            + "id: 'formDefId',"
+                            + "name: 'Form Definition Name',"
+                            + "key: 'formDefKey',"
+                            + "type: 'historicTaskForm',"
+                            + "historicTaskId: '" + taskId +"'"
+                            + "}");
         }
     }
 }

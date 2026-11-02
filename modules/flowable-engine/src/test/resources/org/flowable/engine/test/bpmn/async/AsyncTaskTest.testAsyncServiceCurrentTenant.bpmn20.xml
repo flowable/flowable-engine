@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+
+  <process id="asyncService">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="service" />
+    
+    <serviceTask id="service" flowable:class="org.flowable.engine.test.bpmn.async.AsyncServiceTenant" flowable:async="true" />
+    
+    <sequenceFlow id="flow2" sourceRef="service" targetRef="userTask" />
+
+    <userTask id="userTask" />
+    <sequenceFlow id="flow3" sourceRef="userTask" targetRef="theEnd" />
+
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-core-case-palette">
+  <case id="migrationCase" name="Migration Case">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItemcmmnStage1" definitionRef="cmmnStage1" name="Stage 1">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter" />
+        </itemControl>
+        <entryCriterion id="cmmnEntrySentry" sentryRef="sentrycmmnEntrySentry"></entryCriterion>
+      </planItem>
+      <sentry id="sentrycmmnEntrySentry" flowable:triggerMode="onEvent">
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry" sourceRef="planItemcmmnStage1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+        <ifPart id="sentryIfPart_cmmnEntrySentry">
+          <condition><![CDATA[${false}]]></condition>
+        </ifPart>
+      </sentry>
+      <stage id="cmmnStage1" name="Stage 1">
+        <planItem id="planItemcmmnTask_1" name="Human task 1" definitionRef="stageTask1"></planItem>
+        <humanTask id="stageTask1" name="Human task 1" />
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

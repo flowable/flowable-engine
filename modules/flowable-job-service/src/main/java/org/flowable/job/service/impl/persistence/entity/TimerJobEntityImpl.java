@@ -59,9 +59,4 @@ public class TimerJobEntityImpl extends AbstractJobEntityImpl implements TimerJo
         this.lockExpirationTime = claimedUntil;
     }
 
-    @Override
-    public String toString() {
-        return "TimerJobEntity [id=" + id + "]";
-    }
-
 }

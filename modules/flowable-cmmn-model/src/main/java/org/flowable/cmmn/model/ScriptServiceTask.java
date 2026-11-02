@@ -12,18 +12,22 @@
  */
 package org.flowable.cmmn.model;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.flowable.common.engine.api.FlowableException;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Dennis
  */
-public class ScriptServiceTask extends ServiceTask {
+public class ScriptServiceTask extends ServiceTask implements HasInParameters {
 
     public static final String SCRIPT_TASK = "script";
 
     protected boolean autoStoreVariables;
+
+    protected boolean doNotIncludeVariables = false;
+    protected List<IOParameter> inParameters;
 
     public ScriptServiceTask() {
         this.type = SCRIPT_TASK;
@@ -38,11 +42,16 @@ public class ScriptServiceTask extends ServiceTask {
     }
 
     public String getScript() {
-        Optional<String> script = fieldExtensions.stream()
-                .filter(e -> "script".equalsIgnoreCase(e.getFieldName()))
-                .findFirst()
-                .map(FieldExtension::getStringValue);
-        return script.orElseThrow(() -> new FlowableException("Missing script"));
+        for (FieldExtension fieldExtension : fieldExtensions) {
+            if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
+                String script = fieldExtension.getStringValue();
+                if (StringUtils.isNotEmpty(script)) {
+                    return script;
+                }
+                return fieldExtension.getExpression();
+            }
+        }
+        return null;
     }
 
     public boolean isAutoStoreVariables() {
@@ -53,4 +62,49 @@ public class ScriptServiceTask extends ServiceTask {
         this.autoStoreVariables = autoStoreVariables;
     }
 
+    public boolean isDoNotIncludeVariables() {
+        return doNotIncludeVariables;
+    }
+
+    public void setDoNotIncludeVariables(boolean doNotIncludeVariables) {
+        this.doNotIncludeVariables = doNotIncludeVariables;
+    }
+
+    @Override
+    public List<IOParameter> getInParameters() {
+        return inParameters;
+    }
+
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        if (inParameters == null) {
+            inParameters = new ArrayList<>();
+        }
+        inParameters.add(inParameter);
+    }
+
+    @Override
+    public void setInParameters(List<IOParameter> inParameters) {
+        this.inParameters = inParameters;
+    }
+
+    @Override
+    public ScriptServiceTask clone() {
+        ScriptServiceTask clone = new ScriptServiceTask();
+        clone.setValues(this);
+        return clone;
+    }
+
+    public void setValues(ScriptServiceTask otherElement) {
+        super.setValues(otherElement);
+
+        setDoNotIncludeVariables(otherElement.isDoNotIncludeVariables());
+        inParameters = null;
+        if (otherElement.getInParameters() != null && !otherElement.getInParameters().isEmpty()) {
+            inParameters = new ArrayList<>();
+            for (IOParameter parameter : otherElement.getInParameters()) {
+                inParameters.add(parameter.clone());
+            }
+        }
+    }
 }

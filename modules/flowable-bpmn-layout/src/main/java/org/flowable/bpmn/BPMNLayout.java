@@ -327,8 +327,7 @@ public class BPMNLayout extends mxGraphLayout {
     }
 
     protected boolean isBoundaryEvent(Object obj) {
-        if (obj instanceof mxCell) {
-            mxCell cell = (mxCell) obj;
+        if (obj instanceof mxCell cell) {
             return cell.getId().startsWith("boundary-event-");
         }
         return false;

@@ -1,22 +1,17 @@
-Flowable (V6)
+Flowable
 ========
 
-[Maven Central:  
-    ![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.flowable/flowable-engine)
+[![Maven Central](https://img.shields.io/maven-central/v/org.flowable/flowable-engine?label=Maven%20Central)](https://central.sonatype.com/search?q=g:org.flowable%20%26%26%20%28a:flowable-engine%20a:flowable-cmmn-engine%20a:flowable-dmn-engine%29)
+[![Docker](https://shields.io/docker/pulls/flowable/flowable-rest)](https://hub.docker.com/r/flowable/flowable-rest)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/flowable/flowable-engine/blob/main/LICENSE)
 
-[Docker Images:  
-    ![Docker Hub](https://shields.io/docker/pulls/flowable/flowable-ui)](https://hub.docker.com/u/flowable/)
-
-[License:  
-	![license](https://img.shields.io/hexpm/l/plug.svg)](https://github.com/flowable/flowable-engine/blob/master/LICENSE)
-
-![Flowable Actions CI](https://github.com/flowable/flowable-engine/workflows/Flowable%20Main%20Build/badge.svg?branch=master)
+![Flowable Actions CI](https://github.com/flowable/flowable-engine/actions/workflows/main.yml/badge.svg?branch=main)
 
 Homepage: https://www.flowable.org/
 
 ## flowable / flowəb(ə)l /
 * a compact and highly efficient workflow and Business Process Management (BPM) platform for developers, system admins and business users.
-* a lightning fast, tried and tested BPMN 2 process engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
+* a lightning fast, tried and tested BPMN process engine, CMMN case engine and DMN rule engine written in Java.  It is Apache 2.0 licensed open source, with a committed community.
 * can run embedded in a Java application, or as a service on a server, a cluster, and in the cloud.  It integrates perfectly with Spring.  With a rich Java and REST API, it is the ideal engine for orchestrating human or system activities.
 
 ## Introduction
@@ -33,9 +28,15 @@ The Flowable downloads can be found on https://www.flowable.org/downloads.html.
 
 The distribution contains most of the sources as jar files. The source code of Flowable can be found on https://github.com/flowable/flowable-engine.
 
-### JDK 8+
+### JDK 17+
 
-Flowable runs on a JDK higher than or equal to version 8. Use the JDK packaged with your Linux distribution or go to https://adoptopenjdk.net and click on button "Latest release". There are installation instructions on that page as well. To verify that your installation was successful, run "java -version" on the command line.  That should print the installed version of your JDK.
+Flowable V7 runs on a Java higher than or equal to version 17. Use the JDK packaged with your Linux distribution or go to [adoptium.net](https://adoptium.net/) and click on the *Latest LTS Release* button. There are installation instructions on that page as well. To verify that your installation was successful, run `java -version` on the command line. That should print the installed version of your JDK.
+
+[Flowable V6](https://github.com/flowable/flowable-engine/tree/flowable6.x) is still maintained and supports Java 8+.
+
+### Flowable Design
+
+Flowable offers a free to use Flowable Cloud Design application, which you can use to model CMMN, BPMN, DMN and other model types. You can register via the Flowable account registration page to get started https://www.flowable.com/account/open-source.
 
 ### Contributing
 

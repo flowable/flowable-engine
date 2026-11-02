@@ -50,7 +50,7 @@ public class MybatisResourceDataManager extends AbstractCmmnDataManager<CmmnReso
     public CmmnResourceEntity findResourceByDeploymentIdAndResourceName(String deploymentId, String resourceName) {
         Map<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
-        params.put("resourceName", resourceName);
+        params.put("name", resourceName);
         return (CmmnResourceEntity) getDbSqlSession().selectOne("selectCmmnResourceByDeploymentIdAndResourceName", params);
     }
 

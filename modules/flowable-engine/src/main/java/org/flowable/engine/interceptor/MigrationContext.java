@@ -12,24 +12,21 @@
  */
 package org.flowable.engine.interceptor;
 
+import org.flowable.engine.migration.ActivityMigrationMappingOptions.SingleToActivityOptions;
+
 public class MigrationContext {
 
-    protected String assignee;
-    protected String owner;
-
-    public String getAssignee() {
-        return assignee;
+    protected SingleToActivityOptions<?> activityOptions;
+    
+    public MigrationContext(SingleToActivityOptions<?> activityOptions) {
+        this.activityOptions = activityOptions;
     }
 
-    public void setAssignee(String assignee) {
-        this.assignee = assignee;
+    public SingleToActivityOptions<?> getActivityOptions() {
+        return activityOptions;
     }
 
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setActivityOptions(SingleToActivityOptions<?> activityOptions) {
+        this.activityOptions = activityOptions;
     }
 }

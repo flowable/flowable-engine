@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
-import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.FlowableListener;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ScriptInfo;

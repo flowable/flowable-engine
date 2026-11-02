@@ -67,6 +67,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     U processDefinitionId(String processDefinitionId);
 
     /**
+     * Only select jobs which exist for the given process definition key
+     */
+    U processDefinitionKey(String processDefinitionKey);
+
+    /**
      * Only select jobs which exist for the given category
      */
     U category(String category);
@@ -82,6 +87,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
     U elementId(String elementId);
 
     /**
+     * Only select jobs whose element id is one of the given ids.
+     */
+    U elementIds(Collection<String> elementIds);
+
+    /**
      * Only select jobs which exist for the given element name
      */
     U elementName(String elementName);
@@ -90,6 +100,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Only select tasks for the given scope identifier.
      */
     U scopeId(String scopeId);
+
+    /**
+     * Only select jobs whose scope id is one of the given ids.
+     */
+    U scopeIds(Collection<String> scopeIds);
 
     /**
      * Only select jobs without a scope id value.
@@ -115,6 +130,11 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Only select tasks for the given scope definition identifier.
      */
     U scopeDefinitionId(String scopeDefinitionId);
+
+    /**
+     * Only select tasks for the given case definition key.
+     */
+    U caseDefinitionKey(String caseDefinitionKey);
 
     /**
      * Only select jobs for the given case instance.
@@ -170,6 +190,16 @@ public interface BaseJobQuery<U extends BaseJobQuery<U, T>, T extends Job> exten
      * Only select jobs that do not have a tenant id.
      */
     U jobWithoutTenantId();
+
+    /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    U or();
+
+    /**
+     * End an OR statement.
+     */
+    U endOr();
 
     // sorting //////////////////////////////////////////
 

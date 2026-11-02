@@ -24,6 +24,14 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
  * @author Micha Kiener
  */
 public interface CaseReactivationBuilder {
+    
+    /**
+     * Adds a plan item instance for a new plan item definition. This is mainly needed when no reactivation listener was present in the old case definition id.
+     *
+     * @param planItemDefinitionId the plan item definition id for which a new plan item instance will be created in available state
+     * @return the builder for method chaining
+     */
+    CaseReactivationBuilder addTerminatedPlanItemInstanceForPlanItemDefinition(String planItemDefinitionId);
 
     /**
      * Adds a variable to be added to the case before triggering the reactivation event.

@@ -16,10 +16,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.flowable.cmmn.engine.impl.job.AsyncLeaveActivePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -39,6 +39,27 @@ public class AsyncLeaveTaskTest extends FlowableCmmnTestCase {
 
         Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstanceId).singleResult();
         assertThat(job.getJobHandlerType()).isEqualTo(AsyncLeaveActivePlanItemInstanceJobHandler.TYPE);
+        assertThat(job.isExclusive()).isTrue();
+        cmmnManagementService.executeJob(job.getId());
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isOne();
+        assertThat(cmmnManagementService.createJobQuery().count()).isZero();
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testAsyncLeaveNonExclusiveServiceTask() {
+        String caseInstanceId = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start()
+                .getId();
+
+        assertThat(cmmnRuntimeService.getVariable(caseInstanceId, "serviceTaskVar")).isEqualTo("Hello World");
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+
+        Job job = cmmnManagementService.createJobQuery().caseInstanceId(caseInstanceId).singleResult();
+        assertThat(job.getJobHandlerType()).isEqualTo(AsyncLeaveActivePlanItemInstanceJobHandler.TYPE);
+        assertThat(job.isExclusive()).isFalse();
         cmmnManagementService.executeJob(job.getId());
 
         assertThat(cmmnTaskService.createTaskQuery().count()).isOne();

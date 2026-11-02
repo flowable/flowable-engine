@@ -15,8 +15,6 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -37,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Cmmn Deployment" }, description = "Manage Cmmn Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Cmmn Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentResourceCollectionResource extends BaseDeploymentResource {
 
     @Autowired
@@ -56,7 +54,7 @@ public class DeploymentResourceCollectionResource extends BaseDeploymentResource
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @GetMapping(value = "/cmmn-repository/deployments/{deploymentId}/resources", produces = "application/json")
-    public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
+    public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
         // Check if deployment exists
         CmmnDeployment deployment = getCmmnDeployment(deploymentId);
 

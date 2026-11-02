@@ -49,8 +49,7 @@ public abstract class ExpressionUtils {
 
     protected static boolean parseBoolean(Object value) {
         if (value != null) {
-            if (value instanceof String) {
-                String stringValue = (String) value;
+            if (value instanceof String stringValue) {
                 if ("true".equalsIgnoreCase(stringValue) || "false".equalsIgnoreCase(stringValue)) {
                     return Boolean.parseBoolean(value.toString());
                 }
@@ -75,7 +74,7 @@ public abstract class ExpressionUtils {
     }
 
     public static Set<String> getStringSetFromField(final String field) {
-        String[] codes = field.split(",");
+        String[] codes = field.split("\\s*,\\s*");
         Set<String> codeSet = new HashSet<>(Arrays.asList(codes));
         Collections.addAll(codeSet, codes);
         return codeSet;

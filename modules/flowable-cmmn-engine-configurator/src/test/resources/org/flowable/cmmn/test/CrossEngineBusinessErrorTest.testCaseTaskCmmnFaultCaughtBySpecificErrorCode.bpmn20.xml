@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License. -->
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+    <error id="cmmnFaultError" errorCode="CMMN_FAULT" />
+    <process id="testCaseTaskSpecificErrorCode" name="Test CaseTask Specific Error Code" isExecutable="true">
+        <startEvent id="start" />
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="caseTask" />
+        <serviceTask id="caseTask" name="Case Task" flowable:type="case" flowable:caseDefinitionKey="throwCmmnFaultCase" />
+        <boundaryEvent id="boundaryError" attachedToRef="caseTask">
+            <errorEventDefinition errorRef="cmmnFaultError" />
+        </boundaryEvent>
+        <sequenceFlow id="flow2" sourceRef="caseTask" targetRef="end" />
+        <sequenceFlow id="flow3" sourceRef="boundaryError" targetRef="errorHandler" />
+        <userTask id="errorHandler" name="Error Handler" />
+        <sequenceFlow id="flow4" sourceRef="errorHandler" targetRef="end" />
+        <endEvent id="end" />
+    </process>
+</definitions>

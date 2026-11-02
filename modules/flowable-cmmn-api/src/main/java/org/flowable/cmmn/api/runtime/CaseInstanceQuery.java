@@ -13,6 +13,7 @@
 package org.flowable.cmmn.api.runtime;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -25,15 +26,34 @@ import org.flowable.common.engine.api.query.Query;
 public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance> {
 
     CaseInstanceQuery caseDefinitionKey(String caseDefinitionKey);
+    CaseInstanceQuery caseDefinitionKeyLike(String caseDefinitionKeyLike);
+    CaseInstanceQuery caseDefinitionKeyLikeIgnoreCase(String caseDefinitionKeyLikeIgnoreCase);
     CaseInstanceQuery caseDefinitionKeys(Set<String> caseDefinitionKeys);
+    CaseInstanceQuery excludeCaseDefinitionKeys(Set<String> caseDefinitionKeys);
     CaseInstanceQuery caseDefinitionId(String caseDefinitionId);
+    CaseInstanceQuery caseDefinitionIds(Set<String> caseDefinitionIds);
     CaseInstanceQuery caseDefinitionCategory(String caseDefinitionCategory);
+    CaseInstanceQuery caseDefinitionCategoryLike(String caseDefinitionCategoryLike);
+    CaseInstanceQuery caseDefinitionCategoryLikeIgnoreCase(String caseDefinitionCategoryLikeIgnoreCase);
     CaseInstanceQuery caseDefinitionName(String caseDefinitionName);
+    CaseInstanceQuery caseDefinitionNameLike(String caseDefinitionNameLike);
+    CaseInstanceQuery caseDefinitionNameLikeIgnoreCase(String caseDefinitionNameLikeIgnoreCase);
     CaseInstanceQuery caseDefinitionVersion(Integer caseDefinitionVersion);
     CaseInstanceQuery caseInstanceId(String caseInstanceId);
     CaseInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
+    CaseInstanceQuery caseInstanceName(String caseInstanceName);
+    CaseInstanceQuery caseInstanceNameLike(String caseInstanceNameLike);
+    CaseInstanceQuery caseInstanceNameLikeIgnoreCase(String caseInstanceNameLikeIgnoreCase);
+    CaseInstanceQuery caseInstanceRootScopeId(String rootScopeId);
+    CaseInstanceQuery caseInstanceRootScopeIds(Set<String> rootScopeIds);
+    CaseInstanceQuery caseInstanceParentScopeId(String parentScopeId);
+    CaseInstanceQuery caseInstanceParentScopeIds(Set<String> parentScopeIds);
     CaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
+    CaseInstanceQuery caseInstanceBusinessKeyLike(String caseInstanceBusinessKeyLike);
+    CaseInstanceQuery caseInstanceBusinessKeyLikeIgnoreCase(String caseInstanceBusinessKeyLikeIgnoreCase);
     CaseInstanceQuery caseInstanceBusinessStatus(String caseInstanceBusinessStatus);
+    CaseInstanceQuery caseInstanceBusinessStatusLike(String caseInstanceBusinessStatusLike);
+    CaseInstanceQuery caseInstanceBusinessStatusLikeIgnoreCase(String caseInstanceBusinessStatusLikeIgnoreCase);
     CaseInstanceQuery caseInstanceParentId(String parentId);
     CaseInstanceQuery caseInstanceStartedBefore(Date beforeTime);
     CaseInstanceQuery caseInstanceStartedAfter(Date afterTime);
@@ -43,12 +63,16 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceLastReactivatedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceLastReactivatedBy(String userId);
     CaseInstanceQuery caseInstanceCallbackId(String callbackId);
+    CaseInstanceQuery caseInstanceCallbackIds(Set<String> callbackIds);
     CaseInstanceQuery caseInstanceCallbackType(String callbackType);
+    CaseInstanceQuery parentCaseInstanceId(String parentCaseInstanceId);
+    CaseInstanceQuery parentProcessInstanceId(String parentProcessInstanceId);
     CaseInstanceQuery caseInstanceReferenceId(String referenceId);
     CaseInstanceQuery caseInstanceReferenceType(String referenceType);
     CaseInstanceQuery caseInstanceIsCompleteable();
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceTenantIdLike(String tenantIdLike);
+    CaseInstanceQuery caseInstanceTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase);
     CaseInstanceQuery caseInstanceWithoutTenantId();
     
     /**
@@ -221,6 +245,25 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery includeCaseVariables();
 
     /**
+     * Include the case variables with the given names into the query result.
+     */
+    CaseInstanceQuery includeCaseVariables(Collection<String> variableNames);
+
+    /**
+     * Includes case variables into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    CaseInstanceQuery includeCaseVariables(boolean excludeVariableInitialization);
+
+    /**
+     * Include the case variables with the given names into the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    CaseInstanceQuery includeCaseVariables(Collection<String> variableNames, boolean excludeVariableInitialization);
+
+    /**
      * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
      */
     CaseInstanceQuery or();
@@ -231,13 +274,6 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery endOr();
 
     /**
-     * Limit case instance variables
-     * @deprecated no longer needed, this is a noop
-     */
-    @Deprecated
-    CaseInstanceQuery limitCaseInstanceVariables(Integer caseInstanceVariablesLimit);
-
-    /**
      * Localize case name to specified locale.
      */
     CaseInstanceQuery locale(String locale);
@@ -246,6 +282,11 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
      * Instruct localization to fallback to more general locales including the default locale of the JVM if the specified locale is not found.
      */
     CaseInstanceQuery withLocalizationFallback();
+
+    /**
+     * Return only the id value of the case instances, to reduce any additional instance data to be returned.
+     */
+    CaseInstanceQuery returnIdsOnly();
 
     CaseInstanceQuery orderByCaseInstanceId();
     CaseInstanceQuery orderByCaseDefinitionKey();

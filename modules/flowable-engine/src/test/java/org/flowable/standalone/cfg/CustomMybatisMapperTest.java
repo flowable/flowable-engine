@@ -50,7 +50,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Fetch the columns we're interested in
-        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(
+        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<>(
                 MyTestMapper.class) {
 
             @Override
@@ -96,7 +96,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Fetch data with custom query
-        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(
+        CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<>(
                 MyTestMapper.class) {
 
             @Override

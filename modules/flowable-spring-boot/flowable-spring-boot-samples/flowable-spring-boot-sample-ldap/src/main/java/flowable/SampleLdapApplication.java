@@ -21,8 +21,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 
@@ -36,20 +38,23 @@ public class SampleLdapApplication {
         SpringApplication.run(SampleLdapApplication.class, args);
     }
 
-    @Order(99)
-    @Configuration
-    class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
+    @Configuration(proxyBeanMethods = false)
+    class ApiWebSecurityConfigurationAdapter {
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+        @Bean
+        @Order(99)
+        public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+            PathPatternRequestMatcher.Builder pathMatcherBuilder = PathPatternRequestMatcher.withDefaults().basePath("/process-api");
             http
-                .antMatcher("/process-api/**")
-                .authorizeRequests()
-                .antMatchers("/process-api/repository/**").hasAnyAuthority("repository-privilege")
-                .antMatchers("/process-api/management/**").hasAnyAuthority("management-privilege")
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                .securityMatcher(pathMatcherBuilder.matcher("/**"))
+                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(pathMatcherBuilder.matcher("/repository/**")).hasAnyAuthority("repository-privilege")
+                        .requestMatchers(pathMatcherBuilder.matcher("/management/**")).hasAnyAuthority("management-privilege")
+                        .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults());
+
+            return http.build();
         }
     }
 

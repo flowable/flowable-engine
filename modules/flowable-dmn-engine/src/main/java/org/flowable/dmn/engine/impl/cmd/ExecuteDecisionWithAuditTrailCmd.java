@@ -64,8 +64,7 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
             definition = resolveDefinition();
         } catch (FlowableException e) {
             DecisionExecutionAuditContainer container = new DecisionExecutionAuditContainer();
-            container.setFailed();
-            container.setExceptionMessage(e.getMessage());
+            container.setFailedWithException(e);
 
             executeDecisionContext.setDecisionExecution(container);
             return null;

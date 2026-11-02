@@ -208,4 +208,24 @@ public class ConditionalEventSubprocessTest extends PluggableFlowableTestCase {
         assertProcessEnded(processInstance.getId());
     }
 
+    @Test
+    @Deployment
+    public void testGroovyCondition() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "nottest"));
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+
+        runtimeService.evaluateConditionalEvents(processInstance.getId(), Collections.singletonMap("myVar", "test"));
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(4);
+
+        assertThat(taskService.createTaskQuery().count()).isEqualTo(1);
+
+        Task task = taskService.createTaskQuery().taskDefinitionKey("eventSubProcessTask").list().get(0);
+        taskService.complete(task.getId());
+
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isZero();
+    }
+
 }

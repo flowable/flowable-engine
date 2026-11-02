@@ -28,20 +28,21 @@ import org.flowable.editor.language.xml.util.BpmnXmlConverterTest;
  * @see <a href="https://github.com/flowable/flowable-engine/issues/474">Issue 474</a>
  */
 class MultiInstanceTaskConverterTest2 {
-    private static final String PARTICIPANT_VALUE = "[\n" +
-"                   {\n" +
-"                     \"principalType\" : \"User\",\n" +
-"                     \"role\" : \"PotentialOwner\",\n" +
-"                     \"principal\" : \"wfuser1\",\n" +
-"                     \"version\" : 1\n" +
-"                   },\n" +
-"                   {\n" +
-"                     \"principalType\" : \"User\",\n" +
-"                     \"role\" : \"PotentialOwner\",\n" +
-"                     \"principal\" : \"wfuser2\",\n" +
-"                     \"version\" : 1\n" +
-"                   }\n" +
-"                 ]";
+    private static final String PARTICIPANT_VALUE = """
+            [
+                               {
+                                 "principalType" : "User",
+                                 "role" : "PotentialOwner",
+                                 "principal" : "wfuser1",
+                                 "version" : 1
+                               },
+                               {
+                                 "principalType" : "User",
+                                 "role" : "PotentialOwner",
+                                 "principal" : "wfuser2",
+                                 "version" : 1
+                               }
+                             ]""";
 
     @BpmnXmlConverterTest("multiinstancemodel2.bpmn")
     void validateModel(BpmnModel model) {

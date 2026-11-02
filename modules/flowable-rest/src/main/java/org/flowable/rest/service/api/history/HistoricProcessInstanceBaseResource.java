@@ -26,6 +26,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
@@ -59,6 +60,9 @@ public class HistoricProcessInstanceBaseResource {
 
     @Autowired
     protected HistoryService historyService;
+
+    @Autowired
+    protected ManagementService managementService;
     
     @Autowired
     protected RepositoryService repositoryService;
@@ -88,6 +92,18 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());
         }
+        if (queryRequest.getProcessDefinitionKeyLike() != null) {
+            query.processDefinitionKeyLike(queryRequest.getProcessDefinitionKeyLike());
+        }
+        if (queryRequest.getProcessDefinitionKeyLikeIgnoreCase() != null) {
+            query.processDefinitionKeyLikeIgnoreCase(queryRequest.getProcessDefinitionKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getProcessDefinitionKeys() != null) {
+            query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeys());
+        }
+        if (queryRequest.getExcludeProcessDefinitionKeys() != null) {
+            query.excludeProcessDefinitionKeys(queryRequest.getExcludeProcessDefinitionKeys());
+        }
         if (queryRequest.getProcessDefinitionKeyIn() != null) {
             query.processDefinitionKeyIn(queryRequest.getProcessDefinitionKeyIn());
         }
@@ -100,11 +116,35 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getProcessDefinitionName() != null) {
             query.processDefinitionName(queryRequest.getProcessDefinitionName());
         }
+        if (queryRequest.getProcessDefinitionNameLike() != null) {
+            query.processDefinitionNameLike(queryRequest.getProcessDefinitionNameLike());
+        }
+        if (queryRequest.getProcessDefinitionNameLikeIgnoreCase() != null) {
+            query.processDefinitionNameLikeIgnoreCase(queryRequest.getProcessDefinitionNameLikeIgnoreCase());
+        }
         if (queryRequest.getProcessDefinitionVersion() != null) {
             query.processDefinitionVersion(queryRequest.getProcessDefinitionVersion());
         }
         if (queryRequest.getProcessDefinitionCategory() != null) {
             query.processDefinitionCategory(queryRequest.getProcessDefinitionCategory());
+        }
+        if (queryRequest.getProcessDefinitionCategoryLike() != null) {
+            query.processDefinitionCategoryLike(queryRequest.getProcessDefinitionCategoryLike());
+        }
+        if (queryRequest.getProcessDefinitionCategoryLikeIgnoreCase() != null) {
+            query.processDefinitionCategoryLikeIgnoreCase(queryRequest.getProcessDefinitionCategoryLikeIgnoreCase());
+        }
+        if (queryRequest.getRootScopeId() != null) {
+            query.processInstanceRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getRootScopeIds() != null && !queryRequest.getRootScopeIds().isEmpty()) {
+            query.processInstanceRootScopeIds(queryRequest.getRootScopeIds());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.processInstanceParentScopeId(queryRequest.getParentScopeId());
+        }
+        if (queryRequest.getParentScopeIds() != null && !queryRequest.getParentScopeIds().isEmpty()) {
+            query.processInstanceParentScopeIds(queryRequest.getParentScopeIds());
         }
         if (queryRequest.getDeploymentId() != null) {
             query.deploymentId(queryRequest.getDeploymentId());
@@ -117,6 +157,18 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getProcessBusinessKeyLike() != null) {
             query.processInstanceBusinessKeyLike(queryRequest.getProcessBusinessKeyLike());
+        }
+        if (queryRequest.getProcessBusinessKeyLikeIgnoreCase() != null) {
+            query.processInstanceBusinessKeyLikeIgnoreCase(queryRequest.getProcessBusinessKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getProcessBusinessStatus() != null) {
+            query.processInstanceBusinessStatus(queryRequest.getProcessBusinessStatus());
+        }
+        if (queryRequest.getProcessBusinessStatusLike() != null) {
+            query.processInstanceBusinessStatusLike(queryRequest.getProcessBusinessStatusLike());
+        }
+        if (queryRequest.getProcessBusinessStatusLikeIgnoreCase() != null) {
+            query.processInstanceBusinessStatusLikeIgnoreCase(queryRequest.getProcessBusinessStatusLikeIgnoreCase());
         }
         if (queryRequest.getActiveActivityId() != null) {
             query.activeActivityId(queryRequest.getActiveActivityId());
@@ -148,6 +200,12 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getStartedBy() != null) {
             query.startedBy(queryRequest.getStartedBy());
         }
+        if (queryRequest.getFinishedBy() != null) {
+            query.finishedBy(queryRequest.getFinishedBy());
+        }
+        if (queryRequest.getState() != null) {
+            query.state(queryRequest.getState());
+        }
         if (queryRequest.getFinished() != null) {
             if (queryRequest.getFinished()) {
                 query.finished();
@@ -157,8 +215,11 @@ public class HistoricProcessInstanceBaseResource {
         }
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
+        }
+        if (queryRequest.getIncludeProcessVariablesNames() != null) {
+            query.includeProcessVariables(queryRequest.getIncludeProcessVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -167,6 +228,11 @@ public class HistoricProcessInstanceBaseResource {
         if (queryRequest.getCallbackId() != null) {
             query.processInstanceCallbackId(queryRequest.getCallbackId());
         }
+
+        if (queryRequest.getCallbackIds() != null && !queryRequest.getCallbackIds().isEmpty()) {
+            query.processInstanceCallbackIds(queryRequest.getCallbackIds());
+        }
+
         if (queryRequest.getCallbackType() != null) {
             query.processInstanceCallbackType(queryRequest.getCallbackType());
         }
@@ -174,11 +240,18 @@ public class HistoricProcessInstanceBaseResource {
             query.withoutProcessInstanceCallbackId();
         }
         
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
+        }
+        
         if (queryRequest.getTenantId() != null) {
             query.processInstanceTenantId(queryRequest.getTenantId());
         }
         if (queryRequest.getTenantIdLike() != null) {
             query.processInstanceTenantIdLike(queryRequest.getTenantIdLike());
+        }
+        if (queryRequest.getTenantIdLikeIgnoreCase() != null) {
+            query.processInstanceTenantIdLikeIgnoreCase(queryRequest.getTenantIdLikeIgnoreCase());
         }
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
@@ -189,8 +262,9 @@ public class HistoricProcessInstanceBaseResource {
             restApiInterceptor.accessHistoryProcessInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<HistoricProcessInstanceResponse> responseList = paginateList(allRequestParams, queryRequest, query, "processInstanceId", allowedSortProperties,
-                restResponseFactory::createHistoricProcessInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<HistoricProcessInstanceResponse> responseList = managementService.executeCommand(commandContext -> paginateList(allRequestParams, queryRequest,
+                query, "processInstanceId", allowedSortProperties, restResponseFactory::createHistoricProcessInstanceResponseList));
         
         Set<String> processDefinitionIds = new HashSet<>();
         List<HistoricProcessInstanceResponse> processInstanceList = responseList.getData();
@@ -220,15 +294,21 @@ public class HistoricProcessInstanceBaseResource {
     }
     
     protected HistoricProcessInstance getHistoricProcessInstanceFromRequest(String processInstanceId) {
-        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-        if (processInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
-        }
-        
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryProcessInfoById(processInstance);
         }
         
+        return processInstance;
+    }
+
+    protected HistoricProcessInstance getHistoricProcessInstanceFromRequestWithoutAccessCheck(String processInstanceId) {
+        HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a process instance with id '" + processInstanceId + "'.", HistoricProcessInstance.class);
+        }
+
         return processInstance;
     }
 
@@ -237,8 +317,10 @@ public class HistoricProcessInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -303,6 +385,14 @@ public class HistoricProcessInstanceBaseResource {
 
             case LESS_THAN_OR_EQUALS:
                 processInstanceQuery.variableValueLessThanOrEqual(variable.getName(), actualValue);
+                break;
+
+            case EXISTS:
+                processInstanceQuery.variableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                processInstanceQuery.variableNotExists(variable.getName());
                 break;
 
             default:

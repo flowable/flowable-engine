@@ -90,15 +90,6 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         ProcessEngines.registerProcessEngine(this);
-
-        if (processEngineConfiguration.getEngineLifecycleListeners() != null) {
-            for (EngineLifecycleListener engineLifecycleListener : processEngineConfiguration.getEngineLifecycleListeners()) {
-                engineLifecycleListener.onEngineBuilt(this);
-            }
-        }
-
-        processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED), 
-                processEngineConfiguration.getEngineCfgKey());
     }
 
     @Override

@@ -27,6 +27,7 @@ public abstract class FlowNode extends FlowElement {
     protected boolean asynchronous;
     protected boolean asynchronousLeave;
     protected boolean notExclusive;
+    protected boolean asynchronousLeaveNotExclusive;
 
     protected List<SequenceFlow> incomingFlows = new ArrayList<>();
     protected List<SequenceFlow> outgoingFlows = new ArrayList<>();
@@ -69,8 +70,24 @@ public abstract class FlowNode extends FlowElement {
     public void setNotExclusive(boolean notExclusive) {
         this.notExclusive = notExclusive;
     }
+    
+    public boolean isAsynchronousLeaveExclusive() {
+        return !asynchronousLeaveNotExclusive;
+    }
 
-    public Object getBehavior() {
+    public void setAsynchronousLeaveExclusive(boolean exclusive) {
+        this.asynchronousLeaveNotExclusive = !exclusive;
+    }
+
+    public boolean isAsynchronousLeaveNotExclusive() {
+		return asynchronousLeaveNotExclusive;
+	}
+
+	public void setAsynchronousLeaveNotExclusive(boolean asynchronousLeaveNotExclusive) {
+		this.asynchronousLeaveNotExclusive = asynchronousLeaveNotExclusive;
+	}
+
+	public Object getBehavior() {
         return behavior;
     }
 
@@ -99,6 +116,7 @@ public abstract class FlowNode extends FlowElement {
         setAsynchronous(otherNode.isAsynchronous());
         setNotExclusive(otherNode.isNotExclusive());
         setAsynchronousLeave(otherNode.isAsynchronousLeave());
+        setAsynchronousLeaveNotExclusive(otherNode.isAsynchronousLeaveNotExclusive());
 
         if (otherNode.getIncomingFlows() != null) {
             setIncomingFlows(otherNode.getIncomingFlows()

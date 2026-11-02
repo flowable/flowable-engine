@@ -32,11 +32,9 @@ public class TimeCycleParser extends BaseChildElementParser {
 
     @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
-        if (!(parentElement instanceof TimerEventDefinition)) {
+        if (!(parentElement instanceof TimerEventDefinition eventDefinition)) {
             return;
         }
-
-        TimerEventDefinition eventDefinition = (TimerEventDefinition) parentElement;
 
         if (StringUtils.isNotEmpty(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr))) {
             eventDefinition.setEndDate(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_END_DATE, xtr));

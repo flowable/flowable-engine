@@ -389,8 +389,7 @@ public class BpmnParse implements BpmnXMLConstants {
 
     public void createBPMNEdge(String key, List<GraphicInfo> graphicList) {
         FlowElement flowElement = bpmnModel.getFlowElement(key);
-        if (flowElement instanceof SequenceFlow) {
-            SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+        if (flowElement instanceof SequenceFlow sequenceFlow) {
             List<Integer> waypoints = new ArrayList<>();
             for (GraphicInfo waypointInfo : graphicList) {
                 waypoints.add((int) waypointInfo.getX());

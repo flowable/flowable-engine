@@ -20,11 +20,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.types.VariableTypes;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * A transformation based data output association
@@ -54,14 +53,10 @@ public class TransformationDataOutputAssociation extends AbstractDataAssociation
             // Couldn't find a variable type that is able to serialize the output value
             // Perhaps the output value is a Java bean, we try to convert it as JSon
             try {
-                final ObjectMapper mapper = new ObjectMapper();
-
-                // By default, Jackson serializes only public fields, we force to use all fields of the Java Bean
-                mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-
-                // By default, Jackson serializes java.util.Date as timestamp, we force ISO-8601
-                mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-                mapper.setDateFormat(new StdDateFormat().withColonInTimeZone(true));
+                final ObjectMapper mapper = JsonMapper.builder()
+                        // By default, Jackson serializes only public fields, we force to use all fields of the Java Bean
+                        .changeDefaultVisibility(visibilityChecker -> visibilityChecker.withFieldVisibility(Visibility.ANY))
+                        .build();
 
                 value = mapper.convertValue(value, JsonNode.class);
             } catch (final IllegalArgumentException e1) {

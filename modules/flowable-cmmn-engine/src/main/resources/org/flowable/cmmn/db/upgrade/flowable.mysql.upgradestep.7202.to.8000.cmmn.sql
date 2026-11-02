@@ -1,0 +1,3 @@
+ALTER TABLE ACT_CMMN_HI_CASE_INST ADD END_USER_ID_ VARCHAR(255) NULL;
+
+update ACT_GE_PROPERTY set VALUE_ = '8.0.0.0' where NAME_ = 'cmmn.schema.version';

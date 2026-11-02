@@ -13,7 +13,6 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.bpmn.model.ConditionalEventDefinition;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.context.Context;
@@ -23,6 +22,7 @@ import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.condition.ConditionUtil;
 
 /**
  * @author Tijs Rademakers
@@ -33,11 +33,13 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
 
     protected ConditionalEventDefinition conditionalEventDefinition;
     protected String conditionExpression;
+    protected String conditionLanguage;
 
-    public BoundaryConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, boolean interrupting) {
+    public BoundaryConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage, boolean interrupting) {
         super(interrupting);
         this.conditionalEventDefinition = conditionalEventDefinition;
         this.conditionExpression = conditionExpression;
+        this.conditionLanguage = conditionLanguage;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_WAITING, executionEntity.getActivityId(), 
-                    conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                    conditionExpression, conditionLanguage, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                     processEngineConfiguration.getEngineCfgKey());
         }
     }
@@ -59,15 +61,14 @@ public class BoundaryConditionalEventActivityBehavior extends BoundaryEventActiv
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        Expression expression = processEngineConfiguration.getExpressionManager().createExpression(conditionExpression);
-        Object result = expression.getValue(execution);
-        if (result instanceof Boolean && (Boolean) result) {
+		boolean result = ConditionUtil.hasTrueCondition(conditionalEventDefinition.getId(), conditionExpression, conditionLanguage, executionEntity);
+        if (result) {
             processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(executionEntity);
             
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_RECEIVED, executionEntity.getActivityId(), 
-                        conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                        conditionExpression, conditionLanguage, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                         processEngineConfiguration.getEngineCfgKey());
             }
             

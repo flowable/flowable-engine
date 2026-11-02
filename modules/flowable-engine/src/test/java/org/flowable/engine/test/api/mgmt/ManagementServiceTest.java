@@ -28,9 +28,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.lock.LockManager;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
@@ -42,6 +42,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.cmd.AcquireJobsCmd;
@@ -51,7 +52,6 @@ import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -90,6 +90,63 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     }
 
     @Test
+    public void testExecuteJobThrowsNonFlowableException() {
+        JobHandler jobHandler = new ExceptionThrowingJobHandler(() -> new RuntimeException("Test exception"));
+        try {
+            processEngineConfiguration.addJobHandler(jobHandler);
+            String jobId = managementService.executeCommand(commandContext -> {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity job = jobService.createJob();
+                job.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+                job.setJobHandlerType(jobHandler.getType());
+                job.setRetries(3);
+                jobService.insertJob(job);
+                return job.getId();
+            });
+            assertThatThrownBy(() -> managementService.executeJob(jobId))
+                    .isExactlyInstanceOf(FlowableException.class)
+                    .hasMessage("Job " + jobId + " failed")
+                    .cause()
+                    .isExactlyInstanceOf(RuntimeException.class)
+                    .hasMessageContaining("Test exception")
+                    .hasNoCause();
+        } finally {
+            Job job = managementService.createTimerJobQuery().singleResult();
+            if (job != null) {
+                managementService.deleteTimerJob(job.getId());
+            }
+            processEngineConfiguration.removeJobHandler(jobHandler.getType());
+        }
+    }
+
+    @Test
+    public void testExecuteJobThrowsFlowableException() {
+        JobHandler jobHandler = new ExceptionThrowingJobHandler(() -> new FlowableIllegalArgumentException("Test exception"));
+        try {
+            processEngineConfiguration.addJobHandler(jobHandler);
+            String jobId = managementService.executeCommand(commandContext -> {
+                JobService jobService = CommandContextUtil.getJobService(commandContext);
+                JobEntity job = jobService.createJob();
+                job.setJobType(JobEntity.JOB_TYPE_MESSAGE);
+                job.setJobHandlerType(jobHandler.getType());
+                job.setRetries(3);
+                jobService.insertJob(job);
+                return job.getId();
+            });
+            assertThatThrownBy(() -> managementService.executeJob(jobId))
+                    .isInstanceOf(FlowableIllegalArgumentException.class)
+                    .hasMessageContaining("Test exception")
+                    .hasNoCause();
+        } finally {
+            Job job = managementService.createTimerJobQuery().singleResult();
+            if (job != null) {
+                managementService.deleteTimerJob(job.getId());
+            }
+            processEngineConfiguration.removeJobHandler(jobHandler.getType());
+        }
+    }
+
+    @Test
     @Deployment
     public void testGetJobExceptionStacktrace() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
@@ -104,7 +161,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             managementService.moveTimerToExecutableJob(timerJob.getId());
             managementService.executeJob(timerJob.getId());
         })
-                .isExactlyInstanceOf(FlowableException.class)
+                .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("This is an exception thrown from scriptTask");
 
         // Fetch the task to see that the exception that occurred is persisted
@@ -123,7 +180,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testGetJobExceptionMessageMaxLengthIsWellPersisted() {
-        String randomText = RandomStringUtils.randomAlphanumeric(2000);
+        String randomText = RandomStringUtils.insecure().nextAlphanumeric(2000);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("message_with_max_length", randomText);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution", parameters);
@@ -205,8 +262,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         String correlationId = asyncJob.getCorrelationId();
         final String asyncId = asyncJob.getId();
         assertThatThrownBy(() -> managementService.executeJob(asyncId))
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
@@ -222,8 +279,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             Job job = managementService.moveTimerToExecutableJob(jobId);
             managementService.executeJob(job.getId());
         })
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createTimerJobQuery()
                 .processInstanceId(processInstance.getId())
@@ -237,8 +294,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             Job job = managementService.moveTimerToExecutableJob(jobId2);
             managementService.executeJob(jobId2);
         })
-                .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("problem evaluating script");
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("script evaluation failed");
 
         asyncJob = managementService.createDeadLetterJobQuery()
                 .processInstanceId(processInstance.getId())
@@ -339,7 +396,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // Try to delete the job. This should fail.
         assertThatThrownBy(() -> managementService.deleteJob(timerJob.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Cannot delete job when the job is being executed. Try again later.");
+                .hasMessageContainingAll("Cannot delete JobEntity[", "jobHandlerType=trigger-timer, jobType=timer, elementId=escalationTimer",
+                        "processDefinitionId=timerOnTask:1:", " when the job is being executed. Try again later.");
 
         // Clean up
         managementService.executeJob(timerJob.getId());
@@ -366,7 +424,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
         // Try to delete the job. This should fail.
         assertThatThrownBy(() -> managementService.deleteTimerJob(timerJob.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageContaining("Cannot delete timer job when the job is being executed. Try again later.");
+                .hasMessageContainingAll("Cannot delete TimerJobEntity[", "jobHandlerType=trigger-timer, jobType=timer, elementId=escalationTimer",
+                        "processDefinitionId=timerOnTask:1:", " when the job is being executed. Try again later.");
 
         // Clean up
         managementService.moveTimerToExecutableJob(timerJob.getId());
@@ -609,10 +668,8 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
                 return job;
             });
 
-            try {
-                managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3);
-                Assert.fail();
-            } catch (FlowableIllegalArgumentException e) { }
+            assertThatThrownBy(() -> managementService.moveDeadLetterJobToHistoryJob(deadLetterJob.getId(), 3))
+                    .isInstanceOf(FlowableIllegalArgumentException.class);
 
             managementService.deleteDeadLetterJob(deadLetterJob.getId());
         }

@@ -15,14 +15,18 @@ package org.flowable.cmmn.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -30,10 +34,15 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.junit.Test;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.junit.jupiter.api.Test;
 
 public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
+
+    protected static final String TEST_DEPENDENT_SCOPE_TYPE = "testDependentScope";
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
@@ -61,11 +70,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).variableName("serializableVar").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -101,7 +111,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -148,11 +158,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(subCaseInstance.getId()).variableName("localSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -200,7 +211,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             validateEmptyHistoricDataForCaseInstance(subCaseInstance.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -250,11 +261,12 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             HistoricVariableInstanceEntity variableInstance = (HistoricVariableInstanceEntity) cmmnHistoryService.createHistoricVariableInstanceQuery().taskId(task.getId()).variableName("testSerializable").singleResult();
             assertThat(variableInstance.getByteArrayRef()).isNotNull();
             
-            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntity = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
-                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(variableInstance.getByteArrayRef().getId());
+                    return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager()
+                            .findById(variableInstance.getByteArrayRef().getId());
                 }
             });
             
@@ -305,7 +317,7 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
             validateEmptyHistoricDataForCaseInstance(caseInstance.getId());
             validateEmptyHistoricDataForTask(task.getId());
             
-            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<ByteArrayEntity>() {
+            ByteArrayEntity byteArrayEntityAfterDelete = cmmnEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
                 @Override
                 public ByteArrayEntity execute(CommandContext commandContext) {
@@ -325,6 +337,175 @@ public class BulkCaseInstanceDeleteTest extends FlowableCmmnTestCase {
         }
     }
     
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void deleteHistoricTaskInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = cmmnEngineConfiguration.getHistoryLevel();
+        try {
+            cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("oneTaskCase")
+                    .start();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            // The case-task entity link points at the task as the REFERENCE_SCOPE_ID_.
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForTask(task.getId())).isNotEmpty();
+
+            cmmnTaskService.complete(task.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            cmmnHistoryService.deleteHistoricTaskInstance(task.getId());
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForTask(task.getId())).isEmpty();
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForTask(task.getId())).isEmpty();
+
+            cmmnHistoryService.deleteHistoricCaseInstance(caseInstance.getId());
+        } finally {
+            cmmnEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testBasicBlocking.cmmn",
+            "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn"
+    })
+    public void deleteHistoricCaseInstanceRemovesReferenceScopeOrphans() {
+        HistoryLevel historyLevel = cmmnEngineConfiguration.getHistoryLevel();
+        try {
+            cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
+            CaseInstance parentCase = cmmnRuntimeService.createCaseInstanceBuilder()
+                    .caseDefinitionKey("myCase")
+                    .start();
+
+            // Trigger Task One so the entry sentry on the case task fires and the sub-case starts.
+            PlanItemInstance taskOnePlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(parentCase.getId())
+                    .planItemDefinitionId("task1")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(taskOnePlanItem.getId());
+
+            CaseInstance subCase = cmmnRuntimeService.createCaseInstanceQuery()
+                    .caseDefinitionKey("oneTaskCase")
+                    .singleResult();
+            assertThat(subCase).isNotNull();
+
+            PlanItemInstance subTaskPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(subCase.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(subTaskPlanItem.getId());
+
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            // The sub-case is propagated as the REFERENCE_SCOPE_ID_ in the parent's child entity link.
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForCaseInstance(subCase.getId())).isNotEmpty();
+
+            cmmnHistoryService.deleteHistoricCaseInstance(subCase.getId());
+
+            assertThat(cmmnHistoryService.getHistoricEntityLinkParentsForCaseInstance(subCase.getId())).isEmpty();
+            assertThat(cmmnHistoryService.getHistoricEntityLinkChildrenForCaseInstance(subCase.getId())).isEmpty();
+
+            // Trigger Task Two so the parent case completes, then drop it from history.
+            PlanItemInstance taskTwoPlanItem = cmmnRuntimeService.createPlanItemInstanceQuery()
+                    .caseInstanceId(parentCase.getId())
+                    .planItemDefinitionId("task2")
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .singleResult();
+            cmmnRuntimeService.triggerPlanItemInstance(taskTwoPlanItem.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+            cmmnHistoryService.deleteHistoricCaseInstance(parentCase.getId());
+        } finally {
+            cmmnEngineConfiguration.setHistoryLevel(historyLevel);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void deleteHistoricCaseInstanceRemovesDependentScopeVariables() {
+        cmmnEngineConfiguration.addDependentScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+            HistoricVariableInstanceEntity dependentVariable = createDependentScopeHistoricVariable(caseInstance.getId());
+            String byteArrayId = dependentVariable.getByteArrayRef().getId();
+            assertThat(byteArrayId).isNotNull();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            cmmnHistoryService.deleteHistoricCaseInstance(caseInstance.getId());
+
+            assertThat(findHistoricVariableInstanceById(dependentVariable.getId())).isNull();
+            assertThat(findByteArrayById(byteArrayId)).isNull();
+        } finally {
+            cmmnEngineConfiguration.getDependentScopeTypes().remove(TEST_DEPENDENT_SCOPE_TYPE);
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = "org/flowable/cmmn/test/one-human-task-model.cmmn")
+    public void bulkDeleteHistoricCaseInstancesRemovesDependentScopeVariables() {
+        cmmnEngineConfiguration.addDependentScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+        try {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start();
+            HistoricVariableInstanceEntity dependentVariable = createDependentScopeHistoricVariable(caseInstance.getId());
+            String byteArrayId = dependentVariable.getByteArrayRef().getId();
+            assertThat(byteArrayId).isNotNull();
+
+            Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            cmmnTaskService.complete(task.getId());
+            waitForAsyncHistoryExecutorToProcessAllJobs();
+
+            cmmnHistoryService.bulkDeleteHistoricCaseInstances(Collections.singletonList(caseInstance.getId()));
+
+            assertThat(findHistoricVariableInstanceById(dependentVariable.getId())).isNull();
+            assertThat(findByteArrayById(byteArrayId)).isNull();
+        } finally {
+            cmmnEngineConfiguration.getDependentScopeTypes().remove(TEST_DEPENDENT_SCOPE_TYPE);
+        }
+    }
+
+    /**
+     * Mimics a consumer that records history for its own dependent scope type: the row is linked to the case instance
+     * through the scope id, but carries a scope type the regular variable APIs never see.
+     */
+    protected HistoricVariableInstanceEntity createDependentScopeHistoricVariable(String caseInstanceId) {
+        String planItemInstanceId = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstanceId)
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId();
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> {
+            VariableServiceConfiguration variableServiceConfiguration = cmmnEngineConfiguration.getVariableServiceConfiguration();
+            HistoricVariableService historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+
+            HistoricVariableInstanceEntity historicVariable = historicVariableService.createHistoricVariableInstance();
+            historicVariable.setName("dependentScopeVariable");
+            historicVariable.setScopeId(caseInstanceId);
+            historicVariable.setSubScopeId(planItemInstanceId);
+            historicVariable.setScopeType(TEST_DEPENDENT_SCOPE_TYPE);
+            historicVariable.setVariableType(variableServiceConfiguration.getVariableTypes().getVariableType(SerializableType.TYPE_NAME));
+            historicVariable.setCreateTime(new Date());
+            historicVariable.setLastUpdatedTime(historicVariable.getCreateTime());
+            historicVariable.setBytes("dependent scope value".getBytes(StandardCharsets.UTF_8));
+
+            historicVariableService.insertHistoricVariableInstance(historicVariable);
+            return historicVariable;
+        });
+    }
+
+    protected HistoricVariableInstanceEntity findHistoricVariableInstanceById(String id) {
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> cmmnEngineConfiguration
+                .getVariableServiceConfiguration().getHistoricVariableService().getHistoricVariableInstance(id));
+    }
+
+    protected ByteArrayEntity findByteArrayById(String id) {
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> CommandContextUtil
+                .getCmmnEngineConfiguration(commandContext).getByteArrayEntityManager().findById(id));
+    }
+
     protected void validateEmptyHistoricDataForCaseInstance(String caseInstanceId) {
         assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceId).list()).hasSize(0);
         assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceId)).hasSize(0);

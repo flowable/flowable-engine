@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-work-case-palette">
+  <case id="testStageBusinessStatus" name="testStageBusinessStatus" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItemcmmnStage_3" definitionRef="cmmnStage_3">
+        <entryCriterion id="cmmnEntrySentry_4" sentryRef="sentrycmmnEntrySentry_4"></entryCriterion>
+      </planItem>
+      <planItem id="planItembeforeStage" name="beforeStage" definitionRef="beforeStage"></planItem>
+      <planItem id="planItemcmmnStage_8" definitionRef="cmmnStage_8">
+        <entryCriterion id="cmmnEntrySentry_9" sentryRef="sentrycmmnEntrySentry_9"></entryCriterion>
+      </planItem>
+      <sentry id="sentrycmmnEntrySentry_4">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry_4" sourceRef="planItembeforeStage">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentrycmmnEntrySentry_9">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry_9" sourceRef="planItemcmmnStage_3">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="cmmnStage_3" flowable:businessStatus="firstStage">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+        <planItem id="planIteminsideStage" name="insideStage" definitionRef="insideStage"></planItem>
+        <humanTask id="insideStage" name="insideStage" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+          <extensionElements>
+            <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+            <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+            <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+          </extensionElements>
+        </humanTask>
+      </stage>
+      <humanTask id="beforeStage" name="beforeStage" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+          <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </humanTask>
+      <stage id="cmmnStage_8" flowable:businessStatus="${secondStageVar}">
+        <extensionElements>
+          <design:stencilid><![CDATA[ExpandedStage]]></design:stencilid>
+        </extensionElements>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testtttmilstone">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="679.0" width="830.0" x="270.0" y="120.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemcmmnStage_3" cmmnElementRef="planItemcmmnStage_3">
+        <dc:Bounds height="150.0" width="300.0" x="648.0" y="344.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_cmmnEntrySentry_4" cmmnElementRef="cmmnEntrySentry_4">
+        <dc:Bounds height="28.0" width="18.0" x="639.0" y="405.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planIteminsideStage" cmmnElementRef="planIteminsideStage">
+        <dc:Bounds height="80.0" width="100.0" x="736.0" y="380.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItembeforeStage" cmmnElementRef="planItembeforeStage">
+        <dc:Bounds height="80.0" width="100.0" x="404.0" y="383.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemcmmnStage_8" cmmnElementRef="planItemcmmnStage_8">
+        <dc:Bounds height="150.0" width="300.0" x="636.0" y="604.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_cmmnEntrySentry_9" cmmnElementRef="cmmnEntrySentry_9">
+        <dc:Bounds height="28.0" width="18.0" x="783.0" y="590.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_cmmnConnector_5" cmmnElementRef="planItembeforeStage" targetCMMNElementRef="cmmnEntrySentry_4">
+        <di:extension>
+          <flowable:docker type="source" x="50.0" y="40.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="504.0" y="423.0"></di:waypoint>
+        <di:waypoint x="571.5" y="423.0"></di:waypoint>
+        <di:waypoint x="571.5" y="419.0"></di:waypoint>
+        <di:waypoint x="639.0" y="419.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_cmmnConnector_10" cmmnElementRef="planItemcmmnStage_3" targetCMMNElementRef="cmmnEntrySentry_9">
+        <di:extension>
+          <flowable:docker type="source" x="150.0" y="75.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="798.0" y="494.0"></di:waypoint>
+        <di:waypoint x="798.0" y="542.0"></di:waypoint>
+        <di:waypoint x="792.0" y="542.0"></di:waypoint>
+        <di:waypoint x="792.0" y="590.0"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

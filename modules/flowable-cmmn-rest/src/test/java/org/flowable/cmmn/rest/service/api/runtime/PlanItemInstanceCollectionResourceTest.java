@@ -13,14 +13,24 @@
 
 package org.flowable.cmmn.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+
 import java.util.List;
 
+import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for all REST-operations related to a plan item instance collection resource.
@@ -30,8 +40,9 @@ import org.flowable.task.api.Task;
 public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCase {
 
     /**
-     * Test getting a list of case instance, using all possible filters.
+     * Test getting a list of plan item instance, using all possible filters.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testGetPlanItemInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").businessKey("myBusinessKey").start();
@@ -61,8 +72,9 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
     }
     
     /**
-     * Test getting a list of case instance, using all possible filters.
+     * Test getting a list of plan item instances, using all possible filters.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testGetEndedPlanItemInstances() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").businessKey("myBusinessKey").start();
@@ -99,5 +111,65 @@ public class PlanItemInstanceCollectionResourceTest extends BaseSpringRestTestCa
         url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?caseDefinitionId=" + 
                 caseInstance.getCaseDefinitionId() + "&includeEnded=true";
         assertResultsPresentInDataResponse(url, activePlanItemId, endedPlanItemId);
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/runtime/PlanItemInstanceQueryResourceTest.testByStarted.cmmn" })
+    public void testGetStartedPlanItemInstances() throws Exception {
+        // A starts immediately (active), B is gated behind an always-false entry criterion so it stays available and never starts
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testByStarted").start();
+
+        String startedPlanItemId = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("A").singleResult().getId();
+        String notStartedPlanItemId = runtimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceName("B").singleResult().getId();
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?started=true";
+        assertResultsPresentInDataResponse(url, startedPlanItemId);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?started=false";
+        assertResultsPresentInDataResponse(url, notStartedPlanItemId);
+    }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
+    public void testGetEndedPlanItemInstancesWithLocalVariables() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        runtimeService.setLocalVariable(task.getSubScopeId(), "someLocalVariable", "someLocalValue");
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION);
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?id=" + task.getSubScopeId();
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        JsonNode dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + task.getSubScopeId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "        localVariables : [ ]"
+                + "     }"
+                + "]");
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_PLAN_ITEM_INSTANCE_COLLECTION) + "?id=" + task.getSubScopeId() + "&includeLocalVariables=true";
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        dataNode = objectMapper.readTree(response.getEntity().getContent()).get("data");
+        closeResponse(response);
+        assertThatJson(dataNode).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("["
+                + "     {"
+                + "         id : '" + task.getSubScopeId() + "',"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         localVariables:[{"
+                + "             name:'someLocalVariable',"
+                + "             value:'someLocalValue',"
+                + "             scope:'local'"
+                + "         }]"
+                + "     }"
+                + "]");
     }
 }

@@ -13,7 +13,7 @@
 
 package org.flowable.rest.service.api.management;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.job.api.Job;
@@ -33,7 +33,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Jobs" }, description = "Manage Jobs", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Jobs" }, authorizations = { @Authorization(value = "basicAuth") })
 public class JobExceptionStacktraceResource extends JobBaseResource {
 
     @ApiOperation(value = "Get the exception stacktrace for a job", tags = { "Jobs" })

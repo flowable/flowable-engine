@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.batch.api.BatchService;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -33,10 +33,9 @@ import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -60,6 +59,12 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
             throw new FlowableIllegalArgumentException("There is no batch part with the id " + configuration);
         }
 
+        Batch batch = batchService.getBatch(batchPart.getBatchId());
+        if (DeleteProcessInstanceBatchConstants.STATUS_STOPPED.equals(batch.getStatus())) {
+            batchService.completeBatchPart(batchPart.getId(), DeleteProcessInstanceBatchConstants.STATUS_STOPPED, null);
+            return;
+        }
+
         ManagementService managementService = engineConfiguration.getManagementService();
 
         BatchPart computeBatchPart = managementService.createBatchPartQuery()
@@ -72,7 +77,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
 
         if (idsToDelete.isArray()) {
             for (JsonNode idNode : idsToDelete) {
-                processInstanceIdsToDelete.add(idNode.textValue());
+                processInstanceIdsToDelete.add(idNode.stringValue());
             }
         }
 
@@ -102,7 +107,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
         batchService.completeBatchPart(batchPart.getId(), status, resultNode.toString());
 
         // This part is here for backwards compatibility when the sequential deletion was done with a compute as well
-        if (computeBatchPartResult.path("sequential").booleanValue()) {
+        if (computeBatchPartResult.path("sequential").booleanValue(false)) {
             // If the computation was sequential we need to schedule the next job
             List<BatchPart> nextDeleteParts = engineConfiguration.getManagementService()
                     .createBatchPartQuery()
@@ -140,13 +145,7 @@ public class DeleteHistoricProcessInstanceIdsJobHandler implements JobHandler {
     }
 
     protected JsonNode getBatchPartResult(BatchPart batchPart, ProcessEngineConfigurationImpl engineConfiguration) {
-        try {
-            return engineConfiguration.getObjectMapper()
-                    .readTree(batchPart.getResultDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
-            
-        } catch (JsonProcessingException e) {
-            ExceptionUtil.sneakyThrow(e);
-            return null;
-        }
+        return engineConfiguration.getObjectMapper()
+                .readTree(batchPart.getResultDocumentJson(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG));
     }
 }

@@ -1,0 +1,12 @@
+{
+    "name": "One Channel",
+    "key": "one",
+    "channelType": "inbound",
+    "type": "jms",
+    "destination": "unknown-queue",
+    "deserializerType": "json",
+    "concurrency": "dummy",
+    "channelEventKeyDetection": {
+        "fixedValue": "one"
+    }
+}

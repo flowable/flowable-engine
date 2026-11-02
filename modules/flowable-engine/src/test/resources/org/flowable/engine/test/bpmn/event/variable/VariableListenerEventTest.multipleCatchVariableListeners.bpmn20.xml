@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:flowable="http://flowable.org/bpmn" 
+	targetNamespace="Examples">
+
+	<process id="catchVariableListener">
+
+		<startEvent id="start" />
+
+		<sequenceFlow sourceRef="start" targetRef="parallelFork" />
+		
+		<parallelGateway id="parallelFork" />
+		
+		<sequenceFlow sourceRef="parallelFork" targetRef="variableListenerEvent" />
+
+		<intermediateCatchEvent id="variableListenerEvent" name="Variable listener">
+            <extensionElements>
+                <flowable:variableListenerEventDefinition variableName="var1" />
+            </extensionElements>
+        </intermediateCatchEvent>
+		
+		<userTask id="aftertask" />
+		
+		<sequenceFlow sourceRef="parallelFork" targetRef="variableListenerEvent2" />
+
+        <intermediateCatchEvent id="variableListenerEvent2" name="Variable listener 2">
+            <extensionElements>
+                <flowable:variableListenerEventDefinition variableName="var1" />
+            </extensionElements>
+        </intermediateCatchEvent>
+        
+        <userTask id="aftertask2" />
+
+		<sequenceFlow sourceRef="variableListenerEvent" targetRef="aftertask" />
+		
+		<sequenceFlow sourceRef="variableListenerEvent2" targetRef="aftertask2" />
+		
+		<parallelGateway id="parallelJoin" />
+		
+		<sequenceFlow sourceRef="aftertask" targetRef="parallelJoin" />
+		
+		<sequenceFlow sourceRef="aftertask2" targetRef="parallelJoin" />
+
+		<endEvent id="end" />
+		
+		<sequenceFlow sourceRef="parallelJoin" targetRef="end" />
+
+	</process>
+
+</definitions>

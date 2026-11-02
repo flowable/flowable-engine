@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testBusinessError" name="Test BusinessError">
+        <casePlanModel id="casePlanModel" name="Case plan model" autoComplete="true">
+            <planItem id="planItemA" name="A" definitionRef="serviceTaskA" />
+            <planItem id="planItemB" name="B" definitionRef="humanTaskB">
+                <entryCriterion id="entryB" sentryRef="sentryOnAFault" />
+            </planItem>
+            <sentry id="sentryOnAFault">
+                <planItemOnPart id="onPartA" sourceRef="planItemA">
+                    <standardEvent>fault</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <task id="serviceTaskA" name="A" flowable:type="java" flowable:class="org.flowable.cmmn.test.runtime.ThrowBpmnErrorDelegate" />
+            <humanTask id="humanTaskB" name="B" />
+        </casePlanModel>
+    </case>
+</definitions>

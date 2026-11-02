@@ -370,6 +370,25 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * A change tenant id was executed.
      */
     CHANGE_TENANT_ID,
+
+    /**
+     * The business status was updated
+     */
+    BUSINESS_STATUS_UPDATED,
+
+    /**
+     * A definition (process, case, decision, app, form, event or channel definition) has been deployed.
+     * A separate event is dispatched for each newly created definition version. The event entity is the
+     * {@link org.flowable.common.engine.api.repository.FlowableDefinition} that was deployed.
+     */
+    DEFINITION_DEPLOYED,
+
+    /**
+     * A definition (process, case, decision, app, form, event or channel definition) has been undeployed
+     * because its deployment was deleted. A separate event is dispatched for each removed definition. The event
+     * entity is the {@link org.flowable.common.engine.api.repository.FlowableDefinition} that was undeployed.
+     */
+    DEFINITION_UNDEPLOYED
     ;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};
@@ -377,7 +396,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
     /**
      * @param string
      *            the string containing a comma-separated list of event-type names
-     * @return a list of FlowableEngineEventType based on the given list.
+     * @return an array of FlowableEngineEventType based on the given string.
      * @throws FlowableIllegalArgumentException
      *             when one of the given string is not a valid type name
      */

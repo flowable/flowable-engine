@@ -14,6 +14,10 @@ package org.flowable.engine.impl.test;
 
 import static org.flowable.engine.test.FlowableExtension.DEFAULT_CONFIGURATION_RESOURCE;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -21,7 +25,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
-import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
+import org.flowable.engine.impl.interceptor.LoggingExecutionTreeAgendaOperationExecutionListener;
 import org.flowable.engine.test.ConfigurationResource;
 import org.flowable.engine.test.EnableVerboseExecutionTreeLogging;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -40,6 +44,14 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     private static final ExtensionContext.Namespace NAMESPACE = ExtensionContext.Namespace.create(PluggableFlowableExtension.class);
 
     @Override
+    public void beforeEach(ExtensionContext context) {
+        super.beforeEach(context);
+        if (AnnotationSupport.isAnnotated(context.getRequiredTestClass(), EnableVerboseExecutionTreeLogging.class)) {
+            swapCommandInvoker(getProcessEngine(context), true);
+        }
+    }
+
+    @Override
     public void afterEach(ExtensionContext context) throws Exception {
         try {
             super.afterEach(context);
@@ -53,14 +65,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
     @Override
     protected ProcessEngine getProcessEngine(ExtensionContext context) {
         String configurationResource = getConfigurationResource(context);
-        ProcessEngine processEngine = getStore(context).getOrComputeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
-
-        // Enable verbose execution tree debugging if needed
-        Class<?> testClass = context.getRequiredTestClass();
-        if (AnnotationSupport.isAnnotated(testClass, EnableVerboseExecutionTreeLogging.class)) {
-            swapCommandInvoker(processEngine, true);
-        }
-        return processEngine;
+        return getStore(context).computeIfAbsent(configurationResource, this::initializeProcessEngine, ProcessEngine.class);
     }
 
     protected ProcessEngine initializeProcessEngine(String configurationResource) {
@@ -85,18 +90,27 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
 
     protected void swapCommandInvoker(ProcessEngine processEngine, boolean debug) {
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
-        if (commandExecutor instanceof CommandExecutorImpl) {
-            CommandExecutorImpl commandExecutorImpl = (CommandExecutorImpl) commandExecutor;
+        if (commandExecutor instanceof CommandExecutorImpl commandExecutorImpl) {
 
             CommandInterceptor previousCommandInterceptor = null;
             CommandInterceptor commandInterceptor = commandExecutorImpl.getFirst();
 
             while (commandInterceptor != null) {
 
-                boolean matches = debug ? (commandInterceptor instanceof CommandInvoker) : (commandInterceptor instanceof LoggingExecutionTreeCommandInvoker);
-                if (matches) {
+                if (commandInterceptor instanceof CommandInvoker) {
 
-                    CommandInterceptor commandInvoker = debug ? newLoggingExecutionTreeCommandInvoker() : new CommandInvoker((commandContext, runnable) -> runnable.run());
+                    Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners = processEngine.getProcessEngineConfiguration()
+                            .getAgendaOperationExecutionListeners();
+                    if (debug) {
+                        if (agendaOperationExecutionListeners == null) {
+                            agendaOperationExecutionListeners = new ArrayList<>();
+                        } else {
+                            agendaOperationExecutionListeners = new ArrayList<>(agendaOperationExecutionListeners);
+                        }
+                        agendaOperationExecutionListeners.add(newLoggingExecutionTreeAgendaOperationExecutionListener());
+                    }
+
+                    CommandInterceptor commandInvoker = new CommandInvoker(processEngine.getProcessEngineConfiguration().getAgendaOperationRunner(), agendaOperationExecutionListeners);
                     if (previousCommandInterceptor != null) {
                         previousCommandInterceptor.setNext(commandInvoker);
                     } else {
@@ -120,8 +134,7 @@ public class PluggableFlowableExtension extends InternalFlowableExtension {
         return context.getRoot().getStore(NAMESPACE);
     }
 
-    protected CommandInvoker newLoggingExecutionTreeCommandInvoker() {
-        LoggingExecutionTreeCommandInvoker loggingExecutionTreeCommandInvoker = new LoggingExecutionTreeCommandInvoker((commandContext, runnable) -> runnable.run());
-        return loggingExecutionTreeCommandInvoker;
+    protected AgendaOperationExecutionListener newLoggingExecutionTreeAgendaOperationExecutionListener() {
+        return new LoggingExecutionTreeAgendaOperationExecutionListener();
     }
 }

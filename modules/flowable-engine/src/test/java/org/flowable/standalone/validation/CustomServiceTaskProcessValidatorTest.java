@@ -27,6 +27,7 @@ import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ServiceTask;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.validation.ValidationError;
@@ -118,9 +119,9 @@ public class CustomServiceTaskProcessValidatorTest {
     class CustomServiceTaskValidator extends ServiceTaskValidator {
 
         @Override
-        protected void validateUnknownServiceTaskType(Process process, ServiceTask serviceTask, List<ValidationError> errors) {
+        protected void validateUnknownServiceTaskType(Process process, ServiceTask serviceTask, ProcessValidationContext validationContext) {
             if (!"custom-service-task".equals(serviceTask.getType())) {
-                addError(errors, Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
+                validationContext.addError(Problems.SERVICE_TASK_INVALID_TYPE, process, serviceTask, "Invalid or unsupported service task type");
             }
         }
     }

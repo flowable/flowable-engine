@@ -20,7 +20,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
@@ -30,13 +30,13 @@ import org.flowable.validation.validator.ProcessLevelValidator;
 public class EventGatewayValidator extends ProcessLevelValidator {
 
     @Override
-    protected void executeValidation(BpmnModel bpmnModel, Process process, List<ValidationError> errors) {
+    protected void executeValidation(BpmnModel bpmnModel, Process process, ProcessValidationContext validationContext) {
         List<EventGateway> eventGateways = process.findFlowElementsOfType(EventGateway.class);
         for (EventGateway eventGateway : eventGateways) {
             for (SequenceFlow sequenceFlow : eventGateway.getOutgoingFlows()) {
                 FlowElement flowElement = process.getFlowElement(sequenceFlow.getTargetRef(), true);
                 if (flowElement != null && !(flowElement instanceof IntermediateCatchEvent)) {
-                    addError(errors, Problems.EVENT_GATEWAY_ONLY_CONNECTED_TO_INTERMEDIATE_EVENTS, process, eventGateway, "Event based gateway can only be connected to elements of type intermediateCatchEvent");
+                    validationContext.addError(Problems.EVENT_GATEWAY_ONLY_CONNECTED_TO_INTERMEDIATE_EVENTS, process, eventGateway, "Event based gateway can only be connected to elements of type intermediateCatchEvent");
                 }
             }
         }

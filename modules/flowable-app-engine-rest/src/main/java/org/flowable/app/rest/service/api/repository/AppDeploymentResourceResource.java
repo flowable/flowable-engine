@@ -15,7 +15,7 @@ package org.flowable.app.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
@@ -40,7 +40,7 @@ import io.swagger.annotations.Authorization;
  * @author Tim Stephenson
  */
 @RestController
-@Api(tags = { "App Deployments" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResourceResource {
 
     @Autowired

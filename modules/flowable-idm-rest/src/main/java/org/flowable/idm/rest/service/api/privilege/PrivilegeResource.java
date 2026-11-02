@@ -15,8 +15,6 @@ package org.flowable.idm.rest.service.api.privilege;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
@@ -40,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Privileges" }, description = "Manage Privileges", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Privileges" }, authorizations = { @Authorization(value = "basicAuth") })
 public class PrivilegeResource {
     
     @Autowired
@@ -58,7 +56,7 @@ public class PrivilegeResource {
             @ApiResponse(code = 404, message = "Indicates the requested privilege does not exist.")
     })
     @GetMapping(value = "/privileges/{privilegeId}", produces = "application/json")
-    public PrivilegeResponse getUser(@ApiParam(name = "privilegeId") @PathVariable String privilegeId, HttpServletRequest request) {
+    public PrivilegeResponse getUser(@ApiParam(name = "privilegeId") @PathVariable String privilegeId) {
         Privilege privilege = identityService.createPrivilegeQuery().privilegeId(privilegeId).singleResult();
         
         if (privilege == null) {

@@ -13,6 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEntityEvent;
 import org.flowable.common.engine.api.delegate.event.FlowableEvent;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
@@ -701,6 +703,10 @@ public class CallActivityTest extends PluggableFlowableTestCase {
     })
     @DisabledIfSystemProperty(named = "disableWhen", matches = "cockroachdb")
     public void testCallActivityAsyncCompleteRealExecutor() {
+        assumeThat(processEngineConfiguration.getDatabaseType())
+                .as("Test is disabled on SQL Server since the parallel multi-instance async call activities cause deadlocks")
+                .isNotEqualTo(AbstractEngineConfiguration.DATABASE_TYPE_MSSQL);
+
         runtimeService.startProcessInstanceByKey("testAsyncComplete");
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(20000L, 200L);
         assertThat(runtimeService.createProcessInstanceQuery().count()).isZero();

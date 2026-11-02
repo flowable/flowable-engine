@@ -63,4 +63,9 @@ public class RulesDeployer implements EngineDeployer {
             deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), kieBase);
         }
     }
+
+    @Override
+    public void undeploy(EngineDeployment parentDeployment, boolean cascade) {
+        // Nothing to do
+    }
 }

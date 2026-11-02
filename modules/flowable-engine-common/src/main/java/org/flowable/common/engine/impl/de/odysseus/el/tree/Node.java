@@ -24,10 +24,10 @@ public interface Node {
 	/**
 	 * Get the node's number of children.
 	 */
-	public int getCardinality();
+    int getCardinality();
 	
 	/**
 	 * Get i'th child
 	 */
-	public Node getChild(int i);
+    Node getChild(int i);
 }

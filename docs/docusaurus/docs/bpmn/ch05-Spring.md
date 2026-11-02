@@ -218,13 +218,12 @@ In addition to using the values listed above for deploymentMode, you may require
 ## Unit testing
 
 When integrating with Spring, business processes can be tested very easily using the standard [Flowable testing facilities](bpmn/ch04-API.md#unit-testing).
-The following examples show how a business process is tested in typical Spring-based JUnit 4 and 5 test:
+The following examples show how a business process is tested in typical Spring-based JUnit Jupiter test:
 
 **JUnit 5 test.**
 
     @ExtendWith(FlowableSpringExtension.class)
-    @ExtendWith(SpringExtension.class)
-    @ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+    @SpringJUnitConfig(SpringJunitJupiterTest.TestConfiguration.class)
     public class MyBusinessProcessTest {
 
       @Autowired
@@ -247,41 +246,6 @@ The following examples show how a business process is tested in typical Spring-b
     }
 
 Using the FlowableSpringExtension allows the usage of the Deployment annotation.
-
-**JUnit 4 test.**
-
-    @RunWith(SpringJUnit4ClassRunner.class)
-    @ContextConfiguration("classpath:org/flowable/spring/test/junit4/springTypicalUsageTest-context.xml")
-    public class MyBusinessProcessTest {
-
-      @Autowired
-      private RuntimeService runtimeService;
-
-      @Autowired
-      private TaskService taskService;
-
-      @Autowired
-      @Rule
-      public FlowableRule flowableSpringRule;
-
-      @Test
-      @Deployment
-      public void simpleProcessTest() {
-        runtimeService.startProcessInstanceByKey("simpleProcess");
-        Task task = taskService.createTaskQuery().singleResult();
-        assertEquals("My Task", task.getName());
-
-        taskService.complete(task.getId());
-        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
-
-      }
-    }
-
-Note that for this to work, you need to define an *org.flowable.engine.test.Flowable* bean in the Spring configuration (which is injected by auto-wiring in the example above).
-
-    <bean id="flowableRule" class="org.flowable.engine.test.Flowable">
-      <property name="processEngine" ref="processEngine" />
-    </bean>
 
 ## JPA with Hibernate 4.2.x
 

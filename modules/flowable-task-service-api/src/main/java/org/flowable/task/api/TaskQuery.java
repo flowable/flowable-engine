@@ -23,11 +23,6 @@ import java.util.Collection;
  */
 public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task> {
 
-    /**
-     * Select tasks with the given task ids
-     */
-    TaskQuery taskIds(Collection<String> taskId);
-
     /** Only select tasks with the given {@link DelegationState}. */
     TaskQuery taskDelegationState(DelegationState delegationState);
 

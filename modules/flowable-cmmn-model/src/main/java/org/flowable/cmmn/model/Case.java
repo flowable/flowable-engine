@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Case extends CmmnElement implements HasLifecycleListeners {
 
     protected String name;
@@ -30,6 +32,14 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
     protected List<FlowableListener> lifecycleListeners = new ArrayList<>();
     /** Having a reactivation case listener marks the case eligible for reactivation once completed. */
     protected ReactivateEventListener reactivateEventListener;
+    /**
+     * Engine-side handlers that own the case's deploy / undeploy lifecycle for whatever start trigger
+     * the case has (event-registry subscription by default; custom integrations can install additional
+     * handlers via a custom CMMN parse handler). Typed as {@code Object} so this model module stays
+     * engine-dep-free; the engine casts on iteration. Transient — not part of the parsed XML.
+     */
+    @JsonIgnore
+    protected List<Object> startLifecycleHandlers = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -115,5 +125,17 @@ public class Case extends CmmnElement implements HasLifecycleListeners {
     @Override
     public void setLifecycleListeners(List<FlowableListener> lifecycleListeners) {
         this.lifecycleListeners = lifecycleListeners;
+    }
+
+    public List<Object> getStartLifecycleHandlers() {
+        return startLifecycleHandlers;
+    }
+
+    public void setStartLifecycleHandlers(List<Object> startLifecycleHandlers) {
+        this.startLifecycleHandlers = startLifecycleHandlers;
+    }
+
+    public void addStartLifecycleHandler(Object handler) {
+        this.startLifecycleHandlers.add(handler);
     }
 }

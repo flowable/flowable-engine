@@ -30,12 +30,14 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -179,12 +181,27 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionId(processInstance.getProcessDefinitionId()).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLike("oneTask%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyLike("oneTask%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyLikeIgnoreCase("onetask%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyLikeIgnoreCase("onetask%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Collections.singletonList("oneTaskProcess")).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined", "oneTaskProcess")).count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count()).isZero();
 
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKeyLike("businessKey%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLike("businessKey%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKeyLikeIgnoreCase("businesskey%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKeyLikeIgnoreCase("businesskey%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
         assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatus("businessStatus123").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatus("businessStatus123").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatusLike("businessStatus%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatusLike("businessStatus%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceBusinessStatusLikeIgnoreCase("businessstatus%").count()).isEqualTo(1);
+        assertThat(historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessStatusLikeIgnoreCase("businessstatus%").processDefinitionId("invalid").endOr().count()).isEqualTo(1);
 
         List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
@@ -595,6 +612,33 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             assertThat(historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).processInstanceCallbackType("foo").singleResult()).isNull();
+        }
+    }
+
+    @Test
+    @Deployment(resources = { "org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml" })
+    public void testState() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            final String deleteReason = "some delete reason";
+            ProcessInstance pi = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+            HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
+            assertThat(hpi.getState()).isEqualTo(ProcessInstanceState.RUNNING);
+
+            runtimeService.deleteProcessInstance(pi.getId(), deleteReason);
+
+            ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            Task task = taskService.createTaskQuery().processInstanceId(pi2.getId()).singleResult();
+            taskService.complete(task.getId());
+
+            waitForHistoryJobExecutorToProcessAllJobs(7000, 100);
+
+            hpi = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi.getId()).singleResult();
+            assertThat(hpi.getDeleteReason()).isEqualTo(deleteReason);
+            assertThat(hpi.getState()).isEqualTo(ProcessInstanceState.CANCELLED);
+
+            HistoricProcessInstance hpi2 = historyService.createHistoricProcessInstanceQuery().processInstanceId(pi2.getId()).singleResult();
+            assertThat(hpi2.getState()).isEqualTo(ProcessInstanceState.COMPLETED);
         }
     }
 

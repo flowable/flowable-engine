@@ -14,12 +14,16 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInitializingList;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Dennis Federico
@@ -46,10 +50,13 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected Date completedTime;
     protected Date occurredTime;
     protected Date terminatedTime;
+    protected Date failedTime;
     protected Date exitTime;
     protected Date endedTime;
     protected Date lastUpdatedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected String entryCriterionId;
@@ -58,6 +65,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     protected boolean showInOverview;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected String localizedName;
+    protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricPlanItemInstanceEntityImpl() {
     }
@@ -75,6 +83,8 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         this.planItemDefinitionId = planItemInstance.getPlanItemDefinitionId();
         this.planItemDefinitionType = planItemInstance.getPlanItemDefinitionType();
         this.startUserId = planItemInstance.getStartUserId();
+        this.assignee = planItemInstance.getAssignee();
+        this.completedBy = planItemInstance.getCompletedBy();
         this.referenceId = planItemInstance.getReferenceId();
         this.referenceType = planItemInstance.getReferenceType();
         this.createTime = planItemInstance.getCreateTime();
@@ -91,6 +101,7 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         this.completedTime = planItemInstance.getCompletedTime();
         this.occurredTime = planItemInstance.getOccurredTime();
         this.terminatedTime = planItemInstance.getTerminatedTime();
+        this.failedTime = planItemInstance.getFailedTime();
         this.endedTime = planItemInstance.getEndedTime();
 
         if (planItemInstance.getTenantId() != null) {
@@ -119,10 +130,13 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
         persistentState.put("completedTime", completedTime);
         persistentState.put("occurredTime", occurredTime);
         persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("failedTime", failedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("lastUpdatedTime", lastUpdatedTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("assignee", assignee);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("planItemDefinitionId", planItemDefinitionId);
@@ -339,6 +353,16 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     }
 
     @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+
+    @Override
+    public void setFailedTime(Date failedTime) {
+        this.failedTime = failedTime;
+    }
+
+    @Override
     public Date getExitTime() {
         return exitTime;
     }
@@ -376,6 +400,26 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+
+    @Override
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
     }
 
     @Override
@@ -465,5 +509,58 @@ public class HistoricPlanItemInstanceEntityImpl extends AbstractCmmnEngineEntity
     @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
+    }
+
+    @Override
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (HistoricVariableInstance variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
+                    variables.put(variableInstance.getVariableName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public List<HistoricVariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new HistoricVariableInitializingList();
+        }
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
+    }
+
+
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("HistoricPlanItemInstance with id: ")
+                .append(id);
+
+        if (getName() != null) {
+            sb.append(", name: ").append(getName());
+        }
+        sb.append(", definitionId: ")
+                .append(planItemDefinitionId)
+                .append(", state: ")
+                .append(state);
+
+        sb
+                .append(", caseInstanceId: ")
+                .append(caseInstanceId)
+                .append(", caseDefinitionId: ")
+                .append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        return sb.toString();
     }
 }

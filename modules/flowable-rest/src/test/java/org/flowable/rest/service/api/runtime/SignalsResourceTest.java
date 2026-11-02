@@ -30,12 +30,11 @@ import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -211,7 +210,7 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
     }
 
     @Test
-    @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" })
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/SignalsResourceTest.process-signal-start.bpmn20.xml" }, tenantId = "acme")
     public void testGetEventSubscription() throws Exception {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().singleResult();
 
@@ -228,8 +227,8 @@ public class SignalsResourceTest extends BaseSpringRestTestCase {
                         + "eventName: '" + eventSubscription.getEventName() + "',"
                         + "activityId: '" + eventSubscription.getActivityId() + "',"
                         + "processDefinitionId: '" + eventSubscription.getProcessDefinitionId() + "',"
-                        + "created: " + new TextNode(getISODateStringWithTZ(eventSubscription.getCreated())) + ","
-                        + "tenantId: ''"
+                        + "created: '" + getISODateString(eventSubscription.getCreated()) + "',"
+                        + "tenantId: 'acme'"
                         + "}");
     }
 }

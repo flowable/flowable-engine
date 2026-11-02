@@ -14,6 +14,7 @@
 package org.flowable.engine.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -34,12 +35,14 @@ import org.flowable.engine.impl.cmd.AddEventConsumerCommand;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddMultiInstanceExecutionCmd;
-import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.ProcessInstanceClaimCmd;
 import org.flowable.engine.impl.cmd.DeleteMultiInstanceExecutionCmd;
 import org.flowable.engine.impl.cmd.DeleteProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.DeleteProcessInstanceStartEventSubscriptionCmd;
+import org.flowable.engine.impl.cmd.DeleteProcessInstancesByIdCmd;
 import org.flowable.engine.impl.cmd.DispatchEventCommand;
 import org.flowable.engine.impl.cmd.EvaluateConditionalEventsCmd;
 import org.flowable.engine.impl.cmd.ExecuteActivityForAdhocSubProcessCmd;
@@ -64,13 +67,22 @@ import org.flowable.engine.impl.cmd.GetStartFormCmd;
 import org.flowable.engine.impl.cmd.GetStartFormModelCmd;
 import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
+import org.flowable.engine.impl.cmd.ModifyProcessInstanceStartEventSubscriptionCmd;
+import org.flowable.engine.impl.cmd.RegisterProcessInstanceStartEventSubscriptionCmd;
 import org.flowable.engine.impl.cmd.RemoveEventConsumerCommand;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.flowable.engine.impl.cmd.RemoveProcessInstanceAssigneeCmd;
+import org.flowable.engine.impl.cmd.RemoveProcessInstanceOwnerCmd;
+import org.flowable.engine.impl.cmd.SetAsyncExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceAssigneeCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessStatusCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceDueDateCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
+import org.flowable.engine.impl.cmd.UpdateProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.SetProcessInstanceOwnerCmd;
 import org.flowable.engine.impl.cmd.SignalEventReceivedCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceAsyncCmd;
 import org.flowable.engine.impl.cmd.StartProcessInstanceByMessageCmd;
@@ -79,6 +91,10 @@ import org.flowable.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.TriggerCmd;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceUpdateBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilderImpl;
+import org.flowable.engine.impl.runtime.ProcessInstanceStartEventSubscriptionModificationBuilderImpl;
 import org.flowable.engine.runtime.ChangeActivityStateBuilder;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.runtime.Execution;
@@ -88,9 +104,14 @@ import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.api.EventSubscriptionQuery;
 import org.flowable.eventsubscription.service.impl.EventSubscriptionQueryImpl;
 import org.flowable.form.api.FormInfo;
@@ -233,6 +254,21 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public void setProcessInstanceDueDate(String processInstanceId, Date dueDate) {
+        commandExecutor.execute(new SetProcessInstanceDueDateCmd(processInstanceId, dueDate));
+    }
+
+    @Override
+    public void claimProcessInstance(String processInstanceId, String userId) {
+        commandExecutor.execute(new ProcessInstanceClaimCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void unclaimProcessInstance(String processInstanceId) {
+        commandExecutor.execute(new ProcessInstanceClaimCmd(processInstanceId, null));
+    }
+
+    @Override
     public Map<String, Object> getVariables(String executionId) {
         return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
     }
@@ -345,6 +381,36 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void setVariablesLocal(String executionId, Map<String, ?> variables) {
         commandExecutor.execute(new SetExecutionVariablesCmd(executionId, variables, true));
+    }
+    
+    @Override
+    public void setVariableAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariableLocalAsync(String executionId, String variableName, Object value) {
+        if (variableName == null) {
+            throw new FlowableIllegalArgumentException("variableName is null");
+        }
+        Map<String, Object> variables = new HashMap<>();
+        variables.put(variableName, value);
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
+    }
+
+    @Override
+    public void setVariablesAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, false));
+    }
+
+    @Override
+    public void setVariablesLocalAsync(String executionId, Map<String, ?> variables) {
+        commandExecutor.execute(new SetAsyncExecutionVariablesCmd(executionId, variables, true));
     }
 
     @Override
@@ -482,6 +548,26 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     @Override
     public void evaluateConditionalEvents(String processInstanceId, Map<String, Object> processVariables) {
         commandExecutor.execute(new EvaluateConditionalEventsCmd(processInstanceId, processVariables));
+    }
+
+    @Override
+    public void setOwner(String processInstanceId, String userId) {
+        commandExecutor.execute(new SetProcessInstanceOwnerCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void removeOwner(String processInstanceId) {
+        commandExecutor.execute(new RemoveProcessInstanceOwnerCmd(processInstanceId));
+    }
+
+    @Override
+    public void setAssignee(String processInstanceId, String userId) {
+        commandExecutor.execute(new SetProcessInstanceAssigneeCmd(processInstanceId, userId));
+    }
+
+    @Override
+    public void removeAssignee(String processInstanceId) {
+        commandExecutor.execute(new RemoveProcessInstanceAssigneeCmd(processInstanceId));
     }
 
     @Override
@@ -714,6 +800,21 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public ProcessInstanceStartEventSubscriptionBuilder createProcessInstanceStartEventSubscriptionBuilder() {
+        return new ProcessInstanceStartEventSubscriptionBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessInstanceStartEventSubscriptionModificationBuilder createProcessInstanceStartEventSubscriptionModificationBuilder() {
+        return new ProcessInstanceStartEventSubscriptionModificationBuilderImpl(this);
+    }
+
+    @Override
+    public ProcessInstanceStartEventSubscriptionDeletionBuilder createProcessInstanceStartEventSubscriptionDeletionBuilder() {
+        return new ProcessInstanceStartEventSubscriptionDeletionBuilderImpl(this);
+    }
+
+    @Override
     public void setProcessInstanceName(String processInstanceId, String name) {
         commandExecutor.execute(new SetProcessInstanceNameCmd(processInstanceId, name));
     }
@@ -749,6 +850,15 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
     }
 
     @Override
+    public ProcessInstanceUpdateBuilder createProcessInstanceUpdateBuilder(String processInstanceId) {
+        return new ProcessInstanceUpdateBuilderImpl(this, processInstanceId);
+    }
+
+    public void updateProcessInstance(ProcessInstanceUpdateBuilderImpl builder) {
+        commandExecutor.execute(new UpdateProcessInstanceCmd(builder));
+    }
+
+    @Override
     public ChangeActivityStateBuilder createChangeActivityStateBuilder() {
         return new ChangeActivityStateBuilderImpl(this);
     }
@@ -779,6 +889,18 @@ public class RuntimeServiceImpl extends CommonEngineServiceImpl<ProcessEngineCon
         } else {
             throw new FlowableIllegalArgumentException("No processDefinitionId, processDefinitionKey provided");
         }
+    }
+
+    public EventSubscription registerProcessInstanceStartEventSubscription(ProcessInstanceStartEventSubscriptionBuilderImpl builder) {
+        return commandExecutor.execute(new RegisterProcessInstanceStartEventSubscriptionCmd(builder));
+    }
+
+    public void migrateProcessInstanceStartEventSubscriptionsToProcessDefinitionVersion(ProcessInstanceStartEventSubscriptionModificationBuilderImpl builder) {
+        commandExecutor.execute(new ModifyProcessInstanceStartEventSubscriptionCmd(builder));
+    }
+
+    public void deleteProcessInstanceStartEventSubscriptions(ProcessInstanceStartEventSubscriptionDeletionBuilderImpl builder) {
+        commandExecutor.execute(new DeleteProcessInstanceStartEventSubscriptionCmd(builder));
     }
 
     public void changeActivityState(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {

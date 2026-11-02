@@ -15,14 +15,13 @@ package org.flowable.app.engine.test.impl;
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.flowable.app.api.repository.AppDeploymentBuilder;
 import org.flowable.app.engine.AppEngine;
 import org.flowable.app.engine.AppEngineConfiguration;
 import org.flowable.app.engine.test.AppDeployment;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,13 +34,12 @@ public abstract class AppTestHelper {
     private static final Logger LOGGER = LoggerFactory.getLogger(AppTestHelper.class);
 
     public static final String[] APP_RESOURCE_SUFFIXES = new String[] { "app" };
-    
-    static Map<String, AppEngine> appEngines = new HashMap<>();
-    
+
+    static final EngineTestCache<AppEngine> appEngines = new EngineTestCache<>();
+
     // Test annotation support /////////////////////////////////////////////
 
     public static String annotationDeploymentSetUp(AppEngine appEngine, Class<?> testClass, String methodName) {
-        String deploymentId = null;
         Method method = null;
         try {
             method = testClass.getMethod(methodName, (Class<?>[]) null);
@@ -50,6 +48,12 @@ public abstract class AppTestHelper {
             return null;
         }
         AppDeployment deploymentAnnotation = method.getAnnotation(AppDeployment.class);
+        return annotationDeploymentSetUp(appEngine, testClass, method, deploymentAnnotation);
+    }
+
+    public static String annotationDeploymentSetUp(AppEngine appEngine, Class<?> testClass, Method method, AppDeployment deploymentAnnotation) {
+        String deploymentId = null;
+        String methodName = method.getName();
         if (deploymentAnnotation != null) {
             LOGGER.debug("annotation @AppDeployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
             String[] resources = deploymentAnnotation.resources();
@@ -89,14 +93,12 @@ public abstract class AppTestHelper {
     }
     
     public static AppEngine getAppEngine(String configurationResource) {
-        AppEngine appEngine = appEngines.get(configurationResource);
-        if (appEngine == null) {
+        return appEngines.getOrCreate(configurationResource, resource -> {
             LOGGER.debug("==== BUILDING APP ENGINE ========================================================================");
-            appEngine = AppEngineConfiguration.createAppEngineConfigurationFromResource(configurationResource).buildAppEngine();
+            AppEngine appEngine = AppEngineConfiguration.createAppEngineConfigurationFromResource(resource).buildAppEngine();
             LOGGER.debug("==== APP ENGINE CREATED =========================================================================");
-            appEngines.put(configurationResource, appEngine);
-        }
-        return appEngine;
+            return appEngine;
+        });
     }
 
     /**

@@ -20,7 +20,6 @@ import java.util.Map;
 import org.flowable.common.engine.impl.persistence.entity.AbstractServiceEngineEntityManager;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayRef;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.InternalVariableInstanceQueryImpl;
@@ -41,19 +40,16 @@ public class VariableInstanceEntityManagerImpl
     }
 
     @Override
-    public VariableInstanceEntity create(String name, VariableType type, Object value) {
-        VariableInstanceEntity variableInstance = create(name, type);
-        variableInstance.setValue(value);
+    public VariableInstanceEntity create(String name) {
+        VariableInstanceEntity variableInstance = create();
+        variableInstance.setName(name);
         return variableInstance;
     }
 
     @Override
-    public VariableInstanceEntity create(String name, VariableType type) {
-        VariableInstanceEntity variableInstance = create();
-        variableInstance.setName(name);
-        variableInstance.setType(type);
-        variableInstance.setTypeName(type.getTypeName());
-        return variableInstance;
+    public void insertWithValue(VariableInstanceEntity variable, Object value, String tenantId) {
+        getServiceConfiguration().getVariableInstanceValueModifier().setVariableValue(variable, value, tenantId);
+        insert(variable);
     }
 
     @Override
@@ -80,7 +76,6 @@ public class VariableInstanceEntityManagerImpl
     public long findVariableInstanceCountByNativeQuery(Map<String, Object> parameterMap) {
         return dataManager.findVariableInstanceCountByNativeQuery(parameterMap);
     }
-
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {
         super.delete(entity, false);

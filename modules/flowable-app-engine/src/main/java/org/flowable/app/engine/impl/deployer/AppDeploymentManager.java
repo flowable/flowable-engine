@@ -13,6 +13,8 @@
 
 package org.flowable.app.engine.impl.deployer;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +29,11 @@ import org.flowable.app.engine.impl.repository.AppDefinitionQueryImpl;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
+import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.EngineDeployer;
+import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class AppDeploymentManager {
@@ -106,7 +111,7 @@ public class AppDeploymentManager {
             AppDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedAppDefinition = appDefinitionCache.get(appDefinitionId);
+            cachedAppDefinition = deployment.getAppDefinitionCacheEntry(appDefinitionId);
 
             if (cachedAppDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put app definition '" + appDefinitionId + "' in the cache");
@@ -125,10 +130,22 @@ public class AppDeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", AppDeploymentEntity.class);
         }
         
+        List<EngineDeployer> engineUnDeployers = new ArrayList<>(deployers);
+        engineUnDeployers.sort(Comparator.comparingInt(EngineDeployer::getUndeployOrder));
+
+        for (EngineDeployer deployer : engineUnDeployers) {
+            deployer.undeploy(deployment, cascade);
+        }
+
+        FlowableEventDispatcher eventDispatcher = appEngineConfiguration.getEventDispatcher();
         for (AppDefinition appDefinition : new AppDefinitionQueryImpl().deploymentId(deploymentId).list()) {
             appDefinitionCache.remove(appDefinition.getId());
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(appDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
+                        appEngineConfiguration.getEngineCfgKey());
+            }
         }
-        
+
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
     }
 

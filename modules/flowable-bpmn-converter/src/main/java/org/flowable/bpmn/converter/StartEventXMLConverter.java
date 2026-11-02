@@ -23,6 +23,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.child.BaseChildElementParser;
+import org.flowable.bpmn.converter.child.InParameterParser;
 import org.flowable.bpmn.converter.child.VariableListenerEventDefinitionParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
@@ -46,6 +47,8 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
             new ExtensionAttribute(ATTRIBUTE_SAME_DEPLOYMENT));
     
     public StartEventXMLConverter() {
+        InParameterParser inParameterParser = new InParameterParser();
+        childParserMap.put(inParameterParser.getElementName(), inParameterParser);
         VariableListenerEventDefinitionParser variableListenerEventDefinitionParser = new VariableListenerEventDefinitionParser();
         childParserMap.put(variableListenerEventDefinitionParser.getElementName(), variableListenerEventDefinitionParser);
     }
@@ -114,7 +117,7 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
             writeQualifiedAttribute(ATTRIBUTE_SAME_DEPLOYMENT, "false", xtw);
         }
 
-        if (startEvent.getEventDefinitions() != null && startEvent.getEventDefinitions().size() > 0) {
+        if (startEvent.getEventDefinitions() != null && !startEvent.getEventDefinitions().isEmpty()) {
             writeDefaultAttribute(ATTRIBUTE_EVENT_START_INTERRUPTING, String.valueOf(startEvent.isInterrupting()), xtw);
         }
     }
@@ -122,7 +125,8 @@ public class StartEventXMLConverter extends BaseBpmnXMLConverter {
     @Override
     protected boolean writeExtensionChildElements(BaseElement element, boolean didWriteExtensionStartElement, XMLStreamWriter xtw) throws Exception {
         StartEvent startEvent = (StartEvent) element;
-        didWriteExtensionStartElement = writeVariableListenerDefinition(startEvent, didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeIOParameters(ELEMENT_IN_PARAMETERS, startEvent.getInParameters(), didWriteExtensionStartElement, xtw);
+        didWriteExtensionStartElement = BpmnXMLUtil.writeCustomEventDefinitionExtensionElements(startEvent, didWriteExtensionStartElement, xtw);
         didWriteExtensionStartElement = writeFormProperties(startEvent, didWriteExtensionStartElement, xtw);
         return didWriteExtensionStartElement;
     }

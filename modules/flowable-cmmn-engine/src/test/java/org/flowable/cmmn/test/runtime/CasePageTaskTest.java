@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -28,14 +29,14 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class CasePageTaskTest extends FlowableCmmnTestCase {
 
@@ -76,6 +77,14 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId())
                 .planItemDefinitionId("casePageTask1")
                 .planItemInstanceFormKey("myFormKeyValue")
+                .includeEnded()
+                .singleResult();
+        assertThat(pagePlanItemInstance).isNotNull();
+
+        pagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").caseInstanceId(caseInstance.getId()).endOr()
+                .or().caseInstanceId("undefinedId").planItemDefinitionId("casePageTask1").endOr()
+                .or().caseInstanceId("undefinedId").planItemInstanceFormKey("myFormKeyValue").endOr()
                 .includeEnded()
                 .singleResult();
         assertThat(pagePlanItemInstance).isNotNull();
@@ -177,11 +186,19 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("janedoe").singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").involvedUser("janedoe").endOr().singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
+
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe2").singleResult();
         assertThat(planItemInstance).isNull();
 
         List<String> groups = Collections.singletonList("sales");
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedGroups(groups).singleResult();
+        assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
+
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .or().caseInstanceId("undefinedId").involvedGroups(groups).endOr().singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(groups).singleResult();
@@ -199,6 +216,20 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
 
         planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().involvedUser("johndoe").involvedGroups(nonMatchingGroups).singleResult();
         assertThat(planItemInstance.getName()).isEqualTo("Case Page Task One");
+
+        HistoricPlanItemInstance historicByUser = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedUser("janedoe").endOr()
+                .singleResult();
+        assertThat(historicByUser.getName()).isEqualTo("Case Page Task One");
+
+        HistoricPlanItemInstance historicByGroup = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedGroups(groups).endOr()
+                .singleResult();
+        assertThat(historicByGroup.getName()).isEqualTo("Case Page Task One");
+
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery()
+                .or().planItemInstanceCaseInstanceId("undefinedId").involvedUser("nonexisting").endOr()
+                .list()).isEmpty();
 
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -288,6 +319,67 @@ public class CasePageTaskTest extends FlowableCmmnTestCase {
             historicPlanItemInstanceQuery = cmmnHistoryService.createHistoricPlanItemInstanceQuery().involvedGroups(testGroups);
             assertThat(historicPlanItemInstanceQuery.count()).isEqualTo(1);
             assertThat(historicPlanItemInstanceQuery.list()).hasSize(1);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testExpressionIdentityLinks() {
+        List<String> users1 = new ArrayList<>();
+        users1.add("johndoe");
+        users1.add("janedoe");
+        
+        List<String> users2 = new ArrayList<>();
+        users2.add("patdoe");
+        users2.add("katedoe");
+        
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .variable("assigneeValue", "johndoe")
+                .variable("ownerValue", "janedoe")
+                .variable("users1", users1)
+                .variable("users2", users2)
+                .caseDefinitionKey("myCase")
+                .start();
+
+        PlanItemInstance pagePlanItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemDefinitionId("casePageTask1")
+                .singleResult();
+        assertThat(pagePlanItemInstance).isNotNull();
+
+        List<IdentityLink> identityLinks = cmmnRuntimeService.getIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
+
+        assertThat(identityLinks)
+                .extracting(IdentityLink::getType, IdentityLink::getUserId, IdentityLink::getGroupId)
+                .containsExactlyInAnyOrder(
+                        tuple(IdentityLinkType.ASSIGNEE, "johndoe", null),
+                        tuple(IdentityLinkType.OWNER, "janedoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "johndoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "janedoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "patdoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, "katedoe", null),
+                        tuple(IdentityLinkType.CANDIDATE, null, "group1"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "group2"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "group3"),
+                        tuple(IdentityLinkType.CANDIDATE, null, "group4")
+                );
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            List<HistoricIdentityLink> historicIdentityLinks = cmmnHistoryService.getHistoricIdentityLinksForPlanItemInstance(pagePlanItemInstance.getId());
+            assertThat(historicIdentityLinks)
+                    .extracting(HistoricIdentityLink::getType, HistoricIdentityLink::getUserId, HistoricIdentityLink::getGroupId)
+                    .containsExactlyInAnyOrder(
+                            tuple(IdentityLinkType.ASSIGNEE, "johndoe", null),
+                            tuple(IdentityLinkType.OWNER, "janedoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "johndoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "janedoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "patdoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, "katedoe", null),
+                            tuple(IdentityLinkType.CANDIDATE, null, "group1"),
+                            tuple(IdentityLinkType.CANDIDATE, null, "group2"),
+                            tuple(IdentityLinkType.CANDIDATE, null, "group3"),
+                            tuple(IdentityLinkType.CANDIDATE, null, "group4")
+                    );
         }
     }
 }

@@ -33,7 +33,6 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
-import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -45,6 +44,7 @@ import org.flowable.form.api.FormFieldHandler;
 import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.form.api.FormSubmissionBuilder;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
@@ -65,10 +65,13 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String overrideDefinitionTenantId;
     protected String predefinedProcessInstanceId;
     protected String processInstanceName;
+    protected String startEventId;
     protected String callbackId;
     protected String callbackType;
     protected String referenceId;
     protected String referenceType;
+    protected String ownerId;
+    protected String assigneeId;
     protected String stageInstanceId;
     protected Map<String, Object> startFormVariables;
     protected String outcome;
@@ -101,6 +104,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         
         this.processDefinitionParentDeploymentId = processInstanceBuilder.getProcessDefinitionParentDeploymentId();
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
+        this.startEventId = processInstanceBuilder.getStartEventId();
         this.overrideDefinitionTenantId = processInstanceBuilder.getOverrideDefinitionTenantId();
         this.predefinedProcessInstanceId = processInstanceBuilder.getPredefinedProcessInstanceId();
         this.transientVariables = processInstanceBuilder.getTransientVariables();
@@ -108,6 +112,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.callbackType = processInstanceBuilder.getCallbackType();
         this.referenceId = processInstanceBuilder.getReferenceId();
         this.referenceType = processInstanceBuilder.getReferenceType();
+        this.ownerId = processInstanceBuilder.getOwnerId();
+        this.assigneeId = processInstanceBuilder.getAssigneeId();
         this.stageInstanceId = processInstanceBuilder.getStageInstanceId();
         this.startFormVariables = processInstanceBuilder.getStartFormVariables();
         this.outcome = processInstanceBuilder.getOutcome();
@@ -138,18 +144,20 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     protected ProcessInstance handleProcessInstanceWithForm(CommandContext commandContext, ProcessDefinition processDefinition, 
                     ProcessEngineConfigurationImpl processEngineConfiguration) {
-        FormInfo formInfo = null;
-        Map<String, Object> processVariables = null;
-
-        if (hasStartFormData()) {
-
-            FormService formService = CommandContextUtil.getFormService(commandContext);
+        
+        FormService formService = CommandContextUtil.getFormService(commandContext);
+        
+        FlowElement startElement = null;
+        if (hasStartFormData() || extraFormInfo != null) {
             BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(processDefinition.getId());
             Process process = bpmnModel.getProcessById(processDefinition.getKey());
-            FlowElement startElement = process.getInitialFlowElement();
+            startElement = process.getInitialFlowElement();
+        }
 
-            if (startElement instanceof StartEvent) {
-                StartEvent startEvent = (StartEvent) startElement;
+        FormInfo formInfo = null;
+        Map<String, Object> processVariables = null;
+        if (hasStartFormData()) {
+            if (startElement instanceof StartEvent startEvent) {
                 String startFormKey = startEvent.getFormKey();
                 if (StringUtils.isNotEmpty(startFormKey)) {
                     FormRepositoryService formRepositoryService = CommandContextUtil.getFormRepositoryService(commandContext);
@@ -157,12 +165,21 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                     formInfo = resolveFormInfo(startEvent, processDefinition, formRepositoryService, processEngineConfiguration);
 
                     if (formInfo != null) {
-                        if (isFormFieldValidationEnabled(processEngineConfiguration, startEvent)) {
-                            formService.validateFormFields(formInfo, startFormVariables);
+                        boolean validateForm = isFormFieldValidationEnabled(processEngineConfiguration, startEvent);
+                        FormSubmissionBuilder formSubmissionBuilder = formService.createFormSubmissionBuilder()
+                                .elementId(startEvent.getId())
+                                .elementType("startEvent")
+                                .scopeDefinitionId(processDefinition.getId())
+                                .scopeType(ScopeTypes.BPMN)
+                                .formInfo(formInfo)
+                                .values(startFormVariables)
+                                .outcome(outcome);
+                        if (validateForm) {
+                            formSubmissionBuilder.validate();
                         }
                         // The processVariables are the variables that should be used when starting the process
                         // the actual variables should instead be used when saving the form instances
-                        processVariables = formService.getVariablesFromFormSubmission(formInfo, startFormVariables, outcome);
+                        processVariables = formSubmissionBuilder.extractVariables();
                         if (processVariables != null) {
                             if (variables == null) {
                                 variables = new HashMap<>();
@@ -177,8 +194,20 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         Map<String, Object> extraFormVariables = null;
         if (extraFormInfo != null) {
-            FormService formService = CommandContextUtil.getFormService(commandContext);
-            extraFormVariables = formService.getVariablesFromFormSubmission(this.extraFormInfo, this.extraFormVariables, this.extraFormOutcome);
+            String startEventId = null;
+            if (startElement instanceof StartEvent) {
+                startEventId = startElement.getId();
+            }
+            
+            extraFormVariables = formService.createFormSubmissionBuilder()
+                    .elementId(startEventId)
+                    .elementType("startEvent")
+                    .scopeDefinitionId(processDefinition.getId())
+                    .scopeType(ScopeTypes.BPMN)
+                    .formInfo(this.extraFormInfo)
+                    .values(this.extraFormVariables)
+                    .outcome(this.extraFormOutcome)
+                    .extractVariables();
 
             if (extraFormVariables != null) {
                 if (variables == null) {
@@ -193,7 +222,6 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
         if (processVariables != null) {
             // processVariables can be non null only if the formInfo was not null
-            FormService formService = CommandContextUtil.getFormService(commandContext);
             formService.createFormInstance(startFormVariables, formInfo, null, processInstance.getId(),
                             processInstance.getProcessDefinitionId(), processInstance.getTenantId(), outcome);
             FormFieldHandler formFieldHandler = processEngineConfiguration.getFormFieldHandler();
@@ -242,8 +270,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
 
     protected ProcessInstance startProcessInstance(ProcessDefinition processDefinition) {
         return processInstanceHelper.createProcessInstance(processDefinition, businessKey, businessStatus, processInstanceName,
-            overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
-            callbackId, callbackType, referenceId, referenceType, stageInstanceId, userIdentityLinks, groupIdentityLinks, true);
+            startEventId, overrideDefinitionTenantId, predefinedProcessInstanceId, variables, transientVariables,
+            callbackId, callbackType, referenceId, referenceType, ownerId, assigneeId, stageInstanceId, userIdentityLinks, groupIdentityLinks, true);
     }
 
     protected boolean hasStartFormData() {
@@ -255,64 +283,25 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     }
 
     protected ProcessDefinition getProcessDefinition(ProcessEngineConfigurationImpl processEngineConfiguration, CommandContext commandContext) {
-        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
-        ProcessDefinitionEntityManager processDefinitionEntityManager = processEngineConfiguration.getProcessDefinitionEntityManager();
-
         // Find the process definition
         ProcessDefinition processDefinition = null;
         if (processDefinitionId != null) {
+            DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
             processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
             if (processDefinition == null) {
                 throw new FlowableObjectNotFoundException("No process definition found for id = '" + processDefinitionId + "'", ProcessDefinition.class);
             }
 
-        } else if (processDefinitionKey != null && (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId))) {
+        } else if (processDefinitionKey != null) {
+            processDefinition = processEngineConfiguration.getProcessInstanceHelper()
+                    .resolveProcessDefinition(processDefinitionKey, tenantId,
+                            fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant(),
+                            processDefinitionParentDeploymentId, processEngineConfiguration);
 
-            if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKey(processDefinitionParentDeploymentId, processDefinitionKey);
-            }
-
-            if (processDefinition == null) {
-                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
-            }
-
-            if (processDefinition == null) {
-                throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey + "'", ProcessDefinition.class);
-            }
-
-        } else if (processDefinitionKey != null && tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-
-            if (processDefinitionParentDeploymentId != null) {
-                processDefinition = processDefinitionEntityManager
-                        .findProcessDefinitionByParentDeploymentAndKeyAndTenantId(processDefinitionParentDeploymentId, processDefinitionKey, tenantId);
-            }
-
-            if (processDefinition == null) {
-                processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, tenantId);
-            }
-
-            if (processDefinition == null) {
-                if (fallbackToDefaultTenant || processEngineConfiguration.isFallbackToDefaultTenant()) {
-                    String defaultTenant = processEngineConfiguration.getDefaultTenantProvider().getDefaultTenant(tenantId, ScopeTypes.BPMN, processDefinitionKey);
-                    if (StringUtils.isNotEmpty(defaultTenant)) {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKeyAndTenantId(processDefinitionKey, defaultTenant);
-                        if (processDefinition != null) {
-                            overrideDefinitionTenantId = tenantId;
-                        }
-                        
-                    } else {
-                        processDefinition = processDefinitionEntityManager.findLatestProcessDefinitionByKey(processDefinitionKey);
-                    }
-                    
-                    if (processDefinition == null) {
-                        throw new FlowableObjectNotFoundException("No process definition found for key '" + processDefinitionKey +
-                            "'. Fallback to default tenant was also applied.", ProcessDefinition.class);
-                    }
-                } else {
-                    throw new FlowableObjectNotFoundException("Process definition with key '" + processDefinitionKey +
-                        "' and tenantId '"+ tenantId +"' was not found", ProcessDefinition.class);
-                }
+            if (tenantId != null && !ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)
+                    && !tenantId.equals(processDefinition.getTenantId())) {
+                // Process definition comes from the fallback to the default tenant
+                overrideDefinitionTenantId = tenantId;
             }
 
         } else {

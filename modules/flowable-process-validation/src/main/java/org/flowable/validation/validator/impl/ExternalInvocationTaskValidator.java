@@ -21,13 +21,13 @@ import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.SendEventServiceTask;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
-import org.flowable.validation.ValidationError;
+import org.flowable.validation.ProcessValidationContext;
 import org.flowable.validation.validator.Problems;
 import org.flowable.validation.validator.ProcessLevelValidator;
 
 public abstract class ExternalInvocationTaskValidator extends ProcessLevelValidator {
 
-    protected void validateFieldDeclarationsForEmail(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForEmail(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, ProcessValidationContext validationContext) {
         boolean recipientDefined = false;
         boolean textOrHtmlDefined = false;
 
@@ -56,14 +56,14 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
 
         if (!recipientDefined) {
-            addError(errors, Problems.MAIL_TASK_NO_RECIPIENT, process, task, "No recipient is defined on the mail activity");
+            validationContext.addError(Problems.MAIL_TASK_NO_RECIPIENT, process, task, "No recipient is defined on the mail activity");
         }
         if (!textOrHtmlDefined) {
-            addError(errors, Problems.MAIL_TASK_NO_CONTENT, process, task, "Text, html, textVar or htmlVar field should be provided");
+            validationContext.addError(Problems.MAIL_TASK_NO_CONTENT, process, task, "Text, html, textVar or htmlVar field should be provided");
         }
     }
 
-    protected void validateFieldDeclarationsForShell(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForShell(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, ProcessValidationContext validationContext) {
         boolean shellCommandDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
@@ -75,17 +75,17 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
             }
 
             if (("wait".equals(fieldName) || "redirectError".equals(fieldName) || "cleanEnv".equals(fieldName)) && !"true".equals(fieldValue.toLowerCase()) && !"false".equals(fieldValue.toLowerCase())) {
-                addError(errors, Problems.SHELL_TASK_INVALID_PARAM, process, task, fieldExtension, "Undefined parameter value for shell field");
+                validationContext.addError(Problems.SHELL_TASK_INVALID_PARAM, process, task, fieldExtension, "Undefined parameter value for shell field");
             }
 
         }
 
         if (!shellCommandDefined) {
-            addError(errors, Problems.SHELL_TASK_NO_COMMAND, process, task, "No shell command is defined on the shell activity");
+            validationContext.addError(Problems.SHELL_TASK_NO_COMMAND, process, task, "No shell command is defined on the shell activity");
         }
     }
 
-    protected void validateFieldDeclarationsForDmn(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForDmn(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, ProcessValidationContext validationContext) {
         boolean keyDefined = false;
 
         for (FieldExtension fieldExtension : fieldExtensions) {
@@ -103,11 +103,11 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
 
         if (!keyDefined) {
-            addError(errors, Problems.DMN_TASK_NO_KEY, process, task, "No decision table or decision service reference key is defined on the dmn activity");
+            validationContext.addError(Problems.DMN_TASK_NO_KEY, process, task, "No decision table or decision service reference key is defined on the dmn activity");
         }
     }
 
-    protected void validateFieldDeclarationsForHttp(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForHttp(org.flowable.bpmn.model.Process process, TaskWithFieldExtensions task, List<FieldExtension> fieldExtensions, ProcessValidationContext validationContext) {
         boolean requestMethodDefined = false;
         boolean requestUrlDefined = false;
 
@@ -127,37 +127,37 @@ public abstract class ExternalInvocationTaskValidator extends ProcessLevelValida
         }
 
         if (!requestMethodDefined) {
-            addError(errors, Problems.HTTP_TASK_NO_REQUEST_METHOD, process, task, "No request method is defined on the http activity");
+            validationContext.addError(Problems.HTTP_TASK_NO_REQUEST_METHOD, process, task, "No request method is defined on the http activity");
         }
 
         if (!requestUrlDefined) {
-            addError(errors, Problems.HTTP_TASK_NO_REQUEST_URL, process, task, "No request url is defined on the http activity");
+            validationContext.addError(Problems.HTTP_TASK_NO_REQUEST_URL, process, task, "No request url is defined on the http activity");
         }
 
     }
     
-    protected void validateFieldDeclarationsForCase(org.flowable.bpmn.model.Process process, CaseServiceTask caseServiceTask, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForCase(org.flowable.bpmn.model.Process process, CaseServiceTask caseServiceTask, ProcessValidationContext validationContext) {
         if (StringUtils.isEmpty(caseServiceTask.getCaseDefinitionKey())) {
-            addError(errors, Problems.CASE_TASK_NO_CASE_DEFINITION_KEY, process, caseServiceTask, "No case definition key is defined on the case task");
+            validationContext.addError(Problems.CASE_TASK_NO_CASE_DEFINITION_KEY, process, caseServiceTask, "No case definition key is defined on the case task");
         }
     }
     
-    protected void validateFieldDeclarationsForSendEventTask(org.flowable.bpmn.model.Process process, SendEventServiceTask sendEventServiceTask, List<ValidationError> errors) {
+    protected void validateFieldDeclarationsForSendEventTask(org.flowable.bpmn.model.Process process, SendEventServiceTask sendEventServiceTask, ProcessValidationContext validationContext) {
         if (StringUtils.isEmpty(sendEventServiceTask.getEventType())) {
-            addError(errors, Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
+            validationContext.addError(Problems.SEND_EVENT_TASK_NO_EVENT_TYPE, process, sendEventServiceTask, "No event type is defined on the send event task");
         }
         List<ExtensionElement> channelKeyExtensionElements = sendEventServiceTask.getExtensionElements().get("channelKey");
         if (channelKeyExtensionElements == null || channelKeyExtensionElements.isEmpty() || StringUtils.isEmpty(channelKeyExtensionElements.get(0).getElementText())) {
             List<ExtensionElement> systemChannelElements = sendEventServiceTask.getExtensionElements().get("systemChannel");
             if (systemChannelElements == null || systemChannelElements.isEmpty()) {
-                addError(errors, Problems.SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL, process, sendEventServiceTask, "No outbound channel set on the send event task");
+                validationContext.addError(Problems.SEND_EVENT_TASK_NO_OUTBOUND_CHANNEL, process, sendEventServiceTask, "No outbound channel set on the send event task");
             }
         }
     }
 
-    protected void validateExternalWorkerTask(org.flowable.bpmn.model.Process process, ExternalWorkerServiceTask externalWorkerServiceTask, List<ValidationError> errors) {
+    protected void validateExternalWorkerTask(org.flowable.bpmn.model.Process process, ExternalWorkerServiceTask externalWorkerServiceTask, ProcessValidationContext validationContext) {
         if (StringUtils.isEmpty(externalWorkerServiceTask.getTopic())) {
-            addError(errors, Problems.EXTERNAL_WORKER_TASK_NO_TOPIC, process, externalWorkerServiceTask, "No topic is defined on the external worker task");
+            validationContext.addError(Problems.EXTERNAL_WORKER_TASK_NO_TOPIC, process, externalWorkerServiceTask, "No topic is defined on the external worker task");
         }
     }
 }

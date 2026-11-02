@@ -30,7 +30,7 @@ public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements T
 
     private static final long serialVersionUID = -8915149072830499057L;
 
-    public ScriptTypeTaskListener(Expression language, Expression script) {
+    public ScriptTypeTaskListener(Expression language, String script) {
         this.script = script;
         this.language = language;
     }
@@ -42,6 +42,6 @@ public class ScriptTypeTaskListener extends AbstractScriptEvaluator implements T
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        validateParametersAndEvaluteScript(delegateTask);
+        evaluateScriptRequest(createScriptRequest(delegateTask).traceEnhancer(trace -> trace.addTraceTag("type", "taskListener")));
     }
 }

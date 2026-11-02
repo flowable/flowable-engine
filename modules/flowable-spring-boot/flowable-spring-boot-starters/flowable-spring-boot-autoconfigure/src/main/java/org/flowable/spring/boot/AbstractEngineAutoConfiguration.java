@@ -55,6 +55,8 @@ public abstract class AbstractEngineAutoConfiguration {
 
         engineConfiguration.setDataSource(dataSource);
 
+        engineConfiguration.setDatabaseCatalog(defaultText(flowableProperties.getDatabaseCatalog(), engineConfiguration.getDatabaseCatalog()));
+
         engineConfiguration.setDatabaseSchema(defaultText(flowableProperties.getDatabaseSchema(), engineConfiguration.getDatabaseSchema()));
         engineConfiguration.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), engineConfiguration
             .getDatabaseSchemaUpdate()));
@@ -127,14 +129,6 @@ public abstract class AbstractEngineAutoConfiguration {
             return deploymentName;
         }
         return defaultName;
-    }
-
-    protected <T> T defaultIfNotNull(T value, T defaultValue) {
-        if (value == null) {
-            return defaultValue;
-        }
-
-        return value;
     }
 
 }

@@ -28,7 +28,7 @@ public class ELInputEntryExpressionPreParser {
         expression = expression.replaceAll("fn_addDate", "date:addDate");
         expression = expression.replaceAll("fn_now", "date:now");
 
-        if (expression.startsWith("#{") || expression.startsWith("${")) {
+        if ((expression.contains("#{") || expression.contains("${")) && expression.contains("}")) {
             return expression;
         }
         

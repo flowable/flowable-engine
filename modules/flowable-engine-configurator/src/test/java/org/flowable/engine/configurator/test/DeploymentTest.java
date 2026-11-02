@@ -13,10 +13,14 @@
 package org.flowable.engine.configurator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinition;
 import org.flowable.app.api.repository.AppDeployment;
-import org.flowable.app.engine.test.FlowableAppTestCase;
+import org.flowable.app.engine.AppEngine;
+import org.flowable.app.engine.AppEngineConfiguration;
+import org.flowable.app.engine.test.FlowableAppExtension;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
@@ -26,13 +30,25 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author Tijs Rademakers
  */
-public class DeploymentTest extends FlowableAppTestCase {
-    
+@ExtendWith(FlowableAppExtension.class)
+class DeploymentTest {
+
+    protected AppEngineConfiguration appEngineConfiguration;
+    protected AppRepositoryService appRepositoryService;
+
+    @BeforeEach
+    void setUp(AppEngine appEngine) {
+        appEngineConfiguration = appEngine.getAppEngineConfiguration();
+        appRepositoryService = appEngine.getAppRepositoryService();
+    }
+
     @Test
     public void testAppDefinitionDeployed() throws Exception {
         String baseResourcePath = "org/flowable/engine/configurator/test/";
@@ -77,16 +93,26 @@ public class DeploymentTest extends FlowableAppTestCase {
             CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
             assertThat(caseDefinition).isNotNull();
             assertThat(caseDefinition.getKey()).isEqualTo("oneTaskCase");
+
+            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
+
+            assertThat(appRepositoryService.createAppDefinitionQuery().list())
+                    .extracting(AppDefinition::getKey)
+                    .isEmpty();
+
+            assertThat(repositoryService.createProcessDefinitionQuery().list())
+                    .extracting(ProcessDefinition::getKey)
+                    .isEmpty();
+
+            assertThat(cmmnRepositoryService.createCaseDefinitionQuery().list())
+                    .extracting(CaseDefinition::getKey)
+                    .isEmpty();
             
             
         } finally {
-            appRepositoryService.deleteDeployment(appDeployment.getId(), true);
-            if (deployment != null) {
-                processEngineConfiguration.getRepositoryService().deleteDeployment(deployment.getId());
-            }
-            
-            if (cmmnDeployment != null) {
-                cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(cmmnDeployment.getId(), true);
+            appDeployment = appRepositoryService.createDeploymentQuery().deploymentId(appDeployment.getId()).singleResult();
+            if (appDeployment != null) {
+                appRepositoryService.deleteDeployment(appDeployment.getId(), true);
             }
         }
     }

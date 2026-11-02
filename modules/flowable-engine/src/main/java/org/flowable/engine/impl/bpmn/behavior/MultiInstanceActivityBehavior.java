@@ -46,7 +46,7 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
@@ -77,8 +77,8 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
@@ -146,7 +146,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
             try {
                 nrOfInstances = createInstances(delegateExecution);
-            } catch (BpmnError error) {
+            } catch (BusinessError error) {
                 ErrorPropagation.propagateError(error, execution);
             }
 
@@ -168,6 +168,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void leave(DelegateExecution execution) {
+        DelegateExecution rootExecution = null;
+        try {
+            rootExecution = getMultiInstanceRootExecution(execution);
+            CommandContextUtil.getProcessEngineConfiguration().getListenerNotificationHelper()
+                    .executeExecutionListeners(activity, rootExecution, ExecutionListener.EVENTNAME_END);
+        } catch (BusinessError error) {
+            ErrorPropagation.propagateError(error, rootExecution);
+            return;
+        }
         cleanupMiRoot(execution);
     }
 
@@ -197,8 +206,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
                     Integer elementIndexValue = getLoopVariable(childExecution, getCollectionElementIndexVariable());
                     String counterValue = aggregatedVarInstance.getId() + COUNTER_VAR_VALUE_SEPARATOR + elementIndexValue;
-                    VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(COUNTER_VAR_PREFIX + targetVarName,
-                            aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), counterValue, variableServiceConfiguration);
+                    VariableInstanceEntity counterVarInstance = createScopedVariableAggregationVariableInstance(childExecution.getTenantId(),
+                            COUNTER_VAR_PREFIX + targetVarName, aggregatedVarInstance.getScopeId(), aggregatedVarInstance.getSubScopeId(), counterValue,
+                            variableServiceConfiguration);
                     variableService.insertVariableInstance(counterVarInstance);
                 }
             }
@@ -337,6 +347,13 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     
     @Override
     public void interrupted(DelegateExecution execution) {
+        if (execution.isMultiInstanceRoot()) {
+            // We are only performing the interrupt logic for multi instance root executions
+            internalInterrupted(execution);
+        }
+    }
+
+    protected void internalInterrupted(DelegateExecution execution) {
         if (hasVariableAggregationDefinitions(execution)) {
             Map<String, VariableAggregationDefinition> aggregationsByTarget = groupAggregationsByTarget(execution, aggregations.getOverviewAggregations(),
                     CommandContextUtil.getProcessEngineConfiguration());
@@ -372,11 +389,10 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             
             Object value = expressionManager.createExpression(activeCompletionCondition).getValue(execution);
             
-            if (!(value instanceof Boolean)) {
+            if (!(value instanceof Boolean booleanValue)) {
                 throw new FlowableIllegalArgumentException("completionCondition '" + activeCompletionCondition + "' does not evaluate to a boolean value");
             }
 
-            Boolean booleanValue = (Boolean) value;
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Completion condition of multi-instance satisfied: {}", booleanValue);
             }
@@ -488,12 +504,33 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 }
                 
             } else {
-                throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
-                
+                throw new FlowableIllegalArgumentException(buildUnresolvedCollectionExceptionMessage());
             }
         }
     }
-    
+
+    protected String buildUnresolvedCollectionExceptionMessage() {
+        StringBuilder exceptionStringBuilder = new StringBuilder("Couldn't resolve collection expression");
+        if (collectionExpression != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionExpression.getExpressionText());
+            exceptionStringBuilder.append(")");
+        }
+        exceptionStringBuilder.append(", variable reference");
+        if (collectionVariable != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionVariable);
+            exceptionStringBuilder.append(")");
+        }
+        exceptionStringBuilder.append(" or string");
+        if (collectionString != null) {
+            exceptionStringBuilder.append(" (");
+            exceptionStringBuilder.append(collectionString);
+            exceptionStringBuilder.append(")");
+        }
+        return exceptionStringBuilder.toString();
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected Collection iterableToCollection(Iterable iterable) {
         List result = new ArrayList();
@@ -597,7 +634,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
                 if (overrideValueNode.isNull()) {
                     activeValue = null;
                 } else {
-                    activeValue = overrideValueNode.asText();
+                    activeValue = overrideValueNode.asString();
                 }
             }
         }

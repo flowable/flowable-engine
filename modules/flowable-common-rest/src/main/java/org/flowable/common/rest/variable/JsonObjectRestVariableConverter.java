@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 public class JsonObjectRestVariableConverter implements RestVariableConverter {
     
@@ -32,6 +32,11 @@ public class JsonObjectRestVariableConverter implements RestVariableConverter {
     @Override
     public String getRestTypeName() {
         return "json";
+    }
+
+    @Override
+    public boolean isVariableTypeSupported(String variableTypeName) {
+        return "json".equals(variableTypeName) || "longJson".equals(variableTypeName);
     }
 
     @Override
@@ -58,7 +63,7 @@ public class JsonObjectRestVariableConverter implements RestVariableConverter {
     public void convertVariableValue(Object variableValue, EngineRestVariable result) {
         if (variableValue != null) {
             if (!(variableValue instanceof JsonNode)) {
-                throw new FlowableIllegalArgumentException("Converter can only convert com.fasterxml.jackson.databind.JsonNode.");
+                throw new FlowableIllegalArgumentException("Converter can only convert tools.jackson.databind.JsonNode.");
             }
             result.setValue(variableValue);
         } else {

@@ -41,6 +41,16 @@ public interface ExternalWorkerJobEntityManager extends EntityManager<ExternalWo
      * Returns all {@link ExternalWorkerJobEntity} for the given scope and subscope.
      */
     List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId);
+    
+    /**
+     * Returns all {@link ExternalWorkerJobEntity} for the given worker id.
+     */
+    List<ExternalWorkerJobEntity> findJobsByWorkerId(String workerId);
+    
+    /**
+     * Returns all {@link ExternalWorkerJobEntity} for the given worker and tenant id.
+     */
+    List<ExternalWorkerJobEntity> findJobsByWorkerIdAndTenantId(String workerId, String tenantId);
 
     /**
      * Executes a {@link ExternalWorkerJobQueryImpl} and returns the matching {@link ExternalWorkerJobEntity} instances.

@@ -13,7 +13,6 @@
 package org.flowable.dmn.engine.impl.hitpolicy;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -61,22 +60,20 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
         }
 
         // sort on predefined list(s) of output values
-        ruleResults.sort(new Comparator<Map<String, Object>>() {
-
-            @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-                CompareToBuilder compareToBuilder = new CompareToBuilder();
-                for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
-                    List<Object> outputValues = entry.getValue();
-                    if (outputValues != null && !outputValues.isEmpty()) {
-                        compareToBuilder.append(o1.get(entry.getKey()), o2.get(entry.getKey()),
-                                new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
-                        compareToBuilder.toComparison();
-                    }
+        ruleResults.sort((o1, o2) -> {
+            CompareToBuilder compareToBuilder = new CompareToBuilder();
+            for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {
+                List<Object> outputValues = entry.getValue();
+                if (outputValues != null && !outputValues.isEmpty()) {
+                    compareToBuilder.append(o1.get(entry.getKey()), o2.get(entry.getKey()),
+                            new OutputOrderComparator<>(outputValues.toArray(new Comparable[outputValues.size()])));
+                    compareToBuilder.toComparison();
                 }
-                return compareToBuilder.toComparison();
             }
+            return compareToBuilder.toComparison();
         });
+
+        updateStackWithDecisionResults(ruleResults, executionContext);
 
         DecisionExecutionAuditContainer auditContainer = executionContext.getAuditContainer();
         auditContainer.setDecisionResult(ruleResults);

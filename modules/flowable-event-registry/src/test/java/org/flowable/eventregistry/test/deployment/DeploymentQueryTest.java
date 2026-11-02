@@ -28,24 +28,26 @@ public class DeploymentQueryTest extends AbstractFlowableEventTest {
     private String deploymentId2;
     private String deploymentId3;
 
-    private String eventModel = "{\n" +
-            "    \"key\": \"$changeme$\",\n" +
-            "    \"name\": \"My first event\"\n" +
-            "}\n" +
-            "";
+    private String eventModel = """
+            {
+                "key": "$changeme$",
+                "name": "My first event"
+            }
+            """;
 
-    private String channelModel = "{\n" +
-            "    \"key\": \"$changeme$\",\n" +
-            "    \"name\": \"My first event\",\n" +
-            "    \"channelType\": \"inbound\",\n" +
-            "    \"type\": \"jms\",\n" +
-            "    \"destination\": \"$changemedestination$\",\n" +
-            "    \"deserializerType\": \"json\",\n" +
-            "    \"channelEventKeyDetection\": {\n" +
-            "       \"fixedValue\": \"$changemefixedvalue$\"\n" +
-            "    }\n" +
-            "}\n" +
-            "";
+    private String channelModel = """
+            {
+                "key": "$changeme$",
+                "name": "My first event",
+                "channelType": "inbound",
+                "type": "jms",
+                "destination": "$changemedestination$",
+                "deserializerType": "json",
+                "channelEventKeyDetection": {
+                   "fixedValue": "$changemefixedvalue$"
+                }
+            }
+            """;
 
     @BeforeEach
     public void deploy() {

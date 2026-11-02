@@ -86,16 +86,16 @@ Sometimes you need more powerful queries, for example, queries using an OR opera
 
 As Flowable DMN is an embeddable Java engine, writing unit tests for DMN definitions is as simple as writing regular unit tests.
 
-Flowable supports the JUnit version 4 and 5 style of unit testing.
+Flowable supports the JUnit Jupiter style of unit testing.
 
-In the JUnit 5 style one needs to use the org.flowable.dmn.engine.test.FlowableDmnTest annotation
+In the JUnit Jupiter style one needs to use the org.flowable.dmn.engine.test.FlowableDmnTest annotation
 or register the org.flowable.dmn.engine.test.FlowableDmnExtension manually.
-The FlowableDmnTest annotation is just a meta annotation and the does the registration of the FlowableDmnExtension
+The FlowableDmnTest annotation is just a meta-annotation and does the registration of the FlowableDmnExtension
 (i.e. it does @ExtendWith(FlowableDmnExtension.class)).
 This will make the DmnEngine and the services available as parameters into the test and lifecycle methods
 (@BeforeAll, @BeforeEach, @AfterEach, @AfterAll).
 Before each test the dmnEngine will be initialized by default with the flowable.dmn.cfg.xml resource on the classpath.
-In order to specify a different configuration file the org.flowable.dmn.engine.test.DmnConfigurationResource
+To specify a different configuration file the org.flowable.dmn.engine.test.DmnConfigurationResource
 annotation needs to be used (see second example).
 Dmn engines are cached statically over multiple unit tests when the configuration resource is the same.
 
@@ -110,9 +110,9 @@ in the same package as the test class, will be deployed.
 At the end of the test, the deployment will be deleted, including all related dmn definitions, executions, and so on.
 See the DmnDeployment class for more information.
 
-Taking all that in account, a JUnit 5 test looks as follows:
+Taking all that into account, a JUnit Jupiter test looks as follows:
 
-**JUnit 5 test with default resource.**
+**JUnit Jupiter test with default resource.**
 
     @FlowableDmnTest
     class MyDecisionTableTest {
@@ -132,9 +132,9 @@ Taking all that in account, a JUnit 5 test looks as follows:
       }
     }
 
-    With JUnit 5 you can also inject the id of the deployment (with +org.flowable.dmn.engine.test.DmnDeploymentId+_) into your test and lifecycle methods.
+With JUnit Jupiter you can also inject the id of the deployment (with +org.flowable.dmn.engine.test.DmnDeploymentId+_) into your test and lifecycle methods.
 
-**JUnit 5 test with custom resource.**
+**JUnit Jupiter test with custom resource.**
 
     @FlowableDmnTest
     @DmnConfigurationResource("flowable.custom.dmn.cfg.xml")
@@ -143,34 +143,6 @@ Taking all that in account, a JUnit 5 test looks as follows:
       @Test
       @DmnDeploymentAnnotation
       void simpleDmnTest(DmnEngine dmnEngine) {
-        DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()
-                .decisionKey("extensionUsage")
-                .variable("inputVariable1", 2)
-                .variable("inputVariable2", "test2")
-                .executeWithSingleResult();
-
-        Assertions.assertThat(executionResult).containsEntry("output1", "test1");
-      }
-    }
-
-When writing JUnit 4 unit tests, the org.flowable.dmn.engine.test.FlowableDmnRule Rule can be used. Through this rule, the DMN engine and services are available through getters. Including this Rule will enable the use of the org.flowable.dmn.engine.test.DmnDeploymentAnnotation annotation (see above for an explanation of its use and configuration) and it will look for the default configuration file on the classpath. DMN engines are statically cached over multiple unit tests when using the same configuration resource.
-It’s also possible to provide a custom engine configuration to the rule.
-
-The following code snippet shows an example of using the JUnit 4 style of testing and the usage of the FlowableDmnRule (and passing an optional custom configuration):
-
-**JUnit 4 test.**
-
-    public class MyDecisionTableTest {
-
-      @Rule
-      public FlowableDmnRule flowableDmnRule = new FlowableDmnRule("custom1.flowable.dmn.cfg.xml");
-
-      @Test
-      @DmnDeploymentAnnotation
-      public void ruleUsageExample() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
 
         Map<String, Object> executionResult = ruleService.createExecuteDecisionBuilder()

@@ -13,6 +13,7 @@
 
 package org.flowable.variable.api.history;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
@@ -30,6 +31,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
     /** Only select historic process variables with the given process instance. */
     HistoricVariableInstanceQuery processInstanceId(String processInstanceId);
+
+    /** Only select historic process variables with the given process instances. */
+    HistoricVariableInstanceQuery processInstanceIds(Collection<String> processInstanceIds);
 
     /** Only select historic process variables with the given id. **/
     HistoricVariableInstanceQuery executionId(String executionId);
@@ -77,6 +81,11 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
      * Only select historic variables with the given scope id.
      */
     HistoricVariableInstanceQuery scopeId(String scopeId);
+
+    /**
+     * Only select historic variables with the given scope ids.
+     */
+    HistoricVariableInstanceQuery scopeIds(Collection<String> scopeIds);
     
     /**
      * Only select historic variables with the given sub scope id.

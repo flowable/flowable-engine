@@ -19,6 +19,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -59,9 +60,14 @@ public interface CmmnHistoryConfigurationSettings {
     boolean isHistoryEnabledForPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
     /**
-     * Returns whether history is enabled for the provided user task.
+     * Returns whether history is enabled for the provided human task.
      */
-    boolean isHistoryEnabledForUserTask(TaskInfo taskInfo);
+    boolean isHistoryEnabledForHumanTask(TaskInfo taskInfo);
+    
+    /**
+     * Returns whether task history is enabled for the provided case definition id.
+     */
+    boolean isHistoryEnabledForHumanTask(String caseDefinitionId);
 
     /**
      * Returns whether history is enabled for the provided variable instance.
@@ -78,4 +84,8 @@ public interface CmmnHistoryConfigurationSettings {
      */
     boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink);
 
+    /**
+     * Returns whether variable history is enabled for the provided historic task instance.
+     */
+    boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance);
 }

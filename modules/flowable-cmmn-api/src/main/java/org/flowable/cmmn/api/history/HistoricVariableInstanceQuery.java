@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.api.history;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
@@ -27,6 +28,9 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
 
     /** Only select historic variables with the given case instance. */
     HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId);
+
+    /** Only select historic variables with the given case instances. */
+    HistoricVariableInstanceQuery caseInstanceIds(Collection<String> caseInstanceIds);
     
     /** Only select historic variables with the given plan item instance id. */
     HistoricVariableInstanceQuery planItemInstanceId(String planItemInstanceId);

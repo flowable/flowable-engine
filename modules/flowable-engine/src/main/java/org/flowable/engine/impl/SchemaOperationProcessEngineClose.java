@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.impl;
 
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineDropDbCmd;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -28,7 +28,10 @@ public class SchemaOperationProcessEngineClose implements Command<Void> {
     public Void execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.isUsingRelationalDatabase()) {
-            ((ProcessDbSchemaManager) processEngineConfiguration.getSchemaManager()).performSchemaOperationsProcessEngineClose();
+            String databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
+            if (org.flowable.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
+                new SchemaOperationsEngineDropDbCmd(processEngineConfiguration.getEngineScopeType()).execute(commandContext);
+            }
         }
         return null;
     }

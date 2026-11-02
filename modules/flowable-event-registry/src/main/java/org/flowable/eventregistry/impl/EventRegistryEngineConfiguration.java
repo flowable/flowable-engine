@@ -18,12 +18,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.HasExpressionManagerEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.SchemaManager;
 import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
@@ -34,6 +37,7 @@ import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.FullDeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
+import org.flowable.eventregistry.api.CorrelationValueTransformer;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryConfigurationApi;
@@ -42,12 +46,12 @@ import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.InboundChannelModelCacheManager;
 import org.flowable.eventregistry.api.InboundEventPayloadExtractor;
 import org.flowable.eventregistry.api.InboundEventProcessor;
+import org.flowable.eventregistry.api.JsonPayloadValueTransformer;
 import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionExecutor;
 import org.flowable.eventregistry.api.management.EventRegistryChangeDetectionManager;
 import org.flowable.eventregistry.impl.cfg.StandaloneEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.impl.cfg.StandaloneInMemEventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.cmd.SchemaOperationsEventRegistryEngineBuild;
 import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
 import org.flowable.eventregistry.impl.db.EventDbSchemaManager;
 import org.flowable.eventregistry.impl.deployer.CachingAndArtifactsManager;
@@ -90,16 +94,10 @@ import org.flowable.eventregistry.impl.pipeline.OutboundChannelModelProcessor;
 import org.flowable.eventregistry.json.converter.ChannelJsonConverter;
 import org.flowable.eventregistry.json.converter.EventJsonConverter;
 
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.exception.DatabaseException;
-
-public class EventRegistryEngineConfiguration extends AbstractEngineConfiguration
+public class EventRegistryEngineConfiguration extends AbstractBuildableEngineConfiguration<EventRegistryEngine>
         implements EventRegistryConfigurationApi, HasExpressionManagerEngineConfiguration {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/eventregistry/db/mapping/mappings.xml";
-
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "FLW_EV_";
 
     protected String eventRegistryEngineName = EventRegistryEngines.NAME_DEFAULT;
 
@@ -123,12 +121,13 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     protected EventResourceEntityManager resourceEntityManager;
 
     protected ExpressionManager expressionManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
     protected Collection<ELResolver> preDefaultELResolvers;
     protected Collection<ELResolver> preBeanELResolvers;
     protected Collection<ELResolver> postDefaultELResolvers;
 
-    protected EventJsonConverter eventJsonConverter = new EventJsonConverter();
-    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter();
+    protected EventJsonConverter eventJsonConverter = new EventJsonConverter(this::getObjectMapper);
+    protected ChannelJsonConverter channelJsonConverter = new ChannelJsonConverter(this::getObjectMapper);
 
     // DEPLOYERS
     // ////////////////////////////////////////////////////////////////
@@ -160,6 +159,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     protected Map<String, InboundEventPayloadExtractor<?>> inboundEventPayloadExtractorsByChannelType;
     protected InboundEventPayloadExtractor<?> defaultInboundEventPayloadExtractor;
+    protected JsonPayloadValueTransformer jsonPayloadValueTransformer;
+    protected CorrelationValueTransformer correlationValueTransformer;
     
     // Change detection
     protected boolean enableEventRegistryChangeDetection;
@@ -203,25 +204,24 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     // buildEventRegistryEngine
     // ///////////////////////////////////////////////////////
 
+    @Override
+    protected EventRegistryEngine createEngine() {
+        return new EventRegistryEngineImpl(this);
+    }
+
+    @Override
+    protected Consumer<EventRegistryEngine> createPostEngineBuildConsumer() {
+        return new EventRegistryEnginePostEngineBuildConsumer();
+    }
+
     public EventRegistryEngine buildEventRegistryEngine() {
-        init();
-        EventRegistryEngineImpl eventRegistryEngine = new EventRegistryEngineImpl(this);
-
-        if (enableEventRegistryChangeDetectionAfterEngineCreate) {
-
-            eventRegistryEngine.handleDeployedChannelDefinitions();
-
-            if (enableEventRegistryChangeDetection) {
-                eventRegistryChangeDetectionExecutor.initialize();
-            }
-        }
-
-        return eventRegistryEngine;
+        return buildEngine();
     }
 
     // init
     // /////////////////////////////////////////////////////////////////////
 
+    @Override
     protected void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -256,12 +256,15 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
         initDataManagers();
         initEntityManagers();
         initEventRegistry();
+        initPayloadValueTransformer();
+        initCorrelationValueTransformer();
         initInboundEventProcessor();
         initOutboundEventProcessor();
         initSystemOutboundEventProcessor();
         initInboundEventPayloadExtractorProvider();
         initChannelDefinitionProcessors();
         initDeployers();
+        initEventDispatcher();
         initInboundChannelModelCacheManager();
         initChangeDetectionManager();
         initChangeDetectionExecutor();
@@ -289,6 +292,10 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
             if (postDefaultELResolvers != null) {
                 postDefaultELResolvers.forEach(eventRegistryExpressionManager::addPostDefaultResolver);
+            }
+
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(eventRegistryExpressionManager));
             }
 
             expressionManager = eventRegistryExpressionManager;
@@ -335,32 +342,8 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     // data model ///////////////////////////////////////////////////////////////
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        if (this.schemaManager == null) {
-            this.schemaManager = new EventDbSchemaManager();
-        }
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsEventRegistryEngineBuild();
-            }
-        }
-    }
-
-    private void closeDatabase(Liquibase liquibase) {
-        if (liquibase != null) {
-            Database database = liquibase.getDatabase();
-            if (database != null) {
-                try {
-                    database.close();
-                } catch (DatabaseException e) {
-                    logger.warn("Error closing database", e);
-                }
-            }
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new EventDbSchemaManager();
     }
 
     // session factories ////////////////////////////////////////////////////////
@@ -525,10 +508,22 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
             inboundChannelModelCacheManager = new DefaultInboundChannelModelCacheManager(this);
         }
     }
-    
+
     public void initEventRegistry() {
         if (this.eventRegistry == null) {
             this.eventRegistry = new DefaultEventRegistry(this);
+        }
+    }
+    
+    public void initPayloadValueTransformer() {
+        if (this.jsonPayloadValueTransformer == null) {
+            this.jsonPayloadValueTransformer = new DefaultJsonPayloadValueTransformer();
+        }
+    }
+    
+    public void initCorrelationValueTransformer() {
+        if (this.correlationValueTransformer == null) {
+            this.correlationValueTransformer = new DefaultCorrelationValueTransformer();
         }
     }
 
@@ -656,6 +651,24 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
 
     public EventRegistryEngineConfiguration setEventRegistry(EventRegistry eventRegistry) {
         this.eventRegistry = eventRegistry;
+        return this;
+    }
+
+    public JsonPayloadValueTransformer getJsonPayloadValueTransformer() {
+        return jsonPayloadValueTransformer;
+    }
+
+    public EventRegistryEngineConfiguration setJsonPayloadValueTransformer(JsonPayloadValueTransformer jsonPayloadValueTransformer) {
+        this.jsonPayloadValueTransformer = jsonPayloadValueTransformer;
+        return this;
+    }
+
+    public CorrelationValueTransformer getCorrelationValueTransformer() {
+        return correlationValueTransformer;
+    }
+
+    public EventRegistryEngineConfiguration setCorrelationValueTransformer(CorrelationValueTransformer correlationValueTransformer) {
+        this.correlationValueTransformer = correlationValueTransformer;
         return this;
     }
 
@@ -903,6 +916,19 @@ public class EventRegistryEngineConfiguration extends AbstractEngineConfiguratio
     @Override
     public EventRegistryEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
+    }
+
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
         return this;
     }
 

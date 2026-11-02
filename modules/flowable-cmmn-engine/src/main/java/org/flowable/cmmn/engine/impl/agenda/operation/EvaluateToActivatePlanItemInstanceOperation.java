@@ -39,7 +39,7 @@ public class EvaluateToActivatePlanItemInstanceOperation extends AbstractEvaluat
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Evaluate To Activate] plan item intance ");
+        stringBuilder.append("[Evaluate To Activate] plan item instance ");
         stringBuilder.append(planItemInstanceEntity.getId());
 
         if (planItemLifeCycleEvent != null) {

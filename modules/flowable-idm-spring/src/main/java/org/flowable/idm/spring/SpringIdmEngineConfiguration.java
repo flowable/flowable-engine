@@ -46,8 +46,8 @@ public class SpringIdmEngineConfiguration extends IdmEngineConfiguration impleme
     }
 
     @Override
-    public IdmEngine buildIdmEngine() {
-        IdmEngine idmEngine = super.buildIdmEngine();
+    public IdmEngine buildEngine() {
+        IdmEngine idmEngine = super.buildEngine();
         IdmEngines.setInitialized(true);
         return idmEngine;
     }

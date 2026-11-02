@@ -130,7 +130,7 @@ public class MybatisChannelDefinitionDataManager extends AbstractEventDataManage
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " event definitions with key = '" + channelDefinitionKey + "' and version = '" + eventVersion + "'.");
+            throw new FlowableException("There are " + results.size() + " event definitions with key = '" + channelDefinitionKey + "' and version = '" + eventVersion + "' in tenant = '" + tenantId + "'.");
         }
         return null;
     }
@@ -154,12 +154,4 @@ public class MybatisChannelDefinitionDataManager extends AbstractEventDataManage
         getDbSqlSession().directUpdate("updateChannelDefinitionTenantIdForDeploymentId", params);
     }
 
-    @Override
-    public void updateChannelDefinitionTypeAndImplementation(String channelDefinitionId, String type, String implementation) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", channelDefinitionId);
-        params.put("type", type);
-        params.put("implementation", implementation);
-        getDbSqlSession().directUpdate("updateChannelDefinitionTypeAndImplementationById", params);
-    }
 }

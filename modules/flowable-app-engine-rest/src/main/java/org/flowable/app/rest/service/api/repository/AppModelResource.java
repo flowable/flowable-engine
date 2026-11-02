@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Definitions" }, description = "Manage App Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppModelResource {
     
     @Autowired

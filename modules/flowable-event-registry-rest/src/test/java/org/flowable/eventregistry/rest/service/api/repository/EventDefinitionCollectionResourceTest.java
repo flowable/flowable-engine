@@ -18,6 +18,7 @@ import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -29,6 +30,7 @@ public class EventDefinitionCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test getting event definitions. GET event-registry-repository/event-definitions
      */
+    @Test
     public void testGetEventDefinitions() throws Exception {
 
         try {

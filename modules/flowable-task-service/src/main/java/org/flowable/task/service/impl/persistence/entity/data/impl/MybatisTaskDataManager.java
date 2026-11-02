@@ -112,7 +112,12 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     @Override
     @SuppressWarnings("unchecked")
     public List<Task> findTasksWithRelatedEntitiesByQueryCriteria(TaskQueryImpl taskQuery) {
-        final String query = "selectTasksWithRelatedEntitiesByQueryCriteria";
+        final String query;
+        if (taskQuery.isIncludeTaskLocalVariables() || taskQuery.isIncludeProcessVariables() || taskQuery.isIncludeCaseVariables()) {
+            query = "selectTasksWithRelatedEntitiesByQueryCriteria";
+        } else {
+            query = "selectTasksWithIdentityLinksByQueryCriteria";
+        }
         setSafeInValueLists(taskQuery);
         return getDbSqlSession().selectList(query, taskQuery, getManagedEntityClass());
     }
@@ -175,6 +180,10 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         
         if (taskQuery.getInvolvedGroups() != null) {
             taskQuery.setSafeInvolvedGroups(createSafeInValuesList(taskQuery.getInvolvedGroups()));
+        }
+
+        if (taskQuery.getScopeIds() != null) {
+            taskQuery.setSafeScopeIds(createSafeInValuesList(taskQuery.getScopeIds()));
         }
         
         if (taskQuery.getOrQueryObjects() != null && !taskQuery.getOrQueryObjects().isEmpty()) {

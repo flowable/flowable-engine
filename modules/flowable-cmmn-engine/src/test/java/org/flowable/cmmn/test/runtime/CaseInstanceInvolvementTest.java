@@ -14,6 +14,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,21 +25,16 @@ import java.util.stream.Stream;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.identitylink.api.IdentityLinkType;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author martin.grofcik
  */
 public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
-
-    @Rule
-    public ExpectedException expectException = ExpectedException.none();
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/oneTaskCase.cmmn")
@@ -94,26 +90,23 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
 
     @Test
     public void getCaseInstanceWithNullInvolvedUser() {
-        this.expectException.expect(FlowableIllegalArgumentException.class);
-        this.expectException.expectMessage("involvedUser is null");
-
-        cmmnRuntimeService.createCaseInstanceQuery().involvedUser(null);
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceQuery().involvedUser(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("involvedUser is null");
     }
 
     @Test
     public void getCaseInstanceWithNullInvolvedGroups() {
-        this.expectException.expect(FlowableIllegalArgumentException.class);
-        this.expectException.expectMessage("involvedGroups are null");
-
-        cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(null);
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("involvedGroups are null");
     }
 
     @Test
     public void getCaseInstanceWithEmptyInvolvedGroups() {
-        this.expectException.expect(FlowableIllegalArgumentException.class);
-        this.expectException.expectMessage("involvedGroups are empty");
-
-        cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.emptySet());
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceQuery().involvedGroups(Collections.emptySet()))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("involvedGroups are empty");
     }
 
     @Test
@@ -124,10 +117,9 @@ public class CaseInstanceInvolvementTest extends FlowableCmmnTestCase {
             start();
         cmmnRuntimeService.addUserIdentityLink(caseInstance.getId(), "kermit", IdentityLinkType.PARTICIPANT);
 
-        this.expectException.expect(FlowableIllegalArgumentException.class);
-        this.expectException.expectMessage("involvedUser is null");
-
-        cmmnRuntimeService.createCaseInstanceQuery().involvedUser(null).count();
+        assertThatThrownBy(() -> cmmnRuntimeService.createCaseInstanceQuery().involvedUser(null))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("involvedUser is null");
     }
 
     @Test

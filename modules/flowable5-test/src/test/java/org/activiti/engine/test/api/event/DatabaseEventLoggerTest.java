@@ -28,8 +28,9 @@ import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Joram Barrez
@@ -38,7 +39,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     protected EventLogger databaseEventLogger;
 
-    protected ObjectMapper objectMapper = new ObjectMapper();
+    protected ObjectMapper objectMapper = JsonMapper.shared();
 
     @Override
     protected void setUp() throws Exception {

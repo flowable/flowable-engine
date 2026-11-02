@@ -24,8 +24,7 @@ public class InboundChannelModelValidator implements ChannelValidator {
 
     @Override
     public void validateChannel(ChannelModel channelModel) {
-        if (channelModel instanceof InboundChannelModel) {
-            InboundChannelModel inboundChannelModel = (InboundChannelModel) channelModel;
+        if (channelModel instanceof InboundChannelModel inboundChannelModel) {
 
             validateChannel(inboundChannelModel);
         }

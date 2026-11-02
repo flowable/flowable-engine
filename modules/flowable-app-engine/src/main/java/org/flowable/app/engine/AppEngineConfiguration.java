@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.sql.DataSource;
 
@@ -27,10 +28,10 @@ import org.flowable.app.api.AppManagementService;
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppResourceConverter;
 import org.flowable.app.engine.impl.AppEngineImpl;
+import org.flowable.app.engine.impl.AppEnginePostEngineBuildConsumer;
 import org.flowable.app.engine.impl.AppManagementServiceImpl;
 import org.flowable.app.engine.impl.AppRepositoryServiceImpl;
 import org.flowable.app.engine.impl.cfg.StandaloneInMemAppEngineConfiguration;
-import org.flowable.app.engine.impl.cmd.SchemaOperationsAppEngineBuild;
 import org.flowable.app.engine.impl.db.AppDbSchemaManager;
 import org.flowable.app.engine.impl.db.EntityDependencyOrder;
 import org.flowable.app.engine.impl.deployer.AppDeployer;
@@ -51,6 +52,7 @@ import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisAppDeplo
 import org.flowable.app.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
 import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.EngineConfigurator;
 import org.flowable.common.engine.impl.EngineDeployer;
@@ -67,12 +69,13 @@ import org.flowable.common.engine.impl.el.DefaultExpressionManager;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.json.VariableJsonMapper;
+import org.flowable.common.engine.impl.json.jackson3.Jackson3VariableJsonMapper;
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.common.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.eventregistry.impl.configurator.EventRegistryEngineConfigurator;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
-import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.api.IdmEngineConfigurationApi;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.configurator.IdmEngineConfigurator;
@@ -80,7 +83,8 @@ import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
-import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
+import org.flowable.variable.service.impl.types.BigDecimalType;
+import org.flowable.variable.service.impl.types.BigIntegerType;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
@@ -102,11 +106,10 @@ import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 
-public class AppEngineConfiguration extends AbstractEngineConfiguration implements
+public class AppEngineConfiguration extends AbstractBuildableEngineConfiguration<AppEngine> implements
         AppEngineConfigurationApi, HasExpressionManagerEngineConfiguration, HasVariableTypes {
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/app/db/mapping/mappings.xml";
-    public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_APP_";
 
     protected String appEngineName = AppEngines.NAME_DEFAULT;
 
@@ -123,8 +126,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     protected boolean disableIdmEngine;
     protected boolean disableEventRegistry;
-
-    protected boolean executeServiceSchemaManagers = true;
     
     protected AppDeployer appDeployer;
     protected AppDeploymentManager deploymentManager;
@@ -134,8 +135,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     protected DeploymentCache<AppDefinitionCacheEntry> appDefinitionCache;
 
     protected ExpressionManager expressionManager;
-    protected SchemaManager identityLinkSchemaManager;
-    protected SchemaManager variableSchemaManager;
+    protected Collection<Consumer<ExpressionManager>> expressionManagerConfigurers;
 
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -158,6 +158,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
      */
     protected boolean jsonVariableTypeTrackObjects = true;
 
+    protected VariableJsonMapper variableJsonMapper;
 
     protected BusinessCalendarManager businessCalendarManager;
 
@@ -189,11 +190,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return new StandaloneInMemAppEngineConfiguration();
     }
 
-    public AppEngine buildAppEngine() {
-        init();
+    @Override
+    protected AppEngine createEngine() {
         return new AppEngineImpl(this);
     }
 
+    @Override
+    protected Consumer<AppEngine> createPostEngineBuildConsumer() {
+        return new AppEnginePostEngineBuildConsumer();
+    }
+
+    public AppEngine buildAppEngine() {
+        return buildEngine();
+    }
+
+    @Override
     protected void init() {
         initEngineConfigurations();
         initConfigurators();
@@ -229,6 +240,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         initDataManagers();
         initEntityManagers();
         initDeployers();
+        initEventDispatcher();
         initAppDefinitionCache();
         initAppResourceConverter();
         initDeploymentManager();
@@ -239,40 +251,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
     }
 
     @Override
-    public void initSchemaManager() {
-        super.initSchemaManager();
-        initAppSchemaManager();
-
-        if (executeServiceSchemaManagers) {
-            initIdentityLinkSchemaManager();
-            initVariableSchemaManager();
-        }
-    }
-    
-    public void initSchemaManagementCommand() {
-        if (schemaManagementCmd == null) {
-            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
-                this.schemaManagementCmd = new SchemaOperationsAppEngineBuild();
-            }
-        }
-    }
-
-    protected void initAppSchemaManager() {
-        if (this.schemaManager == null) {
-            this.schemaManager = new AppDbSchemaManager();
-        }
-    }
-
-    protected void initVariableSchemaManager() {
-        if (this.variableSchemaManager == null) {
-            this.variableSchemaManager = new VariableDbSchemaManager();
-        }
-    }
-
-    protected void initIdentityLinkSchemaManager() {
-        if (this.identityLinkSchemaManager == null) {
-            this.identityLinkSchemaManager = new IdentityLinkDbSchemaManager();
-        }
+    protected SchemaManager createEngineSchemaManager() {
+        return new AppDbSchemaManager();
     }
 
     @Override
@@ -281,9 +261,21 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
+    @Override
+    public void initObjectMapper() {
+        super.initObjectMapper();
+        if (variableJsonMapper == null) {
+            variableJsonMapper = new Jackson3VariableJsonMapper(objectMapper);
+        }
+    }
+
     public void initExpressionManager() {
         if (expressionManager == null) {
             expressionManager = new DefaultExpressionManager(beans);
+
+            if (expressionManagerConfigurers != null) {
+                expressionManagerConfigurers.forEach(configurer -> configurer.accept(expressionManager));
+            }
         }
     }
 
@@ -412,8 +404,8 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
                 }
             }
             variableTypes.addType(new NullType());
-            variableTypes.addType(new StringType(getMaxLengthString()));
-            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new StringType(getMaxLengthString(), variableLengthVerifier));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1, variableLengthVerifier));
             variableTypes.addType(new BooleanType());
             variableTypes.addType(new ShortType());
             variableTypes.addType(new IntegerType());
@@ -425,13 +417,15 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new BigDecimalType());
+            variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
-            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new JsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
             // longJsonType only needed for reading purposes
-            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), objectMapper, jsonVariableTypeTrackObjects));
-            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(JsonType.longJsonType(getMaxLengthString(), variableLengthVerifier, variableJsonMapper, jsonVariableTypeTrackObjects));
+            variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -450,6 +444,7 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+        this.variableServiceConfiguration.setVariableJsonMapper(this.variableJsonMapper);
     }
 
     public void initVariableServiceConfiguration() {
@@ -669,14 +664,6 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public boolean isExecuteServiceSchemaManagers() {
-        return executeServiceSchemaManagers;
-    }
-
-    public void setExecuteServiceSchemaManagers(boolean executeServiceSchemaManagers) {
-        this.executeServiceSchemaManagers = executeServiceSchemaManagers;
-    }
-
     @Override
     public ExpressionManager getExpressionManager() {
         return expressionManager;
@@ -688,21 +675,16 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
-    public SchemaManager getIdentityLinkSchemaManager() {
-        return identityLinkSchemaManager;
+    public Collection<Consumer<ExpressionManager>> getExpressionManagerConfigurers() {
+        return expressionManagerConfigurers;
     }
 
-    public AppEngineConfiguration setIdentityLinkSchemaManager(SchemaManager identityLinkSchemaManager) {
-        this.identityLinkSchemaManager = identityLinkSchemaManager;
-        return this;
-    }
-
-    public SchemaManager getVariableSchemaManager() {
-        return variableSchemaManager;
-    }
-
-    public AppEngineConfiguration setVariableSchemaManager(SchemaManager variableSchemaManager) {
-        this.variableSchemaManager = variableSchemaManager;
+    @Override
+    public AbstractEngineConfiguration addExpressionManagerConfigurer(Consumer<ExpressionManager> configurer) {
+        if (this.expressionManagerConfigurers == null) {
+            this.expressionManagerConfigurers = new ArrayList<>();
+        }
+        this.expressionManagerConfigurers.add(configurer);
         return this;
     }
 
@@ -768,6 +750,17 @@ public class AppEngineConfiguration extends AbstractEngineConfiguration implemen
 
     public AppEngineConfiguration setJsonVariableTypeTrackObjects(boolean jsonVariableTypeTrackObjects) {
         this.jsonVariableTypeTrackObjects = jsonVariableTypeTrackObjects;
+        return this;
+    }
+
+    @Override
+    public VariableJsonMapper getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    @Override
+    public AppEngineConfiguration setVariableJsonMapper(VariableJsonMapper variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
         return this;
     }
 

@@ -12,24 +12,17 @@
  */
 package org.flowable.spring.boot;
 
-import java.util.List;
-
 import org.flowable.common.rest.exception.BaseExceptionHandlerAdvice;
-import org.flowable.common.rest.multipart.PutAwareStandardServletMultiPartResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Base dispatcher configuration that can be used to configure context for the REST API.
@@ -40,28 +33,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @EnableAsync
 public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DispatcherServletConfiguration.class);
-
     @Autowired
-    protected ObjectMapper objectMapper;
-
-    @Bean
-    public MultipartResolver multipartResolver() {
-        PutAwareStandardServletMultiPartResolver multipartResolver = new PutAwareStandardServletMultiPartResolver();
-        //FIXME in order to support both 1.5.x and 2.0 we can't use MultipartProperties (the package is changed)
-        //multipartResolver.setResolveLazily(multipartProperties.isResolveLazily());
-        return multipartResolver;
-    }
+    protected JsonMapper jsonMapper;
 
     @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        addDefaultHttpMessageConverters(converters);
-        for (HttpMessageConverter<?> converter : converters) {
-            if (converter instanceof MappingJackson2HttpMessageConverter) {
-                MappingJackson2HttpMessageConverter jackson2HttpMessageConverter = (MappingJackson2HttpMessageConverter) converter;
-                jackson2HttpMessageConverter.setObjectMapper(objectMapper);
-                break;
-            }
-        }
+    protected void configureMessageConverters(HttpMessageConverters.ServerBuilder builder) {
+        builder.withJsonConverter(new JacksonJsonHttpMessageConverter(jsonMapper));
     }
 }

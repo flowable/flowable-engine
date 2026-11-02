@@ -25,6 +25,7 @@ public class GraphicInfo extends BaseElement {
     protected Boolean expanded;
     protected int xmlRowNumber;
     protected int xmlColumnNumber;
+    protected double rotation;
 
     public double getX() {
         return x;
@@ -94,6 +95,14 @@ public class GraphicInfo extends BaseElement {
         this.xmlColumnNumber = xmlColumnNumber;
     }
 
+    public double getRotation() {
+        return rotation;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
+    }
+
     public boolean equals(GraphicInfo ginfo) {
     	if (this.getX() != ginfo.getX()) {
     		return false;
@@ -107,6 +116,9 @@ public class GraphicInfo extends BaseElement {
     	if (this.getWidth() != ginfo.getWidth()) {
     		return false;
     	}
+        if (this.getRotation() != ginfo.getRotation()) {
+            return false;
+        }
 
     	// check for zero value in case we are comparing model value to BPMN DI value
     	// model values do not have xml location information

@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.repository;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -38,7 +39,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionImageResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "Get a process definition image", tags = { "Process Definitions" })
@@ -49,18 +50,23 @@ public class ProcessDefinitionImageResource extends BaseProcessDefinitionResourc
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/image", produces = MediaType.IMAGE_PNG_VALUE)
     public ResponseEntity<byte[]> getModelResource(@ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
-        InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId());
-
-        if (imageStream != null) {
-            HttpHeaders responseHeaders = new HttpHeaders();
-            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
-            try {
-                return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
-            } catch (Exception e) {
-                throw new FlowableException("Error reading image stream", e);
-            }
-        } else {
-            throw new FlowableIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
+        
+        try (final InputStream imageStream = repositoryService.getProcessDiagram(processDefinition.getId())) {
+	        if (imageStream != null) {
+	            HttpHeaders responseHeaders = new HttpHeaders();
+	            responseHeaders.set("Content-Type", MediaType.IMAGE_PNG_VALUE);
+	            try {
+	                return new ResponseEntity<>(IOUtils.toByteArray(imageStream), responseHeaders, HttpStatus.OK);
+	            } catch (Exception e) {
+	                throw new FlowableException("Error reading image stream", e);
+	            }
+	            
+	        } else {
+	            throw new FlowableIllegalArgumentException("Process definition with id '" + processDefinition.getId() + "' has no image.");
+	        }
+        
+        } catch (IOException e) {
+        	throw new FlowableException("Error reading image stream", e);
         }
     }
 

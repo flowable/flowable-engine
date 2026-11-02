@@ -121,7 +121,6 @@ public class DefaultProcessDiagramCanvas {
     protected static BufferedImage BUSINESS_RULE_TASK_IMAGE;
     protected static BufferedImage SHELL_TASK_IMAGE;
     protected static BufferedImage DMN_TASK_IMAGE;
-    protected static BufferedImage MULE_TASK_IMAGE;
     protected static BufferedImage CAMEL_TASK_IMAGE;
     protected static BufferedImage HTTP_TASK_IMAGE;
 
@@ -234,7 +233,6 @@ public class DefaultProcessDiagramCanvas {
             SHELL_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/shellTask.png", customClassLoader));
             DMN_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/dmnTask.png", customClassLoader));
             CAMEL_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/camelTask.png", customClassLoader));
-            MULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/muleTask.png", customClassLoader));
             HTTP_TASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/httpTask.png", customClassLoader));
 
             TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
@@ -942,10 +940,6 @@ public class DefaultProcessDiagramCanvas {
 
     public void drawCamelTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(CAMEL_TASK_IMAGE, name, graphicInfo, scaleFactor);
-    }
-
-    public void drawMuleTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
-        drawTask(MULE_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawHttpTask(String name, GraphicInfo graphicInfo, double scaleFactor) {

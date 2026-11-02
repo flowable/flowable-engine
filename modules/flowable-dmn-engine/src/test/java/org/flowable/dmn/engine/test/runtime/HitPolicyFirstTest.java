@@ -18,25 +18,18 @@ import static org.assertj.core.api.Assertions.entry;
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnDecisionService;
-import org.flowable.dmn.engine.DmnEngine;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
 import org.flowable.dmn.engine.test.DmnDeployment;
-import org.flowable.dmn.engine.test.FlowableDmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
-public class HitPolicyFirstTest {
-
-    @Rule
-    public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
+class HitPolicyFirstTest extends BaseFlowableDmnTest {
 
     @Test
     @DmnDeployment
     public void firstHitPolicy() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
-
         DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
 
         Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
@@ -49,5 +42,18 @@ public class HitPolicyFirstTest {
                         entry("outputVariable1", "gt 10"),
                         entry("outputVariable2", "result2")
                 );
+    }
+
+    @Test
+    @DmnDeployment
+    public void firstHitPolicyNoMatch() {
+        DmnDecisionService dmnRuleService = dmnEngine.getDmnDecisionService();
+
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variable("inputVariable1", 50)
+                .executeWithSingleResult();
+
+        assertThat(result).isNull();
     }
 }

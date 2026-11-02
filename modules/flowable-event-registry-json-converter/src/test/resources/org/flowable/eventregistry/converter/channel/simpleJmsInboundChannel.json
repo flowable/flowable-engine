@@ -10,6 +10,7 @@
   "subscription": "testSubscription",
   "concurrency": "3",
   "deserializerType": "json",
+  "eventFilterDelegateExpression": "testEventFilterExpression",
   "channelEventKeyDetection": {
     "jsonField": "eventKey"
   }

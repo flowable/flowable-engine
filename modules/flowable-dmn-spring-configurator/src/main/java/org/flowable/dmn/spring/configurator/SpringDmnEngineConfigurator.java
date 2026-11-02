@@ -12,10 +12,8 @@
  */
 package org.flowable.dmn.spring.configurator;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.spring.SpringEngineConfiguration;
-import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 
@@ -41,17 +39,8 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
             dmnEngineConfiguration.setBeans(springEngineConfiguration.getBeans());
         }
 
-        initDmnEngine();
+        initEngine();
         
         initServiceConfigurations(engineConfiguration, dmnEngineConfiguration);
-    }
-
-    @Override
-    protected synchronized DmnEngine initDmnEngine() {
-        if (dmnEngineConfiguration == null) {
-            throw new FlowableException("DmnEngineConfiguration is required");
-        }
-
-        return dmnEngineConfiguration.buildDmnEngine();
     }
 }

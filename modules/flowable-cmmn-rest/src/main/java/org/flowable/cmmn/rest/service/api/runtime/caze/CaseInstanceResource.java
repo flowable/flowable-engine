@@ -15,20 +15,18 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.CaseInstanceMigrationValidationResult;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.api.runtime.CaseInstanceUpdateBuilder;
+import org.flowable.cmmn.api.runtime.ChangePlanItemStateBuilder;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.rest.service.api.RestActionRequest;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -37,6 +35,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -45,17 +44,15 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceResource extends BaseCaseInstanceResource {
-    
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired
     protected CmmnMigrationService cmmnMigrationService;
@@ -66,7 +63,7 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
-    public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletRequest request) {
+    public CaseInstanceResponse getCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstanceResponse caseInstanceResponse = restResponseFactory.createCaseInstanceResponse(getCaseInstanceFromRequest(caseInstanceId));
         
         CaseDefinition caseDefinition = repositoryService.createCaseDefinitionQuery().caseDefinitionId(caseInstanceResponse.getCaseDefinitionId()).singleResult();
@@ -87,9 +84,9 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PutMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}", produces = "application/json")
     public CaseInstanceResponse updateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-                    @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletRequest request, HttpServletResponse response) {
+                    @RequestBody CaseInstanceUpdateRequest updateRequest, HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (StringUtils.isNotEmpty(updateRequest.getAction())) {
 
@@ -99,6 +96,12 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
             if (RestActionRequest.EVALUATE_CRITERIA.equals(updateRequest.getAction())) {
                 runtimeService.evaluateCriteria(caseInstance.getId());
+
+            } else if (CaseInstanceUpdateRequest.ACTION_CLAIM.equals(updateRequest.getAction())) {
+                runtimeService.claimCaseInstance(caseInstanceId, updateRequest.getAssignee());
+
+            } else if (CaseInstanceUpdateRequest.ACTION_UNCLAIM.equals(updateRequest.getAction())) {
+                runtimeService.unclaimCaseInstance(caseInstanceId);
 
             } else {
                 throw new FlowableIllegalArgumentException("Invalid action: '" + updateRequest.getAction() + "'.");
@@ -110,11 +113,28 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
                 restApiInterceptor.updateCaseInstance(caseInstance, updateRequest);
             }
 
-            if (StringUtils.isNotEmpty(updateRequest.getName())) {
-                runtimeService.setCaseInstanceName(caseInstanceId, updateRequest.getName());
+            boolean hasUpdates = false;
+            CaseInstanceUpdateBuilder updateBuilder = runtimeService.createCaseInstanceUpdateBuilder(caseInstanceId);
+
+            if (updateRequest.getName() != null) {
+                updateBuilder.name(updateRequest.getName());
+                hasUpdates = true;
             }
-            if (StringUtils.isNotEmpty(updateRequest.getBusinessKey())) {
-                runtimeService.updateBusinessKey(caseInstanceId, updateRequest.getBusinessKey());
+            if (updateRequest.getBusinessKey() != null) {
+                updateBuilder.businessKey(updateRequest.getBusinessKey());
+                hasUpdates = true;
+            }
+            if (updateRequest.getBusinessStatus() != null) {
+                updateBuilder.businessStatus(updateRequest.getBusinessStatus());
+                hasUpdates = true;
+            }
+            if (updateRequest.getDueDate() != null) {
+                updateBuilder.dueDate(updateRequest.getDueDate());
+                hasUpdates = true;
+            }
+
+            if (hasUpdates) {
+                updateBuilder.update();
             }
 
         }
@@ -131,48 +151,44 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
 
     }
 
-    @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance")
+    @ApiOperation(value = "Terminate a case instance", tags = { "Case Instances" }, nickname = "terminateCaseInstance", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and terminate. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}")
-    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void terminateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.terminateCaseInstance(caseInstance);
         }
 
         runtimeService.terminateCaseInstance(caseInstance.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
     
-    @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance")
+    @ApiOperation(value = "Delete a case instance", tags = { "Case Instances" }, nickname = "deleteCaseInstance", code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case instance was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @DeleteMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/delete")
-    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
             restApiInterceptor.deleteCaseInstance(caseInstance);
         }
 
         runtimeService.deleteCaseInstance(caseInstance.getId());
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/stage-overview", produces = "application/json")
     public List<StageResponse> getStageOverview(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
 
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("No case instance found for id " + caseInstanceId);
-        }
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessStageOverview(caseInstance);
@@ -188,30 +204,51 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/change-state", produces = "application/json")
     public void changePlanItemState(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-            @RequestBody ChangePlanItemStateRequest planItemStateRequest, HttpServletRequest request) {
+            @RequestBody ChangePlanItemStateRequest planItemStateRequest) {
+        
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         
         if (restApiInterceptor != null) {
-            restApiInterceptor.changePlanItemState(caseInstanceId, planItemStateRequest);
+            restApiInterceptor.changePlanItemState(caseInstance, planItemStateRequest);
         }
 
+        ChangePlanItemStateBuilder changePlanItemStateBuilder = runtimeService.createChangePlanItemStateBuilder().caseInstanceId(caseInstanceId);
         if (planItemStateRequest.getActivatePlanItemDefinitionIds() != null && !planItemStateRequest.getActivatePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .activatePlanItemDefinitionIds(planItemStateRequest.getActivatePlanItemDefinitionIds())
+            
+            changePlanItemStateBuilder.activatePlanItemDefinitionIds(planItemStateRequest.getActivatePlanItemDefinitionIds())
                 .changeState();
         
         } else if (planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds() != null && !planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
+            changePlanItemStateBuilder.changeToAvailableStateByPlanItemDefinitionIds(planItemStateRequest.getMoveToAvailablePlanItemDefinitionIds())
+                .changeState();
+            
+        } else if (planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            changePlanItemStateBuilder.addWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getAddWaitingForRepetitionPlanItemDefinitionIds())
+                .changeState();
+            
+        } else if (planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds() != null && !planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds().isEmpty()) {
+            changePlanItemStateBuilder.removeWaitingForRepetitionPlanItemDefinitionIds(planItemStateRequest.getRemoveWaitingForRepetitionPlanItemDefinitionIds())
                 .changeState();
         
         } else if (planItemStateRequest.getTerminatePlanItemDefinitionIds() != null && !planItemStateRequest.getTerminatePlanItemDefinitionIds().isEmpty()) {
-            runtimeService.createChangePlanItemStateBuilder()
-                .caseInstanceId(caseInstanceId)
-                .terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
+            changePlanItemStateBuilder.terminatePlanItemDefinitionIds(planItemStateRequest.getTerminatePlanItemDefinitionIds())
                 .changeState();
-    }
+        
+        } else if (planItemStateRequest.getChangePlanItemIds() != null && !planItemStateRequest.getChangePlanItemIds().isEmpty()) {
+            changePlanItemStateBuilder.changePlanItemIds(planItemStateRequest.getChangePlanItemIds())
+                .changeState();
+        
+        } else if (planItemStateRequest.getChangePlanItemIdsWithDefinitionId() != null && !planItemStateRequest.getChangePlanItemIdsWithDefinitionId().isEmpty()) {
+            changePlanItemStateBuilder.changePlanItemIdsWithDefinitionId(planItemStateRequest.getChangePlanItemIdsWithDefinitionId())
+                .changeState();
+        
+        } else if (planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds() != null && !planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds().isEmpty()) {
+            for (PlanItemDefinitionWithTargetIdsRequest definition : planItemStateRequest.getChangePlanItemDefinitionsWithNewTargetIds()) {
+                changePlanItemStateBuilder.changePlanItemDefinitionWithNewTargetIds(definition.getExistingPlanItemDefinitionId(), definition.getNewPlanItemId(), definition.getNewPlanItemDefinitionId());
+            }
+            
+            changePlanItemStateBuilder.changeState();
+        }
         
     }
 
@@ -223,13 +260,39 @@ public class CaseInstanceResource extends BaseCaseInstanceResource {
     })
     @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/migrate", produces = "application/json")
     public void migrateCaseInstance(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
-                                       @RequestBody String migrationDocumentJson, HttpServletRequest request) {
+                                       @RequestBody String migrationDocumentJson) {
 
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        
         if (restApiInterceptor != null) {
-            restApiInterceptor.migrateCaseInstance(caseInstanceId, migrationDocumentJson);
+            restApiInterceptor.migrateCaseInstance(caseInstance, migrationDocumentJson);
         }
 
         CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
         cmmnMigrationService.migrateCaseInstance(caseInstanceId, migrationDocument);
+    }
+    
+    @ApiOperation(value = "Validate case instance migration", tags = { "Case Instances" }, notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and migration was executed."),
+            @ApiResponse(code = 409, message = "Indicates the requested case instance action cannot be executed since the case instance is already activated/suspended."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
+    })
+    @PostMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/validate-migration", produces = "application/json")
+    public CaseInstanceMigrationValidationResponse validateCaseInstanceMigration(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId,
+            @RequestBody String migrationDocumentJson) {
+        
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
+        if (restApiInterceptor != null) {
+            restApiInterceptor.migrateCaseInstance(caseInstance, migrationDocumentJson);
+        }
+
+        CaseInstanceMigrationDocument migrationDocument = CaseInstanceMigrationDocumentConverter.convertFromJson(migrationDocumentJson);
+        CaseInstanceMigrationValidationResult validationResult = cmmnMigrationService.validateMigrationForCaseInstance(caseInstanceId, migrationDocument);
+        
+        CaseInstanceMigrationValidationResponse validationResponse = new CaseInstanceMigrationValidationResponse();
+        validationResponse.setValidationMessages(validationResult.getValidationMessages());
+        
+        return validationResponse;
     }
 }

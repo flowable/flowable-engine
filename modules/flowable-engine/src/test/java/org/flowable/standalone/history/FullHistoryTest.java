@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -853,7 +853,8 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Delete the historic process-instance, which is still running
         assertThatThrownBy(() -> historyService.deleteHistoricProcessInstance(processInstance.getId()))
                 .isExactlyInstanceOf(FlowableException.class)
-                .hasMessageStartingWith("Process instance is still running, cannot delete historic process instance");
+                .hasMessageStartingWith("Process instance is still running, cannot delete HistoricProcessInstanceEntity")
+                .hasMessageContaining("definition=" + processInstance.getProcessDefinitionId());
     }
 
     /**

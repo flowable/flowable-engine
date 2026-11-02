@@ -529,17 +529,6 @@ public interface RepositoryService {
     List<DmnDecision> getDecisionsForProcessDefinition(String processDefinitionId);
 
     /**
-     * Retrieves the {@link DmnDecision}s associated with the given process definition.
-     *
-     * @param processDefinitionId
-     *            id of the process definition, cannot be null.
-     *
-     * @deprecated replaced by getDecisionsForProcessDefinition(String processDefinitionId)
-     */
-    @Deprecated
-    List<DmnDecision> getDecisionTablesForProcessDefinition(String processDefinitionId);
-
-    /**
      * Retrieves the {@link FormDefinition}s associated with the given process definition.
      *
      * @param processDefinitionId

@@ -53,7 +53,7 @@ public class DefaultInternalJobCompatibilityManager implements InternalJobCompat
 
         // Retrieving the compatibility handler needs to be done outside of the executeJobWithLockAndRetry call,
         // as it shouldn't be wrapped in a transaction.
-        Flowable5CompatibilityHandler compatibilityHandler = processEngineConfiguration.getCommandExecutor().execute(new Command<Flowable5CompatibilityHandler>() {
+        Flowable5CompatibilityHandler compatibilityHandler = processEngineConfiguration.getCommandExecutor().execute(new Command<>() {
 
             @Override
             public Flowable5CompatibilityHandler execute(CommandContext commandContext) {

@@ -12,23 +12,28 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.common.engine.api.constant.ReferenceTypes;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -168,11 +173,16 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     }
 
     @Override
-    public boolean isHistoryEnabledForUserTask(TaskInfo taskInfo) {
+    public boolean isHistoryEnabledForHumanTask(TaskInfo taskInfo) {
         String scopeDefinitionId = taskInfo.getScopeDefinitionId();
+        return isHistoryEnabledForHumanTask(scopeDefinitionId);
+    }
+    
+    @Override
+    public boolean isHistoryEnabledForHumanTask(String caseDefinitionId) {
         HistoryLevel engineHistoryLevel = cmmnEngineConfiguration.getHistoryLevel();
-        if (isEnableCaseDefinitionHistoryLevel() && scopeDefinitionId != null) {
-            HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(scopeDefinitionId);
+        if (isEnableCaseDefinitionHistoryLevel() && caseDefinitionId != null) {
+            HistoryLevel caseDefinitionLevel = getCaseDefinitionHistoryLevel(caseDefinitionId);
             if (caseDefinitionLevel != null) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Current history level: {}, level required: {}", caseDefinitionLevel, HistoryLevel.TASK);
@@ -211,16 +221,48 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
     public boolean isHistoryEnabledForVariableInstance(VariableInstanceEntity variableInstanceEntity) {
         String caseDefinitionId = null;
         if (isEnableCaseDefinitionHistoryLevel() && variableInstanceEntity.getScopeId() != null) {
-            CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(variableInstanceEntity.getScopeId());
-            caseDefinitionId = caseInstance.getCaseDefinitionId();
+            caseDefinitionId = getCaseDefinitionId(variableInstanceEntity);
         }
         return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+    }
+
+    protected String getCaseDefinitionId(VariableInstanceEntity variableInstanceEntity) {
+        String scopeId = variableInstanceEntity.getScopeId();
+
+        // A case (or case sub-scope) variable stores the case instance id as its scopeId.
+        CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(scopeId);
+        if (caseInstance != null) {
+            return caseInstance.getCaseDefinitionId();
+        }
+
+        // The scopeId is not a case instance id. This happens for a variable that belongs to a process running
+        // under a case, e.g. a BPMN multi-instance variable-aggregation variable whose scopeId is the process
+        // instance id (see BpmnAggregation). The process may itself be nested under the case through one or more
+        // BPMN call activities, so resolve the root process instance of the call hierarchy - that is the process
+        // a CMMN process task started directly - and use the plan item instance that started it (its referenceId
+        // is that root process instance id) to determine the owning case definition.
+        ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+        if (processInstanceService != null) {
+            String rootProcessInstanceId = processInstanceService.getRootProcessInstanceId(scopeId);
+            List<PlanItemInstanceEntity> planItemInstances = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .findByReferenceId(rootProcessInstanceId);
+            for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+                if (ReferenceTypes.PLAN_ITEM_CHILD_PROCESS.equals(planItemInstance.getReferenceType())) {
+                    return planItemInstance.getCaseDefinitionId();
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
     public boolean isHistoryEnabledForIdentityLink(IdentityLinkEntity identityLinkEntity) {
         String caseDefinitionId = getCaseDefinitionId(identityLinkEntity);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+        if (identityLinkEntity.getTaskId() != null) {
+            return isHistoryEnabledForHumanTask(caseDefinitionId);
+        }
+        return isHistoryLevelAtLeast(HistoryLevel.INSTANCE, caseDefinitionId);
     }
 
     protected String getCaseDefinitionId(IdentityLinkEntity identityLink) {
@@ -244,8 +286,52 @@ public class DefaultCmmnHistoryConfigurationSettings implements CmmnHistoryConfi
 
     @Override
     public boolean isHistoryEnabledForEntityLink(EntityLinkEntity entityLink) {
-        String caseDefinitionId = getCaseDefinitionId(entityLink);
-        return isHistoryLevelAtLeast(HistoryLevel.AUDIT, caseDefinitionId);
+        // Check if history is enabled for the source scope
+        String scopeType = entityLink.getScopeType();
+
+        if (ScopeTypes.BPMN.equals(scopeType)) {
+            // Source scope is a BPMN process — delegate to the BPMN engine via ProcessInstanceService
+            ProcessInstanceService processInstanceService = cmmnEngineConfiguration.getProcessInstanceService();
+            if (processInstanceService != null && !processInstanceService.isHistoryEnabledForProcessInstance(entityLink.getScopeId())) {
+                return false;
+            }
+        } else {
+            String caseDefinitionId = getCaseDefinitionId(entityLink);
+            if (!isHistoryEnabled(caseDefinitionId)) {
+                return false;
+            }
+        }
+
+        // Also check the history level of the reference scope (if it is NONE we should not create the entity link)
+        String referenceScopeId = entityLink.getReferenceScopeId();
+        String referenceScopeType = entityLink.getReferenceScopeType();
+
+        // No check for BPMN scope type because for a child process instance the entity links are created before the entity (see ProcessTaskActivityBehavior)
+        if (referenceScopeId != null && ScopeTypes.CMMN.equals(referenceScopeType)) {
+            CaseInstanceEntity referenceScopeInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(referenceScopeId);
+            if (referenceScopeInstance != null) {
+                return isHistoryEnabled(referenceScopeInstance.getCaseDefinitionId());
+            }
+            return false;
+        }
+
+        if (referenceScopeId != null && ScopeTypes.TASK.equals(referenceScopeType)) {
+            TaskEntity task = cmmnEngineConfiguration.getTaskServiceConfiguration().getTaskService().getTask(referenceScopeId);
+            if (task != null && task.getScopeId() != null) {
+                CaseInstanceEntity caseInstance = cmmnEngineConfiguration.getCaseInstanceEntityManager().findById(task.getScopeId());
+                if (caseInstance != null) {
+                    return isHistoryEnabled(caseInstance.getCaseDefinitionId());
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean isHistoryEnabledForVariables(HistoricTaskInstance historicTaskInstance) {
+        return cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY);
     }
 
     protected String getCaseDefinitionId(EntityLinkEntity entityLink) {

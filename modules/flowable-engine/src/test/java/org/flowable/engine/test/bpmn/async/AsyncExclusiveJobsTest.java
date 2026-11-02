@@ -18,7 +18,9 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.impl.asyncexecutor.AsyncJobExecutorConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 
@@ -57,4 +59,35 @@ public class AsyncExclusiveJobsTest extends PluggableFlowableTestCase {
 
     }
 
+    @Test
+    @Deployment
+    public void testParallelGatewayExclusiveJobs() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("parallelExclusiveServiceTasks")
+                .variable("counter", 0L)
+                .start();
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter"))
+                .isEqualTo(0L);
+
+        AsyncJobExecutorConfiguration asyncExecutorConfiguration = processEngineConfiguration.getAsyncExecutorConfiguration();
+        boolean originalGlobalAcquireLockEnabled = asyncExecutorConfiguration.isGlobalAcquireLockEnabled();
+        CollectingAsyncRunnableExecutionExceptionHandler executionExceptionHandler = new CollectingAsyncRunnableExecutionExceptionHandler();
+        try {
+            asyncExecutorConfiguration.setGlobalAcquireLockEnabled(true);
+            processEngineConfiguration.getJobServiceConfiguration()
+                    .getAsyncRunnableExecutionExceptionHandlers()
+                    .add(0, executionExceptionHandler);
+            waitForJobExecutorToProcessAllJobs(15000, 200);
+        } finally {
+            asyncExecutorConfiguration.setGlobalAcquireLockEnabled(originalGlobalAcquireLockEnabled);
+            processEngineConfiguration.getJobServiceConfiguration()
+                    .getAsyncRunnableExecutionExceptionHandlers()
+                    .remove(executionExceptionHandler);
+        }
+
+        assertThat(executionExceptionHandler.getExceptions()).isEmpty();
+        assertThat(runtimeService.getVariable(processInstance.getId(), "counter"))
+                .isEqualTo(3L);
+    }
 }

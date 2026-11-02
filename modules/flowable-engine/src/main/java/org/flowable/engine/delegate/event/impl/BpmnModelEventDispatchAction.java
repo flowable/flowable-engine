@@ -28,8 +28,7 @@ public class BpmnModelEventDispatchAction implements EventDispatchAction {
 
     @Override
     public void dispatchEvent(CommandContext commandContext, FlowableEventSupport eventSupport, FlowableEvent event) {
-        if (event.getType() == FlowableEngineEventType.ENTITY_DELETED && event instanceof FlowableEntityEvent) {
-            FlowableEntityEvent entityEvent = (FlowableEntityEvent) event;
+        if (event.getType() == FlowableEngineEventType.ENTITY_DELETED && event instanceof FlowableEntityEvent entityEvent) {
             if (entityEvent.getEntity() instanceof ProcessDefinition) {
                 // process definition deleted event doesn't need to be dispatched to event listeners
                 return;

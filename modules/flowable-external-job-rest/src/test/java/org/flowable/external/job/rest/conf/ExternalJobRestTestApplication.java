@@ -12,7 +12,7 @@
  */
 package org.flowable.external.job.rest.conf;
 
-import javax.servlet.MultipartConfigElement;
+import jakarta.servlet.MultipartConfigElement;
 
 import org.flowable.external.job.rest.service.DispatcherServletConfiguration;
 import org.springframework.boot.SpringApplication;

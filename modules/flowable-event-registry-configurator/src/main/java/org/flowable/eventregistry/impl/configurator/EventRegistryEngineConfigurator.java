@@ -31,9 +31,8 @@ import org.flowable.eventregistry.impl.db.EntityDependencyOrder;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator {
+public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator<EventRegistryEngine> {
 
-    protected EventRegistryEngine eventRegistryEngine;
     protected EventRegistryEngineConfiguration eventEngineConfiguration;
 
     @Override
@@ -61,7 +60,7 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
 
         initialiseEventRegistryEngineConfiguration(eventEngineConfiguration);
         initialiseCommonProperties(engineConfiguration, eventEngineConfiguration);
-        this.eventRegistryEngine = initEventRegistryEngine();
+        initEngine();
         initServiceConfigurations(engineConfiguration, eventEngineConfiguration);
     }
 
@@ -79,7 +78,8 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
         return EntityDependencyOrder.DELETE_ORDER;
     }
 
-    protected synchronized EventRegistryEngine initEventRegistryEngine() {
+    @Override
+    protected EventRegistryEngine buildEngine() {
         if (eventEngineConfiguration == null) {
             throw new FlowableException("EventRegistryEngineConfiguration is required");
         }
@@ -97,10 +97,10 @@ public class EventRegistryEngineConfigurator extends AbstractEngineConfigurator 
     }
 
     public EventRegistryEngine getEventRegistryEngine() {
-        return eventRegistryEngine;
+        return buildEngine;
     }
 
     public void setEventRegistryEngine(EventRegistryEngine eventRegistryEngine) {
-        this.eventRegistryEngine = eventRegistryEngine;
+        this.buildEngine = eventRegistryEngine;
     }
 }

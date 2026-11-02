@@ -14,13 +14,17 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
-import org.joda.time.DateTime;
+import org.flowable.common.engine.impl.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,8 +70,14 @@ public class ExecutionVariableFactory {
             } else if (StringUtils.equals("date", type)) {
                 if (expressionResult instanceof Date) {
                     executionVariable = expressionResult;
+                } else if (expressionResult instanceof Instant instant) {
+                    executionVariable = Date.from(instant);
+                } else if (expressionResult instanceof LocalDate localDate) {
+                    executionVariable = Date.from(localDate.atStartOfDay().atZone(ZoneOffset.UTC).toInstant());
+                } else if (expressionResult instanceof LocalDateTime localDateTime) {
+                    executionVariable = Date.from(localDateTime.atZone(ZoneOffset.UTC).toInstant());
                 } else {
-                    executionVariable = new DateTime(expressionResult.toString()).toDate();
+                    executionVariable = DateUtil.parseDate(expressionResult.toString());
                 }
             } else {
                 LOGGER.error("could not create result variable: unrecognized mapping type");

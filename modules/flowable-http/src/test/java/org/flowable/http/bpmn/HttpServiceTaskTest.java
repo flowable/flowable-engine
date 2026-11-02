@@ -27,14 +27,21 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
@@ -42,8 +49,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -51,8 +58,6 @@ import net.javacrumbs.jsonunit.core.Option;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Test
     @Deployment
@@ -156,6 +161,67 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
     @Test
     @Deployment
+    public void testGetWithScriptRequestHandlerGroovy() {
+        ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
+        String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptRequestHandlerResult");
+        List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
+        assertThat(scriptRequestHandlerResult).isEqualTo("http://localhost:1111/bla");
+
+        String requestHeaders = (String) proc.getProcessVariables().get("requestHeaders");
+        assertThat(requestHeaders).isEqualTo("Headers: Content-Type: application/json");
+
+        assertThat(variables)
+                .extracting(HistoricVariableInstance::getVariableName)
+                .containsExactlyInAnyOrder("scriptRequestHandlerResult", "httpGetResponseBody", "originalUrl", "requestHeaders");
+        assertThatJson(variables.stream().filter(v -> v.getVariableName().equals("httpGetResponseBody")).findFirst().map(HistoricVariableInstance::getValue)
+                .orElse(null))
+                .isNotNull()
+                .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
+        assertProcessEnded(proc.getId());
+    }
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler#handleHttpRequest(VariableContainer, HttpRequest, FlowableHttpClient)}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerThrowsException() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleGetOnly").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'ReferenceError: \"syntaxErrorInScript\" is not defined in <eval> at line number 2'"
+                        + " Trace: scopeType=bpmn, scopeDefinitionKey=simpleGetOnly, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=httpGetWithScriptSyntaxErrorInHandler, tenantId=<empty>, type=httpRequestHandler");
+    }
+
+    /**
+     * Tests {@link org.flowable.engine.impl.scripting.ProcessEngineScriptTraceEnhancer}
+     * together with {@link org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler#handleHttpResponse(VariableContainer, HttpResponse)}
+     * contributing the expected error trace information
+     */
+    @Test
+    @Deployment
+    public void testGetWithScriptResponseHandlerThrowsException() {
+        ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("simpleGetOnly").singleResult();
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isInstanceOf(FlowableScriptEvaluationException.class)
+                .hasMessage("JavaScript script evaluation failed: 'ReferenceError: \"syntaxErrorInScript\" is not defined in <eval> at line number 1'"
+                        + " Trace: scopeType=bpmn, scopeDefinitionKey=simpleGetOnly, scopeDefinitionId=" + processDefinition.getId() + ","
+                        + " subScopeDefinitionKey=httpGetWithScriptSyntaxErrorInHandler, tenantId=<empty>, type=httpResponseHandler");
+    }
+
+    @Test
+    @Deployment
+    public void testGetWithScriptRequestHandlerThrowsFlowableException() {
+        assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("simpleGetOnly"))
+                .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessage("Illegal Argument thrown in script");
+    }
+
+    @Test
+    @Deployment
     public void testGetWithScriptResponseHandler() {
         ProcessInstance proc = runtimeService.startProcessInstanceByKey("simpleGetOnly");
         String scriptRequestHandlerResult = (String) proc.getProcessVariables().get("scriptResponseHandlerResult");
@@ -167,7 +233,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         List<HistoricVariableInstance> variables = historyService.createHistoricVariableInstanceQuery().processInstanceId(proc.getId()).list();
         assertThat(variables)
                 .extracting(HistoricVariableInstance::getVariableName)
-                .containsExactly("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
+                .containsExactlyInAnyOrder("scriptResponseHandlerResult", "httpGetResponseBody", "responseHeaders");
         assertThatJson(variables.get(1).getValue())
                 .isEqualTo("{ name: { firstName: 'John', lastName: 'Doe' }}");
         assertProcessEnded(proc.getId());
@@ -217,7 +283,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testRequestTimeout() {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("requestTimeout"))
                 .isExactlyInstanceOf(FlowableException.class)
-                .getCause().isInstanceOfAny(SocketTimeoutException.class, SocketException.class);
+                .cause().isInstanceOfAny(SocketTimeoutException.class, SocketException.class);
     }
 
     @Test
@@ -322,6 +388,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String body = (String) runtimeService.getVariable(process.getId(), "resultResponseBody");
         assertThat(body).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(body, JsonNode.class);
         mapper.convertValue(jsonNode, HttpTestData.class);
         continueProcess(process);
@@ -366,11 +433,53 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         response.put("get500ResponseStatusCode", 500);
         response.put("get500ResponseReason", get500ResponseReason());
         assertKeysEquals(process.getId(), response);
-        continueProcess(process);
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(process.getId())
+                .onlyChildExecutions()
+                .singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("waitAfterError");
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(process.getId());
+    }
+
+    @Test
+    @Deployment
+    public void testHttpGetNonSpecStatusCode() {
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpGetNonSpecCode");
+        assertThat(process.isEnded()).isFalse();
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("get981RequestMethod", "GET");
+        request.put("get981RequestUrl", "https://localhost:9799/api?code=981");
+        request.put("get981RequestHeaders", "Accept: application/json");
+        request.put("get981RequestTimeout", 5000);
+        request.put("get981HandleStatusCodes", "981");
+        request.put("get981SaveRequestVariables", true);
+        assertKeysEquals(process.getId(), request);
+        // Response assertions
+        Map<String, Object> response = new HashMap<>();
+        response.put("get981ResponseStatusCode", 981);
+        response.put("get981ResponseReason", getNonSpecResponseReason(981));
+        assertKeysEquals(process.getId(), response);
+
+        Execution execution = runtimeService.createExecutionQuery()
+                .processInstanceId(process.getId())
+                .onlyChildExecutions()
+                .singleResult();
+        assertThat(execution).isNotNull();
+        assertThat(execution.getActivityId()).isEqualTo("waitAfterError");
+        runtimeService.trigger(execution.getId());
+        assertProcessEnded(process.getId());
     }
 
     protected String get500ResponseReason() {
         return "Server Error";
+    }
+
+    protected String getNonSpecResponseReason(int code) {
+        return String.valueOf(code);
     }
 
     @Test
@@ -394,6 +503,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPostResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);
@@ -514,6 +624,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         // Response body assertions
         String responseBody = (String) runtimeService.getVariable(process.getId(), "httpPatchResponseBody");
         assertThat(responseBody).isNotNull();
+        ObjectMapper mapper = processEngineConfiguration.getObjectMapper();
         JsonNode jsonNode = mapper.readValue(responseBody, JsonNode.class);
         HttpTestData testData = mapper.convertValue(jsonNode, HttpTestData.class);
         assertThat(testData.getBody()).isEqualTo(body);
@@ -629,12 +740,41 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         );
     }
 
+    @Test
+    @Deployment
+    public void testHttpSecureHeaders() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("url", "https://localhost:9799/api?code=200");
+        variables.put("headers", "Content-Type: text/plain");
+        variables.put("secureHeaders", "Authorization: Bearer secretToken\nX-Request-Key: testKey");
+        variables.put("prefix", "test");
+
+        ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpSecureHeaders", variables);
+        assertThat(process.isEnded()).isFalse();
+
+        Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
+        assertThat(headerMap)
+                .contains(
+                        entry("Content-Type", "text/plain"),
+                        entry("Authorization", "Bearer secretToken"),
+                        entry("X-Request-Key", "testKey")
+                );
+
+        // Request assertions
+        Map<String, Object> request = new HashMap<>();
+        request.put("testRequestMethod", "POST");
+        request.put("testRequestUrl", "https://localhost:9799/api?code=200");
+        request.put("testRequestHeaders", "Content-Type: text/plain");
+        request.put("testRequestSecureHeaders", "Authorization: *****\nX-Request-Key: *****");
+        assertKeysEquals(process.getId(), request);
+    }
+
     private void assertKeysEquals(final String processInstanceId, final Map<String, Object> vars) {
         for (String key : vars.keySet()) {
             if (key.contains("Headers")) {
-                assertThat((String) runtimeService.getVariable(processInstanceId, key)).containsSequence((String) vars.get(key));
+                assertThat((String) runtimeService.getVariable(processInstanceId, key)).as(key).containsSequence((String) vars.get(key));
             } else {
-                assertThat(runtimeService.getVariable(processInstanceId, key)).isEqualTo(vars.get(key));
+                assertThat(runtimeService.getVariable(processInstanceId, key)).as(key).isEqualTo(vars.get(key));
             }
         }
     }

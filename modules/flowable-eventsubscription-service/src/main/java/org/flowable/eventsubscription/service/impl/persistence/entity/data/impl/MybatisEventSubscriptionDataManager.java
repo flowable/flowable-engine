@@ -13,11 +13,14 @@
 package org.flowable.eventsubscription.service.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
 import org.flowable.common.engine.impl.db.DbSqlSession;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
@@ -40,8 +43,9 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionIdMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByNameMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcInstTypeAndActivityMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByProcessInstanceAndTypeMatcher;
-import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher;
+import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndScopeStartEventMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeDefinitionIdAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByScopeIdAndTypeMatcher;
 import org.flowable.eventsubscription.service.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsBySubScopeIdMatcher;
@@ -80,9 +84,12 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeMatcher();
 
-    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher = new EventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher();
     
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeIdAndTypeMatcher = new EventSubscriptionsByScopeIdAndTypeMatcher();
+
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher = new EventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher();
+
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByScopeDefinitionIdAndScopeStartEventMatcher = new EventSubscriptionsByScopeDefinitionIdAndScopeStartEventMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> signalEventSubscriptionByNameAndExecutionMatcher = new SignalEventSubscriptionByNameAndExecutionMatcher();
 
@@ -250,17 +257,34 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<EventSubscriptionEntity> findEventSubscriptionsByTypeAndProcessDefinitionId(String type, String processDefinitionId, String tenantId) {
-        final String query = "selectEventSubscriptionsByTypeAndProcessDefinitionId";
-        Map<String, String> params = new HashMap<>();
-        if (type != null) {
-            params.put("eventType", type);
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndProcessDefinitionId(Collection<String> types, String processDefinitionId, String tenantId) {
+        if (types == null || types.isEmpty()) {
+            return Collections.emptyList();
         }
+        Map<String, Object> params = new HashMap<>();
+        params.put("eventTypes", types);
         params.put("processDefinitionId", processDefinitionId);
         if (tenantId != null && !tenantId.equals(EventSubscriptionServiceConfiguration.NO_TENANT_ID)) {
             params.put("tenantId", tenantId);
         }
-        return getDbSqlSession().selectList(query, params);
+        return getDbSqlSession().selectList("selectEventSubscriptionsByTypesAndProcessDefinitionId", params);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<EventSubscriptionEntity> findEventSubscriptionsByTypesAndScopeDefinitionId(Collection<String> eventTypes, String scopeDefinitionId,
+            String scopeType, String tenantId) {
+        if (eventTypes == null || eventTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("eventTypes", eventTypes);
+        params.put("scopeDefinitionId", scopeDefinitionId);
+        params.put("scopeType", scopeType);
+        if (tenantId != null && !tenantId.equals(EventSubscriptionServiceConfiguration.NO_TENANT_ID)) {
+            params.put("tenantId", tenantId);
+        }
+        return getDbSqlSession().selectList("selectEventSubscriptionsByTypesAndScopeDefinitionId", params);
     }
     
     @Override
@@ -315,6 +339,34 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     }
 
     @Override
+    public void updateEventSubscriptionProcessDefinitionId(String oldProcessDefinitionId, String newProcessDefinitionId, String eventType, String activityId,
+        String scopeDefinitionKey, String configuration) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("scopeDefinitionKey", scopeDefinitionKey);
+        params.put("oldProcessDefinitionId", oldProcessDefinitionId);
+        params.put("newProcessDefinitionId", newProcessDefinitionId);
+        params.put("eventType", eventType);
+        params.put("activityId", activityId);
+        if (StringUtils.isNotBlank(configuration)) {
+            params.put("configuration", configuration);
+        }
+        getDbSqlSession().directUpdate("updateManualProcessStartEventSubscriptionWithProcessDefinitionId", params);
+    }
+
+    @Override
+    public void updateEventSubscriptionScopeDefinitionId(String oldScopeDefinitionId, String newScopeDefinitionId, String eventType, String scopeDefinitionKey, String configuration) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("scopeDefinitionKey", scopeDefinitionKey);
+        params.put("oldScopeDefinitionId", oldScopeDefinitionId);
+        params.put("newScopeDefinitionId", newScopeDefinitionId);
+        params.put("eventType", eventType);
+        if (StringUtils.isNotBlank(configuration)) {
+            params.put("configuration", configuration);
+        }
+        getDbSqlSession().directUpdate("updateManualScopeStartEventSubscriptionWithScopeDefinitionId", params);
+    }
+
+    @Override
     public boolean updateEventSubscriptionLockTime(String eventSubscriptionId, Date lockDate, String lockOwner, Date currentTime) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("id", eventSubscriptionId);
@@ -363,12 +415,26 @@ public class MybatisEventSubscriptionDataManager extends AbstractEventSubscripti
     }
 
     @Override
-    public void deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId(String scopeDefinitionId, String scopeType) {
-        Map<String, String> params = new HashMap<>();
+    public void deleteEventSubscriptionsForProcessDefinitionAndProcessStartEvent(String processDefinitionId, String eventType, String activityId, String configuration) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("processDefinitionId", processDefinitionId);
+        params.put("eventType", eventType);
+        params.put("activityId", activityId);
+        if (StringUtils.isNotBlank(configuration)) {
+            params.put("configuration", configuration);
+        }
+        bulkDelete("deleteManualProcessStartEventSubscriptions", eventSubscriptionsByProcessDefinitionIdAndProcessStartEventMatcher, params);
+    }
+
+    @Override
+    public void deleteEventSubscriptionsForScopeDefinitionAndScopeStartEvent(String scopeDefinitionId, String eventType, String configuration) {
+        Map<String, Object> params = new HashMap<>();
         params.put("scopeDefinitionId", scopeDefinitionId);
-        params.put("scopeType", scopeType);
-        bulkDelete("deleteEventSubscriptionsForScopeDefinitionIdAndTypeAndNullScopeId",
-            eventSubscriptionsByScopeDefinitionIdAndTypeAndNullScopeIdMatcher, params);
+        params.put("eventType", eventType);
+        if (StringUtils.isNotBlank(configuration)) {
+            params.put("configuration", configuration);
+        }
+        bulkDelete("deleteManualScopeStartEventSubscriptions", eventSubscriptionsByScopeDefinitionIdAndScopeStartEventMatcher, params);
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

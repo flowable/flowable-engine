@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDefinitionQuery;
 import org.flowable.app.engine.impl.repository.AppDefinitionQueryProperty;
@@ -44,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Definitions" }, description = "Manage App Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDefinitionCollectionResource {
 
     private static final Map<String, QueryProperty> properties = new HashMap<>();
@@ -68,7 +66,7 @@ public class AppDefinitionCollectionResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of app definitions",  nickname = "listAppDefinitions", tags = { "App Definitions" })
+    @ApiOperation(value = "List of app definitions",  nickname = "listAppDefinitions", tags = { "App Definitions" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return app definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return app definitions with a category like the given value.", paramType = "query"),
@@ -90,13 +88,16 @@ public class AppDefinitionCollectionResource {
             @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "Only return app definitions without a tenant id.", paramType = "query"),
             @ApiImplicitParam(name = "latest", dataType = "boolean", value = "If true; only the latest versions will be returned.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "key,category,id,version,name,deploymentId,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the app definitions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @GetMapping(value = "/app-repository/app-definitions", produces = "application/json")
-    public DataResponse<AppDefinitionResponse> getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<AppDefinitionResponse> getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         AppDefinitionQuery appDefinitionQuery = appRepositoryService.createAppDefinitionQuery();
 
         // Populate filter-parameters
@@ -158,8 +159,7 @@ public class AppDefinitionCollectionResource {
             }
         }
         if (allRequestParams.containsKey("latest")) {
-            boolean latest = Boolean.parseBoolean(allRequestParams.get("latest"));
-            if (latest) {
+            if (Boolean.parseBoolean(allRequestParams.get("latest"))) {
                 appDefinitionQuery.latestVersion();
             }
         }

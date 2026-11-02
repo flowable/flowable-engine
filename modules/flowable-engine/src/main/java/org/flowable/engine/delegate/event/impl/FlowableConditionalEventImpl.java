@@ -21,6 +21,7 @@ import org.flowable.engine.delegate.event.FlowableConditionalEvent;
 public class FlowableConditionalEventImpl extends FlowableActivityEventImpl implements FlowableConditionalEvent {
 
     protected String conditionExpression;
+    protected String conditionLanguage;
 
     public FlowableConditionalEventImpl(FlowableEngineEventType type) {
         super(type);
@@ -33,5 +34,14 @@ public class FlowableConditionalEventImpl extends FlowableActivityEventImpl impl
 
     public void setConditionExpression(String conditionExpression) {
         this.conditionExpression = conditionExpression;
+    }
+
+    @Override
+    public String getConditionLanguage() {
+        return conditionLanguage;
+    }
+
+    public void setConditionLanguage(String conditionLanguage) {
+        this.conditionLanguage = conditionLanguage;
     }
 }

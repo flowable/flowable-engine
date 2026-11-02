@@ -16,11 +16,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionElement;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.VariableAggregationDefinition;
 import org.flowable.test.cmmn.converter.util.CmmnXmlConverterTest;
 
@@ -87,6 +92,84 @@ class RepetitionRuleConverterTest {
                 .containsExactly(
                         tuple("description", null, null, null)
                 );
+    }
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/repetitionRuleWithCustomExtensionElements.cmmn")
+    void customExtensionElements(CmmnModel cmmnModel) {
+
+        Stage mainPlanModel = cmmnModel.getPrimaryCase()
+                .getPlanModel();
+
+        PlanItem planItem = mainPlanModel.getPlanItem("repetitionRuleWithExtensionElements");
+        PlanItemControl itemControl = planItem.getItemControl();
+        assertThat(itemControl).isNotNull();
+        RepetitionRule rule = itemControl.getRepetitionRule();
+        assertThat(rule).isNotNull();
+        List<ExtensionElement> testEntryExtensions = rule.getExtensionElements().get("testEntry");
+        assertThat(testEntryExtensions)
+                .extracting(ExtensionElement::getElementText)
+                .containsExactly("Test Entry");
+
+        List<ExtensionElement> nestedTestExtensions = rule.getExtensionElements().get("nestedTest");
+        assertThat(nestedTestExtensions)
+                .hasSize(1)
+                .first()
+                .satisfies(extensionElement -> {
+                    assertThat(extensionElement.getAttributeValue(null, "name"))
+                            .isEqualTo("Test");
+                    assertThat(extensionElement.getChildElements().get("nestedValue"))
+                            .extracting(ExtensionElement::getElementText)
+                            .containsExactly("Test Value");
+                });
+
+    }
+
+    @CmmnXmlConverterTest("org/flowable/test/cmmn/converter/repetitionRuleVariableAggregationsAndCustomExtensionElements.cmmn")
+    void aggregationsAndCustomExtensionElements(CmmnModel cmmnModel) {
+        PlanItem planItem = cmmnModel.getPrimaryCase()
+                .getPlanModel()
+                .getPlanItem("planItem1");
+
+        PlanItemControl itemControl = planItem.getItemControl();
+        assertThat(itemControl).isNotNull();
+        RepetitionRule repetitionRule = itemControl.getRepetitionRule();
+        assertThat(repetitionRule).isNotNull();
+        assertThat(repetitionRule.getExtensionElements())
+                .containsOnlyKeys("testEntry", "nestedTest");
+
+        Collection<VariableAggregationDefinition> aggregations = repetitionRule.getAggregations().getAggregations();
+        assertThat(aggregations)
+                .extracting(VariableAggregationDefinition::getTarget)
+                .containsExactly("reviews");
+
+        assertThat(aggregations)
+                .first()
+                .satisfies(aggregation -> {
+                    assertThat(aggregation.getDefinitions())
+                            .extracting(VariableAggregationDefinition.Variable::getSource, VariableAggregationDefinition.Variable::getTarget)
+                            .containsExactly(
+                                    tuple("taskAssignee", "userId"),
+                                    tuple("approved", null)
+                            );
+                });
+
+        List<ExtensionElement> testEntryExtensions = repetitionRule.getExtensionElements().get("testEntry");
+        assertThat(testEntryExtensions)
+                .extracting(ExtensionElement::getElementText)
+                .containsExactly("Test Entry");
+
+        List<ExtensionElement> nestedTestExtensions = repetitionRule.getExtensionElements().get("nestedTest");
+        assertThat(nestedTestExtensions)
+                .hasSize(1)
+                .first()
+                .satisfies(extensionElement -> {
+                    assertThat(extensionElement.getAttributeValue(null, "name"))
+                            .isEqualTo("Test");
+                    assertThat(extensionElement.getChildElements().get("nestedValue"))
+                            .extracting(ExtensionElement::getElementText)
+                            .containsExactly("Test Value");
+                });
+
     }
 
 }

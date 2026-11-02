@@ -79,8 +79,7 @@ public class IdmByteArrayEntityImpl extends AbstractIdmEngineEntity implements I
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof PersistentState) {
-                PersistentState other = (PersistentState) obj;
+            if (obj instanceof PersistentState other) {
                 return StringUtils.equals(this.name, other.name) && Arrays.equals(this.bytes, other.bytes);
             }
             return false;

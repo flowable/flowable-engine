@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.query.Query;
 
@@ -37,6 +38,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
     PlanItemInstanceQuery derivedCaseDefinitionId(String derivedCaseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
+    PlanItemInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
 
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);
 
@@ -74,11 +76,15 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceOccurredAfter(Date occurredAfter);
     PlanItemInstanceQuery planItemInstanceTerminatedBefore(Date terminatedBefore);
     PlanItemInstanceQuery planItemInstanceTerminatedAfter(Date terminatedAfter);
+    PlanItemInstanceQuery planItemInstanceFailedBefore(Date failedBefore);
+    PlanItemInstanceQuery planItemInstanceFailedAfter(Date failedAfter);
     PlanItemInstanceQuery planItemInstanceExitBefore(Date exitBefore);
     PlanItemInstanceQuery planItemInstanceExitAfter(Date exitAfter);
     PlanItemInstanceQuery planItemInstanceEndedBefore(Date endedBefore);
     PlanItemInstanceQuery planItemInstanceEndedAfter(Date endedAfter);
     PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    PlanItemInstanceQuery planItemInstanceAssignee(String assignee);
+    PlanItemInstanceQuery planItemInstanceCompletedBy(String completedBy);
     PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     PlanItemInstanceQuery planItemInstanceEntryCriterionId(String entryCriterionId);
@@ -97,6 +103,16 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemDefinitionTypes(List<String> planItemDefinitionType);
 
     /**
+     * Begin an OR statement. Make sure you invoke the endOr method at the end of your OR statement.
+     */
+    PlanItemInstanceQuery or();
+
+    /**
+     * End an OR statement.
+     */
+    PlanItemInstanceQuery endOr();
+
+    /**
      * @return The query will only return ended (completed/terminated/occurred/exited) plan item instances.
      *         No runtime instances will be returned.
      */
@@ -106,6 +122,18 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      * @return The query will include both runtime and ended (completed/terminated/occurred/exited) plan item instances.
      */
     PlanItemInstanceQuery includeEnded();
+
+    /**
+     * Only select plan item instances that have been started (last started time is set).
+     * Independent of the default non-ended filter: this does not implicitly include ended instances.
+     */
+    PlanItemInstanceQuery started();
+
+    /**
+     * Only select plan item instances that have not been started (last started time is null).
+     * Independent of the default non-ended filter: this does not implicitly include ended instances.
+     */
+    PlanItemInstanceQuery notStarted();
     
     /**
      * Only select plan item instances which have a local variable with the given value. The type of variable is determined based on the value. 
@@ -370,6 +398,19 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
      *            cannot be null.
      */
     PlanItemInstanceQuery caseVariableNotExists(String name);
+
+    /**
+     *
+     * Include local plan item instance variables in the query result
+     */
+    PlanItemInstanceQuery includeLocalVariables();
+
+    /**
+     * Include local plan item instance variables in the query result.
+     * When {@code excludeVariableInitialization} is true the variable values are not resolved by the query, a value is only resolved when it is read.
+     * A variable whose value cannot be resolved then does not fail the query. The flag applies to all the variables included by the query.
+     */
+    PlanItemInstanceQuery includeLocalVariables(boolean excludeVariableInitialization);
 
     /**
      * Localize plan item name to specified locale.

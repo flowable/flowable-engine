@@ -140,9 +140,8 @@ public class Bindings implements TypeConverter {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Bindings) {
-			Bindings other = (Bindings)obj;
-			return Arrays.equals(functions, other.functions)
+		if (obj instanceof Bindings other) {
+            return Arrays.equals(functions, other.functions)
 				&& Arrays.equals(variables, other.variables)
 				&& converter.equals(other.converter);
 		}

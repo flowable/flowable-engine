@@ -22,12 +22,22 @@ public class CommonDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager 
     private static final String SCHEMA_COMPONENT = "common";
     
     public CommonDbSchemaManager() {
-        super(PROPERTY_TABLE, SCHEMA_COMPONENT, null, COMMON_VERSION_PROPERTY);
+        super(PROPERTY_TABLE, SCHEMA_COMPONENT, COMMON_VERSION_PROPERTY);
     }
     
     @Override
     protected String getResourcesRootDirectory() {
         return "org/flowable/common/db/";
+    }
+    
+    @Override
+    public void schemaCheckVersion() {
+        // Schema check is ignored for the common DB
+    }
+
+    @Override
+    public String getContext() {
+        return SCHEMA_COMPONENT;
     }
     
 }

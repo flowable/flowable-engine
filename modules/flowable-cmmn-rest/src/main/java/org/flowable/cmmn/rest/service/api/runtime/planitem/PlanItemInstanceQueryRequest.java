@@ -15,6 +15,7 @@ package org.flowable.cmmn.rest.service.api.runtime.planitem;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.common.rest.api.PaginateRequest;
@@ -31,6 +32,7 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
     private String elementId;
     private String name;
     private String caseInstanceId;
+    private Set<String> caseInstanceIds;
     private String caseDefinitionId;
     private String stageInstanceId;
     private String planItemDefinitionId;
@@ -43,6 +45,8 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
     private String referenceId;
     private String referenceType;
     private Boolean includeEnded;
+    private Boolean started;
+    private Boolean includeLocalVariables;
     private List<QueryVariable> variables;
     private List<QueryVariable> caseInstanceVariables;
     private String tenantId;
@@ -194,6 +198,22 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
         this.includeEnded = includeEnded;
     }
 
+    public Boolean getStarted() {
+        return started;
+    }
+
+    public void setStarted(Boolean started) {
+        this.started = started;
+    }
+
+    public Boolean getIncludeLocalVariables() {
+        return includeLocalVariables;
+    }
+
+    public void setIncludeLocalVariables(boolean includeLocalVariables) {
+        this.includeLocalVariables = includeLocalVariables;
+    }
+
     public String getTenantId() {
         return tenantId;
     }
@@ -208,5 +228,13 @@ public class PlanItemInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Set<String> getCaseInstanceIds() {
+        return caseInstanceIds;
+    }
+
+    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
+        this.caseInstanceIds = caseInstanceIds;
     }
 }

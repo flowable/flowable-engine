@@ -30,7 +30,7 @@ import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcherAdap
  */
 public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnDataManager<HistoricPlanItemInstanceEntity> implements HistoricPlanItemInstanceDataManager {
 
-    protected CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity> historicPlanItemInstanceByCaseDefinitionIdMatcher = new CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity>() {
+    protected CachedEntityMatcherAdapter<HistoricPlanItemInstanceEntity> historicPlanItemInstanceByCaseDefinitionIdMatcher = new CachedEntityMatcherAdapter<>() {
         @Override
         public boolean isRetained(HistoricPlanItemInstanceEntity entity, Object param) {
             return entity.getCaseDefinitionId().equals(param);
@@ -77,6 +77,14 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public List<HistoricPlanItemInstance> findWithVariablesByCriteria(HistoricPlanItemInstanceQueryImpl historicPlanItemInstanceQuery) {
+        setSafeInValueLists(historicPlanItemInstanceQuery);
+        return getDbSqlSession().selectList("selectHistoricPlanItemInstancesWithLocalVariablesByQueryCriteria", historicPlanItemInstanceQuery,
+                getManagedEntityClass());
+    }
+
+    @Override
     public Class<? extends HistoricPlanItemInstanceEntity> getManagedEntityClass() {
         return HistoricPlanItemInstanceEntityImpl.class;
     }
@@ -94,6 +102,13 @@ public class MybatisHistoricPlanItemInstanceDataManager extends AbstractCmmnData
     protected void setSafeInValueLists(HistoricPlanItemInstanceQueryImpl planItemInstanceQuery) {
         if (planItemInstanceQuery.getInvolvedGroups() != null) {
             planItemInstanceQuery.setSafeInvolvedGroups(createSafeInValuesList(planItemInstanceQuery.getInvolvedGroups()));
+        }
+        if(planItemInstanceQuery.getCaseInstanceIds() != null) {
+            planItemInstanceQuery.setSafeCaseInstanceIds(createSafeInValuesList(planItemInstanceQuery.getCaseInstanceIds()));
+        }
+
+        for (HistoricPlanItemInstanceQueryImpl orQueryObject : planItemInstanceQuery.getOrQueryObjects()) {
+            setSafeInValueLists(orQueryObject);
         }
     }
 }

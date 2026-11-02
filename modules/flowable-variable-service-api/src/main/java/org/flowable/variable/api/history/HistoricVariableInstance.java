@@ -39,6 +39,17 @@ public interface HistoricVariableInstance extends HistoricData {
     String getProcessInstanceId();
 
     /**
+     * The process definition reference. This is not persisted, it is only available when the variable is fetched by a query of process instances
+     * or tasks that includes variables, or in the transaction that creates or updates the variable.
+     */
+    String getProcessDefinitionId();
+
+    /**
+     * The process instance reference.
+     */
+    String getExecutionId();
+
+    /**
      * @return the task id of the task, in case this variable instance has been set locally on a task. Returns null, if this variable is not related to a task.
      */
     String getTaskId();
@@ -58,4 +69,12 @@ public interface HistoricVariableInstance extends HistoricData {
     String getSubScopeId();
     
     String getScopeType();
+
+    /**
+     * The scope definition reference. This is not persisted, it is only available when the variable is fetched by a query of case instances,
+     * plan item instances or tasks that includes variables, or in the transaction that creates or updates the variable.
+     */
+    String getScopeDefinitionId();
+
+    String getMetaInfo();
 }

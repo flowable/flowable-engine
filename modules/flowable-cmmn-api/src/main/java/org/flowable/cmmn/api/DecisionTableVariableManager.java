@@ -17,22 +17,12 @@ import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public interface DecisionTableVariableManager {
 
-    @Deprecated
-    void setVariablesOnPlanItemInstance(List<Map<String, Object>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper);
+    void setVariablesOnPlanItemInstance(List<Map<String, Object>> decisionResult, String externalRef, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults);
 
-    @Deprecated
-    void setDecisionServiceVariablesOnExecution(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper);
-
-    default void setVariablesOnPlanItemInstance(List<Map<String, Object>> decisionResult, String externalRef, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
-        setVariablesOnPlanItemInstance(decisionResult, externalRef, planItemInstance, objectMapper);
-    }
-
-    default void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults) {
-        setDecisionServiceVariablesOnExecution(executionResult, decisionKey, planItemInstance, objectMapper);
-    }
+    void setDecisionServiceVariablesOnPlanItemInstance(Map<String, List<Map<String, Object>>> executionResult, String decisionKey, PlanItemInstance planItemInstance, ObjectMapper objectMapper, boolean multipleResults);
 
 }

@@ -64,6 +64,11 @@ public class FlowableProperties {
     private String databaseSchemaUpdate = "true";
 
     /**
+     * In some situations you want to set the catalog to use for database checks / generation if the database metadata doesn't return that correctly.
+     */
+    private String databaseCatalog;
+
+    /**
      * In some situations you want to set the schema to use for table checks / generation if the database metadata doesn't return that correctly.
      */
     private String databaseSchema;
@@ -130,6 +135,13 @@ public class FlowableProperties {
     @DurationUnit(ChronoUnit.DAYS)
     private Duration historyCleaningAfter = Duration.ofDays(365);
     private int historyCleaningBatchSize = 100;
+
+    /**
+     * Preferred JSON mapper to use for variables.
+     * The options are jackson and jackson2.
+     * Jackson is the default and jackson2 is deprecated for removal.
+     */
+    private String variableJsonMapper = "jackson";
 
     public boolean isAsyncExecutorActivate() {
         return asyncExecutorActivate;
@@ -219,6 +231,14 @@ public class FlowableProperties {
 
     public void setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
+    }
+
+    public String getDatabaseCatalog() {
+        return databaseCatalog;
+    }
+
+    public void setDatabaseCatalog(String databaseCatalog) {
+        this.databaseCatalog = databaseCatalog;
     }
 
     public String getDatabaseSchema() {
@@ -385,5 +405,13 @@ public class FlowableProperties {
 
     public void setHistoryCleaningBatchSize(int historyCleaningBatchSize) {
         this.historyCleaningBatchSize = historyCleaningBatchSize;
+    }
+
+    public String getVariableJsonMapper() {
+        return variableJsonMapper;
+    }
+
+    public void setVariableJsonMapper(String variableJsonMapper) {
+        this.variableJsonMapper = variableJsonMapper;
     }
 }

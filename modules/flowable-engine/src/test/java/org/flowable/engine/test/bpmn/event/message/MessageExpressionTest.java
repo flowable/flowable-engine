@@ -13,16 +13,23 @@
 package org.flowable.engine.test.bpmn.event.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.List;
 
 import org.assertj.core.groups.Tuple;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.eventsubscription.service.impl.persistence.entity.MessageEventSubscriptionEntity;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.IdentityLinkInfo;
+import org.flowable.identitylink.api.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
@@ -34,7 +41,7 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testMessageEventsWithExpression() {
-        assertMesageEventSubscriptions("startMessage2");
+        assertMessageEventSubscriptions("startMessage2");
 
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
             .messageName("startMessage2")
@@ -43,7 +50,7 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
 
         List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks).isEmpty();
-        assertMesageEventSubscriptions("actualCatchMessageValue", "startMessage2");
+        assertMessageEventSubscriptions("actualCatchMessageValue", "startMessage2");
         runtimeService.messageEventReceived(
             "actualCatchMessageValue",
             runtimeService.createEventSubscriptionQuery().eventName("actualCatchMessageValue").singleResult().getExecutionId(),
@@ -57,6 +64,37 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
             runtimeService.createEventSubscriptionQuery().eventName("actualBoundaryMessage").singleResult().getExecutionId());
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertThat(tasks).extracting(Task::getName).containsExactly("T2");
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/event/message/MessageExpressionTest.testMessageEventsWithExpression.bpmn20.xml")
+    public void testMessageEventsWithOwnerAndAssignee() {
+        assertMessageEventSubscriptions("startMessage2");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .messageName("startMessage2")
+            .variable("catchMessage", "actualCatchMessageValue")
+            .owner("kermit")
+            .assignee("denise")
+            .start();
+
+        List<IdentityLink> identityLinks = runtimeService.getIdentityLinksForProcessInstance(processInstance.getId());
+        assertThat(identityLinks)
+            .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+            .containsExactlyInAnyOrder(
+                tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
+                tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+            );
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
+            assertThat(historicIdentityLinks)
+                .extracting(IdentityLinkInfo::getType, IdentityLinkInfo::getUserId, IdentityLinkInfo::getGroupId, IdentityLinkInfo::getProcessInstanceId)
+                .containsExactlyInAnyOrder(
+                    tuple(IdentityLinkType.OWNER, "kermit", null, processInstance.getId()),
+                    tuple(IdentityLinkType.ASSIGNEE, "denise", null, processInstance.getId())
+                );
+        }
     }
 
     @Test
@@ -83,7 +121,7 @@ public class MessageExpressionTest extends PluggableFlowableTestCase {
 
     }
 
-    protected void assertMesageEventSubscriptions(String ... names) {
+    protected void assertMessageEventSubscriptions(String ... names) {
         Tuple[] tuples = new Tuple[names.length];
         for (int i = 0; i < names.length; i++) {
             tuples[i] = Tuple.tuple(MessageEventSubscriptionEntity.EVENT_TYPE, names[i]);

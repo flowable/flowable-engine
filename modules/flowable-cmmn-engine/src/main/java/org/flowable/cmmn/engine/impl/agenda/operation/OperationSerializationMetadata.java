@@ -31,4 +31,8 @@ public interface OperationSerializationMetadata {
 
     String FIELD_IS_STAGE = "isStage";
 
+    String FIELD_ERROR_CODE = "errorCode";
+
+    String FIELD_ERROR_MESSAGE = "errorMessage";
+
 }

@@ -69,8 +69,8 @@ public class SpringEventRegistryEngineConfiguration extends EventRegistryEngineC
     }
     
     @Override
-    public EventRegistryEngine buildEventRegistryEngine() {
-        EventRegistryEngine eventRegistryEngine = super.buildEventRegistryEngine();
+    public EventRegistryEngine buildEngine() {
+        EventRegistryEngine eventRegistryEngine = super.buildEngine();
         EventRegistryEngines.setInitialized(true);
         enginesBuild.add(eventRegistryEngine.getName());
         return eventRegistryEngine;

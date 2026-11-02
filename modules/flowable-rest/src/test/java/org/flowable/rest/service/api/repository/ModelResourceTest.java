@@ -28,11 +28,10 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -85,8 +84,8 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
                             + "sourceUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, model.getId()) + "',"
                             + "sourceExtraUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, model.getId())
                             + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(now.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "createTime: '" + getISODateString(now.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(now.getTime()) + "'"
                             + "}");
 
         } finally {
@@ -197,8 +196,8 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
                             + "tenantId: 'myTenant',"
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
                             + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(updateTime.getTime()))
+                            + "createTime: '" + getISODateString(createTime.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(updateTime.getTime()) + "'"
                             + "}");
 
         } finally {
@@ -260,8 +259,8 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
                             + "id: '" + model.getId() + "',"
                             + "tenantId: null,"
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(createTime.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(updateTime.getTime()))
+                            + "createTime: '" + getISODateString(createTime.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(updateTime.getTime()) + "'"
                             + "}");
 
             model = repositoryService.getModel(model.getId());
@@ -321,8 +320,8 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
                             + "id: '" + model.getId() + "',"
                             + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, model.getId()) + "',"
                             + "deploymentUrl: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_DEPLOYMENT, deploymentId) + "',"
-                            + "createTime: " + new TextNode(getISODateStringWithTZ(now.getTime())) + ","
-                            + "lastUpdateTime: " + new TextNode(getISODateStringWithTZ(now.getTime()))
+                            + "createTime: '" + getISODateString(now.getTime()) + "',"
+                            + "lastUpdateTime: '" + getISODateString(now.getTime()) + "'"
                             + "}");
 
         } finally {

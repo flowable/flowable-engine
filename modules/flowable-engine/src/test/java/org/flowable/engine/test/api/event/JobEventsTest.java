@@ -550,7 +550,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Calendar later = Calendar.getInstance();
         later.add(Calendar.YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(later.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobs(10000, 100);
 
         // Process Cancelled event should not be sent for the subprocess
         List<FlowableEvent> eventsReceived = activitiEventListener.getEventsReceived();

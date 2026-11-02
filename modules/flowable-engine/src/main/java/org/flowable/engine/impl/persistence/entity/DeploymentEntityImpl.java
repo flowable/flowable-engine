@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -50,6 +51,7 @@ public class DeploymentEntityImpl extends AbstractBpmnEngineNoRevisionEntity imp
      * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
+    protected Map<String, ProcessDefinitionCacheEntry> processDefinitionCache = new HashMap<>();
 
     public DeploymentEntityImpl() {
 
@@ -117,6 +119,16 @@ public class DeploymentEntityImpl extends AbstractBpmnEngineNoRevisionEntity imp
             }
         }
         return null;
+    }
+
+    @Override
+    public void addProcessDefinitionCacheEntry(String processDefinitionId, ProcessDefinitionCacheEntry processDefinitionCacheEntry) {
+        processDefinitionCache.put(processDefinitionId, processDefinitionCacheEntry);
+    }
+
+    @Override
+    public ProcessDefinitionCacheEntry getProcessDefinitionCacheEntry(String processDefinitionId) {
+        return processDefinitionCache.get(processDefinitionId);
     }
 
     // getters and setters ////////////////////////////////////////////////////////

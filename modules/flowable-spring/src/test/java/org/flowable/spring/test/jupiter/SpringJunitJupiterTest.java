@@ -40,6 +40,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -51,6 +52,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ExtendWith(FlowableSpringExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = SpringJunitJupiterTest.TestConfiguration.class)
+@DirtiesContext
 public class SpringJunitJupiterTest {
 
     @Autowired

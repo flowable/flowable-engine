@@ -295,8 +295,7 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
 
         if (!excludeVariableInitialization) {
             for (VariableInstance variableInstance : variableInstances) {
-                if (variableInstance instanceof VariableInstanceEntity) {
-                    VariableInstanceEntity variableEntity = (VariableInstanceEntity) variableInstance;
+                if (variableInstance instanceof VariableInstanceEntity variableEntity) {
                     if (variableEntity.getType() != null) {
                         variableEntity.getValue();
 
@@ -373,12 +372,20 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
         return taskIds;
     }
 
+    public List<List<String>> getSafeTaskIds() {
+        return getSafeList(taskIds);
+    }
+
     public String getExecutionId() {
         return executionId;
     }
 
     public Set<String> getExecutionIds() {
         return executionIds;
+    }
+
+    public List<List<String>> getSafeExecutionIds() {
+        return getSafeList(executionIds);
     }
 
     public boolean isExcludeTaskRelated() {

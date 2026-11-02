@@ -40,6 +40,9 @@ public interface CaseInstance {
     String getReferenceId();
     String getReferenceType();
     boolean isCompletable();
+    Date getDueDate();
+    Date getClaimTime();
+    String getClaimedBy();
     String getTenantId();
 
     /**

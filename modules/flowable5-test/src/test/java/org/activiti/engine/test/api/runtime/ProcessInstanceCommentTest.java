@@ -47,7 +47,7 @@ public class ProcessInstanceCommentTest extends PluggableFlowableTestCase {
             try {
                 taskService.addComment(null, processInstance.getId(), "Hello World 2");
             } catch (FlowableException e) {
-                assertTextPresent("Cannot add a comment to a suspended execution", e.getMessage());
+                assertTextPresent("Cannot add a comment to a suspended ProcessInstance", e.getMessage());
             }
 
             // Delete comments again

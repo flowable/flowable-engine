@@ -93,12 +93,6 @@ public abstract class AbstractSpringEngineAutoConfiguration extends AbstractEngi
      * @return the available object from {@code availableProvider} if there, otherwise the unique object from {@code uniqueProvider}
      */
     protected <T> T getIfAvailable(ObjectProvider<T> availableProvider, ObjectProvider<T> uniqueProvider) {
-        // This can be implemented by using availableProvider.getIfAvailable(() -> uniqueProvider.getIfUnique()). However, that is only there in Spring 5
-        // and we want to be support Spring 4 with the starters as well
-        T object = availableProvider.getIfAvailable();
-        if (object == null) {
-            object = uniqueProvider.getIfUnique();
-        }
-        return object;
+        return availableProvider.getIfAvailable(uniqueProvider::getIfUnique);
     }
 }

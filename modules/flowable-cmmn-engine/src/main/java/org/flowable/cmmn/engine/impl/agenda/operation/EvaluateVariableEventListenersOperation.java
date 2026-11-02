@@ -28,7 +28,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubsc
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 public class EvaluateVariableEventListenersOperation extends AbstractEvaluationCriteriaOperation {
 
@@ -83,7 +83,7 @@ public class EvaluateVariableEventListenersOperation extends AbstractEvaluationC
                     try {
                         JsonNode configNode = cmmnEngineConfiguration.getObjectMapper().readTree(configuration);
                         if (configNode.has(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY) && !configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).isNull()) {
-                            changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asText();
+                            changeTypeValue = configNode.get(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY).asString();
                         }
                     } catch (Exception e) {
                         LOGGER.error("Error reading variable listener configuration value for {}", eventSubscription.getActivityId(), e);
@@ -93,10 +93,12 @@ public class EvaluateVariableEventListenersOperation extends AbstractEvaluationC
                 if (changeTypeValue.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_ALL.equals(changeTypeValue) ||
                             (VariableListenerEventDefinition.CHANGE_TYPE_UPDATE_CREATE.equals(changeTypeValue) &&
                                     (VariableListenerEventDefinition.CHANGE_TYPE_CREATE.equals(variableListenerData.getChangeType()) || VariableListenerEventDefinition.CHANGE_TYPE_UPDATE.equals(variableListenerData.getChangeType())))) {
-                        
-                    itVariableListener.remove();
-                    CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstance);
-                    triggeredPlanItemInstance = true;
+                    
+                    if (!variableListenerData.containsProcessedElementId(planItemInstance.getPlanItemDefinitionId())) {
+                        CommandContextUtil.getAgenda().planTriggerPlanItemInstanceOperation(planItemInstance);
+                        triggeredPlanItemInstance = true;
+                        variableListenerData.addProcessedElementId(planItemInstance.getPlanItemDefinitionId());
+                    }
                 }         
             }
         }

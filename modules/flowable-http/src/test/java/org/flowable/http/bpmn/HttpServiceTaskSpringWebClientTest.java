@@ -38,6 +38,15 @@ public class HttpServiceTaskSpringWebClientTest extends HttpServiceTaskTest {
     }
 
     @Test
+    @Deployment
+    @Override
+    // We override because we have a different BPMN XML: unlike the default Apache HttpClient 4 based client, the Spring
+    // WebClient based client follows POST redirects, so the redirect has to be explicitly disallowed to observe the 302.
+    public void testHttpPost3XX() {
+        super.testHttpPost3XX();
+    }
+
+    @Test
     @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testConnectTimeout.bpmn20.xml")
     @Override
     public void testConnectTimeout() {
@@ -66,5 +75,10 @@ public class HttpServiceTaskSpringWebClientTest extends HttpServiceTaskTest {
     @Override
     protected String get500ResponseReason() {
         return HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase();
+    }
+
+    @Override
+    protected String getNonSpecResponseReason(int code) {
+        return null;
     }
 }

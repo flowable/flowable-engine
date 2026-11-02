@@ -13,9 +13,6 @@
 
 package org.flowable.engine.test.mock;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 import org.flowable.common.engine.impl.javax.el.ELContext;
 import org.flowable.common.engine.impl.javax.el.ELResolver;
 
@@ -24,11 +21,6 @@ public class MockElResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
     @Override

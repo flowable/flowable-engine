@@ -17,8 +17,6 @@ import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.batch.api.BatchQuery;
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
@@ -40,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "Batches" }, description = "Manage Batches", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Batches" }, authorizations = { @Authorization(value = "basicAuth") })
 public class BatchCollectionResource {
 
     @Autowired
@@ -53,7 +51,7 @@ public class BatchCollectionResource {
     protected BpmnRestApiInterceptor restApiInterceptor;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "List batches", tags = { "Batches" }, nickname = "listBatches")
+    @ApiOperation(value = "List batches", tags = { "Batches" }, nickname = "listBatches", notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return batch with the given id", paramType = "query"),
             @ApiImplicitParam(name = "batchType", dataType = "string", value = "Only return batches for the given type", paramType = "query"),
@@ -73,7 +71,7 @@ public class BatchCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/management/batches", produces = "application/json")
-    public DataResponse<BatchResponse> getBatches(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<BatchResponse> getBatches(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         BatchQuery query = managementService.createBatchQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -110,7 +108,7 @@ public class BatchCollectionResource {
             query.tenantIdLike(allRequestParams.get("tenantIdLike"));
         }
         if (allRequestParams.containsKey("withoutTenantId")) {
-            if (Boolean.valueOf(allRequestParams.get("withoutTenantId"))) {
+            if (Boolean.parseBoolean(allRequestParams.get("withoutTenantId"))) {
                 query.withoutTenantId();
             }
         }

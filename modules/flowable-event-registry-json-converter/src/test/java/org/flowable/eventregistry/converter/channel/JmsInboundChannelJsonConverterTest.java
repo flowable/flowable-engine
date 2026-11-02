@@ -53,6 +53,8 @@ class JmsInboundChannelJsonConverterTest extends AbstractChannelConverterTest {
                 assertThat(model.getDestination()).isEqualTo("customer");
                 assertThat(model.getDeserializerType()).isEqualTo("json");
 
+                assertThat(model.getEventFilterDelegateExpression()).isEqualTo("testEventFilterExpression");
+
                 ChannelEventKeyDetection eventKeyDetection = model.getChannelEventKeyDetection();
                 assertThat(eventKeyDetection).isNotNull();
                 assertThat(eventKeyDetection.getFixedValue()).isNull();

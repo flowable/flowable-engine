@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef" exporter="Flowable Open Source Modeler" exporterVersion="6.8.0">
+  <case id="example-stage-case" name="Example Stage Case">
+    <casePlanModel id="example-case-model" name="Example Case" flowable:formFieldValidation="true">
+      <planItem id="planItem1" name="Start Task" definitionRef="task" />
+      <planItem id="planItem4" name="Stage" definitionRef="stage">
+        <entryCriterion id="stage-sentry" sentryRef="sentry2" />
+      </planItem>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="task" name="Start Task" />
+      <stage id="stage" name="Stage">
+        <extensionElements>
+          <flowable:planItemLifecycleListener sourceState="available" targetState="active" expression="${planItemInstance.setVariableLocal(&quot;localStageNr&quot;, stageNr)}" />
+          <flowable:planItemLifecycleListener sourceState="wait_repetition" targetState="active" expression="${planItemInstance.setVariableLocal(&quot;localStageNr&quot;, stageNr)}" />
+        </extensionElements>
+        <planItem id="planItem2" name="Stage Task ${localStageNr}" definitionRef="stage-task" />
+        <humanTask id="stage-task" name="Stage Task ${localStageNr}" />
+      </stage>
+    </casePlanModel>
+  </case>
+</definitions>

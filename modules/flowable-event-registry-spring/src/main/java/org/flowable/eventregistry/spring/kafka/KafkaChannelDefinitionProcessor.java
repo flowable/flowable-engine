@@ -14,6 +14,7 @@ package org.flowable.eventregistry.spring.kafka;
 
 import java.lang.reflect.Field;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -40,12 +41,14 @@ import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
 import org.flowable.eventregistry.model.KafkaInboundChannelModel;
 import org.flowable.eventregistry.model.KafkaOutboundChannelModel;
+import org.flowable.eventregistry.spring.kafka.payload.EventPayloadKafkaMessageKeyProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -54,8 +57,11 @@ import org.springframework.beans.factory.config.EmbeddedValueResolver;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
+import org.springframework.core.retry.RetryPolicy;
 import org.springframework.kafka.annotation.KafkaListenerAnnotationBeanPostProcessor;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
@@ -66,22 +72,25 @@ import org.springframework.kafka.core.KafkaOperations;
 import org.springframework.kafka.listener.AbstractMessageListenerContainer;
 import org.springframework.kafka.listener.CommonErrorHandler;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerPartitionPausingBackOffManagerFactory;
+import org.springframework.kafka.listener.ContainerPausingBackOffHandler;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.listener.ExceptionClassifier;
 import org.springframework.kafka.listener.FailedRecordProcessor;
 import org.springframework.kafka.listener.GenericMessageListener;
 import org.springframework.kafka.listener.KafkaConsumerBackoffManager;
+import org.springframework.kafka.listener.ListenerContainerPauseService;
 import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.listener.PartitionPausingBackOffManagerFactory;
 import org.springframework.kafka.retrytopic.DeadLetterPublishingRecovererFactory;
 import org.springframework.kafka.retrytopic.DefaultDestinationTopicProcessor;
 import org.springframework.kafka.retrytopic.DefaultDestinationTopicResolver;
 import org.springframework.kafka.retrytopic.DestinationTopic;
 import org.springframework.kafka.retrytopic.DestinationTopicProcessor;
-import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.kafka.retrytopic.ListenerContainerFactoryConfigurer;
 import org.springframework.kafka.retrytopic.RetryTopicConfiguration;
 import org.springframework.kafka.retrytopic.RetryTopicConfigurationBuilder;
+import org.springframework.kafka.retrytopic.RetryTopicSchedulerWrapper;
+import org.springframework.kafka.retrytopic.SameIntervalTopicReuseStrategy;
 import org.springframework.kafka.retrytopic.TopicSuffixingStrategy;
 import org.springframework.kafka.support.Suffixer;
 import org.springframework.kafka.support.TopicPartitionOffset;
@@ -89,11 +98,8 @@ import org.springframework.kafka.support.converter.ConversionException;
 import org.springframework.kafka.support.serializer.DeserializationException;
 import org.springframework.messaging.converter.MessageConversionException;
 import org.springframework.messaging.handler.invocation.MethodArgumentResolutionException;
-import org.springframework.retry.backoff.ExponentialBackOffPolicy;
-import org.springframework.retry.backoff.ExponentialRandomBackOffPolicy;
-import org.springframework.retry.backoff.FixedBackOffPolicy;
-import org.springframework.retry.backoff.SleepingBackOffPolicy;
-import org.springframework.retry.backoff.UniformRandomBackOffPolicy;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.util.Assert;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
@@ -101,7 +107,7 @@ import org.springframework.util.StringValueResolver;
 import org.springframework.util.backoff.BackOff;
 import org.springframework.util.backoff.FixedBackOff;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * A {@link ChannelModelProcessor} which is responsible for configuring Kafka Event registry integration.
@@ -114,6 +120,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     public static final String CHANNEL_ID_PREFIX = "org.flowable.eventregistry.kafka.ChannelKafkaListenerEndpointContainer#";
 
     protected static final int DEFAULT_PARTITION_FOR_MANUAL_ASSIGNMENT = 0;
+    protected static final long DEFAULT_RETRY_DELAY = 1000L;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -125,6 +132,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
     protected String containerFactoryBeanName = KafkaListenerAnnotationBeanPostProcessor.DEFAULT_KAFKA_LISTENER_CONTAINER_FACTORY_BEAN_NAME;
 
     protected KafkaListenerContainerFactory<?> containerFactory;
+    protected KafkaConsumerBackoffManager kafkaConsumerBackoffManager;
 
     protected BeanFactory beanFactory;
     protected ApplicationContext applicationContext;
@@ -177,6 +185,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         SimpleKafkaListenerEndpoint<Object, Object> endpoint = new SimpleKafkaListenerEndpoint<>();
 
         endpoint.setId(endpointId);
+        endpoint.setMainListenerId(endpointId);
         endpoint.setGroupId(getEndpointGroupId(channelModel, endpoint.getId()));
         endpoint.setTopics(resolveTopics(channelModel));
         endpoint.setTopicPattern(resolvePattern(channelModel));
@@ -246,11 +255,16 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             Collection<KafkaChannelDefinitionProcessor.Configuration> configurations = new ArrayList<>(
                     retryTopicConfiguration.getDestinationTopicProperties().size());
 
-            DefaultDestinationTopicResolver topicResolver = new DefaultDestinationTopicResolver(Clock.systemUTC(), applicationContext);
+            DefaultDestinationTopicResolver topicResolver = new DefaultDestinationTopicResolver(Clock.systemUTC());
+            topicResolver.setApplicationContext(applicationContext);
             DefaultDestinationTopicProcessor processor = new DefaultDestinationTopicProcessor(topicResolver);
             ListenerContainerFactoryConfigurer factoryConfigurer = createListenerContainerFactoryConfigurer(retryConfiguration, backOff, topicResolver);
 
-            DestinationTopicProcessor.Context context = new DestinationTopicProcessor.Context(retryTopicConfiguration.getDestinationTopicProperties());
+            String id = mainEndpoint.getId();
+            if (id == null) {
+                id = "no.id.provided";
+            }
+            DestinationTopicProcessor.Context context = new DestinationTopicProcessor.Context(id, retryTopicConfiguration.getDestinationTopicProperties());
             processor.processDestinationTopicProperties(destinationTopicProperties -> {
                 Suffixer suffixer = new Suffixer(destinationTopicProperties.suffix());
                 if (destinationTopicProperties.isMainEndpoint() || destinationTopicProperties.isDltTopic() || retryConfiguration.hasRetryTopic()) {
@@ -276,6 +290,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                 if (endpoint instanceof SimpleKafkaListenerEndpoint) {
                     SimpleKafkaListenerEndpoint<?, ?> simpleEndpoint = (SimpleKafkaListenerEndpoint<?, ?>) endpoint;
                     simpleEndpoint.setId(suffixer.maybeAddTo(simpleEndpoint.getId()));
+                    simpleEndpoint.setMainListenerId(mainEndpoint.getMainListenerId());
                     simpleEndpoint.setGroupId(suffixer.maybeAddTo(simpleEndpoint.getGroupId()));
                     TopicPartitionOffset[] topicPartitionsToAssign = endpoint.getTopicPartitionsToAssign();
                     if (endpoint.getTopics().isEmpty() && topicPartitionsToAssign != null) {
@@ -289,7 +304,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
                     configurations.add(
                             new Configuration(
                                     simpleEndpoint,
-                                    decorateFactory(destinationTopicProperties, factoryConfigurer, retryTopicConfiguration)
+                                    decorateFactory(factoryConfigurer)
                             )
                     );
                 }
@@ -350,10 +365,7 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             DefaultDestinationTopicResolver topicResolver) {
         DeadLetterPublishingRecovererFactory recovererFactory = new DeadLetterPublishingRecovererFactory(topicResolver);
 
-        PartitionPausingBackOffManagerFactory managerFactory = new PartitionPausingBackOffManagerFactory(endpointRegistry);
-        managerFactory.setApplicationContext(applicationContext);
-
-        KafkaConsumerBackoffManager manager = managerFactory.create();
+        KafkaConsumerBackoffManager manager = getOrCreateKafkaConsumerBackoffManager();
         ListenerContainerFactoryConfigurer factoryConfigurer = new ListenerContainerFactoryConfigurer(manager, recovererFactory, Clock.systemUTC());
         if (retryConfiguration.hasNoRetryTopic()) {
             // If we do not have a retry topic, then the retries have to be blocking
@@ -382,14 +394,44 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return factoryConfigurer;
     }
 
-    protected KafkaListenerContainerFactory<?> decorateFactory(DestinationTopic.Properties destinationTopicProperties,
-            ListenerContainerFactoryConfigurer factoryConfigurer, RetryTopicConfiguration retryTopicConfiguration) {
-        // This is the same as it is done in the Spring Kata RetryTopicConfigurer
-        return destinationTopicProperties.isMainEndpoint() ?
-                factoryConfigurer.decorateFactoryWithoutSettingContainerProperties((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory,
-                        retryTopicConfiguration.forContainerFactoryConfigurer()) :
-                factoryConfigurer.decorateFactory((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory,
-                        retryTopicConfiguration.forContainerFactoryConfigurer());
+    protected KafkaConsumerBackoffManager getOrCreateKafkaConsumerBackoffManager() {
+        if (this.kafkaConsumerBackoffManager != null) {
+            return this.kafkaConsumerBackoffManager;
+        }
+
+        ContainerPartitionPausingBackOffManagerFactory containerBackOffManagerFactory =
+                new ContainerPartitionPausingBackOffManagerFactory(endpointRegistry, applicationContext);
+        containerBackOffManagerFactory.setBackOffHandler(new ContainerPausingBackOffHandler(
+                new ListenerContainerPauseService(endpointRegistry, getOrCreateRetryTopicTaskScheduler())));
+        this.kafkaConsumerBackoffManager = containerBackOffManagerFactory.create();
+        return this.kafkaConsumerBackoffManager;
+
+    }
+
+    protected TaskScheduler getOrCreateRetryTopicTaskScheduler() {
+        ObjectProvider<RetryTopicSchedulerWrapper> retryTopicSchedulerWrapperProvider = applicationContext.getBeanProvider(RetryTopicSchedulerWrapper.class);
+        RetryTopicSchedulerWrapper schedulerWrapper = retryTopicSchedulerWrapperProvider.getIfAvailable();
+        TaskScheduler retryTopicTaskScheduler;
+        if (schedulerWrapper != null) {
+            retryTopicTaskScheduler = schedulerWrapper.getScheduler();
+        } else {
+            retryTopicTaskScheduler = applicationContext.getBeanProvider(TaskScheduler.class).getIfAvailable();
+        }
+
+        if (retryTopicTaskScheduler == null) {
+            ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
+            threadPoolTaskScheduler.setThreadNamePrefix("flowable-kafka-retry-scheduling-");
+            threadPoolTaskScheduler.afterPropertiesSet();
+            ((ConfigurableApplicationContext) applicationContext).addApplicationListener(
+                    (ApplicationListener<ContextClosedEvent>) event -> threadPoolTaskScheduler.destroy());
+            retryTopicTaskScheduler = threadPoolTaskScheduler;
+        }
+
+        return retryTopicTaskScheduler;
+    }
+
+    protected KafkaListenerContainerFactory<?> decorateFactory(ListenerContainerFactoryConfigurer factoryConfigurer) {
+        return factoryConfigurer.decorateFactory((ConcurrentKafkaListenerContainerFactory<?, ?>) containerFactory);
     }
 
     protected void processOutboundDefinition(KafkaOutboundChannelModel channelModel) {
@@ -398,9 +440,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
             String resolvedTopic = resolve(topic);
 
             KafkaPartitionProvider partitionProvider = resolveKafkaPartitionProvider(channelModel);
+            KafkaMessageKeyProvider<?> messageKeyProvider = resolveKafkaMessageKeyProvider(channelModel);
 
             channelModel.setOutboundEventChannelAdapter(new KafkaOperationsOutboundEventChannelAdapter(
-                            kafkaOperations, partitionProvider, resolvedTopic, channelModel.getRecordKey()));
+                            kafkaOperations, partitionProvider, resolvedTopic, messageKeyProvider));
         }
     }
 
@@ -661,8 +704,27 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         }
     }
 
+    protected KafkaMessageKeyProvider<?> resolveKafkaMessageKeyProvider(KafkaOutboundChannelModel channelModel) {
+        KafkaOutboundChannelModel.RecordKey recordKey = channelModel.getRecordKey();
+        if (recordKey == null) {
+            return null;
+        }
+        if (StringUtils.hasText(recordKey.getEventField())) {
+            return new EventPayloadKafkaMessageKeyProvider(recordKey.getEventField());
+        } else if (StringUtils.hasText(recordKey.getDelegateExpression())) {
+            return resolveExpression(recordKey.getDelegateExpression(), KafkaMessageKeyProvider.class);
+        } else if (recordKey.getFixedValue() != null) {
+            String fixedValue = org.apache.commons.lang3.StringUtils.defaultIfBlank(recordKey.getFixedValue(), null);
+            return ignore -> fixedValue;
+        } else {
+            throw new FlowableException(
+                    "The kafka recordKey value was not found for the channel model with key " + channelModel.getKey()
+                            + ". One of fixedValue, delegateExpression or eventField should be set.");
+        }
+    }
+
     protected <T> T resolveExpression(String expression, Class<T> type) {
-        Object value = resolveExpression(expression);
+        Object value = this.resolver.evaluate(expression, this.expressionContext);
         if (type.isInstance(value)) {
             return type.cast(value);
         }
@@ -870,6 +932,14 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         this.containerFactory = containerFactory;
     }
 
+    public KafkaConsumerBackoffManager getKafkaConsumerBackoffManager() {
+        return kafkaConsumerBackoffManager;
+    }
+
+    public void setKafkaConsumerBackoffManager(KafkaConsumerBackoffManager kafkaConsumerBackoffManager) {
+        this.kafkaConsumerBackoffManager = kafkaConsumerBackoffManager;
+    }
+
     protected static class RetryTopicContainerFactoryDecorator implements KafkaListenerContainerFactory<MessageListenerContainer> {
         // We need this class in order to provide only blocking retries with dead letter topic
 
@@ -946,13 +1016,14 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         RetryTopicConfigurationBuilder retryTopicConfigurationBuilder = RetryTopicConfigurationBuilder.newInstance()
                 .autoStartDltHandler(false)
                 .autoCreateTopics(retryConfiguration.autoCreateTopics, retryConfiguration.numPartitions, retryConfiguration.replicationFactor)
-                .dltSuffix(dltTopicSuffix)
                 .retryTopicSuffix(retryTopicSuffix)
-                .useSingleTopicForFixedDelays(retryConfiguration.fixedDelayTopicStrategy)
+                .sameIntervalTopicReuseStrategy(retryConfiguration.sameIntervalTopicReuseStrategy)
                 .setTopicSuffixingStrategy(retryConfiguration.topicSuffixingStrategy);
 
         if (dltTopicSuffix == null) {
             retryTopicConfigurationBuilder.doNotConfigureDlt();
+        } else {
+            retryTopicConfigurationBuilder.dltSuffix(dltTopicSuffix);
         }
 
         if (retryConfiguration.hasRetryTopic()) {
@@ -983,10 +1054,10 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         resolvedRetryConfiguration.dltTopicSuffix = resolveExpressionAsString(retry.getDltTopicSuffix(), "retry.dltTopicSuffix");
         resolvedRetryConfiguration.retryTopicSuffix = resolveExpressionAsString(retry.getRetryTopicSuffix(), "retry.retryTopicSuffix");
 
-        String fixedDelayTopicStrategy = resolveExpressionAsString(retry.getFixedDelayTopicStrategy(), "retry.fixedDelayTopicStrategy");
+        String sameIntervalTopicReuseStrategy = resolveExpressionAsString(retry.getFixedDelayTopicStrategy(), "retry.fixedDelayTopicStrategy");
         // Different default from Spring Kafka
-        resolvedRetryConfiguration.fixedDelayTopicStrategy =
-                fixedDelayTopicStrategy == null ? FixedDelayStrategy.SINGLE_TOPIC : FixedDelayStrategy.valueOf(fixedDelayTopicStrategy);
+        resolvedRetryConfiguration.sameIntervalTopicReuseStrategy =
+                sameIntervalTopicReuseStrategy == null ? SameIntervalTopicReuseStrategy.SINGLE_TOPIC : SameIntervalTopicReuseStrategy.valueOf(sameIntervalTopicReuseStrategy);
 
         String topicSuffixingStrategy = resolveExpressionAsString(retry.getTopicSuffixingStrategy(), "retry.topicSuffixingStrategy");
         // Different default from Spring Kafka
@@ -1003,51 +1074,33 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         return resolvedRetryConfiguration;
     }
 
-    protected SleepingBackOffPolicy<?> createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
+    protected BackOff createNonBlockingBackOffPolicy(KafkaInboundChannelModel.NonBlockingRetryBackOff backOff) {
         if (backOff == null) {
-            return new FixedBackOffPolicy();
+            return new FixedBackOff(DEFAULT_RETRY_DELAY);
         }
         // This code is the same as the one from Spring Kafka
         Long delay = resolveExpressionAsLong(backOff.getDelay(), "retry.nonBlockingBackOff.delay");
-        // Same default as Spring Retry
-        Long min = delay;
+        if (delay == null) {
+            delay = DEFAULT_RETRY_DELAY;
+        }
+        //TODO support java.time.Duration
         Long max = resolveExpressionAsLong(backOff.getMaxDelay(), "retry.nonBlockingBackOff.maxDelay");
         Double multiplier = resolveExpressionAsDouble(backOff.getMultiplier(), "retry.nonBlockingBackOff.multiplier");
         if (multiplier != null && multiplier > 0) {
-            ExponentialBackOffPolicy policy;
-            Boolean random = resolveExpressionAsBoolean(backOff.getRandom(), "retry.nonBlockingBackOff.random");
-            if (Boolean.TRUE.equals(random)) {
-                policy = new ExponentialRandomBackOffPolicy();
-            } else {
-                policy = new ExponentialBackOffPolicy();
+            RetryPolicy.Builder retryPolicyBuilder = RetryPolicy.builder().maxRetries(Long.MAX_VALUE);
+            retryPolicyBuilder.delay(Duration.ofMillis(delay));
+            //TODO add jitter instead of random
+
+            retryPolicyBuilder.multiplier(multiplier);
+
+            if (max != null && max > delay) {
+                retryPolicyBuilder.maxDelay(Duration.ofMillis(max));
             }
 
-            if (min != null) {
-                policy.setInitialInterval(min);
-            }
-
-            policy.setMultiplier(multiplier);
-
-            if (max != null && max > policy.getInitialInterval()) {
-                policy.setMaxInterval(max);
-            }
-
-            return policy;
+            return retryPolicyBuilder.build().getBackOff();
         }
 
-        if (max != null && min != null && max > min) {
-            UniformRandomBackOffPolicy policy = new UniformRandomBackOffPolicy();
-            policy.setMinBackOffPeriod(min);
-            policy.setMaxBackOffPeriod(max);
-            return policy;
-        }
-
-        FixedBackOffPolicy policy = new FixedBackOffPolicy();
-        if (min != null) {
-            policy.setBackOffPeriod(min);
-        }
-
-        return policy;
+        return new FixedBackOff(delay);
     }
 
     protected static class ResolvedRetryConfiguration {
@@ -1055,9 +1108,9 @@ public class KafkaChannelDefinitionProcessor implements BeanFactoryAware, Applic
         protected Integer attempts;
         protected String dltTopicSuffix;
         protected String retryTopicSuffix;
-        protected FixedDelayStrategy fixedDelayTopicStrategy;
+        protected SameIntervalTopicReuseStrategy sameIntervalTopicReuseStrategy;
         protected TopicSuffixingStrategy topicSuffixingStrategy;
-        protected SleepingBackOffPolicy<?> nonBlockingBackOff;
+        protected BackOff nonBlockingBackOff;
         protected boolean autoCreateTopics;
         protected int numPartitions;
         protected short replicationFactor;

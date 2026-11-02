@@ -21,13 +21,39 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class VariableEventListenerTest extends FlowableCmmnTestCase {
+
+    @Test
+    @CmmnDeployment
+    public void testVariableEventListenerWithAvailableCondition() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").variable("availableConditionVar", false).start();
+
+        PlanItemInstance listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).singleResult();
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.UNAVAILABLE);
+
+        // create var1 variable
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test1");
+        // should not trigger variable event listener
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isZero();
+
+        // setting the variable should make the variable event listener available
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "availableConditionVar", true);
+        listenerInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).singleResult();
+        assertThat(listenerInstance.getState()).isEqualTo(PlanItemInstanceState.AVAILABLE);
+
+        // update var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test2");
+        // variable event listener should be completed
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(1);
+    }
 
     @Test
     @CmmnDeployment
@@ -196,6 +222,74 @@ public class VariableEventListenerTest extends FlowableCmmnTestCase {
         
         assertCaseInstanceEnded(caseInstance);
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testTriggerMultipleVariableEventListeners() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("variableListener").start();
+
+        // 5 plan items reachable
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().count()).isEqualTo(5);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionType, PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener", PlanItemInstanceState.AVAILABLE),
+                        tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener2", PlanItemInstanceState.AVAILABLE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.AVAILABLE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskC", PlanItemInstanceState.AVAILABLE)
+                );
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionType, HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener", PlanItemInstanceState.AVAILABLE),
+                            tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener2", PlanItemInstanceState.AVAILABLE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.AVAILABLE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskC", PlanItemInstanceState.AVAILABLE)
+                    );
+        }
+
+        // create different variable
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var2", "test");
+        
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isEqualTo(2);
+
+        // create var1 variable to trigger variable event listener
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
+        
+        // variable event listener should be completed
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER).count()).isZero();
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().list())
+                .extracting(PlanItemInstance::getPlanItemDefinitionType, PlanItemInstance::getPlanItemDefinitionId, PlanItemInstance::getState)
+                .containsExactlyInAnyOrder(
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.ACTIVE),
+                        tuple(PlanItemDefinitionType.HUMAN_TASK, "taskC", PlanItemInstanceState.ACTIVE)
+                );
+
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskB").planItemInstanceStateActive().count()).isEqualTo(1);
+        assertThat(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionId("taskC").planItemInstanceStateActive().count()).isEqualTo(1);
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().list())
+                    .extracting(HistoricPlanItemInstance::getPlanItemDefinitionType, HistoricPlanItemInstance::getPlanItemDefinitionId, HistoricPlanItemInstance::getState)
+                    .containsExactlyInAnyOrder(
+                            tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener", PlanItemInstanceState.COMPLETED),
+                            tuple(PlanItemDefinitionType.VARIABLE_EVENT_LISTENER, "variableEventListener2", PlanItemInstanceState.COMPLETED),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskA", PlanItemInstanceState.ACTIVE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskB", PlanItemInstanceState.ACTIVE),
+                            tuple(PlanItemDefinitionType.HUMAN_TASK, "taskC", PlanItemInstanceState.ACTIVE)
+                    );
+        }
+
+
+        assertCaseInstanceNotEnded(caseInstance);
+        cmmnTaskService.createTaskQuery().list().forEach(t -> cmmnTaskService.complete(t.getId()));
+        assertCaseInstanceEnded(caseInstance);
+    }
 
     @Test
     @CmmnDeployment
@@ -267,6 +361,8 @@ public class VariableEventListenerTest extends FlowableCmmnTestCase {
         
         assertThat(cmmnRuntimeService.createEventSubscriptionQuery().scopeId(caseInstance.getId()).eventType("variable").count()).isEqualTo(1);
 
+        cmmnRuntimeService.setVariable(caseInstance.getId(), "nonExistingVar", "test");
+        
         // create variable triggers the variable event listener
         cmmnRuntimeService.setVariable(caseInstance.getId(), "var1", "test");
         

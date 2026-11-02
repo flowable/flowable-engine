@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.interceptor.CmmnIdentityLinkInterceptor;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -76,6 +77,11 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
 
+                CmmnIdentityLinkInterceptor identityLinkInterceptor = cmmnEngineConfiguration.getIdentityLinkInterceptor();
+                if (identityLinkInterceptor != null && task.getAssignee() != null) {
+                    identityLinkInterceptor.handleAddAssigneeIdentityLinkToTask(task, task.getAssignee());
+                }
+
                 cmmnEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
 
                 if (CommandContextUtil.getEventDispatcher() != null && CommandContextUtil.getEventDispatcher().isEnabled()) {
@@ -83,6 +89,15 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
                             FlowableEngineEventType.TASK_ASSIGNED, task), EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
                 }
 
+            }
+
+            String originalOwner = originalTaskEntity.getOwner();
+
+            if (!StringUtils.equals(originalOwner, task.getOwner()) && task.getOwner() != null) {
+                CmmnIdentityLinkInterceptor identityLinkInterceptor = cmmnEngineConfiguration.getIdentityLinkInterceptor();
+                if (identityLinkInterceptor != null) {
+                    identityLinkInterceptor.handleAddOwnerIdentityLinkToTask(task, task.getOwner());
+                }
             }
         }
 

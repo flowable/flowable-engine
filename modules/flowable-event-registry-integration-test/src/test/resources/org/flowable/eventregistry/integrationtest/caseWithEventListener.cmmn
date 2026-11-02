@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn">
+    <case id="testEvent" name="testEvent">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItemhumanTask1" name="Human task" definitionRef="humanTask1">
+                <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1"></entryCriterion>
+            </planItem>
+            <planItem id="planItemeventListener1" definitionRef="eventListener1"></planItem>
+            <sentry id="sentryentryCriterion1">
+                <planItemOnPart id="sentryOnPartentryCriterion1" sourceRef="planItemeventListener1">
+                  <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <humanTask id="humanTask1" name="Human task" />
+            <eventListener id="eventListener1" flowable:availableCondition="${false}">
+                <extensionElements>
+                  <flowable:eventType><![CDATA[one]]></flowable:eventType>
+                </extensionElements>
+            </eventListener>
+        </casePlanModel>
+    </case>
+</definitions>

@@ -14,15 +14,15 @@ package org.flowable.app.rest.service.api.repository;
 
 import static org.flowable.common.rest.api.PaginateListUtil.paginateList;
 
-import java.io.UnsupportedEncodingException;
+import java.io.InputStream;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.api.AppRepositoryService;
@@ -41,6 +41,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -58,7 +59,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployments" }, description = "Manage App Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentCollectionResource {
 
     private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
@@ -79,7 +80,7 @@ public class AppDeploymentCollectionResource {
     @Autowired(required=false)
     protected AppRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "List of App Deployments", nickname = "listAppDeployments", tags = { "App Deployments" })
+    @ApiOperation(value = "List of App Deployments", nickname = "listAppDeployments", tags = { "App Deployments" }, notes = "For all 'Like' parameters the '%' wildcard character must be URL-encoded as '%25' (for example '?nameLike=acme%25' to match names starting with 'acme').")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return app deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return app deployments with a name like the given name.", paramType = "query"),
@@ -89,6 +90,9 @@ public class AppDeploymentCollectionResource {
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return app deployments with a tenantId like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns app deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
+            @ApiImplicitParam(name = "order", dataType = "string", value = "The sort order, either 'asc' or 'desc'. Defaults to 'asc'.", paramType = "query"),
+            @ApiImplicitParam(name = "start", dataType = "integer", value = "Index of the first row to fetch. Defaults to 0.", paramType = "query"),
+            @ApiImplicitParam(name = "size", dataType = "integer", value = "Number of rows to fetch, starting from start. Defaults to 10.", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
@@ -131,7 +135,8 @@ public class AppDeploymentCollectionResource {
     }
 
     @ApiOperation(value = "Create a new app deployment", tags = {
-            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .app, .zip or .bar.")
+            "App Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .app, .zip or .bar.",
+            code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the app deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for app deployment. The status-description contains additional information.")
@@ -140,7 +145,8 @@ public class AppDeploymentCollectionResource {
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
     @PostMapping(value = "/app-repository/deployments", produces = "application/json", consumes = "multipart/form-data")
-    public AppDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public AppDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request) {
 
         if (restApiInterceptor != null) {
             restApiInterceptor.executeNewDeploymentForTenantId(tenantId);
@@ -169,9 +175,17 @@ public class AppDeploymentCollectionResource {
             }
 
             if (fileName.endsWith(".app")) {
-                deploymentBuilder.addInputStream(fileName, file.getInputStream());
+                try (final InputStream fileInputStream = file.getInputStream()) {
+                    deploymentBuilder.addInputStream(fileName, fileInputStream);
+                }
+
             } else if (fileName.toLowerCase().endsWith(".bar") || fileName.toLowerCase().endsWith(".zip")) {
-                deploymentBuilder.addZipInputStream(new ZipInputStream(file.getInputStream()));
+                try (InputStream fileInputStream = file.getInputStream();
+                        ZipInputStream zipInputStream = new ZipInputStream(fileInputStream)) {
+                    
+                    deploymentBuilder.addZipInputStream(zipInputStream);
+                }
+
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .app");
             }
@@ -207,7 +221,6 @@ public class AppDeploymentCollectionResource {
             }
 
             AppDeployment deployment = deploymentBuilder.deploy();
-            response.setStatus(HttpStatus.CREATED.value());
 
             return appRestResponseFactory.createAppDeploymentResponse(deployment);
 
@@ -232,11 +245,7 @@ public class AppDeploymentCollectionResource {
     
     protected String decode(String string) {
         if (string != null) {
-            try {
-                return URLDecoder.decode(string, "UTF-8");
-            } catch (UnsupportedEncodingException uee) {
-                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
-            }
+            return URLDecoder.decode(string, StandardCharsets.UTF_8);
         }
         return null;
     }

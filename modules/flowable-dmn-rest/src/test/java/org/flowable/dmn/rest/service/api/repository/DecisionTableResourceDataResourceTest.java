@@ -24,12 +24,14 @@ import org.flowable.dmn.api.DmnDecision;
 import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.rest.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.dmn.rest.service.api.DmnRestUrls;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Yvo Swillens
  */
 public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTestCase {
 
+    @Test
     @DmnDeployment(resources = { "org/flowable/dmn/rest/service/api/repository/simple.dmn" })
     public void testGetDecisionTableResource() throws Exception {
 
@@ -44,6 +46,7 @@ public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTest
         assertThat(content).contains("Full Decision");
     }
 
+    @Test
     public void testGetDecisionTableResourceForUnexistingDecisionTable() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_RESOURCE_CONTENT, "unexisting"));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_NOT_FOUND);

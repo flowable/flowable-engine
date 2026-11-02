@@ -13,15 +13,18 @@
 
 package org.flowable.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,16 +32,17 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
+import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import tools.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic task instance query resource.
@@ -46,8 +50,6 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
  * @author Tijs Rademakers
  */
 public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTestCase {
-
-    protected ISO8601DateFormat dateFormat = new ISO8601DateFormat();
 
     /**
      * Test querying historic task instance. GET history/historic-task-instances
@@ -126,21 +128,28 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         assertResultsPresentInDataResponse(url + "?taskDefinitionKeys=processTask,processTask2", 3, task.getId(), task1.getId(), task2.getId());
 
-        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 1, task.getId());
+        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + LocalDate.of(2010, Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 1, task.getId());
 
-        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 0);
+        assertResultsPresentInDataResponse(url + "?dueDateAfter=" + LocalDate.of(2013, Month.MAY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 0);
 
-        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + dateFormat.format(new GregorianCalendar(2010, 0, 1).getTime()), 0);
+        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + LocalDate.of(2010, Month.JANUARY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(),
+                0);
 
-        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + dateFormat.format(new GregorianCalendar(2013, 4, 1).getTime()), 1, task.getId());
+        assertResultsPresentInDataResponse(url + "?dueDateBefore=" + LocalDate.of(2013, Month.MAY, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().toString(), 1, task.getId());
 
-        assertResultsPresentInDataResponse(url + "?taskCreatedOn=" + dateFormat.format(created.getTime()), 1, task1.getId());
+        // Without due date — task has a due date, task1 (completed) and task2 do not
+        assertResultsPresentInDataResponse(url + "?withoutDueDate=true", 2, task1.getId(), task2.getId());
+
+        // withoutDueDate=false must be ignored
+        assertResultsPresentInDataResponse(url + "?withoutDueDate=false", 3, task.getId(), task1.getId(), task2.getId());
+
+        assertResultsPresentInDataResponse(url + "?taskCreatedOn=" + created.toInstant().toString(), 1, task1.getId());
 
         created.set(Calendar.YEAR, 2002);
-        assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + dateFormat.format(created.getTime()), 1, task1.getId());
+        assertResultsPresentInDataResponse(url + "?taskCreatedBefore=" + created.toInstant().toString(), 1, task1.getId());
 
         created.set(Calendar.YEAR, 2000);
-        assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + dateFormat.format(created.getTime()), 3, task1.getId(), task2.getId());
+        assertResultsPresentInDataResponse(url + "?taskCreatedAfter=" + created.toInstant().toString(), 3, task1.getId(), task2.getId());
 
         // Without tenant id
         assertResultsPresentInDataResponse(url + "?withoutTenantId=true", 2, task.getId(), task1.getId());
@@ -173,7 +182,95 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         assertResultsPresentInDataResponse(url + "?taskCandidateGroup=sales&ignoreTaskAssignee=true", 1, task.getId());
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds) throws JsonProcessingException, IOException {
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByRootScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        List<String> taskExecutionIds = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId())
+                .processDefinitionKey("oneTaskProcess").activityId("theTask").list().stream().map(Execution::getId).toList();
+
+        Task task1 = taskService.createTaskQuery().executionId(taskExecutionIds.get(0)).singleResult();
+        Task task2 = taskService.createTaskQuery().executionId(taskExecutionIds.get(1)).singleResult();
+        Task task3 = taskService.createTaskQuery().executionId(taskExecutionIds.get(2)).singleResult();
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCES) + "?rootScopeId="
+                + processInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + task1.getId() + "' },"
+                        + "    { id: '" + task2.getId() + "' },"
+                        + "    { id: '" + task3.getId() + "' },"
+                        + "    { id: '" + formTask1.getId() + "' },"
+                        + "    { id: '" + formTask2.getId() + "' }"
+                        + "  ]"
+                        + "}");
+    }
+
+    @Test
+    @Deployment(resources = {
+            "org/flowable/rest/service/api/runtime/simpleParallelCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleInnerCallActivity.bpmn20.xml",
+            "org/flowable/rest/service/api/runtime/simpleProcessWithUserTasks.bpmn20.xml",
+            "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml"
+    })
+    public void testQueryByParentScopeId() throws IOException {
+        runtimeService.startProcessInstanceByKey("oneTaskProcess");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelCallActivity");
+
+        Execution formTask1Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask1")
+                .singleResult();
+        Task formTask1 = taskService.createTaskQuery().executionId(formTask1Execution.getId()).singleResult();
+
+        Execution taskForm2Execution = runtimeService.createExecutionQuery().rootProcessInstanceId(processInstance.getId()).activityId("formTask2")
+                .singleResult();
+        Task formTask2 = taskService.createTaskQuery().executionId(taskForm2Execution.getId()).singleResult();
+
+        taskService.createTaskQuery().list().forEach(task -> taskService.complete(task.getId()));
+
+        String url = SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCES) + "?parentScopeId="
+                + taskForm2Execution.getProcessInstanceId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(url), HttpStatus.SC_OK);
+
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER)
+                .isEqualTo("{"
+                        + "  data: ["
+                        + "    { id: '" + formTask1.getId() + "' },"
+                        + "    { id: '" + formTask2.getId() + "' }"
+
+                        + "  ]"
+                        + "}");
+
+    }
+
+    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String... expectedTaskIds) throws IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -186,9 +283,8 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
         // Check presence of ID's
         if (expectedTaskIds != null) {
             List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                String id = it.next().get("id").textValue();
+            for (JsonNode jsonNode : dataNode) {
+                String id = jsonNode.get("id").stringValue();
                 toBeFound.remove(id);
             }
             assertThat(toBeFound).as("Not all entries have been found in result, missing: " + StringUtils.join(toBeFound, ", ")).isEmpty();

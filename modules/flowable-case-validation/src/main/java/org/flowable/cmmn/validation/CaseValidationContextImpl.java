@@ -23,7 +23,7 @@ import org.flowable.cmmn.validation.validator.ValidatorSet;
  */
 public class CaseValidationContextImpl implements CaseValidationContext {
 
-    protected final ValidatorSet validatorSet;
+    protected ValidatorSet validatorSet;
     protected final List<ValidationEntry> entries = new ArrayList<>();
 
     public CaseValidationContextImpl(ValidatorSet validatorSet) {
@@ -36,7 +36,13 @@ public class CaseValidationContextImpl implements CaseValidationContext {
         entries.add(entry);
         return entry;
     }
+    
+    @Override
+    public void setCurrentValidatorSet(ValidatorSet validatorSet) {
+        this.validatorSet = validatorSet;
+    }
 
+    @Override
     public List<ValidationEntry> getEntries() {
         return entries;
     }

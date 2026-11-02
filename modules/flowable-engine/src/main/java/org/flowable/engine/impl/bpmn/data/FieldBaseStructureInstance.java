@@ -19,10 +19,10 @@ import java.util.Map;
 
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.ValueNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ValueNode;
 
 /**
  * An instance of {@link FieldBaseStructureDefinition}
@@ -74,9 +74,8 @@ public class FieldBaseStructureInstance implements StructureInstance {
     private Object getFieldValue(int index) {
         final String fieldName = this.getFieldNameAt(index);
         final Object fieldValueObject = this.getFieldValue(fieldName);
-        if (fieldValueObject instanceof ArrayNode) {
+        if (fieldValueObject instanceof ArrayNode fieldArrayNodeValueObject) {
             // The field is a Json Array
-            final ArrayNode fieldArrayNodeValueObject = (ArrayNode) fieldValueObject;
 
             final Class<?> fieldParameterType = this.structureDefinition.getFieldParameterTypeAt(index);
             final ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper();

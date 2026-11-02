@@ -9,20 +9,20 @@
   <insert id="insertEntityLink" parameterType="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
     insert into ${prefix}ACT_RU_ENTITYLINK (ID_, REV_, CREATE_TIME_, LINK_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
     	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, HIERARCHY_TYPE_)
-    values (#{id, jdbcType=VARCHAR},
+    values (#{id, jdbcType=NVARCHAR},
             1, #{createTime, jdbcType=TIMESTAMP},
-            #{linkType, jdbcType=VARCHAR},
-            #{scopeId, jdbcType=VARCHAR},
-            #{subScopeId, jdbcType=VARCHAR},
-            #{scopeType, jdbcType=VARCHAR},
-            #{scopeDefinitionId, jdbcType=VARCHAR},
-            #{parentElementId, jdbcType=VARCHAR},
-            #{referenceScopeId, jdbcType=VARCHAR},
-            #{referenceScopeType, jdbcType=VARCHAR},
-            #{referenceScopeDefinitionId, jdbcType=VARCHAR},
-            #{rootScopeId, jdbcType=VARCHAR},
-            #{rootScopeType, jdbcType=VARCHAR},
-            #{hierarchyType, jdbcType=VARCHAR})
+            #{linkType, jdbcType=NVARCHAR},
+            #{scopeId, jdbcType=NVARCHAR},
+            #{subScopeId, jdbcType=NVARCHAR},
+            #{scopeType, jdbcType=NVARCHAR},
+            #{scopeDefinitionId, jdbcType=NVARCHAR},
+            #{parentElementId, jdbcType=NVARCHAR},
+            #{referenceScopeId, jdbcType=NVARCHAR},
+            #{referenceScopeType, jdbcType=NVARCHAR},
+            #{referenceScopeDefinitionId, jdbcType=NVARCHAR},
+            #{rootScopeId, jdbcType=NVARCHAR},
+            #{rootScopeType, jdbcType=NVARCHAR},
+            #{hierarchyType, jdbcType=NVARCHAR})
             
   </insert>
   
@@ -31,20 +31,20 @@
     	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, HIERARCHY_TYPE_)
     values 
     <foreach collection="list" item="entityLink" index="index" separator=","> 
-      (#{entityLink.id, jdbcType=VARCHAR},
+      (#{entityLink.id, jdbcType=NVARCHAR},
         1, #{entityLink.createTime, jdbcType=TIMESTAMP},
-        #{entityLink.linkType, jdbcType=VARCHAR},
-        #{entityLink.scopeId, jdbcType=VARCHAR},
-        #{entityLink.subScopeId, jdbcType=VARCHAR},
-        #{entityLink.scopeType, jdbcType=VARCHAR},
-        #{entityLink.scopeDefinitionId, jdbcType=VARCHAR},
-        #{entityLink.parentElementId, jdbcType=VARCHAR},
-        #{entityLink.referenceScopeId, jdbcType=VARCHAR},
-        #{entityLink.referenceScopeType, jdbcType=VARCHAR},
-        #{entityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
-        #{entityLink.rootScopeId, jdbcType=VARCHAR},
-        #{entityLink.rootScopeType, jdbcType=VARCHAR},
-        #{entityLink.hierarchyType, jdbcType=VARCHAR})
+        #{entityLink.linkType, jdbcType=NVARCHAR},
+        #{entityLink.scopeId, jdbcType=NVARCHAR},
+        #{entityLink.subScopeId, jdbcType=NVARCHAR},
+        #{entityLink.scopeType, jdbcType=NVARCHAR},
+        #{entityLink.scopeDefinitionId, jdbcType=NVARCHAR},
+        #{entityLink.parentElementId, jdbcType=NVARCHAR},
+        #{entityLink.referenceScopeId, jdbcType=NVARCHAR},
+        #{entityLink.referenceScopeType, jdbcType=NVARCHAR},
+        #{entityLink.referenceScopeDefinitionId, jdbcType=NVARCHAR},
+        #{entityLink.rootScopeId, jdbcType=NVARCHAR},
+        #{entityLink.rootScopeType, jdbcType=NVARCHAR},
+        #{entityLink.hierarchyType, jdbcType=NVARCHAR})
     </foreach>
   </insert>
   
@@ -53,20 +53,20 @@
       <foreach collection="list" item="entityLink" index="index">
         into ${prefix}ACT_RU_ENTITYLINK (ID_, REV_, CREATE_TIME_, LINK_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
         	PARENT_ELEMENT_ID_, REF_SCOPE_ID_, REF_SCOPE_TYPE_, REF_SCOPE_DEFINITION_ID_, ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_, HIERARCHY_TYPE_) VALUES
-           (#{entityLink.id, jdbcType=VARCHAR},
+           (#{entityLink.id, jdbcType=NVARCHAR},
             1, #{entityLink.createTime, jdbcType=TIMESTAMP},
-            #{entityLink.linkType, jdbcType=VARCHAR},
-            #{entityLink.scopeId, jdbcType=VARCHAR},
-            #{entityLink.subScopeId, jdbcType=VARCHAR},
-            #{entityLink.scopeType, jdbcType=VARCHAR},
-            #{entityLink.scopeDefinitionId, jdbcType=VARCHAR},
-            #{entityLink.parentElementId, jdbcType=VARCHAR},
-            #{entityLink.referenceScopeId, jdbcType=VARCHAR},
-            #{entityLink.referenceScopeType, jdbcType=VARCHAR},
-            #{entityLink.referenceScopeDefinitionId, jdbcType=VARCHAR},
-            #{entityLink.rootScopeId, jdbcType=VARCHAR},
-            #{entityLink.rootScopeType, jdbcType=VARCHAR},
-            #{entityLink.hierarchyType, jdbcType=VARCHAR})
+            #{entityLink.linkType, jdbcType=NVARCHAR},
+            #{entityLink.scopeId, jdbcType=NVARCHAR},
+            #{entityLink.subScopeId, jdbcType=NVARCHAR},
+            #{entityLink.scopeType, jdbcType=NVARCHAR},
+            #{entityLink.scopeDefinitionId, jdbcType=NVARCHAR},
+            #{entityLink.parentElementId, jdbcType=NVARCHAR},
+            #{entityLink.referenceScopeId, jdbcType=NVARCHAR},
+            #{entityLink.referenceScopeType, jdbcType=NVARCHAR},
+            #{entityLink.referenceScopeDefinitionId, jdbcType=NVARCHAR},
+            #{entityLink.rootScopeId, jdbcType=NVARCHAR},
+            #{entityLink.rootScopeType, jdbcType=NVARCHAR},
+            #{entityLink.hierarchyType, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -74,59 +74,47 @@
   <!-- ENTITY LINK DELETE -->
   
   <delete id="deleteEntityLink" parameterType="string">
-    delete from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id}
+    delete from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
   
   <delete id="bulkDeleteEntityLink" parameterType="java.util.Collection">
     delete from ${prefix}ACT_RU_ENTITYLINK where 
     <foreach item="entityLink" collection="list" index="index" separator=" or ">
-        ID_ = #{entityLink.id, jdbcType=VARCHAR}
+        ID_ = #{entityLink.id, jdbcType=NVARCHAR}
     </foreach>
   </delete>
   
   <delete id="deleteEntityLinksByScopeIdAndScopeType" parameterType="java.util.Map">
-    delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{scopeId} and SCOPE_TYPE_ = #{scopeType}
+    delete from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=NVARCHAR}
   </delete>
 
   <delete id="deleteEntityLinksByRootScopeIdAndRootScopeType" parameterType="java.util.Map">
-    delete from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{rootScopeId} and ROOT_SCOPE_TYPE_ = #{rootScopeType}
+    delete from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{rootScopeId, jdbcType=NVARCHAR} and ROOT_SCOPE_TYPE_ = #{rootScopeType, jdbcType=NVARCHAR}
   </delete>
   
   <!-- ENTITY LINK RESULTMAP -->
 
   <resultMap id="entityLinkResultMap" type="org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
-    <result property="linkType" column="LINK_TYPE_" jdbcType="VARCHAR" />
-    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="parentElementId" column="PARENT_ELEMENT_ID_" jdbcType="VARCHAR"/>
-    <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
-    <result property="rootScopeId" column="ROOT_SCOPE_ID_" jdbcType="VARCHAR"/>
-    <result property="rootScopeType" column="ROOT_SCOPE_TYPE_" jdbcType="VARCHAR"/>
-    <result property="hierarchyType" column="HIERARCHY_TYPE_" jdbcType="VARCHAR"/>
+    <result property="linkType" column="LINK_TYPE_" jdbcType="NVARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+    <result property="parentElementId" column="PARENT_ELEMENT_ID_" jdbcType="NVARCHAR"/>
+    <result property="referenceScopeId" column="REF_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="referenceScopeType" column="REF_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="referenceScopeDefinitionId" column="REF_SCOPE_DEFINITION_ID_" jdbcType="NVARCHAR"/>
+    <result property="rootScopeId" column="ROOT_SCOPE_ID_" jdbcType="NVARCHAR"/>
+    <result property="rootScopeType" column="ROOT_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+    <result property="hierarchyType" column="HIERARCHY_TYPE_" jdbcType="NVARCHAR"/>
   </resultMap>
 
   <!-- ENTITY LINK SELECT -->
 
   <select id="selectEntityLink" parameterType="string" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-
-  <select id="selectEntityLinksByScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType}
-  </select>
-
-  <select id="selectEntityLinksByReferenceScopeIdAndType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where REF_SCOPE_ID_ = #{parameter.referenceScopeId} and REF_SCOPE_TYPE_ = #{parameter.referenceScopeType} and LINK_TYPE_ = #{parameter.linkType}
-  </select>
-
-  <select id="selectEntityLinksByRootScopeIdAndRootScopeType" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="entityLinkResultMap">
-    select * from ${prefix}ACT_RU_ENTITYLINK where ROOT_SCOPE_ID_ = #{parameter.rootScopeId} and ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType}
+    select * from ${prefix}ACT_RU_ENTITYLINK where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectEntityLinks" resultMap="entityLinkResultMap">
@@ -140,10 +128,10 @@
     inner join (
                     select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_RU_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
+                    where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR} and LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR} and ROOT_SCOPE_ID_ is not null
                     limit 1
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
+    where LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR}
   </select>
 
   <!-- If you change something in the select, then check the other DBs as well -->
@@ -153,10 +141,10 @@
     inner join (
                     select ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_RU_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
+                    where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR} and LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR} and ROOT_SCOPE_ID_ is not null
                     and ROWNUM = 1
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
+    where LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR}
   </select>
 
   <!-- If you change something in the select, then check the other DBs as well -->
@@ -167,9 +155,52 @@
                     select TOP(1)
                     ROOT_SCOPE_ID_, ROOT_SCOPE_TYPE_
                     from ${prefix}ACT_RU_ENTITYLINK
-                    where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType} and LINK_TYPE_ = #{parameter.linkType} and ROOT_SCOPE_ID_ is not null
+                    where SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR} and SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR} and LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR} and ROOT_SCOPE_ID_ is not null
                 ) ROOT_LINK ON RES.ROOT_SCOPE_ID_ = ROOT_LINK.ROOT_SCOPE_ID_ and RES.ROOT_SCOPE_TYPE_ = ROOT_LINK.ROOT_SCOPE_TYPE_
-    where LINK_TYPE_ = #{parameter.linkType}
+    where LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR}
   </select>
+
+    <select id="selectEntityLinksByQuery" parameterType="org.flowable.entitylink.service.impl.InternalEntityLinkQueryImpl" resultMap="entityLinkResultMap">
+        select RES.*
+        from ${prefix}ACT_RU_ENTITYLINK RES
+        <where>
+            <if test="parameter.scopeId != null">
+                AND RES.SCOPE_ID_ = #{parameter.scopeId, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.scopeIds != null">
+                AND RES.SCOPE_ID_ in
+                <foreach collection="parameter.scopeIds" item="scopeId" open="(" separator="," close=")">
+                    #{scopeId, jdbcType=NVARCHAR}
+                </foreach>
+            </if>
+            <if test="parameter.scopeDefinitionId != null">
+                AND RES.SCOPE_DEFINITION_ID_ = #{parameter.scopeDefinitionId, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.scopeType != null">
+                AND RES.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.referenceScopeId != null">
+                AND RES.REF_SCOPE_ID_ = #{parameter.referenceScopeId, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.referenceScopeDefinitionId != null">
+                AND RES.REF_SCOPE_DEFINITION_ID_ = #{parameter.referenceScopeDefinitionId, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.referenceScopeType != null">
+                AND RES.REF_SCOPE_TYPE_ = #{parameter.referenceScopeType, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.rootScopeId != null">
+                AND RES.ROOT_SCOPE_ID_ = #{parameter.rootScopeId, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.rootScopeType != null">
+                AND RES.ROOT_SCOPE_TYPE_ = #{parameter.rootScopeType, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.linkType != null">
+                AND RES.LINK_TYPE_ = #{parameter.linkType, jdbcType=NVARCHAR}
+            </if>
+            <if test="parameter.hierarchyType != null">
+                AND RES.HIERARCHY_TYPE_ = #{parameter.hierarchyType, jdbcType=NVARCHAR}
+            </if>
+        </where>
+    </select>
   
 </mapper>

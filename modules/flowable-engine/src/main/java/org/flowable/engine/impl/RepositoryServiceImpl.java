@@ -87,7 +87,7 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
 
     @Override
     public DeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<DeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
             @Override
             public DeploymentBuilder execute(CommandContext commandContext) {
                 return new DeploymentBuilderImpl(RepositoryServiceImpl.this);
@@ -371,11 +371,6 @@ public class RepositoryServiceImpl extends CommonEngineServiceImpl<ProcessEngine
     @Override
     public List<DmnDecision> getDecisionsForProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetDecisionsForProcessDefinitionCmd(processDefinitionId));
-    }
-
-    @Override
-    public List<DmnDecision> getDecisionTablesForProcessDefinition(String processDefinitionId) {
-        return getDecisionsForProcessDefinition(processDefinitionId);
     }
 
     @Override

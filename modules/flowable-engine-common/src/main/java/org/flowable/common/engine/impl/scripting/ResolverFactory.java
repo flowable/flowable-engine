@@ -14,8 +14,8 @@
 package org.flowable.common.engine.impl.scripting;
 
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -23,6 +23,14 @@ import org.flowable.variable.api.delegate.VariableScope;
  */
 public interface ResolverFactory {
 
-    Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope);
+    /**
+     * Create a {@link Resolver} instance.
+     *
+     * @param engineConfiguration the engine configuration
+     * @param scopeContainer the scope variable container in which the script is executed
+     * @param inputVariableContainer the variable container that should be used to resolve variables
+     * @return the created {@link Resolver} instance
+     */
+    Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer scopeContainer, VariableContainer inputVariableContainer);
 
 }

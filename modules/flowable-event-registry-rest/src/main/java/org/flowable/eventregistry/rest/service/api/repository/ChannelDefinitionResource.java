@@ -13,8 +13,6 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.eventregistry.api.ChannelDefinition;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -34,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Channel Definitions" }, description = "Manage Channel Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Channel Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ChannelDefinitionResource extends BaseEventDefinitionResource {
     
     @Autowired
@@ -43,13 +41,13 @@ public class ChannelDefinitionResource extends BaseEventDefinitionResource {
     @Autowired(required=false)
     protected EventRepositoryService eventRepositoryService;
 
-    @ApiOperation(value = "Get a channel definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get a channel definition", tags = { "Channel Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the channel definitions are returned"),
-            @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
+            @ApiResponse(code = 404, message = "Indicates the requested channel definition was not found.")
     })
     @GetMapping(value = "/event-registry-repository/channel-definitions/{channelDefinitionId}", produces = "application/json")
-    public ChannelDefinitionResponse getChannelDefinition(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId, HttpServletRequest request) {
+    public ChannelDefinitionResponse getChannelDefinition(@ApiParam(name = "channelDefinitionId") @PathVariable String channelDefinitionId) {
         ChannelDefinition channelDefinition = getChannelDefinitionFromRequest(channelDefinitionId);
 
         return restResponseFactory.createChannelDefinitionResponse(channelDefinition);

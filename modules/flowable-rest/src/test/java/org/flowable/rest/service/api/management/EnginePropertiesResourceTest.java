@@ -21,27 +21,48 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.interceptor.Command;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.common.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
  */
 public class EnginePropertiesResourceTest extends BaseSpringRestTestCase {
 
+    protected boolean databaseReset;
+
+    @BeforeEach
+    public void createDatabase() throws Exception {
+        if (!databaseReset) {
+            String originalDatabaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
+            try {
+                processEngineConfiguration.setDatabaseSchemaUpdate(AbstractEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE);
+                managementService.executeCommand(processEngineConfiguration.getSchemaManagementCmd());
+            } finally {
+                processEngineConfiguration.setDatabaseSchemaUpdate(originalDatabaseSchemaUpdate);
+            }
+            databaseReset = true;
+            createUsers();
+        }
+    }
+
     @Test
     public void testGetAllProperties() throws Exception {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_ENGINE_PROPERTIES)), HttpStatus.SC_OK);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
-        assertThat(responseNode.get("schema.version").asText()).isNotNull();
-        assertThat(responseNode.get("common.schema.version").asText()).isNotNull();
+        assertThat(responseNode.get("schema.version").asString()).isNotNull();
+        assertThat(responseNode.get("common.schema.version").asString()).isNotNull();
     }
 
     @Test

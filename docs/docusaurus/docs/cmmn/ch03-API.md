@@ -234,6 +234,10 @@ To filter based on the name:
 
 -   names('name1', 'name2', 'name3')
 
+To filter using a lambda expression:
+
+-   filter(planItemInstance -> planItemInstance.name.startsWith('Service')
+
 For some use cases, the plan item instances that should be filtered should only be part of the current stage. The 'current stage' is either the parent stage of a plan item or the case instance when there’s no parent stage.
 
 -   currentStage()
@@ -350,58 +354,46 @@ By default history data is stored forever, this can cause the history tables to 
 
 ### Automatic History Cleaning Configuration
 
-Automatic cleanup of HistoricCaseInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricCaseInstances and associated data that have ended 365 days prior or older. 
+Automatic cleanup of HistoricCaseInstances is disabled by default but can be enabled and configured programmatically.  Once enabled the default is to run a cleanup job at 1 AM to delete all HistoricCaseInstances and associated data that have ended 365 days prior or older.
+The deletion of the historical processes is done using the Flowable Batch mechanism, by scheduling jobs that are going to delete the processes in batches and store the information about what was done in a batch table.
 
     CmmnEngine cmmnEngine = CmmnEngineConfiguration.
         .createProcessEngineConfigurationFromResourceDefault()
         .setEnableHistoryCleaning(true)
         .setHistoryCleaningTimeCycleConfig("0 0 1 * * ?")
-        .setCleanInstancesEndedAfterNumberOfDays(365)
+        .setCleanInstancesEndedAfter(Duration.ofDays(365))
         .buildCmmnEngine();
  
 Spring properties set in an application.properties or externalized configuration are also available:
  
      flowable.enable-history-cleaning=true
-     flowable.history-cleaning-after-days=365
+     flowable.history-cleaning-after=365d
      flowable.history-cleaning-cycle=0 0 1 * * ?
  
 ### Manually Deleting History
 
-Manually cleaning history can accomplished by executing methods on the CmmnHistoryService query builders.
+[//]: # (TODO change examples)
+
+Manually cleaning history can be accomplished by executing methods on the CmmnHistoryService query builders.
 
 Delete all HistoricCaseInstances and their related data that are older than one year.
 
+     int numberOfCasesInBatch = 10;
      Calendar cal = new GregorianCalendar();
      cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
      cmmnHistoryService.createHistoricCaseInstanceQuery()
        .finishedBefore(cal.getTime())
-       .deleteWithRelatedData();
+       .deleteSequentiallyUsingBatch(numberOfCasesInBatch, "Custom Delete Batch");
 
-Delete just HistoricCaseInstances older than one year.
-
-    Calendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
-    cmmnHistoryService.createHistoricCaseInstanceQuery()
-      .finishedBefore(cal.getTime())
-      .delete();
-      
-Delete just HistoricTaskInstances older than one year.
-
-    Calendar cal = new GregorianCalendar();
-    cal.set(Calendar.YEAR, cal.get(Calendar.YEAR) - 1);
-    cmmnHistoryService.createHistoricTaskInstanceQuery()
-      .finishedBefore(cal.getTime())
-      .delete();
-          
 ## Unit testing
 
 Cases are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests.
 Since Flowable is an embeddable Java engine, writing unit tests for business cases is as simple as writing regular unit tests.
 
-Flowable supports JUnit versions 4 and 5 styles of unit testing.
+Flowable supports JUnit Jupiter styles of unit testing.
 
-In the JUnit 5 style one needs to use the org.flowable.cmmn.engine.test.FlowableCmmnTest annotation or register the org.flowable.cmmn.engine.test.FlowableCmmnExtension manually.
-The FlowableCmmnTest annotation is just a meta annotation and the does the registration of the FlowableCmmnExtension (i.e. it does @ExtendWith(FlowableCmmnExtension.class)).
+In the JUnit Jupiter style one needs to use the org.flowable.cmmn.engine.test.FlowableCmmnTest annotation or register the org.flowable.cmmn.engine.test.FlowableCmmnExtension manually.
+The FlowableCmmnTest annotation is just a meta-annotation and does the registration of the FlowableCmmnExtension (i.e. it does @ExtendWith(FlowableCmmnExtension.class)).
 This will make the CmmnEngine and the services available as parameters into the test and lifecycle methods (@BeforeAll, @BeforeEach, @AfterEach, @AfterAll).
 Before each test the cmmnEngine will be initialized by default with the flowable.cmmn.cfg.xml resource on the classpath.
 In order to specify a different configuration file the org.flowable.cmmn.engine.test.CmmnConfigurationResource annotation needs to be used (see the second example).
@@ -413,9 +405,9 @@ In case there are no resources defined, a resource file of the form testClassNam
 At the end of the test, the deployment will be deleted, including all related case instances, tasks, and so on.
 See the CmmnDeployment class for more information.
 
-Taking all that into account, a JUnit 5 test looks as follows:
+Taking all that into account, a JUnit Jupiter test looks as follows:
 
-**Junit 5 test with the default resource.**
+**Junit Jupiter test with the default resource.**
 
     @FlowableCmmnTest
     class MyTest {
@@ -448,9 +440,9 @@ Taking all that into account, a JUnit 5 test looks as follows:
       }
     }
 
-    With JUnit 5 you can also inject the id of the deployment (with +org.flowable.cmmn.engine.test.CmmnDeploymentId+_) into your test and lifecycle methods.
+With JUnit Jupiter you can also inject the id of the deployment (with +org.flowable.cmmn.engine.test.CmmnDeploymentId+_) into your test and lifecycle methods.
 
-**Junit 5 test with custom resource.**
+**Junit Jupiter test with custom resource.**
 
     @FlowableCmmnTest
     @CmmnConfigurationResource("flowable.custom.cmmn.cfg.xml")
@@ -481,41 +473,4 @@ Taking all that into account, a JUnit 5 test looks as follows:
         cmmnTaskService.complete(task.getId());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
       }
-    }
-
-In the JUnit 4 style, the *org.flowable.cmmn.engine.test.FlowableCmmnTestCase* is available as parent class. It uses a configuration file *flowable.cmmn.cfg.xml* by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
-Behind the scenes, a CmmnTestRunner is used to initialise the CMMN engine. Note in the example below how the *@CmmnDeployment* annotation is used to automatically deploy the case definition (it will look for a .cmmn file in the same folder as the test class and expects the file to be named &lt;Test class name&gt;.&lt;test method name&gt;.cmmn.
-
-    public class MyTest extends FlowableCmmnTestCase {
-
-      @Test
-      @CmmnDeployment
-      public void testSingleHumanTask() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
-                        .caseDefinitionKey("myCase")
-                        .start();
-        assertNotNull(caseInstance);
-
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-        assertEquals("Task 1", task.getName());
-        assertEquals("JohnDoe", task.getAssignee());
-
-        cmmnTaskService.complete(task.getId());
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
-      }
-    }
-
-Alternatively, the *FlowableCmmnRule* is available and allows to set a custom configuration:
-
-**JUnit 4 test with a Rule.**
-
-    @Rule
-    public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/custom.cfg.xml")
-
-    @Test
-    @CmmnDeployment
-    public void testSomething() {
-        // ...
-        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "test"), containsString("John"));
-        // ...
     }

@@ -228,6 +228,7 @@ public class HistoricDecisionExecutionQueryImpl extends AbstractQuery<DmnHistori
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         delete();
     }

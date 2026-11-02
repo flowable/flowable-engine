@@ -21,6 +21,8 @@
             <task id="externalWorkerTaskA" name="A" flowable:type="external-worker" flowable:topic="simple">
                 <extensionElements>
                     <flowable:customValue>test</flowable:customValue>
+                    <flowable:externalWorkerInParameter source="description" target="theDescription"></flowable:externalWorkerInParameter>
+                    <flowable:externalWorkerOutParameter source="theResult" target="result"></flowable:externalWorkerOutParameter>
                 </extensionElements>
             </task>
 

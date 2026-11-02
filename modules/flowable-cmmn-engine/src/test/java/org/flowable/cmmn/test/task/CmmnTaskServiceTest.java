@@ -15,10 +15,13 @@ package org.flowable.cmmn.test.task;
 import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,8 +33,8 @@ import org.flowable.cmmn.engine.interceptor.CreateHumanTaskAfterContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskBeforeContext;
 import org.flowable.cmmn.engine.interceptor.CreateHumanTaskInterceptor;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
@@ -46,19 +49,16 @@ import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  * @author Christopher Welsch
  */
 public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     @CmmnDeployment
@@ -159,30 +159,16 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
-    public void testOneHumanTaskVariableScopeExpressionCase() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
-        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
-
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Error while evaluating expression: ${caseInstance.name}");
-        cmmnTaskService.complete(task.getId(), Collections.singletonMap(
-                "${caseInstance.name}", "newCaseName"
-                )
-        );
-    }
-
-    @Test
-    @CmmnDeployment(resources = "org/flowable/cmmn/test/task/CmmnTaskServiceTest.testOneHumanTaskCase.cmmn")
     public void testOneHumanTaskCompleteSetCaseName() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
 
-        this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Error while evaluating expression: ${name}");
-        cmmnTaskService.complete(task.getId(), Collections.singletonMap(
+        assertThatThrownBy(() -> cmmnTaskService.complete(task.getId(), Collections.singletonMap(
                 "${name}", "newCaseName"
                 )
-        );
+        ))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Error while evaluating expression: ${name}");
     }
 
     @Test
@@ -321,6 +307,95 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         }
     }
 
+    @Test
+    @CmmnDeployment
+    public void testTaskCompletionBuilder() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("taskCompletionBuilderTest").start();
+        TaskQuery tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId());
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("mapInstanceLevelVariable1", "value1");
+        variables.put("mapInstanceLevelVariable2", "value2");
+
+        Map<String, Object> variablesLocal = new HashMap<>();
+        variablesLocal.put("mapInstanceLocalVariable1", "localValue1");
+        variablesLocal.put("mapInstanceLocalVariable2", "localValue2");
+
+        Map<String, Object> transientVariables = new HashMap<>();
+        transientVariables.put("mapInstanceLevelTransientVariable1", "transientValue1");
+        transientVariables.put("mapInstanceLevelTransientVariable2", "transientValue2");
+
+        Map<String, Object> transientLocalVariables = new HashMap<>();
+        transientLocalVariables.put("mapInstanceLocalTransientVariable1", "localTransientValue1");
+        transientLocalVariables.put("mapInstanceLocalTransientVariable2", "localTransientValue2");
+
+        cmmnTaskService.createTaskCompletionBuilder()
+                .variables(variables)
+                .variable("singleInstanceVariable", "singleValue1")
+                .variablesLocal(variablesLocal)
+                .variableLocal("singleLocalVariable", "singleLocalValue1")
+                .transientVariables(transientVariables)
+                .transientVariable("singleTransientVariable", "singleTransientValue1")
+                .transientVariablesLocal(transientLocalVariables)
+                .transientVariableLocal("singleLocalTransientVariable", "singleTransientLocalValue1")
+                .taskId(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).taskName("Task A").singleResult().getId())
+                .complete();
+
+        assertThat(cmmnRuntimeService.getVariables(caseInstance.getId()))
+                .containsOnly(
+                        // variables
+                        entry("mapInstanceLevelVariable1", "value1"),
+                        entry("mapInstanceLevelVariable2", "value2"),
+                        entry("singleInstanceVariable", "singleValue1"),
+                        // local variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLocalVariable1", "localValue1"),
+                        entry("copiedMapInstanceLocalVariable2", "localValue2"),
+                        entry("copiedSingleLocalVariable", "singleLocalValue1"),
+                        // transient variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLevelTransientVariable1", "transientValue1"),
+                        entry("copiedMapInstanceLevelTransientVariable2", "transientValue2"),
+                        entry("copiedSingleTransientVariable", "singleTransientValue1"),
+                        // transient local variables should have been copied in the listener. The original one shouldn't be available
+                        entry("copiedMapInstanceLocalTransientVariable1", "localTransientValue1"),
+                        entry("copiedMapInstanceLocalTransientVariable2", "localTransientValue2"),
+                        entry("copiedSingleLocalTransientVariable", "singleTransientLocalValue1")
+                );
+
+    }
+
+    @Test
+    public void testTaskIdentityLinkCountWithDeletionOfSameLink() {
+        Task task = cmmnTaskService.createTaskBuilder().
+                name("testName").
+                identityLinks(getDefaultIdentityLinks()).
+                create();
+
+        TaskEntityImpl updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(2);
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
+                    cmmnTaskService.deleteUserIdentityLink(task.getId(), "testUserFromBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(1);
+
+        cmmnEngineConfiguration.getCommandExecutor().execute(
+                commandContext -> {
+                    cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
+                    cmmnTaskService.deleteGroupIdentityLink(task.getId(), "testGroupFromBuilder", IdentityLinkType.CANDIDATE);
+                    return null;
+                }
+        );
+        updatedParentTask = (TaskEntityImpl) cmmnTaskService.createTaskQuery().taskId(task.getId()).singleResult();
+        assertThat(updatedParentTask.getIdentityLinkCount()).isEqualTo(0);
+
+        cmmnTaskService.deleteTask(task.getId(),true);
+
+    }
     private static Set<IdentityLinkEntityImpl> getDefaultIdentityLinks() {
         IdentityLinkEntityImpl identityLinkEntityCandidateUser = new IdentityLinkEntityImpl();
         identityLinkEntityCandidateUser.setUserId("testUserFromBuilder");

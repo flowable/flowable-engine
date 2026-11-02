@@ -28,10 +28,12 @@ public class IntermediateCatchConditionalEventActivityBehavior extends Intermedi
 
     protected ConditionalEventDefinition conditionalEventDefinition;
     protected String conditionExpression;
+    protected String conditionLanguage;
 
-    public IntermediateCatchConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression) {
+    public IntermediateCatchConditionalEventActivityBehavior(ConditionalEventDefinition conditionalEventDefinition, String conditionExpression, String conditionLanguage) {
         this.conditionalEventDefinition = conditionalEventDefinition;
         this.conditionExpression = conditionExpression;
+        this.conditionLanguage = conditionLanguage;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class IntermediateCatchConditionalEventActivityBehavior extends Intermedi
         FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_WAITING, 
-                    executionEntity.getActivityId(), conditionExpression, executionEntity.getId(), 
+                    executionEntity.getActivityId(), conditionExpression, conditionLanguage, executionEntity.getId(),
                     executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                     processEngineConfiguration.getEngineCfgKey());
         }
@@ -59,7 +61,7 @@ public class IntermediateCatchConditionalEventActivityBehavior extends Intermedi
             FlowableEventDispatcher eventDispatcher = processEngineConfiguration.getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createConditionalEvent(FlowableEngineEventType.ACTIVITY_CONDITIONAL_RECEIVED, executionEntity.getActivityId(), 
-                        conditionExpression, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
+                        conditionExpression, conditionLanguage, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()),
                         processEngineConfiguration.getEngineCfgKey());
             }
             

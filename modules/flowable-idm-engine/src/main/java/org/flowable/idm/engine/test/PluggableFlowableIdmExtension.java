@@ -31,7 +31,7 @@ public class PluggableFlowableIdmExtension extends InternalFlowableIdmExtension 
 
     @Override
     protected IdmEngine getIdmEngine(ExtensionContext context) {
-        return getStore(context).getOrComputeIfAbsent(IDM_ENGINE, key -> initializeIdmEngine(), IdmEngine.class);
+        return getStore(context).computeIfAbsent(IDM_ENGINE, key -> initializeIdmEngine(), IdmEngine.class);
     }
 
     protected IdmEngine initializeIdmEngine() {

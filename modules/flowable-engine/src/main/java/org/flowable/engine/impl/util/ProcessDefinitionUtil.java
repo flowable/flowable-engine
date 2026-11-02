@@ -45,6 +45,16 @@ public class ProcessDefinitionUtil {
 
     public static String getDefinitionDeploymentId(ProcessDefinition processDefinition, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (processDefinition != null) {
+            String parentDeploymentId = getParentDeploymentId(processDefinition);
+            if (parentDeploymentId == null) {
+                // A process definition loaded from the database does not have the parent deployment id, the cached one has it
+                parentDeploymentId = getParentDeploymentId(getProcessDefinition(processDefinition.getId(), true, processEngineConfiguration));
+            }
+
+            if (parentDeploymentId != null) {
+                return parentDeploymentId;
+            }
+
             DeploymentManager deploymentManager = processEngineConfiguration.getDeploymentManager();
             DeploymentEntity processDeployment = deploymentManager.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
             if (StringUtils.isEmpty(processDeployment.getParentDeploymentId())) {
@@ -53,6 +63,14 @@ public class ProcessDefinitionUtil {
             return processDeployment.getParentDeploymentId();
         }
 
+        return null;
+    }
+
+    protected static String getParentDeploymentId(ProcessDefinition processDefinition) {
+        if (processDefinition instanceof ProcessDefinitionEntity processDefinitionEntity
+                && StringUtils.isNotEmpty(processDefinitionEntity.getParentDeploymentId())) {
+            return processDefinitionEntity.getParentDeploymentId();
+        }
         return null;
     }
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testPlanItemLifecycleListeners" name="Case With Plan Item Lifecycle Listener">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItemserviceTask1" name="Service task" definitionRef="serviceTask1">
+                <itemControl>
+                    <repetitionRule flowable:counterVariable="repetitionCounter"/>
+                </itemControl>
+                <entryCriterion id="entryCriterion1" sentryRef="sentryentryCriterion1"/>
+            </planItem>
+            <planItem id="planItemhumanTask1" name="Human task" definitionRef="humanTask1"/>
+            <sentry id="sentryentryCriterion1">
+                <ifPart>
+                    <condition><![CDATA[${vars:getOrDefault(currentLoopCount, 0) < maxIterations}]]></condition>
+                </ifPart>
+            </sentry>
+            <task id="serviceTask1" name="Service task" flowable:type="java" flowable:expression="${vars:getOrDefault(currentLoopCount, 0) + 1}"
+                  flowable:resultVariableName="currentLoopCount">
+                <extensionElements>
+                    <flowable:planItemLifecycleListener delegateExpression="${testListener}"/>
+                </extensionElements>
+            </task>
+            <humanTask id="humanTask1" name="Human task"/>
+        </casePlanModel>
+    </case>
+    <cmmndi:CMMNDI>
+        <cmmndi:CMMNDiagram id="CMMNDiagram_testPlanItemLifecycleListeners">
+            <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+                <dc:Bounds height="754.0" width="758.0" x="30.0" y="45.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemserviceTask1" cmmnElementRef="planItemserviceTask1">
+                <dc:Bounds height="80.0" width="100.0" x="211.0" y="196.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_entryCriterion1" cmmnElementRef="entryCriterion1">
+                <dc:Bounds height="28.0" width="18.0" x="202.0" y="222.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+            <cmmndi:CMMNShape id="CMMNShape_planItemhumanTask1" cmmnElementRef="planItemhumanTask1">
+                <dc:Bounds height="80.0" width="100.0" x="376.0" y="196.0"/>
+                <cmmndi:CMMNLabel/>
+            </cmmndi:CMMNShape>
+        </cmmndi:CMMNDiagram>
+    </cmmndi:CMMNDI>
+</definitions>

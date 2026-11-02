@@ -13,11 +13,11 @@
 
 package org.flowable.cmmn.rest.service.api.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,9 +28,11 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the historic variable instance query resource.
@@ -42,6 +44,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
     /**
      * Test querying historic variable instance. GET cmmn-history/historic-variable-instances
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/twoHumanTaskCase.cmmn" })
     public void testQueryVariableInstances() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -80,6 +83,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         assertResultsPresentInDataResponse(url + "?variableNameLike=" + encode("%Var2"), 0, null, null);
     }
 
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryVariableExcludeLocalVariable() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
@@ -101,8 +105,91 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         assertResultsPresentInDataResponse(url + "?caseInstanceId=" + caseInstance.getId() + "&excludeLocalVariables=true", 1, "myVar", "test1");
 
     }
+
+    @Test
+    @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
+    public void testVariableInstanceScopeIsPresent() throws Exception {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneHumanTaskCase")
+                .variable("myVar", "test1")
+                .start();
+
+        PlanItemInstance planItemInstance = runtimeService.createPlanItemInstanceQuery().planItemDefinitionId("theTask")
+                .caseInstanceId(caseInstance.getId()).singleResult();
+
+        Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(), "localTaskVariable", "localTaskVarValue");
+
+        runtimeService.setLocalVariable(planItemInstance.getId(), "myLocalVar", "test2");
+
+        taskService.complete(task.getId());
+
+        String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCES) + "?caseInstanceId=" + caseInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 3,"
+                + " data : ["
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         planItemInstanceId : '" + planItemInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'localTaskVariable',"
+                + "             value:'localTaskVarValue',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         planItemInstanceId : '" + planItemInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'myLocalVar',"
+                + "             value:'test2',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         planItemInstanceId : null,"
+                + "         variable:{"
+                + "             name:'myVar',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+        url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_VARIABLE_INSTANCES) + "?caseInstanceId=" + caseInstance.getId()
+                + "&excludeLocalVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER).isEqualTo("{"
+                + " size: 1,"
+                + " data : ["
+                + "     {"
+                + "         caseInstanceId : '" + caseInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'myVar',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+    }
+
     protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
-            throws JsonProcessingException, IOException {
+            throws IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -115,11 +202,9 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode dataElementNode = it.next();
+            for (JsonNode dataElementNode : dataNode) {
                 JsonNode variableNode = dataElementNode.get("variable");
-                String name = variableNode.get("name").textValue();
+                String name = variableNode.get("name").asString();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -127,7 +212,7 @@ public class HistoricVariableInstanceCollectionResourceTest extends BaseSpringRe
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

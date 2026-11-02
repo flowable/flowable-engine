@@ -90,6 +90,28 @@ public class VariableListenerEventTest extends PluggableFlowableTestCase {
     
     @Test
     @Deployment
+    public void multipleCatchVariableListeners() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("catchVariableListener");
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list()).hasSize(2);
+        
+        assertThat(runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(3);
+
+        runtimeService.setVariable(processInstance.getId(), "var2", "test");
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list()).hasSize(2);
+        
+        runtimeService.setVariable(processInstance.getId(), "var1", "test");
+        
+        assertThat(runtimeService.createEventSubscriptionQuery().processInstanceId(processInstance.getId()).list()).hasSize(0);
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(2);
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("aftertask").processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+        assertThat(taskService.createTaskQuery().taskDefinitionKey("aftertask2").processInstanceId(processInstance.getId()).count()).isEqualTo(1);
+    }
+    
+    @Test
+    @Deployment
     public void boundaryVariableListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryVariableListener");
         

@@ -66,7 +66,7 @@ public class EventRepositoryServiceImpl extends CommonEngineServiceImpl<EventReg
 
     @Override
     public EventDeploymentBuilder createDeployment() {
-        return commandExecutor.execute(new Command<EventDeploymentBuilder>() {
+        return commandExecutor.execute(new Command<>() {
             @Override
             public EventDeploymentBuilder execute(CommandContext commandContext) {
                 return new EventDeploymentBuilderImpl();

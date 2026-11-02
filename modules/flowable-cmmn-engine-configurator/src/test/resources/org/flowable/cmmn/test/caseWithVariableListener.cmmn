@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-engage-case-palette">
+  <case id="caseWithVariableListener" name="Case with variable listener">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+      <planItem id="planItemcmmnStage_10" definitionRef="cmmnStage_10">
+        <entryCriterion id="cmmnEntrySentry_11" sentryRef="sentrycmmnEntrySentry_11"></entryCriterion>
+      </planItem>
+      <planItem id="planItemcmmnStage_1" name="Testing" definitionRef="cmmnStage_1">
+        <entryCriterion id="cmmnEntrySentry_2" sentryRef="sentrycmmnEntrySentry_2"></entryCriterion>
+      </planItem>
+      <planItem id="planItemcmmnTask_1" name="Init state" definitionRef="cmmnTask_1"></planItem>
+      <sentry id="sentrycmmnEntrySentry_11">
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry_11" sourceRef="planItemcmmnTask_1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <sentry id="sentrycmmnEntrySentry_2">
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry_2" sourceRef="planItemcmmnTask_1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <stage id="cmmnStage_10">
+        <planItem id="planItemcmmnTask_9" name="Variable change task ${myVar}" definitionRef="cmmnTask_9">
+          <itemControl>
+            <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1" />
+          </itemControl>
+          <entryCriterion id="cmmnEntrySentry_10" sentryRef="sentrycmmnEntrySentry_10"></entryCriterion>
+        </planItem>
+        <planItem id="planItemcmmnEventListener_4" definitionRef="cmmnEventListener_4">
+          <itemControl>
+            <extensionElements>
+              <flowable:parentCompletionRule type="ignoreIfAvailableOrEnabled"></flowable:parentCompletionRule>
+            </extensionElements>
+            <repetitionRule flowable:counterVariable="repetitionCounter" flowable:maxInstanceCount="1" />
+          </itemControl>
+        </planItem>
+        <sentry id="sentrycmmnEntrySentry_10" name="Entry criterion">
+          <planItemOnPart id="sentryOnPartcmmnEntrySentry_10" sourceRef="planItemcmmnEventListener_4">
+            <standardEvent>occur</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <humanTask id="cmmnTask_9" name="Variable change task ${myVar}" />
+        <eventListener id="cmmnEventListener_4" flowable:eventType="variable" flowable:variableName="myVar" flowable:variableChangeType="update-create" />
+      </stage>
+      <stage id="cmmnStage_1" name="Testing">
+        <planItem id="planItemcmmnTask_4" name="Change State" definitionRef="cmmnTask_4"></planItem>
+        <planItem id="planItemcmmnTask_6" name="After process" definitionRef="cmmnTask_6">
+          <entryCriterion id="cmmnEntrySentry_7" sentryRef="sentrycmmnEntrySentry_7"></entryCriterion>
+        </planItem>
+        <sentry id="sentrycmmnEntrySentry_7">
+          <planItemOnPart id="sentryOnPartcmmnEntrySentry_7" sourceRef="planItemcmmnTask_4">
+            <standardEvent>complete</standardEvent>
+          </planItemOnPart>
+        </sentry>
+        <processTask id="cmmnTask_4" name="Change State">
+          <extensionElements>
+            <flowable:in sourceExpression="${planItemInstance.caseInstanceId}" target="caseInstanceId"></flowable:in>
+          </extensionElements>
+          <processRefExpression><![CDATA[testVariableChangeProcess]]></processRefExpression>
+        </processTask>
+        <humanTask id="cmmnTask_6" name="After process" />
+      </stage>
+      <task id="cmmnTask_1" name="Init state" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.ChangeCaseVariableValueCmmnDelegate" />
+    </casePlanModel>
+  </case>
+</definitions>

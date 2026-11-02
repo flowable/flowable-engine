@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.joda.JodaDeprecationLogger;
 import org.flowable.dmn.api.ExecuteDecisionContext;
 import org.flowable.dmn.engine.impl.audit.DecisionExecutionAuditUtil;
 import org.flowable.dmn.model.Decision;
@@ -77,7 +78,7 @@ public class ELExecutionContextBuilder {
         }
 
         Map<String, Object> inputVariables = executeDecisionInfo.getVariables();
-        preProcessInputVariables(decisionTable, inputVariables);
+        preProcessInputVariables(decisionTable, inputVariables, executeDecisionInfo);
         executionContext.setStackVariables(inputVariables);
 
         LOGGER.debug("Execution Context created");
@@ -85,7 +86,7 @@ public class ELExecutionContextBuilder {
         return executionContext;
     }
 
-    protected static void preProcessInputVariables(DecisionTable decisionTable, Map<String, Object> inputVariables) {
+    protected static void preProcessInputVariables(DecisionTable decisionTable, Map<String, Object> inputVariables, ExecuteDecisionContext executeDecisionInfo) {
 
         if (inputVariables == null) {
             inputVariables = new HashMap<>();
@@ -115,28 +116,34 @@ public class ELExecutionContextBuilder {
 
         // check if transformation is needed
         for (Map.Entry<String, Object> inputVariable : inputVariables.entrySet()) {
+            String inputVariableName = inputVariable.getKey();
             try {
-                if (inputVariable.getValue() instanceof LocalDate) {
-                    Date transformedDate = ((LocalDate) inputVariable.getValue()).toDate();
-                    inputVariables.put(inputVariable.getKey(), transformedDate);
-                } else if (inputVariable.getValue() instanceof java.time.LocalDate) {
-                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariable.getValue()).atStartOfDay()
+                Object inputVariableValue = inputVariable.getValue();
+                if (inputVariableValue instanceof LocalDate) {
+                    JodaDeprecationLogger.LOGGER.warn(
+                            "Using Joda-Time LocalDate has been deprecated and will be removed in a future version."
+                                    + " Input variable {} from {} {} for decision table {} is a Joda-Time LocalDate. ",
+                            inputVariableName, executeDecisionInfo.getScopeType(), executeDecisionInfo.getInstanceId(), decisionTable.getId());
+                    Date transformedDate = ((LocalDate) inputVariableValue).toDate();
+                    inputVariables.put(inputVariableName, transformedDate);
+                } else if (inputVariableValue instanceof java.time.LocalDate) {
+                    Date transformedDate = Date.from(((java.time.LocalDate) inputVariableValue).atStartOfDay()
                             .atZone(ZoneId.systemDefault())
                             .toInstant());
-                    inputVariables.put(inputVariable.getKey(), transformedDate);
-                } else if (inputVariable.getValue() instanceof Long || inputVariable.getValue() instanceof Integer) {
-                    BigInteger transformedNumber = new BigInteger(inputVariable.getValue().toString());
-                    inputVariables.put(inputVariable.getKey(), transformedNumber);
-                } else if (inputVariable.getValue() instanceof Double ) {
-                    BigDecimal transformedNumber = new BigDecimal((Double) inputVariable.getValue());
-                    inputVariables.put(inputVariable.getKey(), transformedNumber);
-                } else if (inputVariable.getValue() instanceof Float) {
-                    double doubleValue = Double.parseDouble(inputVariable.getValue().toString());
+                    inputVariables.put(inputVariableName, transformedDate);
+                } else if (inputVariableValue instanceof Long || inputVariableValue instanceof Integer) {
+                    BigInteger transformedNumber = new BigInteger(inputVariableValue.toString());
+                    inputVariables.put(inputVariableName, transformedNumber);
+                } else if (inputVariableValue instanceof Double ) {
+                    BigDecimal transformedNumber = new BigDecimal((Double) inputVariableValue);
+                    inputVariables.put(inputVariableName, transformedNumber);
+                } else if (inputVariableValue instanceof Float) {
+                    double doubleValue = Double.parseDouble(inputVariableValue.toString());
                     BigDecimal transformedNumber = new BigDecimal(doubleValue);
-                    inputVariables.put(inputVariable.getKey(), transformedNumber);
+                    inputVariables.put(inputVariableName, transformedNumber);
                 }
             } catch (Exception ex) {
-                throw new FlowableException("error while transforming variable", ex);
+                throw new FlowableException("error while transforming input variable " + inputVariableName + " for decision table " + decisionTable.getId(), ex);
             }
         }
     }

@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.app.api.repository.AppDeployment;
+import org.flowable.app.engine.impl.persistence.entity.deploy.AppDefinitionCacheEntry;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 
@@ -32,6 +33,10 @@ public interface AppDeploymentEntity extends AppDeployment, Entity {
     void addDeployedArtifact(Object deployedArtifact);
 
     <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    
+    void addAppDefinitionCacheEntry(String appDefinitionId, AppDefinitionCacheEntry appDefinitionCacheEntry);
+
+    AppDefinitionCacheEntry getAppDefinitionCacheEntry(String appDefinitionId);
 
     void setName(String name);
 

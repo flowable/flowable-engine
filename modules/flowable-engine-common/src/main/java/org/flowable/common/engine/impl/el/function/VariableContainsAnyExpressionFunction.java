@@ -16,8 +16,8 @@ import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.variable.VariableContainer;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.flowable.common.engine.impl.json.FlowableArrayNode;
+import org.flowable.common.engine.impl.util.JsonUtil;
 
 /**
  * Checks if the value of a variable (fetched using the variableName through the variable scope) contains any of the provided values.
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
  * 
  * - {@link String}: following {@link StringUtils#contains(CharSequence, CharSequence)} semantics for one of the passed values
  * - {@link Collection}: following the {@link Collection#contains(Object)} for one of the passed values
- * - {@link ArrayNode}: supports checking if the arraynode contains a JsonNode for the types that are supported as variable type
+ * - {@code Json Array}: supports checking if the array contains a JsonNode for the types that are supported as variable type
  * 
  * When the variable value is null, false is returned in all cases.
  * When the variable value is not null, and the instance type is not one of the cases above, false will be returned.
@@ -43,8 +43,7 @@ public class VariableContainsAnyExpressionFunction extends AbstractFlowableVaria
     public static boolean containsAny(VariableContainer variableContainer, String variableName, Object... values) {
         Object variableValue = getVariableValue(variableContainer, variableName);
         if (variableValue != null) {
-            if (variableValue instanceof String) {
-                String variableStringValue = (String) variableValue;
+            if (variableValue instanceof String variableStringValue) {
                 for (Object value : values) {
                     String stringValue = (String) value;
                     if (StringUtils.contains(variableStringValue, stringValue)) {
@@ -53,8 +52,7 @@ public class VariableContainsAnyExpressionFunction extends AbstractFlowableVaria
                 }
                 return false;
 
-            } else if (variableValue instanceof Collection) {
-                Collection collectionVariableValue = (Collection) variableValue;
+            } else if (variableValue instanceof Collection collectionVariableValue) {
                 for (Object value : values) {
                    if (VariableContainsExpressionFunction.collectionContains(collectionVariableValue, value)) {
                        return true;
@@ -62,8 +60,8 @@ public class VariableContainsAnyExpressionFunction extends AbstractFlowableVaria
                 }
                 return false;
 
-            } else if (variableValue instanceof ArrayNode) {
-                ArrayNode arrayNodeVariableValue = (ArrayNode) variableValue;
+            } else if (JsonUtil.isArrayNode(variableValue)) {
+                FlowableArrayNode arrayNodeVariableValue = JsonUtil.asFlowableArrayNode(variableValue);
                 for (Object value : values) {
                    if (VariableContainsExpressionFunction.arrayNodeContains(arrayNodeVariableValue, value)) {
                        return true;

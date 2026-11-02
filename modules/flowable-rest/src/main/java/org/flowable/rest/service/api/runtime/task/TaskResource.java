@@ -13,9 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableForbiddenException;
@@ -53,7 +50,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = {"Tasks"}, description = "Manage Tasks", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"Tasks"}, authorizations = {@Authorization(value = "basicAuth")})
 public class TaskResource extends TaskBaseResource {
 
     @Autowired(required = false)
@@ -65,7 +62,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
-    public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId) {
         return restResponseFactory.createTaskResponse(getTaskFromRequest(taskId));
     }
 
@@ -77,13 +74,13 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 409, message = "Indicates the requested task was updated simultaneously.")
     })
     @PutMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
-    public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest, HttpServletRequest request) {
+    public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest) {
 
         if (taskRequest == null) {
             throw new FlowableException("A request body was expected when updating the task.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         // Populate the task properties based on the request
         populateTaskFromRequest(task, taskRequest);
@@ -115,7 +112,7 @@ public class TaskResource extends TaskBaseResource {
             throw new FlowableException("A request body was expected when executing a task action.");
         }
 
-        Task task = getTaskFromRequest(taskId);
+        Task task = getTaskFromRequestWithoutAccessCheck(taskId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.executeTaskAction(task, actionRequest);
@@ -126,6 +123,9 @@ public class TaskResource extends TaskBaseResource {
 
         } else if (TaskActionRequest.ACTION_CLAIM.equals(actionRequest.getAction())) {
             claimTask(task, actionRequest);
+
+        } else if (TaskActionRequest.ACTION_UNCLAIM.equals(actionRequest.getAction())) {
+            unclaimTask(task);
 
         } else if (TaskActionRequest.ACTION_DELEGATE.equals(actionRequest.getAction())) {
             delegateTask(task, actionRequest);
@@ -138,7 +138,7 @@ public class TaskResource extends TaskBaseResource {
         }
     }
 
-    @ApiOperation(value = "Delete a task", tags = {"Tasks"})
+    @ApiOperation(value = "Delete a task", tags = {"Tasks"}, code = 204)
     @ApiImplicitParams({
             @ApiImplicitParam(name = "cascadeHistory", dataType = "string", value = "Whether or not to delete the HistoricTask instance when deleting the task (if applicable). If not provided, this value defaults to false.", paramType = "query"),
             @ApiImplicitParam(name = "deleteReason", dataType = "string", value = "Reason why the task is deleted. This value is ignored when cascadeHistory is true.", paramType = "query")
@@ -149,10 +149,11 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @DeleteMapping(value = "/runtime/tasks/{taskId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
-                           @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
+                           @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason) {
 
-        Task taskToDelete = getTaskFromRequest(taskId);
+        Task taskToDelete = getTaskFromRequestWithoutAccessCheck(taskId);
         if (taskToDelete.getExecutionId() != null) {
             // Can not delete a task that is part of a process instance
             throw new FlowableForbiddenException("Cannot delete a task that is part of a process instance.");
@@ -172,7 +173,6 @@ public class TaskResource extends TaskBaseResource {
             // Delete with delete-reason
             taskService.deleteTask(taskToDelete.getId(), deleteReason);
         }
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     @ApiOperation(value = "Get a task form", tags = {"Tasks"})
@@ -181,7 +181,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @GetMapping(value = "/runtime/tasks/{taskId}/form", produces = "application/json")
-    public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
+    public String getTaskForm(@ApiParam(name = "taskId") @PathVariable String taskId) {
         Task task = getTaskFromRequest(taskId);
         if (StringUtils.isEmpty(task.getFormKey())) {
             throw new FlowableIllegalArgumentException("Task has no form defined");
@@ -253,5 +253,9 @@ public class TaskResource extends TaskBaseResource {
         // FlowableTaskAlreadyClaimedException is thrown and converted to
         // a CONFLICT response by the ExceptionHandlerAdvice
         taskService.claim(task.getId(), actionRequest.getAssignee());
+    }
+
+    protected void unclaimTask(Task task) {
+        taskService.unclaim(task.getId());
     }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+    <error id="myError" errorCode="myErrorCode1"/>
+
+    <process id="callProcessWithSingleExceptionMap" isExecutable="true">
+        <startEvent id="theStart"/>
+        <serviceTask id="servicetask2" name="Set Flag" flowable:class="org.flowable.engine.test.bpmn.event.error.mapError.FlagDelegate"/>
+        <callActivity id="callactivity1" name="Call activity" calledElement="testCallProcessCalee">
+            <extensionElements>
+                <flowable:in source="exceptionClass" target="exceptionClass"/>
+                <flowable:in source="exceptionMessage" target="exceptionMessage"/>
+                <flowable:mapException errorCode="myErrorCode1" includeChildExceptions="true">org.flowable.engine.test.bpmn.event.error.mapError.BoundaryErrorParentException</flowable:mapException>
+            </extensionElements>
+        </callActivity>
+        <sequenceFlow id="flow7" sourceRef="theStart" targetRef="callactivity1"/>
+        <endEvent id="endevent2" name="End"/>
+        <sequenceFlow id="flow8" sourceRef="callactivity1" targetRef="endevent2"/>
+        <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="callactivity1">
+            <extensionElements>
+                <flowable:in target="errorMessageVar" source="errorMessage"/>
+            </extensionElements>
+            <errorEventDefinition errorRef="myErrorCode1"/>
+        </boundaryEvent>
+        <sequenceFlow id="flow9" sourceRef="boundaryerror1" targetRef="servicetask2"/>
+        <sequenceFlow id="flow10" sourceRef="servicetask2" targetRef="endevent2"/>
+    </process>
+</definitions>

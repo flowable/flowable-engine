@@ -25,24 +25,19 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.api.Task;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.junit.jupiter.api.Test;
 
 public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompatibilityTest {
 
     @Test
     @Deployment
-    public void testRepeatWithoutEnd() throws Throwable {
+    public void testRepeatWithoutEnd() {
 
         // We need to make sure the time ends on .000, .003 or .007 due to SQL Server rounding to that
         Instant baseInstant = Instant.now().truncatedTo(ChronoUnit.SECONDS).plusMillis(337);
 
         // expect to stop boundary jobs after 20 minutes
-        DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
-        DateTime dt = new DateTime(new DateTime(baseInstant.plus(20, ChronoUnit.MINUTES).getEpochSecond()));
-        String dateStr = fmt.print(dt);
+        String dateStr = baseInstant.plus(20, ChronoUnit.MINUTES).toString();
 
         // reset the timer
         Instant nextTimeInstant = baseInstant;
@@ -71,7 +66,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
 
         // boundary events
 
-        waitForJobExecutorToProcessAllJobs(7000, 100);
+        waitForJobExecutorToProcessAllJobs(10000, 100);
 
         // a new job must be prepared because there are 10 repeats 2 seconds interval
         jobs = managementService.createTimerJobQuery().list();
@@ -80,7 +75,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         for (int i = 0; i < 9; i++) {
             nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
             processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
-            waitForJobExecutorToProcessAllJobs(7000, 100);
+            waitForJobExecutorToProcessAllJobs(10000, 100);
             // a new job must be prepared because there are 10 repeats 2 seconds interval
 
             jobs = managementService.createTimerJobQuery().list();
@@ -90,7 +85,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
         nextTimeInstant = nextTimeInstant.plus(2, ChronoUnit.SECONDS);
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
-        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 100); })
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(10000, 100); })
                 .as("Should not have any other jobs because the endDate is reached")
                 .doesNotThrowAnyException();
 
@@ -100,7 +95,7 @@ public class BoundaryTimerEventRepeatCompatibilityTest extends TimerEventCompati
                 .containsOnly("Task B");
         taskService.complete(tasks.get(0).getId());
 
-        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(7000, 500); })
+        assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(10000, 500); })
                 .as("No jobs should be active here.")
                 .doesNotThrowAnyException();
 

@@ -18,15 +18,17 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CaseServiceTask;
-import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.constant.ReferenceTypes;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.common.engine.impl.util.JsonUtil;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmmn.CaseInstanceService;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
@@ -34,7 +36,11 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
+import org.flowable.engine.impl.util.IOParameterUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.engine.interceptor.ChildInstanceInParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceOutParametersContext;
+import org.flowable.engine.interceptor.ChildInstanceParametersInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,38 +90,34 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         }
         
         Map<String, Object> inParameters = new HashMap<>();
+        Map<String, Object> transientVariables = new HashMap<>();
+
+        if (caseServiceTask.isInheritVariables()) {
+            // Inherit all variables from the parent. Explicit in parameters are
+            // applied afterwards, so they take precedence over the inherited persistent variables.
+            // Transient variables are kept transient in the child so they are not persisted
+            // JSON variables are deep copied so the parent and child don't share the same instance
+            Map<String, Object> executionTransientVariables = execution.getTransientVariables();
+            for (Map.Entry<String, Object> entry : execution.getVariables().entrySet()) {
+                String variableName = entry.getKey();
+                Object variableValue = JsonUtil.deepCopyIfJson(entry.getValue());
+                if (executionTransientVariables.containsKey(variableName)) {
+                    transientVariables.put(variableName, variableValue);
+                } else {
+                    inParameters.put(variableName, variableValue);
+                }
+            }
+        }
 
         // copy process variables
-        for (IOParameter inParameter : caseServiceTask.getInParameters()) {
+        IOParameterUtil.processInParameters(caseServiceTask.getInParameters(), execution, inParameters::put, inParameters::put, expressionManager);
 
-            Object value = null;
-            if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
-                value = expression.getValue(execution);
-
-            } else {
-                value = execution.getVariable(inParameter.getSource());
-            }
-
-            String variableName = null;
-            if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
-                Object variableNameValue = expression.getValue(execution);
-                if (variableNameValue != null) {
-                    variableName = variableNameValue.toString();
-                } else {
-                    LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                        inParameter.getTargetExpression());
-                }
-
-            } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                variableName = inParameter.getTarget();
-
-            }
-
-            inParameters.put(variableName, value);
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = processEngineConfiguration.getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null) {
+            childInstanceParametersInterceptor.afterInParameters(new ChildInstanceInParametersContext(execution, caseServiceTask, inParameters,
+                    transientVariables));
         }
-        
+
         String caseInstanceId = caseInstanceService.generateNewCaseInstanceId();
 
         if (StringUtils.isNotEmpty(caseServiceTask.getCaseInstanceIdVariableName())) {
@@ -126,11 +128,6 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
             }
         }
         
-        if (processEngineConfiguration.isEnableEntityLinks()) {
-            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(), caseServiceTask.getId(),
-                    caseInstanceId, ScopeTypes.CMMN);
-        }
-
         String caseDefinitionKey = getCaseDefinitionKey(caseServiceTask.getCaseDefinitionKey(), execution, expressionManager);
 
         String parentDeploymentId = null;
@@ -138,9 +135,27 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
             parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(execution.getProcessDefinitionId(), processEngineConfiguration);
         }
 
-        caseInstanceService.startCaseInstanceByKey(caseDefinitionKey, caseInstanceId,
-                caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(),
-                parentDeploymentId, inParameters);
+        // Resolve the case definition first so we can check its history level for the entity links
+        String caseDefinitionId = caseInstanceService.resolveCaseDefinitionId(caseDefinitionKey,
+                execution.getTenantId(), caseServiceTask.isFallbackToDefaultTenant(), parentDeploymentId);
+
+        if (processEngineConfiguration.isEnableEntityLinks()) {
+            boolean createHistoricEntityLinks = caseInstanceService.isHistoryEnabledForCaseDefinitionId(caseDefinitionId);
+
+            EntityLinkUtil.createEntityLinks(execution.getProcessInstanceId(), execution.getId(), caseServiceTask.getId(),
+                    caseInstanceId, ScopeTypes.CMMN, createHistoricEntityLinks);
+        }
+
+        try {
+            caseInstanceService.startCaseInstance(caseDefinitionId, caseInstanceId,
+                    caseInstanceName, businessKey, execution.getId(), execution.getTenantId(), inParameters, transientVariables);
+        } catch (BusinessError businessError) {
+            // An uncaught BusinessError from the child CMMN case propagates as a BPMN error.
+            // Clean up the orphaned child case instance, then propagate.
+            caseInstanceService.deleteCaseInstanceWithoutAgenda(caseInstanceId);
+            ErrorPropagation.propagateError(businessError, execution);
+            return;
+        }
 
         // Bidirectional storing of reference to avoid queries later on
         executionEntity.setReferenceId(caseInstanceId);
@@ -165,18 +180,41 @@ public class CaseTaskActivityBehavior extends AbstractBpmnActivityBehavior imple
         // not used
     }
     
+    public void triggerCaseTaskAndLeave(DelegateExecution execution, Map<String, Object> variables) {
+        triggerCaseTaskAndLeave(execution, variables, null);
+    }
+
+    public void triggerCaseTaskAndLeave(DelegateExecution execution, Map<String, Object> variables, VariableContainer childCaseInstance) {
+        triggerCaseTask(execution, variables, childCaseInstance);
+        leave(execution);
+    }
+
     public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables) {
+        triggerCaseTask(execution, variables, null);
+    }
+
+    /**
+     * @param variables the values of the out parameters, already evaluated against the child case instance
+     * @param childCaseInstance the completed child case instance, passed to the {@link ChildInstanceParametersInterceptor};
+     *         the interceptor is not called when it is null
+     */
+    public void triggerCaseTask(DelegateExecution execution, Map<String, Object> variables, VariableContainer childCaseInstance) {
         execution.setVariables(variables);
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
 
         if (executionEntity.isSuspended() || ProcessDefinitionUtil.isProcessDefinitionSuspended(execution.getProcessDefinitionId())) {
-            throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity.getId() + " is suspended");
+            throw new FlowableException("Cannot complete case task. Parent process instance " + executionEntity + " is suspended");
+        }
+
+        ChildInstanceParametersInterceptor childInstanceParametersInterceptor = CommandContextUtil.getProcessEngineConfiguration()
+                .getChildInstanceParametersInterceptor();
+        if (childInstanceParametersInterceptor != null && childCaseInstance != null) {
+            childInstanceParametersInterceptor.afterOutParameters(new ChildInstanceOutParametersContext(execution,
+                    executionEntity.getCurrentFlowElement(), childCaseInstance));
         }
 
         // Set the reference id and type to null since the execution could be reused
         executionEntity.setReferenceId(null);
         executionEntity.setReferenceType(null);
-
-        leave(execution);
     }
 }

@@ -35,10 +35,10 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 public class DmnActivityBehavior extends TaskActivityBehavior {
 
@@ -61,7 +61,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (fieldExtension == null || ((fieldExtension.getStringValue() == null || fieldExtension.getStringValue().length() == 0) &&
                 (fieldExtension.getExpression() == null || fieldExtension.getExpression().length() == 0))) {
 
-            throw new FlowableException("decisionTableReferenceKey is a required field extension for the dmn task " + task.getId());
+            throw new FlowableException("decisionTableReferenceKey is a required field extension for the dmn task " + task.getId() + " in " + execution);
         }
 
         String activeDecisionKey = null;
@@ -110,7 +110,8 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         DecisionExecutionAuditContainer decisionExecutionAuditContainer = executeDecisionBuilder.executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " execution failed in " + execution,
+                    decisionExecutionAuditContainer.getException());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
@@ -126,22 +127,21 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             
             if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorString != null) {
                 if ("true".equalsIgnoreCase(throwErrorString)) {
-                    throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
+                    throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input. In " + execution);
                     
                 } else if (!"false".equalsIgnoreCase(throwErrorString)) {
                     Expression expression = expressionManager.createExpression(throwErrorString);
                     Object expressionValue = expression.getValue(execution);
                     
                     if (expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
-                        throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input.");
+                        throw new FlowableException("DMN decision with key " + finalDecisionKeyValue + " did not hit any rules for the provided input. In " + execution);
                     }
                 }
             }
         }
 
         if (processEngineConfiguration.getDecisionTableVariableManager() != null) {
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 processEngineConfiguration.getDecisionTableVariableManager().setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(),
                     finalDecisionKeyValue, execution, processEngineConfiguration.getObjectMapper(), decisionExecutionAuditContainer.isMultipleResults());
             } else {
@@ -152,8 +152,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         } else {
             boolean multipleResults = decisionExecutionAuditContainer.isMultipleResults() && processEngineConfiguration.isAlwaysUseArraysForDmnMultiHitPolicies();
 
-            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer) {
-                DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer = (DecisionServiceExecutionAuditContainer) decisionExecutionAuditContainer;
+            if (decisionExecutionAuditContainer instanceof DecisionServiceExecutionAuditContainer decisionServiceExecutionAuditContainer) {
                 setDecisionServiceVariablesOnExecution(decisionServiceExecutionAuditContainer.getDecisionServiceResult(), finalDecisionKeyValue,
                     execution, processEngineConfiguration.getObjectMapper(), multipleResults);
             } else {

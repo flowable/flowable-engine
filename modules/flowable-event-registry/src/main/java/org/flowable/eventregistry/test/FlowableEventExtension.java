@@ -19,17 +19,14 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.flowable.common.engine.impl.db.SchemaManager;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.test.EnsureCleanDb;
 import org.flowable.common.engine.impl.test.EnsureCleanDbUtils;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
-import org.flowable.eventregistry.impl.util.CommandContextUtil;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -88,7 +85,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Filip Hrisafov
  */
-public class FlowableEventExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+public class FlowableEventExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.eventregistry.cfg.xml";
 
@@ -139,7 +136,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
         EventRegistryEngine eventRegistryEngine = flowableTestHelper.getEventRegistryEngine();
         String deploymentIdFromDeploymentAnnotation = flowableTestHelper.getDeploymentIdFromDeploymentAnnotation();
         if (deploymentIdFromDeploymentAnnotation != null) {
-            EventTestHelper.annotationDeploymentTearDown(flowableTestHelper.getEventRepositoryService(), 
+            EventTestHelper.annotationDeploymentTearDown(flowableTestHelper.getEventRepositoryService(),
                             deploymentIdFromDeploymentAnnotation, context.getRequiredTestClass(), context.getRequiredTestMethod().getName());
             flowableTestHelper.setDeploymentIdFromDeploymentAnnotation(null);
         }
@@ -151,6 +148,11 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
         } finally {
             eventRegistryEngine.getEventRegistryEngineConfiguration().getClock().reset();
         }
+    }
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
     }
 
     protected void cleanTestAndAssertAndEnsureCleanDb(ExtensionContext context, EventRegistryEngine eventRegistryEngine) {
@@ -169,16 +171,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
                 eventRegistryEngine.getEventRegistryEngineConfiguration(),
                 ensureCleanDb,
                 !context.getExecutionException().isPresent(),
-                new Command<Void>() {
-
-                    @Override
-                    public Void execute(CommandContext commandContext) {
-                        SchemaManager schemaManager = CommandContextUtil.getEventRegistryConfiguration(commandContext).getSchemaManager();
-                        schemaManager.schemaDrop();
-                        schemaManager.schemaCreate();
-                        return null;
-                    }
-                }
+                eventRegistryEngine.getEventRegistryEngineConfiguration().getSchemaManagementCmd()
 
         );
     }
@@ -221,7 +214,7 @@ public class FlowableEventExtension implements ParameterResolver, BeforeEachCall
 
     protected FlowableEventTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(), key -> new FlowableEventTestHelper(
+            .computeIfAbsent(context.getRequiredTestClass(), key -> new FlowableEventTestHelper(
                             createEventRegistryEngine(context)), FlowableEventTestHelper.class);
     }
 

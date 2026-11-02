@@ -13,6 +13,8 @@
 package org.flowable.cmmn.engine.impl.interceptor;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +22,7 @@ import java.util.Set;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.AbstractCommandInterceptor;
@@ -28,6 +31,7 @@ import org.flowable.common.engine.impl.interceptor.CommandConfig;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.common.engine.impl.interceptor.CommandInterceptor;
+import org.flowable.common.engine.impl.util.ExceptionUtil;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSession;
 import org.flowable.common.engine.impl.variablelistener.VariableListenerSessionData;
 import org.slf4j.Logger;
@@ -41,9 +45,11 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnCommandInvoker.class);
 
     protected AgendaOperationRunner agendaOperationRunner;
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
-    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner) {
+    public CmmnCommandInvoker(AgendaOperationRunner agendaOperationRunner, Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
         this.agendaOperationRunner = agendaOperationRunner;
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
     }
 
     @SuppressWarnings("unchecked")
@@ -54,12 +60,20 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         if (commandContext.isReused() && !agenda.isEmpty()) {
             commandContext.setResult(command.execute(commandContext));
         } else {
-            agenda.planOperation(() -> commandContext.setResult(command.execute(commandContext)));
 
+            executeExecutionListenersBeforeAll(commandContext);
+
+            agenda.planOperation(() -> commandContext.setResult(command.execute(commandContext)));
             executeOperations(commandContext, true); // true -> always store the case instance id for the regular operation loop, even if it's a no-op operation.
 
             if (commandContext.isRootUsageOfCurrentEngine()) {
-                evaluateUntilStable(commandContext);
+
+                Set<String> allHandledCaseInstanceIds = new HashSet<>();
+                commandContext.addAttribute("ctx.attribute.allHandledCaseInstanceIds", allHandledCaseInstanceIds);
+
+                evaluateUntilStable(commandContext, allHandledCaseInstanceIds);
+                executeExecutionListenersAfterAll(commandContext);
+
             }
         }
         
@@ -70,14 +84,60 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
         while (!agenda.isEmpty()) {
             Runnable runnable = agenda.getNextOperation();
-            executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+            executeExecutionListenersBeforeExecute(commandContext, runnable);
+            try {
+                executeOperation(commandContext, isStoreCaseInstanceIdOfNoOperation, runnable);
+            } catch (Throwable throwable) {
+                executeExecutionListenersAfterException(commandContext, runnable, throwable);
+                ExceptionUtil.sneakyThrow(throwable);
+            }
+            executeExecutionListenersAfterExecute(commandContext, runnable);
+        }
+    }
+
+    protected void executeExecutionListenersBeforeAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterAll(CommandContext commandContext) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterAll(commandContext);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersBeforeExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.beforeExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterExecute(CommandContext commandContext, Runnable runnable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecute(commandContext, runnable);
+            }
+        }
+    }
+
+    protected void executeExecutionListenersAfterException(CommandContext commandContext, Runnable runnable, Throwable throwable) {
+        if (agendaOperationExecutionListeners != null && !agendaOperationExecutionListeners.isEmpty()) {
+            for (AgendaOperationExecutionListener listener : agendaOperationExecutionListeners) {
+                listener.afterExecuteException(commandContext, runnable, throwable);
+            }
         }
     }
 
     protected void executeOperation(CommandContext commandContext, boolean isStoreCaseInstanceIdOfNoOperation, Runnable runnable) {
 
-        if (runnable instanceof CmmnOperation) {
-            CmmnOperation operation = (CmmnOperation) runnable;
+        if (runnable instanceof CmmnOperation operation) {
 
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Executing agenda operation {}", runnable);
@@ -102,10 +162,12 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
         }
     }
 
-    protected void evaluateUntilStable(CommandContext commandContext) {
+    protected void evaluateUntilStable(CommandContext commandContext, Set<String> allHandledCaseInstanceIds) {
         Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
         if (involvedCaseInstanceIds != null && !involvedCaseInstanceIds.isEmpty()) {
-            
+
+            allHandledCaseInstanceIds.addAll(involvedCaseInstanceIds);
+
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
 
             for (String caseInstanceId : involvedCaseInstanceIds) {
@@ -136,7 +198,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
             // If new involvedCaseInstanceIds have new entries, this means the evaluation has triggered new operations and data has changed.
             // Need to retrigger the evaluations to make sure no new things can fire now.
             if (!involvedCaseInstanceIds.isEmpty()) {
-                evaluateUntilStable(commandContext);
+                evaluateUntilStable(commandContext, allHandledCaseInstanceIds);
             }
         }
     }

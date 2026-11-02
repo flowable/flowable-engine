@@ -15,10 +15,10 @@ package org.flowable.cmmn.test.eventregistry;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.el.ExpressionManager;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
  * @author Filip Hrisafov
@@ -27,14 +27,14 @@ public abstract class FlowableEventRegistryCmmnTestCase extends FlowableCmmnTest
 
     protected Map<Object, Object> initialBeans;
 
-    @Before
+    @BeforeEach
     public void setUpBeans() {
         ExpressionManager eventRegistryExpressionManager = getEventRegistryEngineConfiguration().getExpressionManager();
         initialBeans = eventRegistryExpressionManager.getBeans();
         eventRegistryExpressionManager.setBeans(new HashMap<>());
     }
 
-    @After
+    @AfterEach
     public void resetBeans() {
         getEventRegistryEngineConfiguration().getExpressionManager().setBeans(initialBeans);
     }

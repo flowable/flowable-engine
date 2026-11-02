@@ -21,23 +21,18 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class CompletionNeutralTest extends FlowableCmmnTestCase {
 
-    @Rule
-    public TestName name = new TestName();
-
     @Test
     @CmmnDeployment
     public void testSimpleStageCompletion() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testSimpleStageCompletion").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -81,7 +76,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testStagedEventListenerBypassed() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStagedEventListenerBypassed").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -125,7 +120,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testEventListenerBypassed() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEventListenerBypassed").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -163,7 +158,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testEmbeddedStage() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testEmbeddedStage").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -206,7 +201,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRequiredPrecedence() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRequiredPrecedence").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -252,7 +247,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRequiredPrecedenceDeepNest").start();
         assertThat(caseInstance).isNotNull();
 
         List<PlanItemInstance> list = cmmnRuntimeService.createPlanItemInstanceQuery().list();
@@ -295,7 +290,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest2() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRequiredPrecedenceDeepNest2").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup
@@ -355,7 +350,7 @@ public class CompletionNeutralTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRequiredPrecedenceDeepNest3() {
-        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey(name.getMethodName()).start();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRequiredPrecedenceDeepNest3").start();
         assertThat(caseInstance).isNotNull();
 
         //Check case setup

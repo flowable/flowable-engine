@@ -128,7 +128,7 @@ public class DeploymentManager {
             DeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
             deployment.setNew(false);
             deploy(deployment, null);
-            cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
+            cachedProcessDefinition = deployment.getProcessDefinitionCacheEntry(processDefinitionId);
 
             if (cachedProcessDefinition == null) {
                 throw new FlowableException("deployment '" + deploymentId + "' didn't put process definition '" + processDefinitionId + "' in the cache");
@@ -189,6 +189,10 @@ public class DeploymentManager {
             return;
         }
 
+        for (EngineDeployer deployer : deployers) {
+            deployer.undeploy(deployment, cascade);
+        }
+
         // Remove any process definition from the cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
@@ -199,6 +203,8 @@ public class DeploymentManager {
             // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition),
+                        processEngineConfiguration.getEngineCfgKey());
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.DEFINITION_UNDEPLOYED, processDefinition),
                         processEngineConfiguration.getEngineCfgKey());
             }
         }

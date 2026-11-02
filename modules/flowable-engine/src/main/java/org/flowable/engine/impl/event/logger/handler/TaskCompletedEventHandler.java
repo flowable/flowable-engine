@@ -37,8 +37,7 @@ public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
         long duration = timeStamp.getTime() - task.getCreateTime().getTime();
         putInMapIfNotNull(data, Fields.DURATION, duration);
 
-        if (event instanceof FlowableEntityWithVariablesEvent) {
-            FlowableEntityWithVariablesEvent activitiEntityWithVariablesEvent = (FlowableEntityWithVariablesEvent) event;
+        if (event instanceof FlowableEntityWithVariablesEvent activitiEntityWithVariablesEvent) {
             if (activitiEntityWithVariablesEvent.getVariables() != null && !activitiEntityWithVariablesEvent.getVariables().isEmpty()) {
                 Map<String, Object> variableMap = new HashMap<>();
                 for (Object variableName : activitiEntityWithVariablesEvent.getVariables().keySet()) {

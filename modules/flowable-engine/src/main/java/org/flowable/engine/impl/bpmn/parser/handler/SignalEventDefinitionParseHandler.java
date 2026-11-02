@@ -14,9 +14,12 @@ package org.flowable.engine.impl.bpmn.parser.handler;
 
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 
 /**
@@ -33,18 +36,26 @@ public class SignalEventDefinitionParseHandler extends AbstractBpmnParseHandler<
     @Override
     protected void executeParse(BpmnParse bpmnParse, SignalEventDefinition signalDefinition) {
 
-        Signal signal = null;
-        if (bpmnParse.getBpmnModel().containsSignalId(signalDefinition.getSignalRef())) {
-            signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
-        }
+        Signal signal = bpmnParse.getBpmnModel().getSignal(signalDefinition.getSignalRef());
 
-        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) bpmnParse.getCurrentFlowElement();
+        if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent intermediateCatchEvent) {
             intermediateCatchEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createIntermediateCatchSignalEventActivityBehavior(intermediateCatchEvent, signalDefinition, signal));
 
-        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent) {
-            BoundaryEvent boundaryEvent = (BoundaryEvent) bpmnParse.getCurrentFlowElement();
+        } else if (bpmnParse.getCurrentFlowElement() instanceof BoundaryEvent boundaryEvent) {
             boundaryEvent.setBehavior(bpmnParse.getActivityBehaviorFactory().createBoundarySignalEventActivityBehavior(boundaryEvent, signalDefinition, signal, boundaryEvent.isCancelActivity()));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof ThrowEvent throwEvent) {
+            throwEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                    .createIntermediateThrowSignalEventActivityBehavior(throwEvent, signalDefinition, signal));
+
+        } else if (bpmnParse.getCurrentFlowElement() instanceof StartEvent startEvent) {
+            if (startEvent.getSubProcess() instanceof EventSubProcess) {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createEventSubProcessSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
+            } else {
+                startEvent.setBehavior(bpmnParse.getActivityBehaviorFactory()
+                        .createSignalStartEventActivityBehavior(startEvent, signalDefinition, signal));
+            }
         }
     }
 }

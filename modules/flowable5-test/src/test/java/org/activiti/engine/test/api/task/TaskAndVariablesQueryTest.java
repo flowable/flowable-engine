@@ -203,40 +203,6 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         }
     }
 
-    public void testQueryWithLimitAndVariables() throws Exception {
-
-        int taskVariablesLimit = 2000;
-        int expectedNumberOfTasks = 103;
-
-        try {
-            // setup - create 100 tasks
-            multipleTaskIds = generateMultipleTestTasks();
-
-            // limit results to 2000 and set maxResults for paging to 200
-            // please see MNT-16040
-            List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .limitTaskVariables(taskVariablesLimit)
-                    .orderByTaskPriority()
-                    .asc()
-                    .listPage(0, 200);
-            // 100 tasks created by generateMultipleTestTasks and 3 created previously at setUp
-            assertEquals(expectedNumberOfTasks, tasks.size());
-
-            tasks = taskService.createTaskQuery()
-                    .includeProcessVariables()
-                    .includeTaskLocalVariables()
-                    .orderByTaskPriority()
-                    .limitTaskVariables(taskVariablesLimit)
-                    .asc()
-                    .listPage(50, 100);
-            assertEquals(53, tasks.size());
-        } finally {
-            taskService.deleteTasks(multipleTaskIds, true);
-        }
-    }
-
     @Deployment
     public void testOrQuery() {
         Map<String, Object> startMap = new HashMap<String, Object>();

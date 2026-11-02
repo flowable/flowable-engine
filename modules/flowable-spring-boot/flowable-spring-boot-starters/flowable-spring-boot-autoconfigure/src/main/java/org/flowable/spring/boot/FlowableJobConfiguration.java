@@ -12,10 +12,14 @@
  */
 package org.flowable.spring.boot;
 
+import org.flowable.common.engine.api.async.AsyncTaskExecutor;
+import org.flowable.common.engine.impl.async.AsyncTaskExecutorConfiguration;
+import org.flowable.common.engine.impl.async.DefaultAsyncTaskExecutor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.AsyncListenableTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 /**
@@ -29,7 +33,7 @@ public class FlowableJobConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public AsyncListenableTaskExecutor taskExecutor() {
+    public org.springframework.core.task.AsyncTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(8);
         executor.setMaxPoolSize(8);
@@ -40,6 +44,25 @@ public class FlowableJobConfiguration {
         executor.setAllowCoreThreadTimeOut(true);
         executor.initialize();
         return executor;
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "flowable.task-invoker")
+    public AsyncTaskExecutorConfiguration flowableAsyncTaskInvokerTaskExecutorConfiguration() {
+        AsyncTaskExecutorConfiguration configuration = new AsyncTaskExecutorConfiguration();
+        configuration.setQueueSize(100);
+        configuration.setThreadPoolNamingPattern("flowable-async-task-invoker-%d");
+        return configuration;
+    }
+
+    @Bean(destroyMethod = "shutdown")
+    @ConditionalOnMissingBean(name = "flowableAsyncTaskInvokerTaskExecutor")
+    public AsyncTaskExecutor flowableAsyncTaskInvokerTaskExecutor(
+            @Qualifier("flowableAsyncTaskInvokerTaskExecutorConfiguration") AsyncTaskExecutorConfiguration executorConfiguration
+    ) {
+        DefaultAsyncTaskExecutor defaultAsyncTaskExecutor = new DefaultAsyncTaskExecutor(executorConfiguration);
+        defaultAsyncTaskExecutor.start();
+        return defaultAsyncTaskExecutor;
     }
 
 }

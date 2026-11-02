@@ -54,7 +54,7 @@ public class ScriptInfoParser extends BaseChildElementParser {
             String elementText = xtr.getElementText();
 
             if (StringUtils.isNotEmpty(elementText)) {
-                script.setScript(elementText);
+                script.setScript(StringUtils.trim(elementText));
             }
             if (parentElement instanceof HasScriptInfo) {
                 ((HasScriptInfo) parentElement).setScriptInfo(script);

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" xmlns:design="http://flowable.org/design" targetNamespace="http://flowable.org/cmmn" design:palette="flowable-work-case-palette">
+  <case id="labelCase" name="labelCase" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+    <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+      <extensionElements>
+        <flowable:default-menu-navigation-size><![CDATA[expanded]]></flowable:default-menu-navigation-size>
+        <flowable:work-form-field-validation><![CDATA[false]]></flowable:work-form-field-validation>
+        <design:stencilid><![CDATA[CasePlanModel]]></design:stencilid>
+      </extensionElements>
+      <planItem id="planItemcmmnTask_17" name="Human task" definitionRef="cmmnTask_17">
+        <entryCriterion id="cmmnEntrySentry_18" sentryRef="sentrycmmnEntrySentry_18"></entryCriterion>
+      </planItem>
+      <planItem id="planItemcmmnEventListener_16" name="abcdef" definitionRef="cmmnEventListener_16"></planItem>
+      <sentry id="sentrycmmnEntrySentry_18" name="Entry criterion">
+        <extensionElements>
+          <design:stencilid><![CDATA[EntryCriterion]]></design:stencilid>
+        </extensionElements>
+        <planItemOnPart id="sentryOnPartcmmnEntrySentry_18" sourceRef="planItemcmmnEventListener_16">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="cmmnTask_17" name="Human task" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+        <extensionElements>
+          <flowable:task-candidates-type><![CDATA[all]]></flowable:task-candidates-type>
+          <design:stencilid><![CDATA[HumanTask]]></design:stencilid>
+          <design:stencilsuperid><![CDATA[Task]]></design:stencilsuperid>
+        </extensionElements>
+      </humanTask>
+      <eventListener id="cmmnEventListener_16" name="abcdef">
+        <extensionElements>
+          <design:stencilid><![CDATA[EventListener]]></design:stencilid>
+          <design:display_ref_in_diagram><![CDATA[true]]></design:display_ref_in_diagram>
+        </extensionElements>
+      </eventListener>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_labelCase">
+      <cmmndi:CMMNShape id="CMMNShape_onecaseplanmodel1" cmmnElementRef="onecaseplanmodel1">
+        <dc:Bounds height="462.0" width="871.0" x="270.0" y="120.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemcmmnTask_17" cmmnElementRef="planItemcmmnTask_17">
+        <dc:Bounds height="80.0" width="100.0" x="693.0" y="311.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_cmmnEntrySentry_18" cmmnElementRef="cmmnEntrySentry_18">
+        <dc:Bounds height="28.0" width="18.0" x="684.0" y="337.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItemcmmnEventListener_16" cmmnElementRef="planItemcmmnEventListener_16">
+        <dc:Bounds height="30.0" width="30.0" x="429.0" y="336.0"></dc:Bounds>
+        <cmmndi:CMMNLabel flowable:rotation="30.0">
+          <dc:Bounds height="18.0" width="85.0" x="350.0" y="250.0"></dc:Bounds>
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_cmmnConnector_19" cmmnElementRef="planItemcmmnEventListener_16" targetCMMNElementRef="cmmnEntrySentry_18">
+        <di:extension>
+          <flowable:docker type="source" x="15.0" y="15.0"></flowable:docker>
+          <flowable:docker type="target" x="9.0" y="14.0"></flowable:docker>
+        </di:extension>
+        <di:waypoint x="459.0" y="351.0"></di:waypoint>
+        <di:waypoint x="684.0" y="351.0"></di:waypoint>
+        <cmmndi:CMMNLabel flowable:rotation="45.0">
+          <dc:Bounds height="18.0" width="85.0" x="500.0" y="250.0"></dc:Bounds>
+        </cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

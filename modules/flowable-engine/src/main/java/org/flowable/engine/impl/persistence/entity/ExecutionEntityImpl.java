@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
@@ -47,12 +48,13 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -88,6 +90,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected ExecutionEntityImpl superExecution;
 
     /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+    protected boolean isSubProcessInstanceInitialized;
     protected ExecutionEntityImpl subProcessInstance;
 
     /** The tenant identifier (if any) */
@@ -96,6 +99,10 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String description;
     protected String localizedName;
     protected String localizedDescription;
+
+    protected Date dueDate;
+    protected Date claimTime;
+    protected String claimedBy;
 
     protected Date lockTime;
     protected String lockOwner;
@@ -163,9 +170,14 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected String processDefinitionName;
 
     /**
-     * persisted reference to the process definition version.
+     * Persisted reference to the process definition version.
      */
     protected Integer processDefinitionVersion;
+
+    /**
+     * Persisted reference to the process definition category.
+     */
+    protected String processDefinitionCategory;
 
     /**
      * Persisted reference to the deployment id.
@@ -174,7 +186,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     /**
      * Persisted reference to the current position in the diagram within the {@link #processDefinitionId}.
-     * 
+     *
      * @see #activityId
      * @see #setActivityId(String)
      * @see #getActivityId()
@@ -272,6 +284,9 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         persistentState.put("isEventScope", this.isEventScope);
         persistentState.put("parentId", parentId);
         persistentState.put("name", name);
+        persistentState.put("dueDate", dueDate);
+        persistentState.put("claimTime", claimTime);
+        persistentState.put("claimedBy", claimedBy);
         persistentState.put("lockTime", lockTime);
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("superExecution", this.superExecutionId);
@@ -463,6 +478,19 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public String getProcessDefinitionCategory() {
+        if (StringUtils.isEmpty(processDefinitionCategory) && StringUtils.isNotEmpty(processDefinitionId)) {
+            resolveProcessDefinitionInfo();
+        }
+        return processDefinitionCategory;
+    }
+
+    @Override
+    public void setProcessDefinitionCategory(String processDefinitionCategory) {
+        this.processDefinitionCategory = processDefinitionCategory;
+    }
+
+    @Override
     public String getDeploymentId() {
         if (StringUtils.isEmpty(deploymentId) && StringUtils.isNotEmpty(processDefinitionId)) {
             resolveProcessDefinitionInfo();
@@ -578,8 +606,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     protected void ensureSubProcessInstanceInitialized() {
-        if (subProcessInstance == null) {
-            subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+        if (!isSubProcessInstanceInitialized && activityId != null && subProcessInstance == null) {
+            isSubProcessInstanceInitialized = true;
+            FlowElement flowElement = getCurrentFlowElement();
+            if (flowElement != null && flowElement instanceof CallActivity) {
+                subProcessInstance = (ExecutionEntityImpl) CommandContextUtil.getExecutionEntityManager().findSubProcessInstanceBySuperExecutionId(id);
+            }
         }
     }
 
@@ -644,7 +676,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     // VariableScopeImpl methods //////////////////////////////////////////////////////////////////
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         if (processInstanceId != null) {
             variableInstance.setProcessInstanceId(processInstanceId);
         } else {
@@ -859,7 +891,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         ensureVariableInstancesInitialized();
 
         if (variableInstances.containsKey(variableName)) {
-            throw new FlowableException("variable '" + variableName + "' already exists. Use setVariableLocal if you want to overwrite the value");
+            throw new FlowableException("variable '" + variableName + "' already exists. Use setVariableLocal if you want to overwrite the value for " + this);
         }
 
         createVariableInstance(variableName, value, sourceActivityExecution);
@@ -910,7 +942,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -926,7 +958,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
         CommandContext commandContext = Context.getCommandContext();
         if (commandContext == null) {
-            throw new FlowableException("lazy loading outside command context");
+            throw new FlowableException("lazy loading outside command context for " + this);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -1047,7 +1079,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return isEnded;
     }
 
-    public boolean setIsEnded() {
+    public boolean getIsEnded() {
         return isEnded;
     }
 
@@ -1213,6 +1245,36 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
     }
 
     @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
+
+    @Override
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return claimTime;
+    }
+
+    @Override
+    public void setClaimTime(Date claimTime) {
+        this.claimTime = claimTime;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return claimedBy;
+    }
+
+    @Override
+    public void setClaimedBy(String claimedBy) {
+        this.claimedBy = claimedBy;
+    }
+
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
@@ -1271,10 +1333,15 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         return activityName;
     }
 
+    @Override
     public String getCurrentActivityName() {
         return activityName;
     }
 
+    @Override
+    public void setCurrentActivityName(String activityName) {
+        this.activityName = activityName;
+    }
     @Override
     public String getStartActivityId() {
         return startActivityId;
@@ -1465,12 +1532,13 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
         }
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId, false, processEngineConfiguration);
         if (processDefinition == null) {
-            throw new FlowableException("Cannot get process definition for id " + processDefinitionId);
+            throw new FlowableException("Cannot get process definition for id " + processDefinitionId + " for " + this);
         }
 
         this.processDefinitionKey = processDefinition.getKey();
         this.processDefinitionName = processDefinition.getName();
         this.processDefinitionVersion = processDefinition.getVersion();
+        this.processDefinitionCategory = processDefinition.getCategory();
         this.deploymentId = processDefinition.getDeploymentId();
     }
 
@@ -1478,10 +1546,11 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
 
     @Override
     public String toString() {
+        StringBuilder strb;
         if (isProcessInstanceType()) {
-            return "ProcessInstance[" + getId() + "]";
+            strb = new StringBuilder("ProcessInstance[" + getId() + "] - definition '" + getProcessDefinitionId() + "'");
         } else {
-            StringBuilder strb = new StringBuilder();
+            strb = new StringBuilder();
             if (isScope) {
                 strb.append("Scoped execution[ id '").append(getId());
             } else if (isMultiInstanceRoot) {
@@ -1490,6 +1559,7 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
                 strb.append("Execution[ id '").append(getId());
             }
             strb.append("' ]");
+            strb.append(" - definition '").append(getProcessDefinitionId()).append("'");
             
             if (activityId != null) {
                 strb.append(" - activity '").append(activityId).append("'");
@@ -1497,8 +1567,12 @@ public class ExecutionEntityImpl extends AbstractBpmnEngineVariableScopeEntity i
             if (parentId != null) {
                 strb.append(" - parent '").append(parentId).append("'");
             }
-            return strb.toString();
         }
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            strb.append(" - tenantId '").append(tenantId).append("'");
+        }
+        return strb.toString();
     }
 
 

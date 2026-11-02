@@ -17,13 +17,13 @@
         USER_ID_,
         TOKEN_DATA_
       ) values (
-        #{id ,jdbcType=VARCHAR},
-        1, #{tokenValue, jdbcType=VARCHAR},
+        #{id, jdbcType=NVARCHAR},
+        1, #{tokenValue, jdbcType=NVARCHAR},
         #{tokenDate, jdbcType=TIMESTAMP},
-        #{ipAddress, jdbcType=VARCHAR},
-        #{userAgent, jdbcType=VARCHAR},
-        #{userId, jdbcType=VARCHAR},
-        #{tokenData, jdbcType=VARCHAR}
+        #{ipAddress, jdbcType=NVARCHAR},
+        #{userAgent, jdbcType=NVARCHAR},
+        #{userId, jdbcType=NVARCHAR},
+        #{tokenData, jdbcType=NVARCHAR}
       )
   </insert>
   
@@ -40,13 +40,13 @@
       ) values 
       <foreach collection="list" item="token" index="index" separator=",">
       (
-        #{token.id ,jdbcType=VARCHAR},
-        1, #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.id, jdbcType=NVARCHAR},
+        1, #{token.tokenValue, jdbcType=NVARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
-        #{token.ipAddress, jdbcType=VARCHAR},
-        #{token.userAgent, jdbcType=VARCHAR},
-        #{token.userId, jdbcType=VARCHAR},
-        #{token.tokenData, jdbcType=VARCHAR}
+        #{token.ipAddress, jdbcType=NVARCHAR},
+        #{token.userAgent, jdbcType=NVARCHAR},
+        #{token.userId, jdbcType=NVARCHAR},
+        #{token.tokenData, jdbcType=NVARCHAR}
       )
       </foreach>
   </insert>
@@ -64,13 +64,13 @@
             USER_ID_,
             TOKEN_DATA_
       ) VALUES (
-        #{token.id ,jdbcType=VARCHAR},
-        1, #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.id, jdbcType=NVARCHAR},
+        1, #{token.tokenValue, jdbcType=NVARCHAR},
         #{token.tokenDate, jdbcType=TIMESTAMP},
-        #{token.ipAddress, jdbcType=VARCHAR},
-        #{token.userAgent, jdbcType=VARCHAR},
-        #{token.userId, jdbcType=VARCHAR},
-        #{token.tokenData, jdbcType=VARCHAR}
+        #{token.ipAddress, jdbcType=NVARCHAR},
+        #{token.userAgent, jdbcType=NVARCHAR},
+        #{token.userId, jdbcType=NVARCHAR},
+        #{token.tokenData, jdbcType=NVARCHAR}
       )
       </foreach>
       SELECT * FROM dual
@@ -83,38 +83,38 @@
     update ${prefix}ACT_ID_TOKEN
     <set>
       REV_ = #{revisionNext, jdbcType=INTEGER},
-      TOKEN_VALUE_ = #{tokenValue, jdbcType=VARCHAR},
+      TOKEN_VALUE_ = #{tokenValue, jdbcType=NVARCHAR},
       TOKEN_DATE_ = #{tokenDate, jdbcType=TIMESTAMP},
-      IP_ADDRESS_ = #{ipAddress, jdbcType=VARCHAR},
-      USER_AGENT_ = #{userAgent, jdbcType=VARCHAR},
-      USER_ID_ = #{userId, jdbcType=VARCHAR},
-      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR},
+      IP_ADDRESS_ = #{ipAddress, jdbcType=NVARCHAR},
+      USER_AGENT_ = #{userAgent, jdbcType=NVARCHAR},
+      USER_ID_ = #{userId, jdbcType=NVARCHAR},
+      TOKEN_DATA_ = #{tokenData, jdbcType=NVARCHAR},
     </set>
-    where ID_ = #{id, jdbcType=VARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=NVARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- TOKEN DELETE -->
   
   <delete id="deleteToken" parameterType="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
-    delete from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
+    delete from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
 
   <!-- TOKEN SELECT -->
   
   <resultMap id="tokenResultMap" type="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="tokenValue" column="TOKEN_VALUE_" jdbcType="VARCHAR" />
+    <result property="tokenValue" column="TOKEN_VALUE_" jdbcType="NVARCHAR" />
     <result property="tokenDate" column="TOKEN_DATE_" jdbcType="TIMESTAMP" />
-    <result property="ipAddress" column="IP_ADDRESS_" jdbcType="VARCHAR" />
-    <result property="userAgent" column="USER_AGENT_" jdbcType="VARCHAR" />
-    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
-    <result property="tokenData" column="TOKEN_DATA_" jdbcType="VARCHAR" />
+    <result property="ipAddress" column="IP_ADDRESS_" jdbcType="NVARCHAR" />
+    <result property="userAgent" column="USER_AGENT_" jdbcType="NVARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="NVARCHAR" />
+    <result property="tokenData" column="TOKEN_DATA_" jdbcType="NVARCHAR" />
   </resultMap>
   
   <select id="selectToken" parameterType="string" resultMap="tokenResultMap">
-    select * from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
   
   <select id="selectTokenByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultMap="tokenResultMap">
@@ -134,50 +134,50 @@
     from ${prefix}ACT_ID_TOKEN RES 
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids" 
                  open="(" separator="," close=")">
-          #{id}
+          #{id, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="tokenValue != null">
-        and RES.TOKEN_VALUE_ = #{tokenValue}
+        and RES.TOKEN_VALUE_ = #{tokenValue, jdbcType=NVARCHAR}
       </if>
       <if test="tokenDate != null">
-        and RES.TOKEN_DATE_ = #{tokenDate}
+        and RES.TOKEN_DATE_ = #{tokenDate, jdbcType=TIMESTAMP}
       </if>
       <if test="tokenDateBefore != null">
-        and RES.TOKEN_DATE_ &lt; #{tokenDateBefore}
+        and RES.TOKEN_DATE_ &lt; #{tokenDateBefore, jdbcType=TIMESTAMP}
       </if>
       <if test="tokenDateAfter != null">
-        and RES.TOKEN_DATE_ &gt; #{tokenDateAfter}
+        and RES.TOKEN_DATE_ &gt; #{tokenDateAfter, jdbcType=TIMESTAMP}
       </if>
       <if test="ipAddress != null">
-        and RES.IP_ADDRESS_ = #{ipAddress}
+        and RES.IP_ADDRESS_ = #{ipAddress, jdbcType=NVARCHAR}
       </if>
       <if test="ipAddressLike != null">
-        and RES.IP_ADDRESS_ like #{ipAddressLike}${wildcardEscapeClause}
+        and RES.IP_ADDRESS_ like #{ipAddressLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="userAgent != null">
-        and RES.USER_AGENT_ = #{userAgent}
+        and RES.USER_AGENT_ = #{userAgent, jdbcType=NVARCHAR}
       </if>
       <if test="userAgentLike != null">
-        and RES.USER_AGENT_ like #{userAgentLike}${wildcardEscapeClause}
+        and RES.USER_AGENT_ like #{userAgentLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="userId != null">
-        and RES.USER_ID_ = #{userId}
+        and RES.USER_ID_ = #{userId, jdbcType=NVARCHAR}
       </if>
       <if test="userIdLike != null">
-        and RES.USER_ID_ like #{userIdLike}${wildcardEscapeClause}
+        and RES.USER_ID_ like #{userIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="tokenData != null">
-        and RES.TOKEN_DATA_ = #{tokenData}
+        and RES.TOKEN_DATA_ = #{tokenData, jdbcType=NVARCHAR}
       </if>
       <if test="tokenDataLike != null">
-        and RES.TOKEN_DATA_ like #{tokenDataLike}${wildcardEscapeClause}
+        and RES.TOKEN_DATA_ like #{tokenDataLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
     </where>
   </sql>

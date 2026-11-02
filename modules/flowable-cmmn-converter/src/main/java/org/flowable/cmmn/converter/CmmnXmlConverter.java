@@ -41,13 +41,12 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.export.AssociationExport;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
 import org.flowable.cmmn.converter.export.DefinitionsRootExport;
-import org.flowable.cmmn.converter.export.StageExport;
+import org.flowable.cmmn.converter.export.PlanItemDefinitionExport;
 import org.flowable.cmmn.converter.export.TextAnnotationExport;
 import org.flowable.cmmn.converter.util.PlanItemDependencyUtil;
 import org.flowable.cmmn.model.Association;
@@ -71,7 +70,6 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
-import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TextAnnotation;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.common.engine.api.FlowableException;
@@ -90,7 +88,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
     protected static Map<String, BaseCmmnXmlConverter> elementConverters = new HashMap<>();
-    protected static Map<String, BaseCmmnXmlConverter> textConverters = new HashMap<>();
+
+    protected CmmnXmlConverterOptions options = new CmmnXmlConverterOptions();
 
     protected ClassLoader classloader;
 
@@ -129,26 +128,21 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
+        addElementConverter(new CmmnDiLabelXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
         addElementConverter(new CmmnDiExtensionXmlConverter());
-
-        addTextConverter(new StandardEventXmlConverter());
-        addTextConverter(new ProcessRefExpressionXmlConverter());
-        addTextConverter(new CaseRefExpressionXmlConverter());
-        addTextConverter(new DecisionRefExpressionXmlConverter());
-        addTextConverter(new ConditionXmlConverter());
-        addTextConverter(new TimerExpressionXmlConverter());
-        addTextConverter(new TextXmlConverter());
-
+        addElementConverter(new StandardEventXmlConverter());
+        addElementConverter(new ProcessRefExpressionXmlConverter());
+        addElementConverter(new CaseRefExpressionXmlConverter());
+        addElementConverter(new DecisionRefExpressionXmlConverter());
+        addElementConverter(new ConditionXmlConverter());
+        addElementConverter(new TimerExpressionXmlConverter());
+        addElementConverter(new TextXmlConverter());
         addElementConverter(new ExtensionElementsXMLConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
         elementConverters.put(converter.getXMLElementName(), converter);
-    }
-
-    public static void addTextConverter(BaseCmmnXmlConverter converter) {
-        textConverters.put(converter.getXMLElementName(), converter);
     }
 
     public CmmnModel convertToCmmnModel(InputStreamProvider inputStreamProvider) {
@@ -171,6 +165,12 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         if (xif.isPropertySupported(XMLInputFactory.SUPPORT_DTD)) {
             xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
         }
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_DTD)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+        }
+        if (xif.isPropertySupported(XMLConstants.ACCESS_EXTERNAL_SCHEMA)) {
+            xif.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+        }
 
         if (encoding == null) {
             encoding = DEFAULT_ENCODING;
@@ -181,7 +181,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 if (!enableSafeBpmnXml) {
                     validateModel(inputStreamProvider);
                 } else {
-                    validateModel(xif.createXMLStreamReader(in));
+                    validateModel(new FlowableXMLStreamReader(xif.createXMLStreamReader(in)));
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new CmmnXMLException("The CMMN 1.1 xml is not properly encoded", e);
@@ -229,11 +229,6 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     currentXmlElement = null;
                     if (elementConverters.containsKey(xtr.getLocalName())) {
                         elementConverters.get(xtr.getLocalName()).elementEnd(xtr, conversionHelper);
-                    }
-
-                } else if ((xtr.isCharacters() || xtr.getEventType() == XMLStreamReader.CDATA) && currentXmlElement != null) {
-                    if (textConverters.containsKey(currentXmlElement)) {
-                        textConverters.get(currentXmlElement).convertToCmmnModel(xtr, conversionHelper);
                     }
 
                 }
@@ -306,7 +301,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
                 Stage planModel = caseModel.getPlanModel();
 
-                StageExport.getInstance().writePlanItemDefinition(model, planModel, xtw);
+                PlanItemDefinitionExport.writePlanItemDefinition(model, planModel, xtw, options);
 
                 // end case element
                 xtw.writeEndElement();
@@ -405,6 +400,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         // set DI elements
         for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
             cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
+            if (diShape.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diShape.getCmmnElementRef(), diShape.getLabelGraphicInfo());
+            }
         }
 
         processDiEdges(cmmnModel, conversionHelper.getDiEdges());
@@ -450,6 +448,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
             cmmnModel.addEdgeInfo(diEdge.getId(), diEdge);
             cmmnModel.addFlowGraphicInfoList(diEdge.getId(), diEdge.getWaypoints());
+            if (diEdge.getLabelGraphicInfo() != null) {
+                cmmnModel.addLabelGraphicInfo(diEdge.getId(), diEdge.getLabelGraphicInfo());
+            }
         }
     }
 
@@ -478,6 +479,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     Association association = new Association();
                     association.setTargetElement(criterion);
                     association.setTargetRef(criterion.getId());
+                    criterion.addIncomingAssociation(association);
 
                     association.setSourceElement(source);
                     association.setSourceRef(source.getId());
@@ -493,8 +495,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
 
-        if (planFragment instanceof Stage) {
-            Stage stage = (Stage) planFragment;
+        if (planFragment instanceof Stage stage) {
             for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
                 if (planItemDefinition instanceof PlanFragment) {
                     processPlanFragment(cmmnModel, (PlanFragment) planItemDefinition);
@@ -530,29 +531,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
 
         if (!planItem.getExitCriteria().isEmpty()) {
-            boolean exitCriteriaAllowed = true;
-            if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
-                    exitCriteriaAllowed = false;
-                }
-            }
-
-            if (exitCriteriaAllowed) {
-                resolveExitCriteriaSentry(planItem);
-            } else {
-                LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
-                planItem.getExitCriteria().clear();
-            }
+            resolveExitCriteriaSentry(planItem);
         }
 
-        if (planItemDefinition instanceof Stage) {
-            Stage planItemStage = (Stage) planItemDefinition;
+        if (planItemDefinition instanceof Stage planItemStage) {
             planItemStage.setPlanItem(planItem);
             processPlanFragment(cmmnModel, planItemStage);
 
-        } else if (planItemDefinition instanceof ProcessTask) {
-            ProcessTask processTask = (ProcessTask) planItemDefinition;
+        } else if (planItemDefinition instanceof ProcessTask processTask) {
             if (processTask.getProcessRef() != null) {
                 org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
                 if (process != null) {
@@ -560,8 +546,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof DecisionTask) {
-            DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+        } else if (planItemDefinition instanceof DecisionTask decisionTask) {
             if (decisionTask.getDecisionRef() != null) {
                 org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
                 if (decision != null) {
@@ -569,8 +554,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             }
 
-        } else if (planItemDefinition instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+        } else if (planItemDefinition instanceof TimerEventListener timerEventListener) {
             String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
             PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
             if (startTriggerPlanItem != null) {
@@ -721,6 +705,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
         }
+    }
+
+    public CmmnXmlConverterOptions getCmmnXmlConverterOptions() {
+        return options;
+    }
+
+    public void setCmmnXmlConverterOptions(CmmnXmlConverterOptions options) {
+        this.options = options;
     }
 
     public void setClassloader(ClassLoader classloader) {

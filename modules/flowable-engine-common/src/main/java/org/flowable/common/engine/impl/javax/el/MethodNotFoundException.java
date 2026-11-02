@@ -1,11 +1,12 @@
 /*
- * Copyright 2006-2009 Odysseus Software GmbH
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,47 +16,25 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
-/**
- * Thrown when a method could not be found while evaluating a {@link MethodExpression}.
- */
-public class MethodNotFoundException extends ELException {
-	private static final long serialVersionUID = 1L;
+import java.io.Serial;
 
-	/**
-	 * Creates a MethodNotFoundException with no detail message.
-	 */
+public class MethodNotFoundException extends ELException {
+
+    @Serial
+    private static final long serialVersionUID = -3631968116081480328L;
+
 	public MethodNotFoundException() {
 		super();
 	}
 
-	/**
-	 * Creates a MethodNotFoundException with the provided detail message.
-	 * 
-	 * @param message
-	 *            the detail message
-	 */
 	public MethodNotFoundException(String message) {
 		super(message);
 	}
 
-	/**
-	 * Creates a MethodNotFoundException with the given root cause.
-	 * 
-	 * @param cause
-	 *            the originating cause of this exception
-	 */
 	public MethodNotFoundException(Throwable cause) {
 		super(cause);
 	}
 
-	/**
-	 * Creates a MethodNotFoundException with the given detail message and root cause.
-	 * 
-	 * @param message
-	 *            the detail message
-	 * @param cause
-	 *            the originating cause of this exception
-	 */
 	public MethodNotFoundException(String message, Throwable cause) {
 		super(message, cause);
 	}

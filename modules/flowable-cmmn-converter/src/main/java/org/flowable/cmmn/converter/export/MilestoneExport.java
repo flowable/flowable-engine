@@ -42,5 +42,8 @@ public class MilestoneExport extends AbstractPlanItemDefinitionExport<Milestone>
         if (StringUtils.isNotEmpty(milestone.getMilestoneVariable())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_MILESTONE_VARIABLE, milestone.getMilestoneVariable());
         }
+        if (StringUtils.isNotEmpty(milestone.getBusinessStatus())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_BUSINESS_STATUS, milestone.getBusinessStatus());
+        }
     }
 }

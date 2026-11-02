@@ -25,6 +25,7 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -83,7 +84,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Filip Hrisafov
  */
-public class FlowableCmmnExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback {
+public class FlowableCmmnExtension implements ParameterResolver, BeforeEachCallback, AfterEachCallback, AfterAllCallback {
 
     public static final String DEFAULT_CONFIGURATION_RESOURCE = "flowable.cmmn.cfg.xml";
 
@@ -130,6 +131,11 @@ public class FlowableCmmnExtension implements ParameterResolver, BeforeEachCallb
     }
 
     @Override
+    public void afterAll(ExtensionContext context) {
+        getStore(context).remove(context.getRequiredTestClass());
+    }
+
+    @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) {
         Class<?> parameterType = parameterContext.getParameter().getType();
         return SUPPORTED_PARAMETERS.contains(parameterType) || FlowableCmmnTestHelper.class.equals(parameterType)
@@ -166,7 +172,7 @@ public class FlowableCmmnExtension implements ParameterResolver, BeforeEachCallb
 
     protected FlowableCmmnTestHelper getTestHelper(ExtensionContext context) {
         return getStore(context)
-            .getOrComputeIfAbsent(context.getRequiredTestClass(),
+            .computeIfAbsent(context.getRequiredTestClass(),
                 key -> new FlowableCmmnTestHelper(createCmmnEngine(context)), FlowableCmmnTestHelper.class);
     }
 

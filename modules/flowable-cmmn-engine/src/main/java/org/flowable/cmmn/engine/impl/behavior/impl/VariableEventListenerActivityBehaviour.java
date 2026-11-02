@@ -35,19 +35,17 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.eventsubscription.service.EventSubscriptionService;
 import org.flowable.eventsubscription.service.impl.persistence.entity.EventSubscriptionEntity;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link CmmnActivityBehavior} implementation for the CMMN extension Variable Event Listener.
  */
 public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableActivityBehavior implements PlanItemActivityBehavior {
 
-    protected String variableName;
-    protected String variableChangeType;
+    protected VariableEventListener variableEventListener;
 
     public VariableEventListenerActivityBehaviour(VariableEventListener variableEventListener) {
-        this.variableName = variableEventListener.getVariableName();
-        this.variableChangeType = variableEventListener.getVariableChangeType();
+        this.variableEventListener = variableEventListener;
     }
 
     @Override
@@ -62,17 +60,18 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
                 eventSubscriptionService.deleteEventSubscription(eventSubscription);
             }
 
-        } else if (PlanItemTransition.CREATE.equals(transition)) {
+        } else if ((PlanItemTransition.CREATE.equals(transition) && StringUtils.isEmpty(variableEventListener.getAvailableConditionExpression()))
+                || PlanItemTransition.INITIATE.equals(transition)) {
             String configuration = null;
-            if (StringUtils.isNotEmpty(variableChangeType)) {
+            if (StringUtils.isNotEmpty(variableEventListener.getVariableChangeType())) {
                 ObjectNode configurationNode = cmmnEngineConfiguration.getObjectMapper().createObjectNode();
-                configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableChangeType);
+                configurationNode.put(VariableListenerEventDefinition.CHANGE_TYPE_PROPERTY, variableEventListener.getVariableChangeType());
                 configuration = configurationNode.toString();
             }
             
             cmmnEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService().createEventSubscriptionBuilder()
                 .eventType("variable")
-                .eventName(variableName)
+                .eventName(variableEventListener.getVariableName())
                 .configuration(configuration)
                 .subScopeId(planItemInstance.getId())
                 .scopeId(planItemInstance.getCaseInstanceId())
@@ -94,13 +93,12 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
         RepetitionRule repetitionRule = ExpressionUtil.getRepetitionRule(planItemInstanceEntity);
         if (repetitionRule != null && ExpressionUtil.evaluateRepetitionRule(commandContext, planItemInstanceEntity, planItemInstanceEntity.getStagePlanItemInstanceEntity())) {
             PlanItemInstanceEntity eventPlanItemInstanceEntity = PlanItemInstanceUtil.copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false, false);
-            eventPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
             agenda.planCreatePlanItemInstanceWithoutEvaluationOperation(eventPlanItemInstanceEntity);
             agenda.planOccurPlanItemInstanceOperation(eventPlanItemInstanceEntity);
             
             CommandContextUtil.getCmmnEngineConfiguration(commandContext).getListenerNotificationHelper().executeLifecycleListeners(
-                    commandContext, planItemInstanceEntity, null, PlanItemInstanceState.AVAILABLE);
+                    commandContext, planItemInstanceEntity, PlanItemInstanceState.ACTIVE, PlanItemInstanceState.AVAILABLE);
             
         } else {
             CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
@@ -108,7 +106,7 @@ public class VariableEventListenerActivityBehaviour extends CoreCmmnTriggerableA
             
             List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionService.findEventSubscriptionsBySubScopeId(planItemInstanceEntity.getId());
             for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
-                if ("variable".equals(eventSubscription.getEventType()) && variableName.equals(eventSubscription.getEventName())) {
+                if ("variable".equals(eventSubscription.getEventType()) && variableEventListener.getVariableName().equals(eventSubscription.getEventName())) {
                     eventSubscriptionService.deleteEventSubscription(eventSubscription);
                 }
             }

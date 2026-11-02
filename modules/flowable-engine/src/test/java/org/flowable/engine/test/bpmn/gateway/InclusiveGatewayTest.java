@@ -56,7 +56,7 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -142,7 +142,7 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         taskService.complete(task1.getId());
 
         // Testing a bug: when the command is nested, the reuse flag gets set to true for the inner command context, never triggering the InactiveBehavior
-        managementService.executeCommand(new Command<Object>() {
+        managementService.executeCommand(new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
@@ -751,10 +751,11 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
         assertThat(tasks).hasSize(1);
 
-        String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+        String executionId = processEngine.getManagementService().executeCommand(new Command<>() {
             @Override
             public String execute(CommandContext commandContext) {
-                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext, processEngineConfiguration.getEventSubscriptionServiceConfiguration());
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext,
+                        processEngineConfiguration.getEventSubscriptionServiceConfiguration());
                 q.processInstanceId(instance.getProcessInstanceId());
 
                 List<EventSubscription> subs = processEngineConfiguration.getEventSubscriptionServiceConfiguration().getEventSubscriptionService()
@@ -1208,11 +1209,11 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
             .flatMap(rootProcess -> runtimeService.createExecutionQuery().processInstanceId(rootProcess.getId()).onlyChildExecutions().list().stream())
             .collect(Collectors.toList());
         //1x MultiInstance root, 2x parallel MultiInstance, 2x CalledActivitySubProcesses and 4x UserTasks executions
-        assertThat(childExecutions).hasSize(9);
+        assertThat(childExecutions).hasSize(10);
         classifiedExecutions = childExecutions.stream().collect(Collectors.groupingBy(Execution::getActivityId));
         assertThat(classifiedExecutions)
                 .containsKeys("multiInstanceSubProcess", "callActivity", "taskInclusive1", "taskInclusive2", "taskInclusive3");
-        assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(3);
+        assertThat(classifiedExecutions.get("multiInstanceSubProcess")).hasSize(4);
         assertThat(classifiedExecutions.get("callActivity")).hasSize(2);
         assertThat(classifiedExecutions.get("taskInclusive1")).hasSize(1);
         assertThat(classifiedExecutions.get("taskInclusive2")).hasSize(2);

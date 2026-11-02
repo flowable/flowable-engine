@@ -23,7 +23,9 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.eventregistry.api.EventManagementService;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRepositoryService;
+import org.flowable.eventregistry.impl.EventRegistryEngine;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
+import org.flowable.eventregistry.impl.EventRegistryEngines;
 import org.flowable.eventregistry.rest.TestInboundEventChannelAdapter;
 import org.flowable.eventregistry.spring.SpringEventRegistryEngineConfiguration;
 import org.flowable.eventregistry.spring.configurator.SpringEventRegistryConfigurator;
@@ -40,6 +42,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.zaxxer.hikari.HikariDataSource;
+
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration(proxyBeanMethods = false)
 public class EngineConfiguration {
@@ -59,7 +63,8 @@ public class EngineConfiguration {
     @Bean
     public DataSource dataSource() {
         HikariDataSource dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl("jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000");
+        dataSource.setMinimumIdle(0);
+        dataSource.setJdbcUrl(jdbcUrl);
         dataSource.setDriverClassName(jdbcDriver);
         dataSource.setUsername(jdbcUsername);
         dataSource.setPassword(jdbcPassword);
@@ -144,6 +149,14 @@ public class EngineConfiguration {
     }
     
     @Bean
+    public EventRegistryEngine eventRegistryEngine(ProcessEngine processEngine) {
+        // The process engine needs to be injected, as otherwise it won't be initialized, which means that the EventRegistryEngine is not initialized yet
+        if (!EventRegistryEngines.isInitialized()) {
+            throw new IllegalStateException("Event registry has not been initialized");
+        }
+        return EventRegistryEngines.getDefaultEventRegistryEngine();
+    }
+    @Bean
     public EventRepositoryService eventRepositoryService(ProcessEngine processEngine) {
         return getEventRegistryEngineConfiguration(processEngine).getEventRepositoryService();
     }
@@ -159,18 +172,13 @@ public class EngineConfiguration {
     }
     
     @Bean
-    public EventRegistryEngineConfiguration eventRegistryEngineConfiguration(ProcessEngine processEngine) {
-        return getEventRegistryEngineConfiguration(processEngine);
-    }
-    
-    @Bean
     public IdmIdentityService idmIdentityService(ProcessEngine processEngine) {
         return getIdmEngineConfiguration(processEngine).getIdmIdentityService();
     }
     
     @Bean(name = "testInboundEventChannelAdapter")
-    public TestInboundEventChannelAdapter testInboundEventChannelAdapter() {
-        return new TestInboundEventChannelAdapter();
+    public TestInboundEventChannelAdapter testInboundEventChannelAdapter(ObjectMapper objectMapper) {
+        return new TestInboundEventChannelAdapter(objectMapper);
     }
     
     protected EventRegistryEngineConfiguration getEventRegistryEngineConfiguration(ProcessEngine processEngine) {

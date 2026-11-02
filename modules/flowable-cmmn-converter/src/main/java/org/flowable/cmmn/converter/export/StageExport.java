@@ -15,6 +15,7 @@ package org.flowable.cmmn.converter.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.converter.CmmnXmlConverterOptions;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -29,7 +30,7 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         return instance;
     }
 
-    private StageExport() {
+    protected StageExport() {
     }
 
     @Override
@@ -75,11 +76,14 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         if (StringUtils.isNotEmpty(stage.getIncludeInStageOverview()) && !"true".equalsIgnoreCase(stage.getIncludeInStageOverview())) { // if it's missing, it's true by default
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INCLUDE_IN_STAGE_OVERVIEW, stage.getIncludeInStageOverview());
         }
+        if (StringUtils.isNotEmpty(stage.getBusinessStatus())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_BUSINESS_STATUS, stage.getBusinessStatus());
+        }
     }
 
     @Override
-    protected void writePlanItemDefinitionBody(CmmnModel model, Stage stage, XMLStreamWriter xtw) throws Exception {
-        super.writePlanItemDefinitionBody(model, stage, xtw);
+    protected void writePlanItemDefinitionBody(CmmnModel model, Stage stage, XMLStreamWriter xtw, CmmnXmlConverterOptions options) throws Exception {
+        super.writePlanItemDefinitionBody(model, stage, xtw, options);
         for (PlanItem planItem : stage.getPlanItems()) {
             PlanItemExport.writePlanItem(model, planItem, xtw);
         }
@@ -89,7 +93,7 @@ public class StageExport extends AbstractPlanItemDefinitionExport<Stage> {
         }
 
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
-            PlanItemDefinitionExport.writePlanItemDefinition(model, planItemDefinition, xtw);
+            PlanItemDefinitionExport.writePlanItemDefinition(model, planItemDefinition, xtw, options);
         }
 
         if (stage.isPlanModel() && stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {

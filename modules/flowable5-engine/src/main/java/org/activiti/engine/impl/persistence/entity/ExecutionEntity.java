@@ -1310,7 +1310,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(),
-                            result.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()),
+                            result.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId(), result.getId()),
                     EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return result;
@@ -1325,7 +1325,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         if (Context.getProcessEngineConfiguration() != null && Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(),
-                            variableInstance.getTaskId(), variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()),
+                            variableInstance.getTaskId(), variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId(), variableInstance.getId()),
                     EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
     }

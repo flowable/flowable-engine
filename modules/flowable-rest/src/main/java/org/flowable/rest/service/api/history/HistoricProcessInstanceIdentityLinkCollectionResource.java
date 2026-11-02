@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.history;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;
@@ -38,7 +36,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceIdentityLinkCollectionResource extends HistoricProcessInstanceBaseResource {
 
     @Autowired
@@ -52,8 +50,12 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource extends Histo
             @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/identitylinks", produces = "application/json")
-    public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
-        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequest(processInstanceId);
+    public List<HistoricIdentityLinkResponse> getProcessIdentityLinks(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId) {
+        HistoricProcessInstance processInstance = getHistoricProcessInstanceFromRequestWithoutAccessCheck(processInstanceId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoricProcessIdentityLinks(processInstance);
+        }
         
         List<HistoricIdentityLink> identityLinks = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
 

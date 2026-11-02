@@ -64,7 +64,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
             throw new FlowableObjectNotFoundException("Cannot find processInstance for id '" + processInstanceId + "'.", Execution.class);
         }
         if (!executionEntity.isProcessInstanceType()) {
-            throw new FlowableException("Cannot set suspension state for execution '" + processInstanceId + "': not a process instance.");
+            throw new FlowableException("Cannot set suspension state for execution '" + executionEntity + "': not a process instance.");
         }
 
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, executionEntity.getProcessDefinitionId())) {

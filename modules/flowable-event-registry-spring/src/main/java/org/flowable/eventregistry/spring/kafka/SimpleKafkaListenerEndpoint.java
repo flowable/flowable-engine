@@ -41,6 +41,7 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint,
     protected Integer concurrency;
     protected Properties consumerProperties;
     protected boolean splitIterables = true;
+    protected String mainListenerId;
 
     protected GenericMessageListener<ConsumerRecord<K, V>> messageListener;
 
@@ -126,6 +127,11 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint,
     }
 
     @Override
+    public String getAckMode() {
+        return null;
+    }
+
+    @Override
     public Properties getConsumerProperties() {
         return consumerProperties;
     }
@@ -148,6 +154,15 @@ public class SimpleKafkaListenerEndpoint<K, V> implements KafkaListenerEndpoint,
 
     public void setSplitIterables(boolean splitIterables) {
         this.splitIterables = splitIterables;
+    }
+
+    @Override
+    public String getMainListenerId() {
+        return mainListenerId;
+    }
+
+    public void setMainListenerId(String mainListenerId) {
+        this.mainListenerId = mainListenerId;
     }
 
     @Override

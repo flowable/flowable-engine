@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="Test case" flowable:initiatorVariableName="initiator" flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <planItem id="planItemcmmnStage_2" name="Stage" definitionRef="cmmnStage_2">
+                <entryCriterion id="cmmnEntrySentry_3" sentryRef="sentrycmmnEntrySentry_3"/>
+            </planItem>
+            <planItem id="planItemcmmnTask_1" name="Task 1" definitionRef="cmmnTask_1"/>
+            <sentry id="sentrycmmnEntrySentry_3" name="Entry criterion">
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_3" sourceRef="planItemcmmnTask_1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="cmmnStage_2" name="Stage">
+                <planItem id="planItemcmmnTask_5" name="Task 2" definitionRef="cmmnTask_5"/>
+                <humanTask id="cmmnTask_5" name="Task 2" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+                </humanTask>
+            </stage>
+            <humanTask id="cmmnTask_1" name="Task 1" flowable:assignee="${initiator}" flowable:formFieldValidation="false">
+            </humanTask>
+        </casePlanModel>
+    </case>
+</definitions>

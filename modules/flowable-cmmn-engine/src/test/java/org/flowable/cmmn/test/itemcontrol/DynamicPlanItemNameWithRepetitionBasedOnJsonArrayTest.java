@@ -21,11 +21,10 @@ import java.util.List;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.junit.Test;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * Testing dynamic, expression based plan item name with local, collection based variables as well as case based ones.
@@ -37,8 +36,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment
     public void testDynamicNameWithRepetitionCollection() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("foo", "a");
         arrayNode.addObject().put("name", "B").put("foo", "b");
@@ -60,8 +58,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment
     public void testDynamicNameWithRepetitionCollectionNoFallbackExpression() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("bar", "a");
         arrayNode.addObject().put("name", "B").put("bar", "b");
@@ -83,8 +80,7 @@ public class DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest extends Flowa
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/itemcontrol/DynamicPlanItemNameWithRepetitionBasedOnJsonArrayTest.testDynamicNameWithRepetitionCollectionNoFallbackExpression.cmmn")
     public void testDynamicNameWithRepetitionCollectionNoFallbackExpressionWithAvailablePlanItem() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ArrayNode arrayNode = objectMapper.createArrayNode();
+        ArrayNode arrayNode = cmmnEngineConfiguration.getObjectMapper().createArrayNode();
 
         arrayNode.addObject().put("name", "A").put("bar", "a");
         arrayNode.addObject().put("name", "B").put("bar", "b");

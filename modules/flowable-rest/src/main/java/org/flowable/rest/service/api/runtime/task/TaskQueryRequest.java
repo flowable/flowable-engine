@@ -16,6 +16,7 @@ package org.flowable.rest.service.api.runtime.task;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.rest.api.PaginateRequest;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
@@ -28,8 +29,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  */
 public class TaskQueryRequest extends PaginateRequest {
 
+    protected String taskId;
     protected String name;
     protected String nameLike;
+    protected String nameLikeIgnoreCase;
     protected String description;
     protected String descriptionLike;
     protected Integer priority;
@@ -73,6 +76,7 @@ public class TaskQueryRequest extends PaginateRequest {
     protected Boolean includeProcessVariables;
     protected String scopeDefinitionId;
     protected String scopeId;
+    protected Set<String> scopeIds;
     protected Boolean withoutScopeId;
     protected String scopeType;
     protected String propagatedStageInstanceId;
@@ -84,9 +88,19 @@ public class TaskQueryRequest extends PaginateRequest {
     protected List<String> categoryIn;
     protected List<String> categoryNotIn;
     protected Boolean withoutCategory;
+    protected String rootScopeId;
+    protected String parentScopeId;
 
     private List<QueryVariable> taskVariables;
     private List<QueryVariable> processInstanceVariables;
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getName() {
         return name;
@@ -102,6 +116,14 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setNameLike(String nameLike) {
         this.nameLike = nameLike;
+    }
+
+    public String getNameLikeIgnoreCase() {
+        return nameLikeIgnoreCase;
+    }
+
+    public void setNameLikeIgnoreCase(String nameLikeIgnoreCase) {
+        this.nameLikeIgnoreCase = nameLikeIgnoreCase;
     }
 
     public String getDescription() {
@@ -552,5 +574,29 @@ public class TaskQueryRequest extends PaginateRequest {
 
     public void setWithoutCategory(Boolean withoutCategory) {
         this.withoutCategory = withoutCategory;
+    }
+
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
+
+    public void setScopeIds(Set<String> scopeIds) {
+        this.scopeIds = scopeIds;
     }
 }

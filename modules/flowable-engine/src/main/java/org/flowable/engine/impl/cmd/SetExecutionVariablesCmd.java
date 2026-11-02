@@ -67,7 +67,7 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
         // locking doesn't work on inserts
         execution.forceUpdate();
         
-        if (VariableListenerUtil.hasVariableListenerEventDefinitions(execution.getProcessDefinitionId())) {
+        if (VariableListenerUtil.hasVariableListenerEventDefinitionsForVariableNames(execution.getProcessDefinitionId(), variables.keySet())) {
             CommandContextUtil.getAgenda(commandContext).planEvaluateVariableListenerEventsOperation(
                     execution.getProcessDefinitionId(), execution.getProcessInstanceId());
         }
@@ -76,8 +76,8 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
     }
 
     @Override
-    protected String getSuspendedExceptionMessage() {
-        return "Cannot set variables because execution '" + executionId + "' is suspended";
+    protected String getSuspendedExceptionMessagePrefix() {
+        return "Cannot set variables to";
     }
 
 }

@@ -26,6 +26,7 @@ import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -50,6 +51,7 @@ public class BaseCaseInstanceResource {
         allowedSortProperties.put("id", CaseInstanceQueryProperty.CASE_INSTANCE_ID);
         allowedSortProperties.put("startTime", CaseInstanceQueryProperty.CASE_START_TIME);
         allowedSortProperties.put("tenantId", CaseInstanceQueryProperty.TENANT_ID);
+        allowedSortProperties.put("businessKey", CaseInstanceQueryProperty.BUSINESS_KEY);
     }
 
     @Autowired
@@ -57,6 +59,9 @@ public class BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRuntimeService runtimeService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
@@ -72,8 +77,23 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
         }
+        if (queryRequest.getCaseInstanceIds() != null && !queryRequest.getCaseInstanceIds().isEmpty()) {
+            query.caseInstanceIds(queryRequest.getCaseInstanceIds());
+        }
         if (queryRequest.getCaseDefinitionKey() != null) {
             query.caseDefinitionKey(queryRequest.getCaseDefinitionKey());
+        }
+        if (queryRequest.getCaseDefinitionKeyLike() != null) {
+            query.caseDefinitionKeyLike(queryRequest.getCaseDefinitionKeyLike());
+        }
+        if (queryRequest.getCaseDefinitionKeyLikeIgnoreCase() != null) {
+            query.caseDefinitionKeyLikeIgnoreCase(queryRequest.getCaseDefinitionKeyLikeIgnoreCase());
+        }
+        if (queryRequest.getCaseDefinitionKeys() != null && !queryRequest.getCaseDefinitionKeys().isEmpty()) {
+            query.caseDefinitionKeys(queryRequest.getCaseDefinitionKeys());
+        }
+        if (queryRequest.getExcludeCaseDefinitionKeys() != null && !queryRequest.getExcludeCaseDefinitionKeys().isEmpty()) {
+            query.excludeCaseDefinitionKeys(queryRequest.getExcludeCaseDefinitionKeys());
         }
         if (queryRequest.getCaseDefinitionId() != null) {
             query.caseDefinitionId(queryRequest.getCaseDefinitionId());
@@ -81,17 +101,62 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseDefinitionCategory() != null) {
             query.caseDefinitionCategory(queryRequest.getCaseDefinitionCategory());
         }
+        if (queryRequest.getCaseDefinitionCategoryLike() != null) {
+            query.caseDefinitionCategoryLike(queryRequest.getCaseDefinitionCategoryLike());
+        }
+        if (queryRequest.getCaseDefinitionCategoryLikeIgnoreCase() != null) {
+            query.caseDefinitionCategoryLikeIgnoreCase(queryRequest.getCaseDefinitionCategoryLikeIgnoreCase());
+        }
         if (queryRequest.getCaseDefinitionName() != null) {
             query.caseDefinitionName(queryRequest.getCaseDefinitionName());
+        }
+        if (queryRequest.getCaseDefinitionNameLike() != null) {
+            query.caseDefinitionNameLike(queryRequest.getCaseDefinitionNameLike());
+        }
+        if (queryRequest.getCaseDefinitionNameLikeIgnoreCase() != null) {
+            query.caseDefinitionNameLikeIgnoreCase(queryRequest.getCaseDefinitionNameLikeIgnoreCase());
         }
         if (queryRequest.getCaseBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseBusinessKey());
         }
+        if (queryRequest.getCaseInstanceName() != null) {
+            query.caseInstanceName(queryRequest.getCaseInstanceName());
+        }
+        if (queryRequest.getCaseInstanceNameLike() != null) {
+            query.caseInstanceNameLike(queryRequest.getCaseInstanceNameLike());
+        }
+        if (queryRequest.getCaseInstanceNameLikeIgnoreCase() != null) {
+            query.caseInstanceNameLikeIgnoreCase(queryRequest.getCaseInstanceNameLikeIgnoreCase());
+        }
+        if (queryRequest.getCaseInstanceRootScopeId() != null) {
+            query.caseInstanceRootScopeId(queryRequest.getCaseInstanceRootScopeId());
+        }
+        if (queryRequest.getCaseInstanceRootScopeIds() != null && !queryRequest.getCaseInstanceRootScopeIds().isEmpty()) {
+            query.caseInstanceRootScopeIds(queryRequest.getCaseInstanceRootScopeIds());
+        }
+        if (queryRequest.getCaseInstanceParentScopeId() != null) {
+            query.caseInstanceParentScopeId(queryRequest.getCaseInstanceParentScopeId());
+        }
+        if (queryRequest.getCaseInstanceParentScopeIds() != null && !queryRequest.getCaseInstanceParentScopeIds().isEmpty()) {
+            query.caseInstanceParentScopeIds(queryRequest.getCaseInstanceParentScopeIds());
+        }
         if (queryRequest.getCaseInstanceBusinessKey() != null) {
             query.caseInstanceBusinessKey(queryRequest.getCaseInstanceBusinessKey());
         }
+        if (queryRequest.getCaseInstanceBusinessKeyLike() != null) {
+            query.caseInstanceBusinessKeyLike(queryRequest.getCaseInstanceBusinessKeyLike());
+        }
+        if (queryRequest.getCaseInstanceBusinessKeyLikeIgnoreCase() != null) {
+            query.caseInstanceBusinessKeyLikeIgnoreCase(queryRequest.getCaseInstanceBusinessKeyLikeIgnoreCase());
+        }
         if (queryRequest.getCaseInstanceBusinessStatus() != null) {
             query.caseInstanceBusinessStatus(queryRequest.getCaseInstanceBusinessStatus());
+        }
+        if (queryRequest.getCaseInstanceBusinessStatusLike() != null) {
+            query.caseInstanceBusinessStatusLike(queryRequest.getCaseInstanceBusinessStatusLike());
+        }
+        if (queryRequest.getCaseInstanceBusinessStatusLikeIgnoreCase() != null) {
+            query.caseInstanceBusinessStatusLikeIgnoreCase(queryRequest.getCaseInstanceBusinessStatusLikeIgnoreCase());
         }
         if (queryRequest.getInvolvedUser() != null) {
             query.involvedUser(queryRequest.getInvolvedUser());
@@ -114,8 +179,17 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getCaseInstanceCallbackId() != null) {
             query.caseInstanceCallbackId(queryRequest.getCaseInstanceCallbackId());
         }
+        if (queryRequest.getCaseInstanceCallbackIds() != null && !queryRequest.getCaseInstanceCallbackIds().isEmpty()) {
+            query.caseInstanceCallbackIds(queryRequest.getCaseInstanceCallbackIds());
+        }
         if (queryRequest.getCaseInstanceCallbackType() != null) {
             query.caseInstanceCallbackType(queryRequest.getCaseInstanceCallbackType());
+        }
+        if (queryRequest.getParentCaseInstanceId() != null) {
+            query.parentCaseInstanceId(queryRequest.getParentCaseInstanceId());
+        }
+        if (queryRequest.getParentProcessInstanceId() != null) {
+            query.parentProcessInstanceId(queryRequest.getParentProcessInstanceId());
         }
         if (queryRequest.getCaseInstanceReferenceId() != null) {
             query.caseInstanceReferenceId(queryRequest.getCaseInstanceReferenceId());
@@ -134,8 +208,11 @@ public class BaseCaseInstanceResource {
         }
         if (queryRequest.getIncludeCaseVariables() != null) {
             if (queryRequest.getIncludeCaseVariables()) {
-                query.includeCaseVariables();
+                query.includeCaseVariables(true);
             }
+        }
+        if (queryRequest.getIncludeCaseVariablesNames() != null) {
+            query.includeCaseVariables(queryRequest.getIncludeCaseVariablesNames(), true);
         }
         if (queryRequest.getVariables() != null) {
             addVariables(query, queryRequest.getVariables());
@@ -156,6 +233,10 @@ public class BaseCaseInstanceResource {
         if (queryRequest.getTenantIdLike() != null) {
             query.caseInstanceTenantIdLike(queryRequest.getTenantIdLike());
         }
+        
+        if (queryRequest.getTenantIdLikeIgnoreCase() != null) {
+            query.caseInstanceTenantIdLikeIgnoreCase(queryRequest.getTenantIdLikeIgnoreCase());
+        }
 
         if (Boolean.TRUE.equals(queryRequest.getWithoutTenantId())) {
             query.caseInstanceWithoutTenantId();
@@ -165,7 +246,9 @@ public class BaseCaseInstanceResource {
             restApiInterceptor.accessCaseInstanceInfoWithQuery(query, queryRequest);
         }
 
-        DataResponse<CaseInstanceResponse> responseList = paginateList(requestParams, queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        DataResponse<CaseInstanceResponse> responseList = cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(requestParams,
+                queryRequest, query, "id", allowedSortProperties, restResponseFactory::createCaseInstanceResponseList));
 
         Set<String> caseDefinitionIds = new HashSet<>();
         List<CaseInstanceResponse> caseInstanceList = responseList.getData();
@@ -194,14 +277,28 @@ public class BaseCaseInstanceResource {
         return responseList;
     }
 
+    /**
+     * Returns the {@link CaseInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
     protected CaseInstance getCaseInstanceFromRequest(String caseInstanceId) {
-        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
-        if (caseInstance == null) {
-            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
-        }
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
 
         if (restApiInterceptor != null) {
             restApiInterceptor.accessCaseInstanceInfoById(caseInstance);
+        }
+
+        return caseInstance;
+    }
+
+    /**
+     * Returns the {@link CaseInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected CaseInstance getCaseInstanceFromRequestWithoutAccessCheck(String caseInstanceId) {
+        CaseInstance caseInstance = runtimeService.createCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
+        if (caseInstance == null) {
+            throw new FlowableObjectNotFoundException("Could not find a case instance with id '" + caseInstanceId + "'.");
         }
 
         return caseInstance;
@@ -212,8 +309,10 @@ public class BaseCaseInstanceResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -285,6 +384,14 @@ public class BaseCaseInstanceResource {
 
             case LESS_THAN_OR_EQUALS:
                 caseInstanceQuery.variableValueLessThanOrEqual(variable.getName(), actualValue);
+                break;
+
+            case EXISTS:
+                caseInstanceQuery.variableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                caseInstanceQuery.variableNotExists(variable.getName());
                 break;
 
             default:

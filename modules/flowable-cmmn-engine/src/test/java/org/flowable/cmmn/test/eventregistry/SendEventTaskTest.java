@@ -23,11 +23,11 @@ import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.api.OutboundEventChannelAdapter;
 import org.flowable.eventregistry.api.model.EventPayloadTypes;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -36,7 +36,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
     protected TestOutboundEventChannelAdapter outboundEventChannelAdapter;
 
-    @Before
+    @BeforeEach
     public void registerEventDefinition() {
         outboundEventChannelAdapter = setupTestChannel();
 
@@ -64,7 +64,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
         return outboundEventChannelAdapter;
     }
 
-    @After
+    @AfterEach
     public void unregisterEventDefinition() {
         EventRepositoryService eventRepositoryService = getEventRepositoryService();
         List<EventDeployment> deployments = eventRepositoryService.createDeploymentQuery().list();
@@ -85,7 +85,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
+        assertThat(jsonNode.get("customerId").asString()).isEqualTo("Hello World!");
     }
     
     @Test
@@ -101,7 +101,7 @@ public class SendEventTaskTest extends FlowableEventRegistryCmmnTestCase {
 
         JsonNode jsonNode = cmmnEngineConfiguration.getObjectMapper().readTree(outboundEventChannelAdapter.receivedEvents.get(0));
         assertThat(jsonNode).hasSize(1);
-        assertThat(jsonNode.get("customerId").asText()).isEqualTo("Hello World!");
+        assertThat(jsonNode.get("customerId").asString()).isEqualTo("Hello World!");
         
         Map<String, Object> headerMap = outboundEventChannelAdapter.headers.get(0);
         assertThat(headerMap.get("headerProperty1")).isEqualTo("test");

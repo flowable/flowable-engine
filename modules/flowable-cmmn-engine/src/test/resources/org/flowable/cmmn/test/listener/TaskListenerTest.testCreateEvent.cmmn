@@ -15,6 +15,8 @@
             <humanTask id="sid-36995D0E-BAB2-44F2-ADD4-FD9070AFD6CA" name="Expression">
                 <extensionElements>
                     <flowable:taskListener event="create" expression="${task.setVariable('expressionVariable', 'Hello World from expression')}"></flowable:taskListener>
+                    <flowable:taskListener event="create" expression="${planItemInstance.setVariable('expressionPlanItemVariable', 'Hello World from expression')}"></flowable:taskListener>
+                    <flowable:taskListener event="create" expression="${caseInstance.setVariable('expressionCaseVariable', 'Hello World from expression')}"></flowable:taskListener>
                 </extensionElements>
             </humanTask>
             <humanTask id="sid-B79A0634-B1BF-44B7-8AC5-35E9E17CC65A" name="DelegateExpression">

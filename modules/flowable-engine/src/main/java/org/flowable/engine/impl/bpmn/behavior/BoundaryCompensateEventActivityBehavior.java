@@ -53,7 +53,7 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
 
         Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
         if (process == null) {
-            throw new FlowableException("Process model (id = " + execution.getId() + ") could not be found");
+            throw new FlowableException("Process model for " + executionEntity + " could not be found");
         }
 
         Activity sourceActivity = null;
@@ -62,8 +62,7 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
         for (Association association : associations) {
             sourceActivity = boundaryEvent.getAttachedToRef();
             FlowElement targetElement = process.getFlowElement(association.getTargetRef(), true);
-            if (targetElement instanceof Activity) {
-                Activity activity = (Activity) targetElement;
+            if (targetElement instanceof Activity activity) {
                 if (activity.isForCompensation()) {
                     compensationActivity = activity;
                     break;
@@ -72,11 +71,11 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
         }
         
         if (sourceActivity == null) {
-            throw new FlowableException("Parent activity for boundary compensation event could not be found");
+            throw new FlowableException("Parent activity for boundary compensation event could not be found for " + executionEntity);
         }
 
         if (compensationActivity == null) {
-            throw new FlowableException("Compensation activity could not be found (or it is missing 'isForCompensation=\"true\"'");
+            throw new FlowableException("Compensation activity could not be found (or it is missing 'isForCompensation=\"true\"') for " + executionEntity);
         }
 
         // find SubProcess or Process instance execution
@@ -94,7 +93,7 @@ public class BoundaryCompensateEventActivityBehavior extends BoundaryEventActivi
         }
 
         if (scopeExecution == null) {
-            throw new FlowableException("Could not find a scope execution for compensation boundary event " + boundaryEvent.getId());
+            throw new FlowableException("Could not find a scope execution for compensation boundary event " + boundaryEvent.getId() + " for " + executionEntity);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();

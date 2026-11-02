@@ -94,7 +94,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
         for (ExecutionEntity childExecution : childExecutions) {
             if (activityId.equals(childExecution.getActivityId()) && childExecution.isMultiInstanceRoot()) {
                 if (miExecution != null) {
-                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId);
+                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId + " in " + childExecution);
                 }
                 miExecution = childExecution;
             }
@@ -102,7 +102,7 @@ public class AddMultiInstanceExecutionCmd implements Command<Execution>, Seriali
             ExecutionEntity childMiExecution = searchForMultiInstanceActivity(activityId, childExecution.getId(), executionEntityManager);
             if (childMiExecution != null) {
                 if (miExecution != null) {
-                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId);
+                    throw new FlowableException("Multiple multi instance executions found for activity id " + activityId + " in " + childExecution);
                 }
                 miExecution = childMiExecution;
             }

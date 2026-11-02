@@ -32,6 +32,7 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
     private static final long serialVersionUID = 1L;
 
     protected String id;
+    protected List<String> ids;
     protected String name;
     protected String userId;
     protected String groupId;
@@ -51,6 +52,12 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
     @Override
     public PrivilegeQuery privilegeId(String id) {
         this.id = id;
+        return this;
+    }
+    
+    @Override
+    public PrivilegeQuery privilegeIds(List<String> ids) {
+        this.ids = ids;
         return this;
     }
 
@@ -85,6 +92,14 @@ public class PrivilegeQueryImpl extends AbstractQuery<PrivilegeQuery, Privilege>
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public List<String> getIds() {
+        return ids;
+    }
+
+    public void setIds(List<String> ids) {
+        this.ids = ids;
     }
 
     public String getName() {

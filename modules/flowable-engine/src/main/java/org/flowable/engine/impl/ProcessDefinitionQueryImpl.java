@@ -455,6 +455,10 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         return ids;
     }
 
+    public List<List<String>> getSafeIds() {
+        return getSafeList(ids);
+    }
+
     public String getName() {
         return name;
     }

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="mapException" name="test" isExecutable="true">
+    <startEvent id="theStart" name="theStart"></startEvent>
+    <serviceTask id="mapTask" name="Map test" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[GET]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://nohost:9798/api]]></flowable:string>
+        </flowable:field>
+        <flowable:mapException errorCode="errorCode" includeChildExceptions="true" rootCause="java.net.UnknownHostException"/>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="theEnd" name="theEnd"></endEvent>
+    <sequenceFlow id="sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615" sourceRef="mapTask" targetRef="theEnd"></sequenceFlow>
+    <sequenceFlow id="sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67" sourceRef="theStart" targetRef="mapTask"></sequenceFlow>
+    <boundaryEvent id="sid-3992A23C-2A98-4C2F-9811-8DDBE31E8C06" attachedToRef="mapTask">
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <endEvent id="theEnd2" name="theEnd2"></endEvent>
+    <sequenceFlow id="sid-05CA3390-553C-4360-A07D-790E5F507A58" sourceRef="sid-3992A23C-2A98-4C2F-9811-8DDBE31E8C06" targetRef="theEnd2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_mapException">
+    <bpmndi:BPMNPlane bpmnElement="mapException" id="BPMNPlane_mapException">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="159.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mapTask" id="BPMNShape_mapTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="170.0" y="134.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="315.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-3992A23C-2A98-4C2F-9811-8DDBE31E8C06" id="BPMNShape_sid-3992A23C-2A98-4C2F-9811-8DDBE31E8C06">
+        <omgdc:Bounds height="30.0" width="30.0" x="205.0" y="199.2958984375"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd2" id="BPMNShape_theEnd2">
+        <omgdc:Bounds height="28.0" width="28.0" x="315.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67" id="BPMNEdge_sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67">
+        <omgdi:waypoint x="130.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-05CA3390-553C-4360-A07D-790E5F507A58" id="BPMNEdge_sid-05CA3390-553C-4360-A07D-790E5F507A58">
+        <omgdi:waypoint x="220.0" y="229.2958984375"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="239.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="239.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615" id="BPMNEdge_sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615">
+        <omgdi:waypoint x="270.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

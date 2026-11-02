@@ -12,9 +12,9 @@
  */
 package org.flowable.common.engine.impl.interceptor;
 
-import javax.transaction.Status;
-import javax.transaction.SystemException;
-import javax.transaction.TransactionManager;
+import jakarta.transaction.Status;
+import jakarta.transaction.SystemException;
+import jakarta.transaction.TransactionManager;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.slf4j.Logger;

@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
@@ -355,15 +356,15 @@ public class ChangeStateForCallActivityTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId())
                     .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity")
                     .changeState())
-                    .isExactlyInstanceOf(FlowableException.class)
+                    .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                     .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
-    
+
             //Invalid "unExistent" process definition version
             assertThatThrownBy(() -> runtimeService.createChangeActivityStateBuilder()
                     .processInstanceId(processInstance.getId())
                     .moveActivityIdToSubProcessInstanceActivityId("firstTask", "theTask", "callActivity", 5)
                     .changeState())
-                    .isExactlyInstanceOf(FlowableException.class)
+                    .isExactlyInstanceOf(FlowableIllegalArgumentException.class)
                     .hasMessage("Cannot find activity 'theTask' in process definition with id 'oneTaskProcess'");
     
             //Change state specifying the first version

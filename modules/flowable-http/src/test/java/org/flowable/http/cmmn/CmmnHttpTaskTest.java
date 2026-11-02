@@ -20,33 +20,30 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.engine.CmmnEngine;
+import org.flowable.cmmn.engine.test.CmmnConfigurationResource;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnRule;
+import org.flowable.cmmn.engine.test.FlowableCmmnExtension;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.bpmn.HttpServiceTaskTestServer;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * @author martin.grofcik
  */
+@CmmnConfigurationResource("org/flowable/http/cmmn/CmmnHttpTaskTest.cfg.xml")
+@ExtendWith(FlowableCmmnExtension.class)
 public class CmmnHttpTaskTest {
 
-    @Rule
-    public FlowableCmmnRule cmmnRule;
+    protected CmmnRuntimeService cmmnRuntimeService;
 
-    public CmmnHttpTaskTest() {
-        this("org/flowable/http/cmmn/CmmnHttpTaskTest.cfg.xml");
-    }
-
-    protected CmmnHttpTaskTest(String configurationResource) {
-        this.cmmnRule = new FlowableCmmnRule(configurationResource);
-    }
-
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(CmmnEngine cmmnEngine) throws Exception {
+        this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
         HttpServiceTaskTestServer.setUp();
     }
 
@@ -63,10 +60,10 @@ public class CmmnHttpTaskTest {
 
     @Test
     @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithVariableName.cmmn")
-    public void testGetWithVariableName() {
+    public void testGetWithVariableName(CmmnRuntimeService cmmnRuntimeService) {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "test")).contains("John");
+        assertThat((String) cmmnRuntimeService.getVariable(caseInstance.getId(), "test")).contains("John");
 
     }
 
@@ -75,7 +72,7 @@ public class CmmnHttpTaskTest {
     public void testGetWithoutVariableName() {
         CaseInstance caseInstance = createCaseInstance();
 
-        assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "httpGetResponseBody")).contains("John");
+        assertThat((String) cmmnRuntimeService.getVariable(caseInstance.getId(), "httpGetResponseBody")).contains("John");
     }
 
     @Test
@@ -83,7 +80,7 @@ public class CmmnHttpTaskTest {
     public void testGetWithResponseHandler() {
         CaseInstance caseInstance = createCaseInstance();
 
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         Map<String, String> names = new HashMap<>();
         names.put("firstName", "John");
         names.put("lastName", "Doe");
@@ -95,7 +92,7 @@ public class CmmnHttpTaskTest {
     @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testGetWithRequestHandler.cmmn")
     public void testGetWithRequestHandler() {
         CaseInstance caseInstance = createCaseInstance();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables).hasSize(1);
         assertThat((String) variables.get("httpGetResponseBody")).contains("John");
     }
@@ -165,7 +162,7 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables).containsEntry("httpGetResponseStatusCode", 302);
     }
 
@@ -183,7 +180,7 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables)
                 .contains(
                         entry("get500RequestMethod", "GET"),
@@ -203,7 +200,7 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables)
                 .contains(
                         entry("httpPostRequestMethod", "POST"),
@@ -222,7 +219,7 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables)
                 .contains(
                         entry("httpPostResponseStatusCode", 302)
@@ -235,7 +232,7 @@ public class CmmnHttpTaskTest {
         CaseInstance caseInstance = createCaseInstance();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables)
                 .contains(
                         entry("httpDeleteResponseStatusCode", 400),
@@ -246,13 +243,13 @@ public class CmmnHttpTaskTest {
     @Test
     @CmmnDeployment(resources = "org/flowable/http/cmmn/CmmnHttpTaskTest.testHttpPut5XX.cmmn")
     public void testHttpPut5XX() throws Exception {
-        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variable("prefix", "httpPost")
                 .start();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> variables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> variables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(variables)
                 .contains(
                         entry("httpPostRequestMethod", "PUT"),
@@ -291,13 +288,13 @@ public class CmmnHttpTaskTest {
         variables.put("response", true);
         variables.put("prefix", "httpPost");
 
-        CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .variables(variables)
                 .start();
 
         assertThat(caseInstance).isNotNull();
-        Map<String, Object> outputVariables = cmmnRule.getCmmnRuntimeService().getVariables(caseInstance.getId());
+        Map<String, Object> outputVariables = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertThat(outputVariables)
                 .contains(
                         entry("httpPostRequestMethod", "PUT"),
@@ -320,7 +317,7 @@ public class CmmnHttpTaskTest {
     }
 
     protected CaseInstance createCaseInstance() {
-        return cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+        return cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .start();
     }

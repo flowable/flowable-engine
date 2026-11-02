@@ -13,9 +13,6 @@
 
 package org.flowable.idm.rest.service.api.group;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.idm.api.Group;
@@ -23,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -37,10 +35,10 @@ import io.swagger.annotations.Authorization;
  * @author Joram Barrez
  */
 @RestController
-@Api(tags = { "Groups" }, description = "Manage Groups", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Groups" }, authorizations = { @Authorization(value = "basicAuth") })
 public class GroupMembershipCollectionResource extends BaseGroupResource {
     
-    @ApiOperation(value = "Add a member to a group", tags = { "Groups" })
+    @ApiOperation(value = "Add a member to a group", tags = { "Groups" }, code = 201)
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the group was found and the member has been added."),
             @ApiResponse(code = 400, message = "Indicates the userId was not included in the request body."),
@@ -48,7 +46,8 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
             @ApiResponse(code = 409, message = "Indicates the requested user is already a member of the group.")
     })
     @PostMapping(value = "/groups/{groupId}/members", produces = "application/json")
-    public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip, HttpServletRequest request, HttpServletResponse response) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public MembershipResponse createMembership(@ApiParam(name = "groupId") @PathVariable String groupId, @RequestBody MembershipRequest memberShip) {
 
         Group group = getGroupFromRequest(groupId);
 
@@ -63,7 +62,6 @@ public class GroupMembershipCollectionResource extends BaseGroupResource {
         }
 
         identityService.createMembership(memberShip.getUserId(), group.getId());
-        response.setStatus(HttpStatus.CREATED.value());
 
         return restResponseFactory.createMembershipResponse(memberShip.getUserId(), group.getId());
     }

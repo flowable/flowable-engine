@@ -26,12 +26,11 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.junit.jupiter.api.Test;
 
 import net.javacrumbs.jsonunit.core.Option;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to a identity links on a Process instance resource.
@@ -64,13 +63,13 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
                 .when(Option.IGNORING_ARRAY_ORDER)
                 .isEqualTo("[ {"
                         + "    url: '" + SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "john", "customType") + "',"
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "john", "customType") + "',"
                         + "    user: 'john',"
                         + "    group: null,"
                         + "    type: 'customType'"
                         + "}, {"
                         + "    url: '" + SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "paul", "candidate") + "',"
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "paul", "candidate") + "',"
                         + "    user: 'paul',"
                         + "    group: null,"
                         + "    type: 'candidate'"
@@ -102,7 +101,7 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
         assertThatJson(responseNode)
                 .isEqualTo("{"
                         + "url: '" + SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "kermit", "myType") + "',"
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType") + "',"
                         + "user: 'kermit',"
                         + "type: 'myType',"
                         + "group: null"
@@ -123,12 +122,24 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
         httpPost.setEntity(new StringEntity(requestNode.toString()));
         closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
-        // Test with group (which is not supported on processes)
+        // Test with group
         requestNode = objectMapper.createObjectNode();
         requestNode.put("type", "myType");
         requestNode.put("group", "sales");
         httpPost.setEntity(new StringEntity(requestNode.toString()));
-        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+        response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "url: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "sales", "myType") + "',"
+                        + "user: null,"
+                        + "type: 'myType',"
+                        + "group: 'sales'"
+                        + "}");
 
         // Test with no type
         requestNode = objectMapper.createObjectNode();
@@ -143,21 +154,20 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceIdentityLinkResourceTest.process.bpmn20.xml" })
     public void testGetSingleIdentityLink() throws Exception {
-
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "myType");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "users", "someType");
 
         CloseableHttpResponse response = executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "kermit", "myType")), HttpStatus.SC_OK);
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")), HttpStatus.SC_OK);
 
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
         closeResponse(response);
         assertThat(responseNode).isNotNull();
         assertThatJson(responseNode)
                 .isEqualTo("{"
-                        + "url: '" + SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "kermit", "myType") + "',"
+                        + "url: '" + SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType") + "',"
                         + "user: 'kermit',"
                         + "type: 'myType',"
                         + "group: null"
@@ -166,8 +176,29 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
         // Test with unexisting process
         closeResponse(executeRequest(
                 new HttpGet(SERVER_URL_PREFIX + RestUrls
-                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit",
-                                "myType")),
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, "unexisting", RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")),
+                HttpStatus.SC_NOT_FOUND));
+        
+        response = executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType")), HttpStatus.SC_OK);
+
+        responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThat(responseNode).isNotNull();
+        assertThatJson(responseNode)
+                .isEqualTo("{"
+                        + "url: '" + SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType") + "',"
+                        + "user: null,"
+                        + "type: 'someType',"
+                        + "group: 'users'"
+                        + "}");
+
+        // Test with unexisting process
+        closeResponse(executeRequest(
+                new HttpGet(SERVER_URL_PREFIX + RestUrls
+                        .createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, "unexisting", RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType")),
                 HttpStatus.SC_NOT_FOUND));
     }
 
@@ -177,21 +208,34 @@ public class ProcessInstanceIdentityLinkResourceTest extends BaseSpringRestTestC
     @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceIdentityLinkResourceTest.process.bpmn20.xml" })
     public void testDeleteSingleIdentityLink() throws Exception {
-
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         runtimeService.addUserIdentityLink(processInstance.getId(), "kermit", "myType");
+        runtimeService.addGroupIdentityLink(processInstance.getId(), "users", "someType");
 
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "kermit", "myType")),
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")),
                 HttpStatus.SC_NO_CONTENT));
 
         // Test with unexisting process identity link
-        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), "kermit", "myType")),
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")),
                 HttpStatus.SC_NOT_FOUND));
 
         // Test with unexisting process
         closeResponse(executeRequest(
                 new HttpDelete(SERVER_URL_PREFIX
                         + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, "unexistingprocess", RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_USERS, "kermit", "myType")),
+                HttpStatus.SC_NOT_FOUND));
+        
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType")),
+                HttpStatus.SC_NO_CONTENT));
+
+        // Test with unexisting process identity link
+        closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, processInstance.getId(), RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType")),
+                HttpStatus.SC_NOT_FOUND));
+
+        // Test with unexisting process
+        closeResponse(executeRequest(
+                new HttpDelete(SERVER_URL_PREFIX
+                        + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_IDENTITYLINK, "unexistingprocess", RestUrls.SEGMENT_IDENTITYLINKS_FAMILY_GROUPS, "users", "someType")),
                 HttpStatus.SC_NOT_FOUND));
     }
 }

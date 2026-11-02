@@ -21,9 +21,6 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 
-/**
- * @author Valentin Zickner
- */
 public class CaseInstanceMigrationBatchCmd implements Command<Batch> {
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
@@ -43,7 +40,7 @@ public class CaseInstanceMigrationBatchCmd implements Command<Batch> {
         if (caseInstanceMigrationDocument == null) {
             throw new FlowableException("Must specify a case instance migration document to migrate");
         }
-        this.caseDefinitionId = null;
+        this.caseDefinitionId = caseDefinitionId;
         this.caseInstanceMigrationDocument = caseInstanceMigrationDocument;
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }

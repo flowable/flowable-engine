@@ -27,6 +27,7 @@ public class EngineRestVariable {
     private String type;
     private Object value;
     private String valueUrl;
+    private boolean valueUnresolvable;
 
     @ApiModelProperty(example = "myVariable", value = "Name of the variable")
     public String getName() {
@@ -37,7 +38,7 @@ public class EngineRestVariable {
         this.name = name;
     }
 
-    @ApiModelProperty(example = "string", value = "Type of the variable.", notes = " When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done.")
+    @ApiModelProperty(example = "string", value = "Type of the variable.", notes = "When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done. Some known types are: string, integer, long, short, double, instant, date, localDate, localDateTime, boolean, json")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getType() {
         return type;
@@ -66,4 +67,14 @@ public class EngineRestVariable {
         return valueUrl;
     }
 
+    @ApiModelProperty(example = "false", value = "Whether the value of the variable could not be resolved, e.g. because its serialized value can no longer be read.",
+            notes = "The value of such a variable is null. Only present in a response when true.")
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public boolean isValueUnresolvable() {
+        return valueUnresolvable;
+    }
+
+    public void setValueUnresolvable(boolean valueUnresolvable) {
+        this.valueUnresolvable = valueUnresolvable;
+    }
 }

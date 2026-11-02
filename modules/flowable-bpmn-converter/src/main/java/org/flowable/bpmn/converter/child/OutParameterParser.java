@@ -22,18 +22,19 @@ import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.CallActivity;
-import org.flowable.bpmn.model.CaseServiceTask;
-import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.ExtensionAttribute;
+import org.flowable.bpmn.model.HasOutParameters;
 import org.flowable.bpmn.model.IOParameter;
 
 public class OutParameterParser extends BaseChildElementParser {
 
     public static final List<ExtensionAttribute> defaultOutParameterAttributes = Arrays.asList(
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_TYPE),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION),
             new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TRANSIENT),
-            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET)
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET),
+            new ExtensionAttribute(ATTRIBUTE_IOPARAMETER_TARGET_TYPE)
     );
 
     @Override
@@ -57,6 +58,11 @@ public class OutParameterParser extends BaseChildElementParser {
 
             parameter.setTarget(target);
 
+            String sourceType = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_TYPE);
+            if (StringUtils.isNotEmpty(sourceType)) {
+                parameter.setSourceType(sourceType);
+            }
+
             String transientValue = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_TRANSIENT);
             if ("true".equalsIgnoreCase(transientValue)) {
                 parameter.setTransient(true);
@@ -64,19 +70,11 @@ public class OutParameterParser extends BaseChildElementParser {
 
             BpmnXMLUtil.addCustomAttributes(xtr, parameter, defaultOutParameterAttributes);
 
-            if (parentElement instanceof CallActivity) {
-                CallActivity callActivity = (CallActivity) parentElement;
-                callActivity.getOutParameters().add(parameter);
-
-            } else if (parentElement instanceof CaseServiceTask) {
-                ((CaseServiceTask) parentElement).getOutParameters().add(parameter);
-
-            } else if (parentElement instanceof Event) {
-                ((Event) parentElement).getOutParameters().add(parameter);
+            if (parentElement instanceof HasOutParameters) {
+                ((HasOutParameters) parentElement).addOutParameter(parameter);
             }
 
-        } else if (parentElement instanceof CallActivity) {
-            CallActivity callActivity = (CallActivity) parentElement;
+        } else if (parentElement instanceof CallActivity callActivity) {
 
             String variables = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_VARIABLES);
             if ("all".equalsIgnoreCase(variables)) {

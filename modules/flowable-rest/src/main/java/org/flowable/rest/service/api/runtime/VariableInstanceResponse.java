@@ -26,6 +26,7 @@ public class VariableInstanceResponse {
     protected String processInstanceId;
     protected String processInstanceUrl;
     protected String taskId;
+    protected String executionId;
     protected RestVariable variable;
 
     @ApiModelProperty(example = "14")
@@ -71,4 +72,13 @@ public class VariableInstanceResponse {
     public void setVariable(RestVariable variable) {
         this.variable = variable;
     }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
 }

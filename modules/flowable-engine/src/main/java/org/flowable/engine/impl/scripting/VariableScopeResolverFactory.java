@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.scripting;
 
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
 import org.flowable.common.engine.impl.scripting.Resolver;
 import org.flowable.common.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -25,9 +25,10 @@ import org.flowable.variable.api.delegate.VariableScope;
 public class VariableScopeResolverFactory implements ResolverFactory {
 
     @Override
-    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableScope variableScope) {
-        if (variableScope != null) {
-            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, variableScope);
+    public Resolver createResolver(AbstractEngineConfiguration engineConfiguration, VariableContainer scopeContainer,
+            VariableContainer inputVariableContainer) {
+        if (scopeContainer != null) {
+            return new VariableScopeResolver((ProcessEngineConfigurationImpl) engineConfiguration, scopeContainer, inputVariableContainer);
         }
         return null;
     }

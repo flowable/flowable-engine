@@ -9,26 +9,26 @@
   <insert id="insertUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
     insert into ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_)
     values (
-      #{id ,jdbcType=VARCHAR},
-      1, #{firstName ,jdbcType=VARCHAR},
-      #{lastName ,jdbcType=VARCHAR},
-      #{displayName ,jdbcType=VARCHAR},
-      #{email ,jdbcType=VARCHAR},
-      #{tenantId ,jdbcType=VARCHAR},
-      #{password ,jdbcType=VARCHAR}
+      #{id, jdbcType=NVARCHAR},
+      1, #{firstName, jdbcType=NVARCHAR},
+      #{lastName, jdbcType=NVARCHAR},
+      #{displayName, jdbcType=NVARCHAR},
+      #{email, jdbcType=NVARCHAR},
+      #{tenantId, jdbcType=NVARCHAR},
+      #{password, jdbcType=NVARCHAR}
     )
   </insert>
 
   <insert id="bulkInsertUser" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_) VALUES
       <foreach collection="list" item="user" index="index" separator=",">
-        (#{user.id ,jdbcType=VARCHAR},
-         1, #{user.firstName ,jdbcType=VARCHAR},
-         #{user.lastName ,jdbcType=VARCHAR},
-         #{user.displayName ,jdbcType=VARCHAR},
-         #{user.email ,jdbcType=VARCHAR},
-         #{user.tenantId ,jdbcType=VARCHAR},
-         #{user.password ,jdbcType=VARCHAR})
+        (#{user.id, jdbcType=NVARCHAR},
+         1, #{user.firstName, jdbcType=NVARCHAR},
+         #{user.lastName, jdbcType=NVARCHAR},
+         #{user.displayName, jdbcType=NVARCHAR},
+         #{user.email, jdbcType=NVARCHAR},
+         #{user.tenantId, jdbcType=NVARCHAR},
+         #{user.password, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -36,13 +36,13 @@
     INSERT ALL
       <foreach collection="list" item="user" index="index">
         INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, DISPLAY_NAME_, EMAIL_, TENANT_ID_, PWD_) VALUES
-        (#{user.id ,jdbcType=VARCHAR},
-         1, #{user.firstName ,jdbcType=VARCHAR},
-         #{user.lastName ,jdbcType=VARCHAR},
-         #{user.displayName ,jdbcType=VARCHAR},
-         #{user.email ,jdbcType=VARCHAR},
-         #{user.tenantId ,jdbcType=VARCHAR},
-         #{user.password ,jdbcType=VARCHAR})
+        (#{user.id, jdbcType=NVARCHAR},
+         1, #{user.firstName, jdbcType=NVARCHAR},
+         #{user.lastName, jdbcType=NVARCHAR},
+         #{user.displayName, jdbcType=NVARCHAR},
+         #{user.email, jdbcType=NVARCHAR},
+         #{user.tenantId, jdbcType=NVARCHAR},
+         #{user.password, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -52,55 +52,55 @@
   <update id="updateUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
     update ${prefix}ACT_ID_USER
     <set>
-      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      REV_ = #{revisionNext, jdbcType=INTEGER},
       <if test="originalPersistentState.firstName != firstName">
-        FIRST_ = #{firstName, jdbcType=VARCHAR},
+        FIRST_ = #{firstName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.lastName != lastName">
-        LAST_ = #{lastName ,jdbcType=VARCHAR},
+        LAST_ = #{lastName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.displayName != displayName">
-        DISPLAY_NAME_ = #{displayName ,jdbcType=VARCHAR},
+        DISPLAY_NAME_ = #{displayName, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.email != email">
-        EMAIL_ = #{email ,jdbcType=VARCHAR},
+        EMAIL_ = #{email, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
-        TENANT_ID_ = #{tenantId ,jdbcType=VARCHAR},
+        TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
       </if>
       <if test="originalPersistentState.password != password">
-        PWD_ = #{password ,jdbcType=VARCHAR},
+        PWD_ = #{password, jdbcType=NVARCHAR},
       </if>
       PICTURE_ID_ = #{pictureByteArrayRef ,typeHandler=IdmByteArrayRefTypeHandler}
     </set>
-    where ID_ = #{id}
-      and REV_ = #{revision}
+    where ID_ = #{id, jdbcType=NVARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
   </update>
 
   <!-- USER DELETE -->
 
   <delete id="deleteUser" parameterType="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
-    delete from ${prefix}ACT_ID_USER where ID_ = #{id} and REV_ = #{revision}
+    delete from ${prefix}ACT_ID_USER where ID_ = #{id, jdbcType=NVARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
   </delete>
 
   <!-- USER RESULTMAP -->
 
   <resultMap id="userResultMap" type="org.flowable.idm.engine.impl.persistence.entity.UserEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
-    <result property="firstName" column="FIRST_" jdbcType="VARCHAR" />
-    <result property="lastName" column="LAST_" jdbcType="VARCHAR" />
-    <result property="displayName" column="DISPLAY_NAME_" jdbcType="VARCHAR" />
-    <result property="email" column="EMAIL_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
-    <result property="password" column="PWD_" jdbcType="VARCHAR" />
+    <result property="firstName" column="FIRST_" jdbcType="NVARCHAR" />
+    <result property="lastName" column="LAST_" jdbcType="NVARCHAR" />
+    <result property="displayName" column="DISPLAY_NAME_" jdbcType="NVARCHAR" />
+    <result property="email" column="EMAIL_" jdbcType="NVARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
+    <result property="password" column="PWD_" jdbcType="NVARCHAR" />
     <result property="pictureByteArrayRef" column="PICTURE_ID_" typeHandler="IdmByteArrayRefTypeHandler" />
   </resultMap>
 
   <!-- USER SELECT -->
 
   <select id="selectUser" parameterType="string" resultMap="userResultMap">
-    select * from ${prefix}ACT_ID_USER where ID_ = #{id,jdbcType=VARCHAR}
+    select * from ${prefix}ACT_ID_USER where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectUserByQueryCriteria" parameterType="org.flowable.idm.engine.impl.UserQueryImpl" resultMap="userResultMap">
@@ -120,66 +120,66 @@
     from ${prefix}ACT_ID_USER RES
     <where>
       <if test="id != null">
-        RES.ID_ = #{id}
+        RES.ID_ = #{id, jdbcType=NVARCHAR}
       </if>
       <if test="ids != null &amp;&amp; !ids.empty">
         and RES.ID_ IN
         <foreach item="id" index="index" collection="ids"
                  open="(" separator="," close=")">
-          #{id}
+          #{id, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="idIgnoreCase != null">
-        and lower(RES.ID_) = #{idIgnoreCase}
+        and lower(RES.ID_) = #{idIgnoreCase, jdbcType=NVARCHAR}
       </if>
       <if test="firstName != null">
-        and RES.FIRST_ = #{firstName}
+        and RES.FIRST_ = #{firstName, jdbcType=NVARCHAR}
       </if>
       <if test="firstNameLike != null">
-        and RES.FIRST_ like #{firstNameLike}${wildcardEscapeClause}
+        and RES.FIRST_ like #{firstNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="firstNameLikeIgnoreCase != null">
-        and lower(RES.FIRST_) like #{firstNameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.FIRST_) like #{firstNameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="lastName != null">
-        and RES.LAST_ = #{lastName}
+        and RES.LAST_ = #{lastName, jdbcType=NVARCHAR}
       </if>
       <if test="lastNameLike != null">
-        and RES.LAST_ like #{lastNameLike}${wildcardEscapeClause}
+        and RES.LAST_ like #{lastNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="lastNameLikeIgnoreCase != null">
-        and lower(RES.LAST_) like #{lastNameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.LAST_) like #{lastNameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="fullNameLike != null">
-        and (CONCAT(CONCAT(RES.FIRST_, ' '), RES.LAST_) like #{fullNameLike}${wildcardEscapeClause})
+        and (CONCAT(CONCAT(RES.FIRST_, ' '), RES.LAST_) like #{fullNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="fullNameLikeIgnoreCase != null">
-        and (lower(CONCAT(CONCAT(RES.FIRST_ , ' '), RES.LAST_)) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
+        and (lower(CONCAT(CONCAT(RES.FIRST_ , ' '), RES.LAST_)) like #{fullNameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause})
       </if>
       <if test="displayName != null">
-        and RES.DISPLAY_NAME_ = #{displayName}
+        and RES.DISPLAY_NAME_ = #{displayName, jdbcType=NVARCHAR}
       </if>
       <if test="displayNameLike != null">
-        and RES.DISPLAY_NAME_ like #{displayNameLike}${wildcardEscapeClause}
+        and RES.DISPLAY_NAME_ like #{displayNameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="displayNameLikeIgnoreCase != null">
-        and lower(RES.DISPLAY_NAME_) like #{displayNameLikeIgnoreCase}${wildcardEscapeClause}
+        and lower(RES.DISPLAY_NAME_) like #{displayNameLikeIgnoreCase, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="email != null">
-        and RES.EMAIL_ = #{email}
+        and RES.EMAIL_ = #{email, jdbcType=NVARCHAR}
       </if>
       <if test="emailLike != null">
-        and RES.EMAIL_ like #{emailLike}${wildcardEscapeClause}
+        and RES.EMAIL_ like #{emailLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="groupId != null">
-        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId})
+        and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ = #{groupId, jdbcType=NVARCHAR})
       </if>
       <if test="groupIds != null &amp;&amp; !groupIds.empty">
         and exists(select 1 from ${prefix}ACT_ID_MEMBERSHIP M where M.USER_ID_ = RES.ID_ and M.GROUP_ID_ in  
-            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId}</foreach>)
+            <foreach item="groupId" index="index" collection="groupIds" open="(" separator="," close=")">#{groupId, jdbcType=NVARCHAR}</foreach>)
       </if>
     </where>
   </sql>
@@ -196,7 +196,7 @@
     select RES.* from ${prefix}ACT_ID_USER RES
     inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on MAPPING.USER_ID_ = RES.ID_
     inner join ${prefix}ACT_ID_PRIV PRIV on PRIV.ID_ = MAPPING.PRIV_ID_
-    where PRIV.ID_ = #{parameter}
+    where PRIV.ID_ = #{parameter, jdbcType=NVARCHAR}
     order by RES.LAST_
   </select>
 

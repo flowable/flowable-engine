@@ -13,15 +13,17 @@
 
 package org.flowable.engine.impl.test;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.test.FlowableRule;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
@@ -33,7 +35,7 @@ public class HistoryTestHelper {
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration) {
         return isHistoryLevelAtLeast(historyLevel, processEngineConfiguration, 20000);
     }
-    
+
     public static boolean isHistoryLevelAtLeast(HistoryLevel historyLevel, ProcessEngineConfigurationImpl processEngineConfiguration, long time) {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(historyLevel)) {
             
@@ -47,12 +49,8 @@ public class HistoryTestHelper {
         
         return false;
     }
-    
-    public static void waitForJobExecutorToProcessAllHistoryJobs(FlowableRule activitiRule, long maxMillisToWait, long intervalMillis) {
-        waitForJobExecutorToProcessAllHistoryJobs(activitiRule.getProcessEngine().getProcessEngineConfiguration(), activitiRule.getManagementService(), maxMillisToWait, intervalMillis);
-    }
 
-    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService, 
+    public static void waitForJobExecutorToProcessAllHistoryJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,
             long maxMillisToWait, long intervalMillis) {
         waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, maxMillisToWait, intervalMillis, true);
     }
@@ -90,7 +88,14 @@ public class HistoryTestHelper {
                     timer.cancel();
                 }
                 if (areJobsAvailable) {
-                    throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded");
+                    List<HistoryJob> historyJobs = managementService.createHistoryJobQuery().list();
+                    String jobData = historyJobs.stream()
+                            .map(job -> String.format(
+                                    "Job id=%s, handlerType=%s, retries=%d, exceptionMessage=%s, handlerConfiguration=%s, advancedJobHandlerConfiguration=%s",
+                                    job.getId(), job.getJobHandlerType(), job.getRetries(), job.getExceptionMessage(), job.getJobHandlerConfiguration(),
+                                    managementService.getHistoryJobHistoryJson(job.getId())))
+                            .collect(Collectors.joining("\n"));
+                    throw new FlowableException("time limit of " + maxMillisToWait + " was exceeded. Remaining, unprocessed jobs:\n" + jobData);
                 }
     
             } finally {
@@ -99,11 +104,6 @@ public class HistoryTestHelper {
                 }
             }
         }
-    }
-
-    public static boolean areHistoryJobsAvailable(FlowableRule activitiRule) {
-        return areHistoryJobsAvailable(activitiRule.getManagementService());
-
     }
 
     public static boolean areHistoryJobsAvailable(ManagementService managementService) {

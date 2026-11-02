@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="One Task Test Case" flowable:initiatorVariableName="initiator"
+          flowable:candidateStarterGroups="flowableUser">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model" flowable:formFieldValidation="false">
+            <planItem id="planItem3" name="Task 1" definitionRef="humanTask1"/>
+            <planItem id="planItem4" name="Milestone 1" definitionRef="milestone1"/>
+            <humanTask id="humanTask1" name="Task 1" flowable:assignee="${initiator}" />
+            <milestone id="milestone1" name="Milestone 1" />
+        </casePlanModel>
+    </case>
+</definitions>

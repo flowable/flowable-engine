@@ -9,33 +9,33 @@
   <insert id="insertEventLogEntry" parameterType="org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl">
     insert into ${prefix}ACT_EVT_LOG(TYPE_, PROC_DEF_ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_)
     values (
-      #{type, jdbcType=VARCHAR}, 
-      #{processDefinitionId, jdbcType=VARCHAR}, 
-      #{processInstanceId, jdbcType=VARCHAR},
-      #{executionId, jdbcType=VARCHAR},
-      #{taskId, jdbcType=VARCHAR},   
-      #{timeStamp, jdbcType=TIMESTAMP}, 
-      #{userId, jdbcType=VARCHAR},
+      #{type, jdbcType=NVARCHAR},
+      #{processDefinitionId, jdbcType=NVARCHAR},
+      #{processInstanceId, jdbcType=NVARCHAR},
+      #{executionId, jdbcType=NVARCHAR},
+      #{taskId, jdbcType=NVARCHAR},
+      #{timeStamp, jdbcType=TIMESTAMP},
+      #{userId, jdbcType=NVARCHAR},
       #{data, jdbcType=${blobType}},
-      #{lockOwner, jdbcType=VARCHAR},
+      #{lockOwner, jdbcType=NVARCHAR},
       #{lockTime, jdbcType=TIMESTAMP},
-      #{isProcessed, jdbcType=INTEGER} 
-    )  
+      #{isProcessed, jdbcType=INTEGER}
+    )
   </insert>
-  
+
   <insert id="bulkInsertEventLogEntry" parameterType="java.util.List">
     insert into ${prefix}ACT_EVT_LOG(TYPE_, PROC_DEF_ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_)
-    values 
+    values
       <foreach collection="list" item="eventLogEntry" index="index" separator=",">
-        (#{eventLogEntry.type, jdbcType=VARCHAR}, 
-         #{eventLogEntry.processDefinitionId, jdbcType=VARCHAR}, 
-         #{eventLogEntry.processInstanceId, jdbcType=VARCHAR},
-         #{eventLogEntry.executionId, jdbcType=VARCHAR},
-         #{eventLogEntry.taskId, jdbcType=VARCHAR},   
-         #{eventLogEntry.timeStamp, jdbcType=TIMESTAMP}, 
-         #{eventLogEntry.userId, jdbcType=VARCHAR},
+        (#{eventLogEntry.type, jdbcType=NVARCHAR},
+         #{eventLogEntry.processDefinitionId, jdbcType=NVARCHAR},
+         #{eventLogEntry.processInstanceId, jdbcType=NVARCHAR},
+         #{eventLogEntry.executionId, jdbcType=NVARCHAR},
+         #{eventLogEntry.taskId, jdbcType=NVARCHAR},
+         #{eventLogEntry.timeStamp, jdbcType=TIMESTAMP},
+         #{eventLogEntry.userId, jdbcType=NVARCHAR},
          #{eventLogEntry.data, jdbcType=${blobType}},
-         #{eventLogEntry.lockOwner, jdbcType=VARCHAR},
+         #{eventLogEntry.lockOwner, jdbcType=NVARCHAR},
          #{eventLogEntry.lockTime, jdbcType=TIMESTAMP},
          #{eventLogEntry.isProcessed, jdbcType=INTEGER})
       </foreach>
@@ -45,35 +45,35 @@
     insert into ${prefix}ACT_EVT_LOG(LOG_NR_, TYPE_, PROC_DEF_ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_)
     values (
       ${prefix}ACT_EVT_LOG_seq.nextVal,
-      #{type, jdbcType=VARCHAR}, 
-      #{processDefinitionId, jdbcType=VARCHAR}, 
-      #{processInstanceId, jdbcType=VARCHAR},
-      #{executionId, jdbcType=VARCHAR},
-      #{taskId, jdbcType=VARCHAR},   
-      #{timeStamp, jdbcType=TIMESTAMP}, 
-      #{userId, jdbcType=VARCHAR},
+      #{type, jdbcType=NVARCHAR},
+      #{processDefinitionId, jdbcType=NVARCHAR},
+      #{processInstanceId, jdbcType=NVARCHAR},
+      #{executionId, jdbcType=NVARCHAR},
+      #{taskId, jdbcType=NVARCHAR},
+      #{timeStamp, jdbcType=TIMESTAMP},
+      #{userId, jdbcType=NVARCHAR},
       #{data, jdbcType=${blobType}},
-      #{lockOwner, jdbcType=VARCHAR},
+      #{lockOwner, jdbcType=NVARCHAR},
       #{lockTime, jdbcType=TIMESTAMP},
-      #{isProcessed, jdbcType=INTEGER} 
-    )  
+      #{isProcessed, jdbcType=INTEGER}
+    )
   </insert>
 
   <insert id="bulkInsertEventLogEntry" databaseId="oracle" parameterType="java.util.List">
-    INSERT ALL 
+    INSERT ALL
       <foreach collection="list" item="eventLogEntry" index="index">
         into ${prefix}ACT_EVT_LOG(LOG_NR_, TYPE_, PROC_DEF_ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_,
-        TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES 
+        TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_) VALUES
             (${prefix}ACT_EVT_LOG_seq.nextVal,
-             #{eventLogEntry.type, jdbcType=VARCHAR}, 
-             #{eventLogEntry.processDefinitionId, jdbcType=VARCHAR}, 
-             #{eventLogEntry.processInstanceId, jdbcType=VARCHAR},
-             #{eventLogEntry.executionId, jdbcType=VARCHAR},
-             #{eventLogEntry.taskId, jdbcType=VARCHAR},   
-             #{eventLogEntry.timeStamp, jdbcType=TIMESTAMP}, 
-             #{eventLogEntry.userId, jdbcType=VARCHAR},
+             #{eventLogEntry.type, jdbcType=NVARCHAR},
+             #{eventLogEntry.processDefinitionId, jdbcType=NVARCHAR},
+             #{eventLogEntry.processInstanceId, jdbcType=NVARCHAR},
+             #{eventLogEntry.executionId, jdbcType=NVARCHAR},
+             #{eventLogEntry.taskId, jdbcType=NVARCHAR},
+             #{eventLogEntry.timeStamp, jdbcType=TIMESTAMP},
+             #{eventLogEntry.userId, jdbcType=NVARCHAR},
              #{eventLogEntry.data, jdbcType=${blobType}},
-             #{eventLogEntry.lockOwner, jdbcType=VARCHAR},
+             #{eventLogEntry.lockOwner, jdbcType=NVARCHAR},
              #{eventLogEntry.lockTime, jdbcType=TIMESTAMP},
              #{eventLogEntry.isProcessed, jdbcType=INTEGER})
       </foreach>
@@ -85,15 +85,15 @@
   <resultMap id="eventLogEntryResultMap" type="org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl">
     <id property="logNumber" column="LOG_NR_" jdbcType="BIGINT" />
     <result property="id" column="LOG_NR_" jdbcType="BIGINT" />
-    <result property="type" column="TYPE_" jdbcType="VARCHAR"/>
-    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR"/>
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR"/>
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR"/>
+    <result property="type" column="TYPE_" jdbcType="NVARCHAR"/>
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="NVARCHAR"/>
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="NVARCHAR"/>
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="NVARCHAR"/>
+    <result property="taskId" column="TASK_ID_" jdbcType="NVARCHAR"/>
     <result property="timeStamp" column="TIME_STAMP_" jdbcType="TIMESTAMP"/>
-    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="NVARCHAR" />
     <result property="data" column="DATA_" jdbcType="${blobType}"/>
-    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="VARCHAR"/>
+    <result property="lockOwner" column="LOCK_OWNER_" jdbcType="NVARCHAR"/>
     <result property="lockTime" column="LOCK_TIME_" jdbcType="TIMESTAMP"/>
     <result property="isProcessed" column="IS_PROCESSED_" jdbcType="INTEGER"/>
   </resultMap>
@@ -106,20 +106,20 @@
   
   <select id="selectEventLogEntries" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
     select * from ${prefix}ACT_EVT_LOG 
-    WHERE LOG_NR_ &gt; #{parameter.startLogNr}
-    AND LOG_NR_ &lt; #{parameter.endLogNr}
+    WHERE LOG_NR_ &gt; #{parameter.startLogNr, jdbcType=BIGINT}
+    AND LOG_NR_ &lt; #{parameter.endLogNr, jdbcType=BIGINT}
     ORDER BY LOG_NR_ 
   </select>
   
   <select id="selectEventLogEntriesByProcessInstanceId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="eventLogEntryResultMap">
     select * from ${prefix}ACT_EVT_LOG 
-    WHERE PROC_INST_ID_ = #{parameter.processInstanceId}
+    WHERE PROC_INST_ID_ = #{parameter.processInstanceId, jdbcType=NVARCHAR}
     ORDER BY LOG_NR_ 
   </select>
   
   <!-- DELETE -->
   <delete id="deleteEventLogEntry" parameterType="long">
-    delete from ${prefix}ACT_EVT_LOG where LOG_NR_ = #{logNr}
+    delete from ${prefix}ACT_EVT_LOG where LOG_NR_ = #{logNr, jdbcType=BIGINT}
   </delete>
 
 </mapper>

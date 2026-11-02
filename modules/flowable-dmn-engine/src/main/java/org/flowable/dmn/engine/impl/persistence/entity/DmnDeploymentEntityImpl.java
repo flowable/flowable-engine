@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 
 /**
  * @author Tijs Rademakers
@@ -43,6 +44,7 @@ public class DmnDeploymentEntityImpl extends AbstractDmnEngineNoRevisionEntity i
      * Will only be used during actual deployment to pass deployed artifacts (eg decision tables). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
+    protected Map<String, DecisionCacheEntry> decisionDefinitionCache = new HashMap<>();
 
     public DmnDeploymentEntityImpl() {
 
@@ -97,6 +99,16 @@ public class DmnDeploymentEntityImpl extends AbstractDmnEngineNoRevisionEntity i
             }
         }
         return null;
+    }
+    
+    @Override
+    public void addDecisionCacheEntry(String decisionDefinitionId, DecisionCacheEntry decisionCacheEntry) {
+        decisionDefinitionCache.put(decisionDefinitionId, decisionCacheEntry);
+    }
+
+    @Override
+    public DecisionCacheEntry getDecisionCacheEntry(String decisionDefinitionId) {
+        return decisionDefinitionCache.get(decisionDefinitionId);
     }
 
     // getters and setters ////////////////////////////////////////////////////////

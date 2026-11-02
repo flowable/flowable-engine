@@ -65,8 +65,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
 
     protected EventGateway getPrecedingEventBasedGateway(DelegateExecution execution) {
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
-        if (currentFlowElement instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) currentFlowElement;
+        if (currentFlowElement instanceof IntermediateCatchEvent intermediateCatchEvent) {
             List<SequenceFlow> incomingSequenceFlow = intermediateCatchEvent.getIncomingFlows();
 
             // If behind an event based gateway, there is only one incoming sequence flow that originates from said gateway
@@ -110,8 +109,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
     
             // Execute the cancel behaviour of the IntermediateCatchEvent
             for (ExecutionEntity executionEntity : executionEntities) {
-                if (eventActivityIds.contains(executionEntity.getActivityId()) && execution.getCurrentFlowElement() instanceof IntermediateCatchEvent) {
-                    IntermediateCatchEvent intermediateCatchEvent = (IntermediateCatchEvent) execution.getCurrentFlowElement();
+                if (eventActivityIds.contains(executionEntity.getActivityId()) && execution.getCurrentFlowElement() instanceof IntermediateCatchEvent intermediateCatchEvent) {
                     if (intermediateCatchEvent.getBehavior() instanceof IntermediateCatchEventActivityBehavior) {
                         ((IntermediateCatchEventActivityBehavior) intermediateCatchEvent.getBehavior()).eventCancelledByEventGateway(executionEntity);
                         eventActivityIds.remove(executionEntity.getActivityId()); // We only need to delete ONE execution at the event.

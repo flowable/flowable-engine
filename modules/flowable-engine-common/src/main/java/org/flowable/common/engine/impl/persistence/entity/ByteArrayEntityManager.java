@@ -30,4 +30,10 @@ public interface ByteArrayEntityManager extends EntityManager<ByteArrayEntity> {
      */
     void deleteByteArrayById(String byteArrayEntityId);
 
+    /**
+     * Deletes the {@link ByteArrayEntity} with the given ids from the database. Important: this operation will NOT do any optimistic locking, to avoid loading the bytes in memory. So use this method
+     * only in conjunction with an entity that has optimistic locking!.
+     */
+    void bulkDeleteByteArraysById(List<String> byteArrayEntityIds);
+
 }

@@ -54,7 +54,7 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
         }
 
         if (task.isSuspended()) {
-            throw new FlowableException(getSuspendedTaskException());
+            throw new FlowableException(getSuspendedTaskExceptionPrefix() + " a suspended " + task);
         }
 
         return execute(commandContext, task);
@@ -68,8 +68,8 @@ public abstract class NeedsActiveTaskCmd<T> implements Command<T>, Serializable 
     /**
      * Subclasses can override this method to provide a customized exception message that will be thrown when the task is suspended.
      */
-    protected String getSuspendedTaskException() {
-        return "Cannot execute operation: task is suspended";
+    protected String getSuspendedTaskExceptionPrefix() {
+        return "Cannot execute operation for";
     }
 
 }

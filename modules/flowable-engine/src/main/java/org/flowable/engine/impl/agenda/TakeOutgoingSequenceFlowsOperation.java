@@ -33,9 +33,11 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.common.engine.impl.util.CollectionUtil;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
+import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.UelExpressionCondition;
@@ -106,7 +108,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             handleSequenceFlow();
 
         } else {
-            throw new FlowableException("Programmatic error: this operation needs either a FlowNode or a SequenceFlow as current FlowElement");
+            throw new FlowableException("Programmatic error: this operation needs either a FlowNode or a SequenceFlow as current FlowElement for " + execution);
 
         }
     }
@@ -116,8 +118,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         if (currentFlowElement instanceof FlowNode) {
             sourceFlowNode = (FlowNode) currentFlowElement;
 
-        } else if (currentFlowElement instanceof SequenceFlow){
-            SequenceFlow sequenceFlow = (SequenceFlow) currentFlowElement;
+        } else if (currentFlowElement instanceof SequenceFlow sequenceFlow){
             FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
             if (sourceFlowElement instanceof FlowNode) {
                 sourceFlowNode = (FlowNode) sourceFlowElement;
@@ -139,27 +140,35 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
         }
         job.setJobHandlerConfiguration(jobHandlerConfig);
 
-        jobService.createAsyncJob(job, sourceFlowNode.isExclusive());
+        jobService.createAsyncJob(job, sourceFlowNode.isAsynchronousLeaveExclusive());
         jobService.scheduleAsyncJob(job);
     }
 
     protected void handleFlowNode(FlowNode flowNode) {
-
-        handleActivityEnd(flowNode);
-        if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
-            handleAdhocSubProcess(flowNode);
-        } else {
-            leaveFlowNode(flowNode);
+        boolean continueNormally = handleActivityEnd(flowNode);
+        if (continueNormally) {
+            // Only continue here, when no BpmnException has been thrown by end listeners.
+            if (flowNode.getParentContainer() != null && flowNode.getParentContainer() instanceof AdhocSubProcess) {
+                handleAdhocSubProcess(flowNode);
+            } else {
+                leaveFlowNode(flowNode);
+            }
         }
     }
 
-    protected void handleActivityEnd(FlowNode flowNode) {
+    protected boolean handleActivityEnd(FlowNode flowNode) {
         // a process instance execution can never leave a flow node, but it can pass here whilst cleaning up
         // hence the check for NOT being a process instance
+        boolean continueNormally = true;
         if (!execution.isProcessInstanceType()) {
-
-            if (CollectionUtil.isNotEmpty(flowNode.getExecutionListeners())) {
-                executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+            if (shouldExecuteEndListeners(flowNode)) {
+                try {
+                    executeExecutionListeners(flowNode, ExecutionListener.EVENTNAME_END);
+                } catch (BusinessError businessError) {
+                    ErrorPropagation.propagateError(businessError, execution);
+                    // We don't return here immediately, because the activity needs to be ended properly and the event dispatched
+                    continueNormally = false;
+                }
             }
 
             if (execution.isActive()
@@ -183,6 +192,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                         processEngineConfiguration.getEngineCfgKey());
             }
         }
+        return continueNormally;
     }
     
     protected void leaveFlowNode(FlowNode flowNode) {
@@ -237,7 +247,7 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 agenda.planEndExecutionOperation(execution);
 
             } else {
-                throw new FlowableException("No outgoing sequence flow of element '" + flowNode.getId() + "' could be selected for continuing the process");
+                throw new FlowableException("No outgoing sequence flow of element '" + flowNode.getId() + "' could be selected for continuing the process for " + execution);
             }
 
         } else {
@@ -359,11 +369,10 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             agenda.planDestroyScopeOperation(execution);
 
-        } else if (currentFlowElement instanceof Activity) {
+        } else if (currentFlowElement instanceof Activity activity) {
 
             // If the current activity is an activity, we need to remove any currently active boundary events
 
-            Activity activity = (Activity) currentFlowElement;
             if (CollectionUtil.isNotEmpty(activity.getBoundaryEvents())) {
 
                 // Cancel events are not removed
@@ -424,6 +433,19 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 }
             }
         }
+        return true;
+    }
+
+    protected boolean shouldExecuteEndListeners(FlowNode flowNode) {
+        if (CollectionUtil.isEmpty(flowNode.getExecutionListeners())) {
+            return false;
+        }
+        if (flowNode instanceof Activity) {
+            // Execution end listeners should not be executed if the activity has multi instance loop characteristics
+            // That is handled in the MultiInstanceActivityBehaviour
+            return !((Activity) flowNode).hasMultiInstanceLoopCharacteristics();
+        }
+
         return true;
     }
 

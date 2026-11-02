@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -42,6 +43,7 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
     protected String activityType;
     protected String executionId;
     protected String assignee;
+    protected String completedBy;
     protected String taskId;
     protected String calledProcessInstanceId;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
@@ -60,6 +62,7 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
         persistentState.put("executionId", executionId);
         persistentState.put("taskId", taskId);
         persistentState.put("assignee", assignee);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("calledProcessInstanceId", calledProcessInstanceId);
         persistentState.put("activityId", activityId);
         persistentState.put("activityName", activityName);
@@ -200,6 +203,16 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
     }
 
     @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -236,7 +249,21 @@ public class ActivityInstanceEntityImpl extends AbstractBpmnEngineEntity impleme
 
     @Override
     public String toString() {
-        return "ActivityInstanceEntity[id=" + id + ", activityId=" + activityId + ", activityName=" + activityName + ", executionId= " + executionId + "]";
+        StringBuilder sb = new StringBuilder();
+        sb.append("ActivityInstanceEntity[id=").append(id)
+                .append(", activityId=").append(activityId);
+        if (activityName != null) {
+            sb.append(", activityName=").append(activityName);
+        }
+
+        sb.append(", executionId=").append(executionId)
+                .append(", definitionId=").append(processDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            sb.append(", tenantId=").append(tenantId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
 }

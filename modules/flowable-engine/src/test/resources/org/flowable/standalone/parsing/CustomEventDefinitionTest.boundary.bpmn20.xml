@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/test">
+
+  <process id="customEventDefinitionBoundaryProcess" isExecutable="true">
+
+    <startEvent id="theStart"/>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
+
+    <userTask id="theTask" name="Wait for boundary"/>
+
+    <boundaryEvent id="customBoundary" attachedToRef="theTask" cancelActivity="true">
+      <extensionElements>
+        <flowable:myTestEventDefinition customKey="boundary-99"/>
+      </extensionElements>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd"/>
+    <sequenceFlow id="flow3" sourceRef="customBoundary" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+
+  </process>
+
+</definitions>

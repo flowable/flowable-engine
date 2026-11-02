@@ -32,8 +32,9 @@ import org.flowable.common.engine.api.async.AsyncTaskInvoker;
 import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.common.engine.impl.el.ExpressionManager;
+import org.flowable.common.engine.impl.el.FixedValue;
 import org.flowable.engine.cfg.HttpClientConfig;
-import org.flowable.engine.delegate.BpmnError;
+import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.FutureJavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
@@ -42,9 +43,7 @@ import org.flowable.engine.impl.bpmn.http.handler.DelegateExpressionHttpHandler;
 import org.flowable.engine.impl.bpmn.http.handler.ScriptHttpHandler;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.http.common.api.HttpRequest;
 import org.flowable.http.common.api.HttpResponse;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.api.delegate.HttpRequestHandler;
@@ -77,7 +76,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
     @Override
     public CompletableFuture<ExecutionData> execute(DelegateExecution execution, AsyncTaskInvoker taskInvoker) {
-        HttpRequest request;
+        RequestData request;
 
         HttpServiceTask httpServiceTask = (HttpServiceTask) execution.getCurrentFlowElement();
         try {
@@ -87,7 +86,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
             if (e instanceof FlowableException) {
                 throw (FlowableException) e;
             } else {
-                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution.getId(), e);
+                throw new FlowableException(HTTP_TASK_REQUEST_FIELD_INVALID + " in execution " + execution, e);
             }
         }
 
@@ -95,11 +94,11 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
         HttpRequestHandler httpRequestHandler = createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), processEngineConfiguration);
 
         if (httpRequestHandler != null) {
-            httpRequestHandler.handleHttpRequest(execution, request, null);
+            httpRequestHandler.handleHttpRequest(execution, request.getHttpRequest(), null);
         }
 
         // Validate request
-        validateRequest(request);
+        validateRequest(request.getHttpRequest());
 
         boolean parallelInSameTransaction;
         if (httpServiceTask.getParallelInSameTransaction() != null) {
@@ -114,7 +113,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     @Override
     public void afterExecution(DelegateExecution execution, ExecutionData result) {
 
-        HttpRequest request = result.getRequest();
+        RequestData request = result.getRequest();
         HttpResponse response = result.getResponse();
 
         Throwable resultException = result.getException();
@@ -141,8 +140,8 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
 
             // Save response fields in the execution
             saveResponseFields(execution, request, response, processEngineConfiguration.getObjectMapper());
-        } catch (BpmnError e) {
-            // Rethrow BPMN error so it can be propagated
+        } catch (BusinessError e) {
+            // Rethrow business error so it can be propagated
             throw e;
         } catch (Exception ex) {
             if (request.isIgnoreErrors()) {
@@ -201,8 +200,7 @@ public class DefaultBpmnHttpActivityDelegate extends BaseHttpActivityDelegate im
     }
 
     protected ScriptHttpHandler createScriptHttpHandler(ExpressionManager expressionManager, ScriptInfo scriptInfo) {
-        ScriptHttpHandler scriptHttpHandler = new ScriptHttpHandler(createExpression(expressionManager, scriptInfo.getLanguage()),
-                createExpression(expressionManager, scriptInfo.getScript()));
+        ScriptHttpHandler scriptHttpHandler = new ScriptHttpHandler(createExpression(expressionManager, scriptInfo.getLanguage()), scriptInfo.getScript());
         if (scriptInfo.getResultVariable() != null) {
             scriptHttpHandler.setResultVariable(createExpression(expressionManager, scriptInfo.getResultVariable()));
         }

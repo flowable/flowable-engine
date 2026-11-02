@@ -20,6 +20,7 @@ import java.util.Map;
 import org.flowable.common.engine.api.repository.EngineResource;
 import org.flowable.common.engine.impl.persistence.entity.Entity;
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.engine.impl.persistence.deploy.DecisionCacheEntry;
 
 /**
  * @author Tijs Rademakers
@@ -32,6 +33,10 @@ public interface DmnDeploymentEntity extends DmnDeployment, Entity {
     void addDeployedArtifact(Object deployedArtifact);
 
     <T> List<T> getDeployedArtifacts(Class<T> clazz);
+    
+    void addDecisionCacheEntry(String decisionDefinitionId, DecisionCacheEntry decisionCacheEntry);
+
+    DecisionCacheEntry getDecisionCacheEntry(String decisionDefinitionId);
 
     void setName(String name);
 

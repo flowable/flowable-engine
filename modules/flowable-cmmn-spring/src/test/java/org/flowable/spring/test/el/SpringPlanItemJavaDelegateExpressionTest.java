@@ -14,6 +14,7 @@ package org.flowable.spring.test.el;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
@@ -24,22 +25,30 @@ import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.flowable.cmmn.spring.impl.test.FlowableCmmnSpringExtension;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 /**
  * @author Joram Barrez
  */
+@SpringJUnitConfig(locations = {
+        "SpringBeanTest-context.xml"
+})
+@ExtendWith(FlowableCmmnSpringExtension.class)
 public class SpringPlanItemJavaDelegateExpressionTest {
 
-    @Rule
-    public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/spring/test/el/SpringBeanTest-context.xml");
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
+
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
 
     @Test
     @CmmnDeployment
     public void testCmmnTriggerableActivityBehaviorDelegateExpression() {
-        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("myCase")
             .start();
@@ -53,19 +62,18 @@ public class SpringPlanItemJavaDelegateExpressionTest {
         // When triggered, the plan item will complete
         cmmnRuntimeService.createPlanItemInstanceTransitionBuilder(planItemInstance.getId()).trigger();
 
-        assertThat(cmmnRule.getCmmnHistoryService().createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult().getState())
+        assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceCaseInstanceId(caseInstance.getId()).singleResult().getState())
             .isEqualTo(PlanItemInstanceState.COMPLETED);
     }
 
     @Test
     @CmmnDeployment
     public void testPlanItemJavaDelegateExpression() {
-        CmmnRuntimeService cmmnRuntimeService = cmmnRule.getCmmnRuntimeService();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("myCase")
             .start();
 
-        assertThat(cmmnRule.getCmmnHistoryService().createHistoricVariableInstanceQuery()
+        assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery()
             .caseInstanceId(caseInstance.getId()).singleResult().getValue()).isEqualTo(true);
     }
 

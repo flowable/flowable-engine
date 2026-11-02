@@ -35,7 +35,8 @@ public abstract class PlanItemDefinitionXmlConverter extends CaseElementXmlConve
             if (parentStage != null) {
                 parentStage.addPlanItemDefinition(planItemDefinition);
             }
-        }   
+        }
+
         return planItemDefinition;
     }
     

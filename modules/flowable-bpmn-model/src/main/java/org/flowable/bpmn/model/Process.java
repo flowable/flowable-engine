@@ -138,8 +138,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     protected List<Association> findAssociationsWithSourceRefRecursive(FlowElementsContainer flowElementsContainer, String sourceRef) {
         List<Association> associations = new ArrayList<>();
         for (Artifact artifact : flowElementsContainer.getArtifacts()) {
-            if (artifact instanceof Association) {
-                Association association = (Association) artifact;
+            if (artifact instanceof Association association) {
                 if (association.getSourceRef() != null && association.getTargetRef() != null && association.getSourceRef().equals(sourceRef)) {
                     associations.add(association);
                 }
@@ -161,8 +160,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     protected List<Association> findAssociationsWithTargetRefRecursive(FlowElementsContainer flowElementsContainer, String targetRef) {
         List<Association> associations = new ArrayList<>();
         for (Artifact artifact : flowElementsContainer.getArtifacts()) {
-            if (artifact instanceof Association) {
-                Association association = (Association) artifact;
+            if (artifact instanceof Association association) {
                 if (association.getTargetRef() != null && association.getTargetRef().equals(targetRef)) {
                     associations.add(association);
                 }

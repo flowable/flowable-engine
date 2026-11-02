@@ -21,19 +21,19 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
 
     private String deplId;
 
-    @Before
+    @BeforeEach
     public void createCase() {
         org.flowable.cmmn.api.repository.CmmnDeployment deployment = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/CaseInstanceUpdateBusinessKeyTest.testUpdateExistingCaseBusinessKey.cmmn")
@@ -42,7 +42,7 @@ public class CaseInstanceUpdateBusinessKeyTest extends FlowableCmmnTestCase {
         deplId = deployment.getId();
     }
 
-    @After
+    @AfterEach
     public void deleteCase() {
         cmmnRepositoryService.deleteDeployment(deplId, true);
     }

@@ -15,13 +15,10 @@ package org.flowable.cmmn.rest.service.api.runtime.caze;
 
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
-import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.image.CaseDiagramGenerator;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -44,14 +41,11 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Case Instances" }, description = "Manage Case Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instances" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
 
     @Autowired
     protected CmmnRepositoryService repositoryService;
-
-    @Autowired
-    protected CmmnEngineConfiguration cmmnEngineConfiguration;
 
     @ApiOperation(value = "Get diagram for a case instance", tags = { "Case Instances" })
     @ApiResponses(value = {
@@ -60,7 +54,7 @@ public class CaseInstanceDiagramResource extends BaseCaseInstanceResource {
             @ApiResponse(code = 404, message = "Indicates the requested case instance was not found.")
     })
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/diagram")
-    public ResponseEntity<byte[]> getCaseInstanceDiagram(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId, HttpServletResponse response) {
+    public ResponseEntity<byte[]> getCaseInstanceDiagram(@ApiParam(name = "caseInstanceId") @PathVariable String caseInstanceId) {
         CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
 
         CaseDefinition caseDef = repositoryService.getCaseDefinition(caseInstance.getCaseDefinitionId());

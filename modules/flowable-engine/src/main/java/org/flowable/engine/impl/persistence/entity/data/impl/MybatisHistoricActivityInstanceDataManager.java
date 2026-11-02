@@ -93,12 +93,14 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
 
     @Override
     public long findHistoricActivityInstanceCountByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        setSafeInValueLists(historicActivityInstanceQuery);
         return (Long) getDbSqlSession().selectOne("selectHistoricActivityInstanceCountByQueryCriteria", historicActivityInstanceQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<HistoricActivityInstance> findHistoricActivityInstancesByQueryCriteria(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        setSafeInValueLists(historicActivityInstanceQuery);
         return getDbSqlSession().selectList("selectHistoricActivityInstancesByQueryCriteria", historicActivityInstanceQuery);
     }
 
@@ -115,6 +117,7 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
 
     @Override
     public void deleteHistoricActivityInstances(HistoricActivityInstanceQueryImpl historicActivityInstanceQuery) {
+        setSafeInValueLists(historicActivityInstanceQuery);
         getDbSqlSession().delete("bulkDeleteHistoricActivityInstances", historicActivityInstanceQuery, HistoricActivityInstanceEntityImpl.class);
     }
     
@@ -128,4 +131,12 @@ public class MybatisHistoricActivityInstanceDataManager extends AbstractProcessD
         getDbSqlSession().delete("bulkDeleteHistoricActivityInstancesForNonExistingProcessInstances", null, HistoricActivityInstanceEntityImpl.class);
     }
 
+    protected void setSafeInValueLists(HistoricActivityInstanceQueryImpl activityInstanceQuery) {
+        if (activityInstanceQuery.getProcessInstanceIds() != null) {
+            activityInstanceQuery.setSafeProcessInstanceIds(createSafeInValuesList(activityInstanceQuery.getProcessInstanceIds()));
+        }
+        if (activityInstanceQuery.getCalledProcessInstanceIds() != null) {
+            activityInstanceQuery.setSafeCalledProcessInstanceIds(createSafeInValuesList(activityInstanceQuery.getCalledProcessInstanceIds()));
+        }
+    }
 }

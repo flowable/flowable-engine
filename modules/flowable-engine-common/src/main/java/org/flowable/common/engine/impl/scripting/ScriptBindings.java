@@ -13,8 +13,10 @@
 
 package org.flowable.common.engine.impl.scripting;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +25,8 @@ import java.util.Set;
 import javax.script.Bindings;
 import javax.script.SimpleScriptContext;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.flowable.common.engine.api.variable.VariableContainer;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -39,18 +43,21 @@ public class ScriptBindings implements Bindings {
     protected static final Set<String> UNSTORED_KEYS = new HashSet<>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println", "nashorn.global"));
 
     protected List<Resolver> scriptResolvers;
-    protected VariableScope variableScope;
+    protected VariableContainer scopeContainer;
+    protected VariableContainer inputVariableContainer;
     protected Bindings defaultBindings;
     protected boolean storeScriptVariables = true; // By default everything is stored (backwards compatibility)
 
-    public ScriptBindings(List<Resolver> scriptResolvers, VariableScope variableScope) {
+    public ScriptBindings(List<Resolver> scriptResolvers, VariableContainer scopeContainer, VariableContainer inputVariableContainer) {
         this.scriptResolvers = scriptResolvers;
-        this.variableScope = variableScope;
+        this.scopeContainer = scopeContainer;
+        this.inputVariableContainer = inputVariableContainer;
         this.defaultBindings = new SimpleScriptContext().getBindings(SimpleScriptContext.ENGINE_SCOPE);
     }
 
-    public ScriptBindings(List<Resolver> scriptResolvers, VariableScope variableScope, boolean storeScriptVariables) {
-        this(scriptResolvers, variableScope);
+    public ScriptBindings(List<Resolver> scriptResolvers, VariableContainer scopeContainer, VariableContainer inputVariableContainer,
+            boolean storeScriptVariables) {
+        this(scriptResolvers, scopeContainer, inputVariableContainer);
         this.storeScriptVariables = storeScriptVariables;
     }
 
@@ -79,8 +86,8 @@ public class ScriptBindings implements Bindings {
         if (storeScriptVariables) {
             Object oldValue = null;
             if (!UNSTORED_KEYS.contains(name)) {
-                oldValue = variableScope.getVariable(name);
-                variableScope.setVariable(name, value);
+                oldValue = scopeContainer.getVariable(name);
+                scopeContainer.setVariable(name, value);
                 return oldValue;
             }
         }
@@ -89,22 +96,31 @@ public class ScriptBindings implements Bindings {
 
     @Override
     public Set<Map.Entry<String, Object>> entrySet() {
-        return variableScope.getVariables().entrySet();
+        Set<Map.Entry<String, Object>> entries = new HashSet<>();
+        for (String key : inputVariableContainer.getVariableNames()) {
+            entries.add(Pair.of(key, inputVariableContainer.getVariable(key)));
+        }
+        return entries;
     }
 
     @Override
     public Set<String> keySet() {
-        return variableScope.getVariables().keySet();
+        return inputVariableContainer.getVariableNames();
     }
 
     @Override
     public int size() {
-        return variableScope.getVariables().size();
+        return inputVariableContainer.getVariableNames().size();
     }
 
     @Override
     public Collection<Object> values() {
-        return variableScope.getVariables().values();
+        Set<String> variableNames = inputVariableContainer.getVariableNames();
+        List<Object> values = new ArrayList<>(variableNames.size());
+        for (String key : variableNames) {
+            values.add(inputVariableContainer.getVariable(key));
+        }
+        return values;
     }
 
     @Override
@@ -139,4 +155,10 @@ public class ScriptBindings implements Bindings {
         UNSTORED_KEYS.add(unstoredKey);
     }
 
+    protected Map<String, Object> getVariables() {
+        if (this.scopeContainer instanceof VariableScope) {
+            return ((VariableScope) this.scopeContainer).getVariables();
+        }
+        return Collections.emptyMap();
+    }
 }

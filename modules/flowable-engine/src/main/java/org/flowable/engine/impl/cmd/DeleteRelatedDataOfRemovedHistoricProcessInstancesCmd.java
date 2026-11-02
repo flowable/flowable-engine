@@ -15,12 +15,14 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
 
+@Deprecated
 public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -37,7 +39,10 @@ public class DeleteRelatedDataOfRemovedHistoricProcessInstancesCmd implements Co
             }
         }
         processEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingProcessInstances();
-        processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        if (processEngineConfiguration.getHistoryManager().isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
+            processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService()
+                    .deleteHistoricVariableInstancesForNonExistingProcessInstances();
+        }
         processEngineConfiguration.getHistoricDetailEntityManager().deleteHistoricDetailForNonExistingProcessInstances();
 
         return null;

@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.reactivation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.reactivation.CaseReactivationBuilder;
@@ -30,6 +32,7 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
 
     protected final CommandExecutor commandExecutor;
     protected final String caseInstanceId;
+    protected List<String> terminatedPlanItemDefinitionIds = new ArrayList<>();
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
 
@@ -40,6 +43,10 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
 
     public String getCaseInstanceId() {
         return caseInstanceId;
+    }
+
+    public List<String> getTerminatedPlanItemDefinitionIds() {
+        return terminatedPlanItemDefinitionIds;
     }
 
     public boolean hasVariables() {
@@ -56,6 +63,12 @@ public class CaseReactivationBuilderImpl implements CaseReactivationBuilder {
 
     public Map<String, Object> getTransientVariables() {
         return transientVariables;
+    }
+
+    @Override
+    public CaseReactivationBuilder addTerminatedPlanItemInstanceForPlanItemDefinition(String planItemDefinitionId) {
+        this.terminatedPlanItemDefinitionIds.add(planItemDefinitionId);
+        return this;
     }
 
     @Override

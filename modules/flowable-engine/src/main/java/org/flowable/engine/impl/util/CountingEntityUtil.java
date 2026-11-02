@@ -14,7 +14,6 @@ package org.flowable.engine.impl.util;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -69,7 +68,7 @@ public class CountingEntityUtil {
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);
             }
-        } else if (ScopeTypes.BPMN_DEPENDENT.contains(variableInstance.getScopeType()) && isExecutionRelatedEntityCountEnabledGlobally()) {
+        } else if (processEngineConfiguration.getDependentScopeTypes().contains(variableInstance.getScopeType()) && isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) processEngineConfiguration.getExecutionEntityManager().findById(variableInstance.getSubScopeId());
             if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setVariableCount(executionEntity.getVariableCount() + 1);

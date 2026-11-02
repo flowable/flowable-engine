@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions id="definitions"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             targetNamespace="Examples">
+
+    <process id="testErrorInScript">
+
+        <startEvent id="theStart"/>
+
+        <scriptTask id="theScriptTaskWithJavaScript" scriptFormat="JavaScript">
+            <script>
+                <![CDATA[ var foo = 1;  var jsError = foo.substring(0,1); ]]>
+            </script>
+        </scriptTask>
+
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theScriptTaskWithJavaScript"/>
+        <sequenceFlow id="flow2" sourceRef="theScriptTaskWithJavaScript" targetRef="theEnd"/>
+
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

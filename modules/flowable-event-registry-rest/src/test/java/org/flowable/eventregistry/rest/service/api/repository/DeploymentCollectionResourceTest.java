@@ -23,8 +23,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.rest.service.BaseSpringRestTestCase;
 import org.flowable.eventregistry.rest.service.api.EventRestUrls;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -38,6 +39,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET cmmn-repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {
@@ -88,6 +90,38 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
             // Check without tenantId filtering
             url = baseUrl + "?withoutTenantId=true";
             assertResultsPresentInDataResponse(url, firstDeployment.getId());
+
+        } finally {
+            // Always cleanup any created deployments, even if the test failed
+            List<EventDeployment> deployments = repositoryService.createDeploymentQuery().list();
+            for (EventDeployment deployment : deployments) {
+                repositoryService.deleteDeployment(deployment.getId());
+            }
+        }
+    }
+
+    @Test
+    public void testGetDeploymentsSorting() throws Exception {
+
+        try {
+            // Alter time to ensure different deployTimes
+            Calendar yesterday = Calendar.getInstance();
+            yesterday.add(Calendar.DAY_OF_MONTH, -1);
+            eventRegistryEngineConfiguration.getClock().setCurrentTime(yesterday.getTime());
+
+            EventDeployment firstDeployment = repositoryService.createDeployment().name("Deployment 1").category("DEF")
+                    .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
+                    .tenantId("acme")
+                    .deploy();
+
+            eventRegistryEngineConfiguration.getClock().setCurrentTime(Calendar.getInstance().getTime());
+            EventDeployment secondDeployment = repositoryService.createDeployment().name("Deployment 2").category("ABC")
+                    .addClasspathResource("org/flowable/eventregistry/rest/service/api/repository/simpleEvent.event")
+                    .tenantId("myTenant")
+                    .deploy();
+
+            String baseUrl = EventRestUrls.createRelativeResourceUrl(EventRestUrls.URL_DEPLOYMENT_COLLECTION);
+            assertResultsPresentInDataResponse(baseUrl, firstDeployment.getId(), secondDeployment.getId());
 
             // Check ordering by name
             CloseableHttpResponse response = executeRequest(

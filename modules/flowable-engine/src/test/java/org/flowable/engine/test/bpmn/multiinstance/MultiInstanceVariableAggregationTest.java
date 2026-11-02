@@ -21,7 +21,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,10 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.variable.VariableAggregatorContext;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.delegate.variable.VariableAggregator;
+import org.flowable.engine.delegate.variable.VariableAggregatorContext;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -44,6 +44,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.variables.VariablesTest;
 import org.flowable.eventsubscription.api.EventSubscription;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -51,10 +52,10 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 import org.flowable.variable.service.impl.types.JsonType;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -538,6 +539,14 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         VariableInstance reviewsVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
         assertThat(reviewsVarInstance).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
     }
 
     @Test
@@ -610,6 +619,102 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                     .variableName("reviews")
                     .singleResult();
             assertThat(historicReviews).isNull();
+        }
+    }
+
+    @Test
+    @Deployment
+    public void testParallelMultiInstanceUserTaskWithTimerBoundaryEvent() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+            .processDefinitionKey("myProcess")
+            .variable("nrOfLoops", 3)
+            .start();
+
+        ArrayNode reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo("["
+                    + "{ userId: null },"
+                    + "{ userId: null },"
+                    + "{ userId: null }"
+                    + "]");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .hasEntrySatisfying("reviews", variable -> {
+                        assertThat(variable).isInstanceOf(ArrayNode.class);
+                        assertThatJson(variable)
+                                .isEqualTo(
+                                        "["
+                                                + "{ userId: null },"
+                                                + "{ userId: null },"
+                                                + "{ userId: null }"
+                                                + "]");
+                    });
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        reviews = runtimeService.getVariable(processInstance.getId(), "reviews", ArrayNode.class);
+
+        assertThatJson(reviews)
+            .isEqualTo(
+                "["
+                    + "{ userId: 'userOne' },"
+                    + "{ userId: 'userTwo' },"
+                    + "{ userId: 'userThree' }"
+                    + "]");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .hasEntrySatisfying("reviews", variable -> {
+                        assertThat(variable).isInstanceOf(ArrayNode.class);
+                        assertThatJson(variable)
+                                .isEqualTo(
+                                        "["
+                                                + "{ userId: 'userOne' },"
+                                                + "{ userId: 'userTwo' },"
+                                                + "{ userId: 'userThree' }"
+                                                + "]");
+                    });
+        }
+
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(timerJob).isNotNull();
+        Job job = managementService.moveTimerToExecutableJob(timerJob.getId());
+        managementService.executeJob(job.getId());
+
+        Task afterBoundary = taskService.createTaskQuery().singleResult();
+        assertThat(afterBoundary).isNotNull();
+        assertThat(afterBoundary.getTaskDefinitionKey()).isEqualTo("afterBoundary");
+
+        assertThat(runtimeService.getVariableInstance(processInstance.getId(), "reviews")).isNull();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .includeProcessVariables()
+                    .singleResult();
+
+            assertThat(historicProcessInstance.getProcessVariables())
+                    .doesNotContainKey("reviews");
         }
     }
 
@@ -811,7 +916,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                         .setValue("testUser", execution);
                 return null;
             });
-        }).hasMessage("Error while evaluating expression: ${reviews[0].userId}");
+        }).hasMessageStartingWith("Error while evaluating expression: ${reviews[0].userId} with ProcessInstance[")
+            .hasMessageContaining(" - definition 'myProcess:1:");
 
         reviewsInstance = runtimeService.getVariableInstance(processInstance.getId(), "reviews");
 
@@ -864,6 +970,68 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             assertThat(historicReviews.getVariableTypeName()).isEqualTo(JsonType.TYPE_NAME);
         }
 
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceVariableAggregationTest.testParallelMultiInstanceUserTaskWithBoundaryEvent.bpmn20.xml")
+    public void testParallelMultiInstanceUserTaskWithProcessDeletion() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("myProcess")
+                .variable("nrOfLoops", 3)
+                .start();
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: null },"
+                            + "{ userId: null },"
+                            + "{ userId: null }"
+                            + "]");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+                .orderByTaskPriority().asc()
+                .list();
+        assertThat(tasks).hasSize(3);
+
+        taskService.setAssignee(tasks.get(0).getId(), "userOne");
+        taskService.setAssignee(tasks.get(1).getId(), "userTwo");
+        taskService.setAssignee(tasks.get(2).getId(), "userThree");
+
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", true);
+        variables.put("description", "description task 0");
+        taskService.complete(tasks.get(0).getId(), variables);
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNotNull();
+            assertThat(historicReviews.getVariableTypeName()).isEqualTo(BpmnAggregatedVariableType.TYPE_NAME);
+            assertThatJson(historicReviews.getValue())
+                    .isEqualTo("["
+                            + "{ userId: 'userOne', approved : true, description : 'description task 0' },"
+                            + "{ userId: 'userTwo' },"
+                            + "{ userId: 'userThree' }"
+                            + "]");
+        }
+
+        runtimeService.deleteProcessInstance(processInstance.getId(), "for testing");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance historicReviews = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .variableName("reviews")
+                    .singleResult();
+            assertThat(historicReviews).isNull();
+        }
     }
 
     @Test
@@ -1250,7 +1418,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
 
         // The aggregated variables should be deleted now too
 
-        List<VariableInstanceEntity> variableInstanceEntities = managementService.executeCommand(new Command<List<VariableInstanceEntity>>() {
+        List<VariableInstanceEntity> variableInstanceEntities = managementService.executeCommand(new Command<>() {
 
             @Override
             public List<VariableInstanceEntity> execute(CommandContext commandContext) {
@@ -1751,8 +1919,7 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
             ArrayNode arrayNode = objectMapper.createArrayNode();
             for (VariableAggregationDefinition.Variable variable : context.getDefinition().getDefinitions()) {
                 Object sourceVariable = execution.getVariable(variable.getSource());
-                if (sourceVariable instanceof ArrayNode) {
-                    ArrayNode sourceArrayNode = (ArrayNode) sourceVariable;
+                if (sourceVariable instanceof ArrayNode sourceArrayNode) {
                     for (int i = 0; i < sourceArrayNode.size(); i++) {
                         JsonNode node = arrayNode.get(i);
                         JsonNode sourceNode = sourceArrayNode.get(i);
@@ -1760,10 +1927,10 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
                             arrayNode.add(sourceNode.deepCopy());
                         } else if (node.isObject()) {
                             ObjectNode objectNode = (ObjectNode) node;
-                            Iterator<Map.Entry<String, JsonNode>> fieldsIterator = sourceNode.fields();
-                            while (fieldsIterator.hasNext()) {
-                                Map.Entry<String, JsonNode> field = fieldsIterator.next();
-                                objectNode.set(field.getKey(), field.getValue());
+                            for (Map.Entry<String, JsonNode> propertyEntry : sourceNode.properties()) {
+                                String propertyName = propertyEntry.getKey();
+                                JsonNode value = propertyEntry.getValue();
+                                objectNode.set(propertyName, value);
                             }
                         }
                     }

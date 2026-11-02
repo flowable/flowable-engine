@@ -18,10 +18,11 @@ import java.util.List;
 /**
  * @author Valentin Zickner
  */
-public class ChildTask extends Task {
+public class ChildTask extends Task implements HasInParameters, HasOutParameters {
 
     protected String businessKey;
     protected boolean inheritBusinessKey;
+    protected boolean inheritVariables;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
 
@@ -41,18 +42,40 @@ public class ChildTask extends Task {
         this.inheritBusinessKey = inheritBusinessKey;
     }
 
+    public boolean isInheritVariables() {
+        return inheritVariables;
+    }
+
+    public void setInheritVariables(boolean inheritVariables) {
+        this.inheritVariables = inheritVariables;
+    }
+
+    @Override
     public List<IOParameter> getInParameters() {
         return inParameters;
     }
 
+    @Override
+    public void addInParameter(IOParameter inParameter) {
+        inParameters.add(inParameter);
+    }
+
+    @Override
     public void setInParameters(List<IOParameter> inParameters) {
         this.inParameters = inParameters;
     }
 
+    @Override
     public List<IOParameter> getOutParameters() {
         return outParameters;
     }
 
+    @Override
+    public void addOutParameter(IOParameter outParameter) {
+        outParameters.add(outParameter);
+    }
+
+    @Override
     public void setOutParameters(List<IOParameter> outParameters) {
         this.outParameters = outParameters;
     }

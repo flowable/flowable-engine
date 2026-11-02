@@ -56,7 +56,7 @@ public interface HistoryManager {
     /**
      * Record a process-instance ended. Updates the historic process instance if activity history is enabled.
      */
-    void recordProcessInstanceEnd(ExecutionEntity processInstance, String deleteReason, String activityId, Date endTime);
+    void recordProcessInstanceEnd(ExecutionEntity processInstance, String state, String deleteReason, String activityId, Date endTime);
 
     /**
      * Record a process-instance started and record start-event if activity history is enabled.
@@ -98,14 +98,6 @@ public interface HistoryManager {
     void recordActivityEnd(ActivityInstance activityInstance);
 
     /**
-     * Record activity end in the case when runtime activity instance does not exist.
-     * @deprecated Shouldn't be used anymore, as an execution is not unique to an activity instance.
-     *             Use {@link HistoryManager#recordActivityEnd(ActivityInstance)} instead.
-     */
-    @Deprecated
-    void recordActivityEnd(ExecutionEntity executionEntity, String deleteReason, Date endTime);
-
-    /**
      * Finds the {@link HistoricActivityInstanceEntity} that is active in the given execution.
      */
     HistoricActivityInstanceEntity findHistoricActivityInstance(ExecutionEntity execution, boolean validateEndTimeNull);
@@ -123,7 +115,7 @@ public interface HistoryManager {
     /**
      * Record task as ended, if audit history is enabled.
      */
-    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason, Date endTime);
+    void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String userId, String deleteReason, Date endTime);
 
     /**
      * Record task name change, if audit history is enabled.
@@ -207,6 +199,11 @@ public interface HistoryManager {
     void recordIdentityLinkCreated(IdentityLinkEntity identityLink);
 
     /**
+     * Record the creation of a new {@link IdentityLink} for the processInstance, if audit history is enabled.
+     */
+    void recordIdentityLinkCreated(ExecutionEntity processInstance, IdentityLinkEntity identityLinkEntity);
+
+    /**
      * Record the deletion of a {@link IdentityLink}, if audit history is enabled
      */
     void recordIdentityLinkDeleted(IdentityLinkEntity identityLink);
@@ -221,9 +218,19 @@ public interface HistoryManager {
      */
     void recordEntityLinkDeleted(EntityLinkEntity entityLink);
 
+    /**
+     * Record the update of the business key of a process instance in history, if history is enabled.
+     */
     void updateProcessBusinessKeyInHistory(ExecutionEntity processInstance);
-    
+
+    /**
+     * Record the update of the business status of a process instance in history, if history is enabled.
+     */
     void updateProcessBusinessStatusInHistory(ExecutionEntity processInstance);
+
+    void updateProcessDueDateInHistory(ExecutionEntity processInstance);
+
+    void updateProcessClaimTimeInHistory(ExecutionEntity processInstance);
 
     /**
      * Record the update of a process definition for historic process instance, task, and activity instance, if history is enabled.

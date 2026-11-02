@@ -38,6 +38,11 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
      * Returns all {@link SuspendedJobEntity} instances related to an execution id.
      */
     List<SuspendedJobEntity> findJobsByProcessInstanceId(String id);
+    
+    /**
+     * Returns all {@link SuspendedJobEntity} instances related to a sub scope id.
+     */
+    List<SuspendedJobEntity> findJobsBySubScopeId(String id);
 
     /**
      * Executes a {@link JobQueryImpl} and returns the matching {@link SuspendedJobEntity} instances.

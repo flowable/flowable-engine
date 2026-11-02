@@ -12,39 +12,16 @@
  */
 package org.flowable.app.api.repository;
 
-import org.flowable.app.api.AppRepositoryService;
+import org.flowable.common.engine.api.repository.FlowableDefinition;
 
-public interface AppDefinition {
-
-    /** unique identifier */
-    String getId();
+public interface AppDefinition extends FlowableDefinition {
 
     /**
      * category name which is derived from the targetNamespace attribute in the definitions element
      */
     String getCategory();
 
-    /** label used for display purposes */
-    String getName();
-
-    /** unique name for all versions of this app definition */
-    String getKey();
-
     /** description of this app definition **/
     String getDescription();
-
-    /** version of this app definition */
-    int getVersion();
-
-    /**
-     * name of {@link AppRepositoryService#getResourceAsStream(String, String) the resource} of this app definition.
-     */
-    String getResourceName();
-
-    /** The deployment in which this app definition is contained. */
-    String getDeploymentId();
-
-    /** The tenant identifier of this app definition */
-    String getTenantId();
 
 }

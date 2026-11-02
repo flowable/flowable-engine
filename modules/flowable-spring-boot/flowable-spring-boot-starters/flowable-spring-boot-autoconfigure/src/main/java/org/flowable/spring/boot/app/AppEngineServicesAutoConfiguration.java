@@ -20,24 +20,22 @@ import org.flowable.app.spring.SpringAppEngineConfiguration;
 import org.flowable.spring.boot.BaseEngineConfigurationWithConfigurers;
 import org.flowable.spring.boot.FlowableProperties;
 import org.flowable.spring.boot.condition.ConditionalOnAppEngine;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * Provides sane definitions for the various beans required to be productive with Flowable in Spring.
  *
  * @author Tijs Rademakers
  */
-@Configuration(proxyBeanMethods = false)
 @ConditionalOnAppEngine
 @EnableConfigurationProperties({
     FlowableProperties.class,
     FlowableAppProperties.class
 })
-@AutoConfigureAfter({
+@AutoConfiguration(after = {
     AppEngineAutoConfiguration.class
 })
 public class AppEngineServicesAutoConfiguration extends BaseEngineConfigurationWithConfigurers<SpringAppEngineConfiguration> {

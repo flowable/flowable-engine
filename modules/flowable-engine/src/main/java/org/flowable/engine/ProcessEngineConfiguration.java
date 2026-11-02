@@ -16,17 +16,16 @@ package org.flowable.engine;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.time.Duration;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.async.AsyncTaskExecutor;
 import org.flowable.common.engine.api.async.AsyncTaskInvoker;
-import org.flowable.common.engine.api.engine.EngineLifecycleListener;
-import org.flowable.common.engine.impl.AbstractEngineConfiguration;
+import org.flowable.common.engine.impl.AbstractBuildableEngineConfiguration;
 import org.flowable.common.engine.impl.cfg.BeansConfigurationHelper;
 import org.flowable.common.engine.impl.cfg.mail.MailServerInfo;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -36,6 +35,9 @@ import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.common.engine.impl.cfg.mail.DefaultMailClientProvider;
+import org.flowable.mail.common.api.client.FlowableMailClient;
+import org.flowable.mail.common.api.client.MailClientProvider;
 import org.flowable.task.service.TaskPostProcessor;
 
 /**
@@ -83,7 +85,7 @@ import org.flowable.task.service.TaskPostProcessor;
  * @see ProcessEngines
  * @author Tom Baeyens
  */
-public abstract class ProcessEngineConfiguration extends AbstractEngineConfiguration {
+public abstract class ProcessEngineConfiguration extends AbstractBuildableEngineConfiguration<ProcessEngine> {
 
     protected String processEngineName = ProcessEngines.NAME_DEFAULT;
     protected int idBlockSize = 2500;
@@ -91,16 +93,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected boolean asyncExecutorActivate;
     protected boolean asyncHistoryExecutorActivate;
 
-    protected String mailServerHost = "localhost";
-    protected String mailServerUsername; // by default no name and password are provided, which
-    protected String mailServerPassword; // means no authentication for mail server
-    protected int mailServerPort = 25;
-    protected int mailServerSSLPort = 465;
-    protected boolean useSSL;
-    protected boolean useTLS;
-    protected String mailServerDefaultFrom = "flowable@localhost";
-    protected String mailServerForceTo;
-    protected Charset mailServerDefaultCharset;
+    protected MailClientProvider mailClientProvider = new DefaultMailClientProvider();
+    protected MailServerInfo defaultMailServer;
     protected String mailSessionJndi;
     protected Map<String, MailServerInfo> mailServers = new HashMap<>();
     protected Map<String, String> mailSessionsJndi = new HashMap<>();
@@ -119,6 +113,8 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected AsyncExecutor asyncExecutor;
     protected AsyncTaskExecutor asyncTaskExecutor;
     protected boolean shutdownAsyncTaskExecutor;
+    protected AsyncTaskExecutor asyncTaskInvokerTaskExecutor;
+    protected boolean shutdownAsyncTaskInvokerTaskExecutor;
     protected AsyncTaskInvoker asyncTaskInvoker;
 
     protected AsyncExecutor asyncHistoryExecutor;
@@ -167,7 +163,9 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     protected ProcessEngineConfiguration() {
     }
 
-    public abstract ProcessEngine buildProcessEngine();
+    public ProcessEngine buildProcessEngine() {
+        return buildEngine();
+    }
 
     public static ProcessEngineConfiguration createProcessEngineConfigurationFromResourceDefault() {
         return createProcessEngineConfigurationFromResource("flowable.cfg.xml", "processEngineConfiguration");
@@ -250,30 +248,81 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    public MailClientProvider getMailClientProvider() {
+        return mailClientProvider;
+    }
+
+    public ProcessEngineConfiguration setMailClientProvider(MailClientProvider mailClientProvider) {
+        this.mailClientProvider = mailClientProvider;
+        return this;
+    }
+
+    /**
+     * @deprecated use {@link #getMailClientProvider()} and {@link MailClientProvider#getMailClient(String)} with {@code null} instead
+     */
+    @Deprecated
+    public FlowableMailClient getDefaultMailClient() {
+        return mailClientProvider.getMailClient(null);
+    }
+
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
+    public ProcessEngineConfiguration setDefaultMailClient(FlowableMailClient defaultMailClient) {
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.setDefaultMailClient(defaultMailClient);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
+        }
+        return this;
+    }
+
+    public MailServerInfo getDefaultMailServer() {
+        return getOrCreateDefaultMaiLServer();
+    }
+
+    public ProcessEngineConfiguration setDefaultMailServer(MailServerInfo defaultMailServer) {
+        this.defaultMailServer = defaultMailServer;
+        return this;
+    }
+
+    protected MailServerInfo getOrCreateDefaultMaiLServer() {
+        if (defaultMailServer == null) {
+            defaultMailServer = new MailServerInfo();
+            defaultMailServer.setMailServerHost("localhost");
+            defaultMailServer.setMailServerPort(25);
+            defaultMailServer.setMailServerSSLPort(465);
+            defaultMailServer.setMailServerDefaultFrom("flowable@localhost");
+        }
+        return defaultMailServer;
+    }
+
     public String getMailServerHost() {
-        return mailServerHost;
+        return getOrCreateDefaultMaiLServer().getMailServerHost();
     }
 
     public ProcessEngineConfiguration setMailServerHost(String mailServerHost) {
-        this.mailServerHost = mailServerHost;
+        getOrCreateDefaultMaiLServer().setMailServerHost(mailServerHost);
         return this;
     }
 
     public String getMailServerUsername() {
-        return mailServerUsername;
+        return getOrCreateDefaultMaiLServer().getMailServerUsername();
     }
 
     public ProcessEngineConfiguration setMailServerUsername(String mailServerUsername) {
-        this.mailServerUsername = mailServerUsername;
+        getOrCreateDefaultMaiLServer().setMailServerUsername(mailServerUsername);
         return this;
     }
 
     public String getMailServerPassword() {
-        return mailServerPassword;
+        return getOrCreateDefaultMaiLServer().getMailServerPassword();
     }
 
     public ProcessEngineConfiguration setMailServerPassword(String mailServerPassword) {
-        this.mailServerPassword = mailServerPassword;
+        getOrCreateDefaultMaiLServer().setMailServerPassword(mailServerPassword);
         return this;
     }
 
@@ -287,65 +336,65 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     }
 
     public int getMailServerPort() {
-        return mailServerPort;
+        return getOrCreateDefaultMaiLServer().getMailServerPort();
     }
 
     public ProcessEngineConfiguration setMailServerPort(int mailServerPort) {
-        this.mailServerPort = mailServerPort;
+        getOrCreateDefaultMaiLServer().setMailServerPort(mailServerPort);
         return this;
     }
 
     public Charset getMailServerDefaultCharset() {
-        return mailServerDefaultCharset;
+        return getOrCreateDefaultMaiLServer().getMailServerDefaultCharset();
     }
 
     public ProcessEngineConfiguration setMailServerDefaultCharset(Charset mailServerDefaultCharset) {
-        this.mailServerDefaultCharset = mailServerDefaultCharset;
+        getOrCreateDefaultMaiLServer().setMailServerDefaultCharset(mailServerDefaultCharset);
         return this;
     }
 
     public int getMailServerSSLPort() {
-        return mailServerSSLPort;
+        return getOrCreateDefaultMaiLServer().getMailServerSSLPort();
     }
 
     public ProcessEngineConfiguration setMailServerSSLPort(int mailServerSSLPort) {
-        this.mailServerSSLPort = mailServerSSLPort;
+        getOrCreateDefaultMaiLServer().setMailServerSSLPort(mailServerSSLPort);
         return this;
     }
 
     public boolean getMailServerUseSSL() {
-        return useSSL;
+        return getOrCreateDefaultMaiLServer().isMailServerUseSSL();
     }
 
     public ProcessEngineConfiguration setMailServerUseSSL(boolean useSSL) {
-        this.useSSL = useSSL;
+        getOrCreateDefaultMaiLServer().setMailServerUseSSL(useSSL);
         return this;
     }
 
     public boolean getMailServerUseTLS() {
-        return useTLS;
+        return getOrCreateDefaultMaiLServer().isMailServerUseTLS();
     }
 
     public ProcessEngineConfiguration setMailServerUseTLS(boolean useTLS) {
-        this.useTLS = useTLS;
+        getOrCreateDefaultMaiLServer().setMailServerUseTLS(useTLS);
         return this;
     }
 
     public String getMailServerDefaultFrom() {
-        return mailServerDefaultFrom;
+        return getOrCreateDefaultMaiLServer().getMailServerDefaultFrom();
     }
 
     public ProcessEngineConfiguration setMailServerDefaultFrom(String mailServerDefaultFrom) {
-        this.mailServerDefaultFrom = mailServerDefaultFrom;
+        getOrCreateDefaultMaiLServer().setMailServerDefaultFrom(mailServerDefaultFrom);
         return this;
     }
 
     public String getMailServerForceTo() {
-        return mailServerForceTo;
+        return getOrCreateDefaultMaiLServer().getMailServerForceTo();
     }
 
     public ProcessEngineConfiguration setMailServerForceTo(String mailServerForceTo) {
-        this.mailServerForceTo = mailServerForceTo;
+        getOrCreateDefaultMaiLServer().setMailServerForceTo(mailServerForceTo);
         return this;
     }
 
@@ -359,6 +408,39 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setMailServers(Map<String, MailServerInfo> mailServers) {
         this.mailServers.putAll(mailServers);
+        return this;
+    }
+
+    /**
+     * @deprecated use {@link #getMailClientProvider().getMailClient(String)} instead
+     */
+    @Deprecated
+    public FlowableMailClient getMailClient(String tenantId) {
+        return mailClientProvider.getMailClient(tenantId);
+    }
+
+    /**
+     * @deprecated use {@link #getMailClientProvider()} instead
+     */
+    @Deprecated
+    public Map<String, FlowableMailClient> getMailClients() {
+        if (mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            return defaultProvider.getMailClients();
+        }
+        return Collections.emptyMap();
+    }
+
+    /**
+     * @deprecated use {@link #setMailClientProvider(MailClientProvider)} instead
+     */
+    @Deprecated
+    public ProcessEngineConfiguration setMailClients(Map<String, FlowableMailClient> mailClients) {
+        if (this.mailClientProvider instanceof DefaultMailClientProvider defaultProvider) {
+            defaultProvider.getMailClients().putAll(mailClients);
+        } else {
+            throw new FlowableException("The mail client provider is not an instance of DefaultMailClientProvider. "
+                    + "Use setMailClientProvider instead.");
+        }
         return this;
     }
 
@@ -605,51 +687,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
-    /**
-     * @deprecated Use {@link #setEngineLifecycleListeners(List)}.
-     */
-    @Deprecated
-    public ProcessEngineConfiguration setProcessEngineLifecycleListener(ProcessEngineLifecycleListener processEngineLifecycleListener) {
-        // Backwards compatibility (when there was only one typed engine listener)
-        if (engineLifecycleListeners == null || engineLifecycleListeners.isEmpty()) {
-            List<EngineLifecycleListener> engineLifecycleListeners = new ArrayList<>(1);
-            engineLifecycleListeners.add(processEngineLifecycleListener);
-            super.setEngineLifecycleListeners(engineLifecycleListeners);
-
-        } else {
-            ProcessEngineLifecycleListener originalEngineLifecycleListener = (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
-
-            ProcessEngineLifecycleListener wrappingEngineLifecycleListener = new ProcessEngineLifecycleListener() {
-
-                @Override
-                public void onProcessEngineBuilt(ProcessEngine processEngine) {
-                    originalEngineLifecycleListener.onProcessEngineBuilt(processEngine);
-                }
-                @Override
-                public void onProcessEngineClosed(ProcessEngine processEngine) {
-                    originalEngineLifecycleListener.onProcessEngineClosed(processEngine);
-                }
-            };
-
-            engineLifecycleListeners.set(0, wrappingEngineLifecycleListener);
-
-        }
-
-        return this;
-    }
-
-    /**
-     * @deprecated Use {@link #getEngineLifecycleListeners()}.
-     */
-    @Deprecated
-    public ProcessEngineLifecycleListener getProcessEngineLifecycleListener() {
-        // Backwards compatibility (when there was only one typed engine listener)
-        if (engineLifecycleListeners != null && !engineLifecycleListeners.isEmpty()) {
-            return (ProcessEngineLifecycleListener) engineLifecycleListeners.get(0);
-        }
-        return null;
-    }
-
     public String getLabelFontName() {
         return labelFontName;
     }
@@ -734,6 +771,15 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
 
     public ProcessEngineConfiguration setAsyncTaskExecutor(AsyncTaskExecutor asyncTaskExecutor) {
         this.asyncTaskExecutor = asyncTaskExecutor;
+        return this;
+    }
+
+    public AsyncTaskExecutor getAsyncTaskInvokerTaskExecutor() {
+        return asyncTaskInvokerTaskExecutor;
+    }
+
+    public ProcessEngineConfiguration setAsyncTaskInvokerTaskExecutor(AsyncTaskExecutor asyncTaskInvokerTaskExecutor) {
+        this.asyncTaskInvokerTaskExecutor = asyncTaskInvokerTaskExecutor;
         return this;
     }
 

@@ -25,10 +25,10 @@ import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.job.api.Job;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to a job collection resource.
@@ -40,6 +40,7 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a list of case instance, using all possible filters.
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/management/timerEventListenerCase.cmmn" })
     public void testGetJobs() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
@@ -89,6 +90,7 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test invalid bulk move action
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/management/timerEventListenerCase.cmmn" })
     public void testExecuteInvalidBulkDeadLetterMove() throws Exception {
         CaseInstance caseInstance = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
@@ -107,8 +109,6 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
-
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 7000, 200, true);
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -138,13 +138,12 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         managementService.moveJobToDeadLetterJob(timerJob.getId());
 
         assertThat(managementService.createDeadLetterJobQuery().list()).hasSize(2);
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         assertThat(managementService.createJobQuery().list()).isEmpty();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         requestNode.put("action", "move");
         requestNode.putArray("jobIds").addAll(jobIds);
-
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 7000, 200, true);
 
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_DEADLETTER_JOB_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
@@ -152,15 +151,11 @@ public class JobCollectionResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
 
         assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
+        assertThat(managementService.createTimerJobQuery().list()).isEmpty();
         assertThat(managementService.createJobQuery().list())
                 .hasSize(2)
                 .extracting(Job::getRetries)
                 .containsOnly(cmmnEngineConfiguration.getAsyncExecutorNumberOfRetries());
-
-        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngine, 7000, 200, true);
-
-        assertThat(managementService.createDeadLetterJobQuery().list()).isEmpty();
-        assertThat(managementService.createJobQuery().list()).isEmpty();
     }
 
 }

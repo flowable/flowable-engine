@@ -12,6 +12,7 @@
  */
 package org.flowable.eventregistry.model;
 
+import java.util.Map;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -29,6 +30,7 @@ public class EventPayload {
     protected boolean correlationParameter;
     protected boolean isFullPayload;
     protected boolean metaParameter;
+    protected Map<String, String> extensionProperties;
 
     public EventPayload() {}
 
@@ -113,6 +115,15 @@ public class EventPayload {
 
     public void setMetaParameter(boolean metaParameter) {
         this.metaParameter = metaParameter;
+    }
+
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    public Map<String, String> getExtensionProperties() {
+        return extensionProperties;
+    }
+
+    public void setExtensionProperties(Map<String, String> extensionProperties) {
+        this.extensionProperties = extensionProperties;
     }
 
     @JsonIgnore

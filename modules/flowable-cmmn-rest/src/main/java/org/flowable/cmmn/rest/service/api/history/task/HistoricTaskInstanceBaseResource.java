@@ -20,9 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.query.QueryProperty;
@@ -67,16 +69,22 @@ public class HistoricTaskInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
 
-    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
+    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
         // Populate query based on request
         if (queryRequest.getTaskId() != null) {
             query.taskId(queryRequest.getTaskId());
+        }
+        if (queryRequest.getPlanItemInstanceId() != null) {
+            query.planItemInstanceId(queryRequest.getPlanItemInstanceId());
         }
         if (queryRequest.getCaseInstanceId() != null) {
             query.caseInstanceId(queryRequest.getCaseInstanceId());
@@ -102,6 +110,12 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.getPropagatedStageInstanceId() != null) {
             query.propagatedStageInstanceId(queryRequest.getPropagatedStageInstanceId());
         }
+        if (queryRequest.getScopeId() != null) {
+            query.scopeId(queryRequest.getScopeId());
+        }
+        if (queryRequest.getScopeIds() != null && !queryRequest.getScopeIds().isEmpty()) {
+            query.scopeIds(queryRequest.getScopeIds());
+        }
         if (Boolean.TRUE.equals(queryRequest.getWithoutScopeId())) {
             query.withoutScopeId();
         }
@@ -110,6 +124,9 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getTaskNameLike() != null) {
             query.taskNameLike(queryRequest.getTaskNameLike());
+        }
+        if (queryRequest.getTaskNameLikeIgnoreCase() != null) {
+            query.taskNameLikeIgnoreCase(queryRequest.getTaskNameLikeIgnoreCase());
         }
         if (queryRequest.getTaskDescription() != null) {
             query.taskDescription(queryRequest.getTaskDescription());
@@ -226,13 +243,13 @@ public class HistoricTaskInstanceBaseResource {
         }
         if (queryRequest.getIncludeTaskLocalVariables() != null) {
             if (queryRequest.getIncludeTaskLocalVariables()) {
-                query.includeTaskLocalVariables();
+                query.includeTaskLocalVariables(true);
             }
         }
 
         if (queryRequest.getIncludeProcessVariables() != null) {
             if (queryRequest.getIncludeProcessVariables()) {
-                query.includeProcessVariables();
+                query.includeProcessVariables(true);
             }
         }
 
@@ -263,23 +280,45 @@ public class HistoricTaskInstanceBaseResource {
         if (queryRequest.isIgnoreTaskAssignee()) {
             query.ignoreAssigneeValue();
         }
+
+        if (queryRequest.getRootScopeId() != null) {
+            query.taskRootScopeId(queryRequest.getRootScopeId());
+        }
+        if (queryRequest.getParentScopeId() != null) {
+            query.taskParentScopeId(queryRequest.getParentScopeId());
+        }
         
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryTaskInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "taskInstanceId", allowedSortProperties,
-            restResponseFactory::createHistoricTaskInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(allRequestParams, queryRequest, query, "taskInstanceId",
+                allowedSortProperties, restResponseFactory::createHistoricTaskInstanceResponseList));
     }
     
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested and calls the access interceptor.
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
     protected HistoricTaskInstance getHistoricTaskInstanceFromRequest(String taskId) {
+        HistoricTaskInstance taskInstance = getHistoricTaskInstanceFromRequestWithoutAccessCheck(taskId);
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
+        }
+        
+        return taskInstance;
+    }
+
+    /**
+     * Returns the {@link HistoricTaskInstance} that is requested without calling the access interceptor
+     * Throws the right exceptions when bad request was made or instance was not found.
+     */
+    protected HistoricTaskInstance getHistoricTaskInstanceFromRequestWithoutAccessCheck(String taskId) {
         HistoricTaskInstance taskInstance = historyService.createHistoricTaskInstanceQuery().taskId(taskId).singleResult();
         if (taskInstance == null) {
             throw new FlowableObjectNotFoundException("Could not find a task instance with id '" + taskId + "'.", HistoricTaskInstance.class);
-        }
-        
-        if (restApiInterceptor != null) {
-            restApiInterceptor.accessHistoryTaskInfoById(taskInstance);
         }
         
         return taskInstance;
@@ -290,8 +329,10 @@ public class HistoricTaskInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -360,6 +401,15 @@ public class HistoricTaskInstanceBaseResource {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
                 break;
+
+            case EXISTS:
+                taskInstanceQuery.taskVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskInstanceQuery.taskVariableNotExists(variable.getName());
+                break;
+
             default:
                 throw new FlowableIllegalArgumentException("Unsupported variable query operation: " + variable.getVariableOperation());
             }
@@ -371,8 +421,10 @@ public class HistoricTaskInstanceBaseResource {
             if (variable.getVariableOperation() == null) {
                 throw new FlowableIllegalArgumentException("Variable operation is missing for variable: " + variable.getName());
             }
-            if (variable.getValue() == null) {
-                throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+            if (variable.getVariableOperation() != QueryVariableOperation.EXISTS && variable.getVariableOperation() != QueryVariableOperation.NOT_EXISTS) {
+                if (variable.getValue() == null) {
+                    throw new FlowableIllegalArgumentException("Variable value is missing for variable: " + variable.getName());
+                }
             }
 
             boolean nameLess = variable.getName() == null;
@@ -440,6 +492,14 @@ public class HistoricTaskInstanceBaseResource {
                 } else {
                     throw new FlowableIllegalArgumentException("Only string variable values are supported using like, but was: " + actualValue.getClass().getName());
                 }
+                break;
+
+            case EXISTS:
+                taskInstanceQuery.processVariableExists(variable.getName());
+                break;
+
+            case NOT_EXISTS:
+                taskInstanceQuery.processVariableNotExists(variable.getName());
                 break;
 
             default:

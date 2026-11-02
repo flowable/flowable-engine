@@ -23,7 +23,10 @@ import org.flowable.spring.impl.test.FlowableSpringExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-@SpringJUnitConfig(classes = BpmnWithEventRegistryJmsConfiguration.class)
+@SpringJUnitConfig(classes = {
+        JmsConfiguration.class,
+        BpmnWithEventRegistryTestConfiguration.class,
+})
 @ExtendWith(FlowableSpringExtension.class)
 @Documented
 @Inherited

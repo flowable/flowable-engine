@@ -49,6 +49,7 @@ public class ProcessTask2CmmnXmlConverterTest {
                 .isInstanceOfSatisfying(ProcessTask.class, task1 -> {
                     assertThat(task1.getProcessRefExpression()).isEqualTo("myTestProcess");
                     assertThat((task1.isSameDeployment())).isTrue();
+                    assertThat(task1.isInheritVariables()).isTrue();
 
                     assertThat(task1.getInParameters()).isEmpty();
                     assertThat(task1.getOutParameters()).isEmpty();

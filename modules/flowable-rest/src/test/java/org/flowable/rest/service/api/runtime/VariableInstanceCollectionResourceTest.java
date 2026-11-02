@@ -13,11 +13,11 @@
 
 package org.flowable.rest.service.api.runtime;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpStatus;
@@ -30,10 +30,11 @@ import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
+
+import net.javacrumbs.jsonunit.core.Option;
 
 /**
  * Test for REST-operation related to the variable instance query resource.
@@ -124,7 +125,123 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
 
     }
 
-    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue) throws JsonProcessingException, IOException {
+    /**
+     * Test querying variable instance and check response for scope value
+     */
+    @Test
+    @Deployment(resources = "org/flowable/rest/service/api/runtime/VariableInstanceCollectionResourceTest.testQueryVariableInstances.bpmn20.xml")
+    public void testVariableInstanceScopeIsPresent() throws Exception {
+
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var1", "test1");
+        taskService.setVariableLocal(task.getId(), "varLocal1", "test2");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        Execution execution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().singleResult();
+        runtimeService.setVariableLocal(execution.getId(), "varLocal2", "test3");
+
+        List<VariableInstance> vars = runtimeService.createVariableInstanceQuery().processInstanceId(processInstance.getId()).excludeLocalVariables().list();
+
+        assertThat(vars.size()).isEqualTo(1);
+        assertThat(vars.get(0).getValue()).isEqualTo("test1");
+
+        taskService.complete(task.getId());
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "var3", "test4");
+        taskService.setVariableLocal(task.getId(), "varLocal3", "test5");
+
+        waitForJobExecutorToProcessAllJobs(7000, 100);
+
+        String url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId();
+
+        CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        JsonNode node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 4,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + execution.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal2',"
+                + "             value:'test3',"
+                + "             scope:'local'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         executionId : '" + execution.getId() + "',"
+                + "         variable:{"
+                + "             name:'varLocal3',"
+                + "             value:'test5',"
+                + "             scope:'local'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+        url = RestUrls.createRelativeResourceUrl(RestUrls.URL_VARIABLE_INSTANCES) + "?processInstanceId=" + processInstance.getId()
+                + "&excludeLocalVariables=true";
+
+        response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
+
+        // Check status and size
+        node = objectMapper.readTree(response.getEntity().getContent());
+
+        assertThatJson(node).when(Option.IGNORING_EXTRA_FIELDS, Option.IGNORING_ARRAY_ORDER, Option.IGNORING_EXTRA_ARRAY_ITEMS).isEqualTo("{"
+                + " size: 2,"
+                + " data : ["
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var1',"
+                + "             value:'test1',"
+                + "             scope:'global'"
+                + "         }"
+                + "     },"
+                + "     {"
+                + "         processInstanceId : '" + processInstance.getId() + "',"
+                + "         variable:{"
+                + "             name:'var3',"
+                + "             value:'test4',"
+                + "             scope:'global'"
+                + "         }"
+                + "     }"
+                + " ]"
+                + "}");
+
+    }
+
+    protected void assertResultsPresentInDataResponse(String url, int numberOfResultsExpected, String variableName, Object variableValue)
+            throws IOException {
 
         // Do the actual call
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + url), HttpStatus.SC_OK);
@@ -137,11 +254,9 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
         // Check presence of ID's
         if (variableName != null) {
             boolean variableFound = false;
-            Iterator<JsonNode> it = dataNode.iterator();
-            while (it.hasNext()) {
-                JsonNode dataElementNode = it.next();
+            for (JsonNode dataElementNode : dataNode) {
                 JsonNode variableNode = dataElementNode.get("variable");
-                String name = variableNode.get("name").textValue();
+                String name = variableNode.get("name").stringValue();
                 if (variableName.equals(name)) {
                     variableFound = true;
                     if (variableValue instanceof Boolean) {
@@ -149,7 +264,7 @@ public class VariableInstanceCollectionResourceTest extends BaseSpringRestTestCa
                     } else if (variableValue instanceof Integer) {
                         assertThat((int) (Integer) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asInt());
                     } else {
-                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asText());
+                        assertThat((String) variableValue).as("Variable value is not equal").isEqualTo(variableNode.get("value").asString());
                     }
                 }
             }

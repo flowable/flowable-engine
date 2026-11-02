@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.StageResponse;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
@@ -78,10 +79,20 @@ public class GetHistoricStageOverviewCmd implements Command<List<StageResponse>>
         
         List<OverviewElement> overviewElements = new ArrayList<>();
         for (Stage stage : stages) {
-            overviewElements.add(new OverviewElement(stage.getId(), stage.getName(), stage.getDisplayOrder(), stage.getIncludeInStageOverview(), stage));
+            OverviewElement overviewElement = new OverviewElement(stage.getId(), stage.getName(), stage.getDisplayOrder(), stage.getIncludeInStageOverview(), stage);
+            Optional<HistoricPlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, stage);
+            if (planItemInstance.isPresent() && StringUtils.isNotEmpty(planItemInstance.get().getName())) {
+                overviewElement.setName(planItemInstance.get().getName());
+            }
+            overviewElements.add(overviewElement);
         }
         for (Milestone milestone : milestones) {
-            overviewElements.add(new OverviewElement(milestone.getId(), milestone.getName(), milestone.getDisplayOrder(), milestone.getIncludeInStageOverview(), milestone));
+            OverviewElement overviewElement = new OverviewElement(milestone.getId(), milestone.getName(), milestone.getDisplayOrder(), milestone.getIncludeInStageOverview(), milestone);
+            Optional<HistoricPlanItemInstance> planItemInstance = getPlanItemInstance(planItemInstances, milestone);
+            if (planItemInstance.isPresent() && StringUtils.isNotEmpty(planItemInstance.get().getName())) {
+                overviewElement.setName(planItemInstance.get().getName());
+            }
+            overviewElements.add(overviewElement);
         }
 
         // If one stage has a display order, they are ordered by that.

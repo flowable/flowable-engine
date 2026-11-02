@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.interceptor.Command;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.entitylink.api.history.HistoricEntityLinkService;
@@ -25,6 +26,7 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 /**
  * @author Tijs Rademakers
  */
+@Deprecated
 public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Command<Object>, Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -36,13 +38,16 @@ public class DeleteRelatedDataOfRemovedHistoricCaseInstancesCmd implements Comma
         IdentityLinkServiceConfiguration identityLinkServiceConfiguration = cmmnEngineConfiguration.getIdentityLinkServiceConfiguration();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricCaseIdentityLinksForNonExistingInstances();
         identityLinkServiceConfiguration.getHistoricIdentityLinkService().deleteHistoricTaskIdentityLinksForNonExistingInstances();
-        HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
-        if (historicEntityLinkService != null) {
-            historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
+        if (cmmnEngineConfiguration.isEnableEntityLinks()) {
+            HistoricEntityLinkService historicEntityLinkService = cmmnEngineConfiguration.getEntityLinkServiceConfiguration().getHistoricEntityLinkService();
+            if (historicEntityLinkService != null) {
+                historicEntityLinkService.deleteHistoricEntityLinksForNonExistingCaseInstances();
+            }
         }
         cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskService().deleteHistoricTaskLogEntriesForNonExistingCaseInstances();
-        cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();
-
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().deleteHistoricVariableInstancesForNonExistingCaseInstances();
+        }
         return null;
     }
 

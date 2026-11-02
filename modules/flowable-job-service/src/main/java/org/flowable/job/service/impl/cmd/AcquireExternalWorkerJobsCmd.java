@@ -30,7 +30,6 @@ import org.flowable.job.service.impl.ExternalWorkerJobAcquireBuilderImpl;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.ExternalWorkerJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
-import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Filip Hrisafov
@@ -78,10 +77,7 @@ public class AcquireExternalWorkerJobsCmd implements Command<List<AcquiredExtern
             lockJob(commandContext, job, lockTimeInMillis);
             Map<String, Object> variables = null;
             if (internalJobManager != null) {
-                VariableScope variableScope = internalJobManager.resolveVariableScope(job);
-                if (variableScope != null) {
-                    variables = variableScope.getVariables();
-                }
+                variables = internalJobManager.resolveVariablesForExternalWorkerJob(job);
 
                 if (job.isExclusive()) {
                     internalJobManager.lockJobScope(job);

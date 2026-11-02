@@ -44,4 +44,9 @@ public interface FlowableVariableEvent extends FlowableEngineEvent {
      */
     String getTaskId();
 
+    /**
+     * @return the id of the variable instance.
+     */
+    String getVariableInstanceId();
+
 }

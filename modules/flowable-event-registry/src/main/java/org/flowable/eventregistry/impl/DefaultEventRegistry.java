@@ -20,6 +20,7 @@ import org.flowable.eventregistry.api.CorrelationKeyGenerator;
 import org.flowable.eventregistry.api.EventRegistry;
 import org.flowable.eventregistry.api.EventRegistryEvent;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
+import org.flowable.eventregistry.api.EventRegistryNonMatchingEventConsumer;
 import org.flowable.eventregistry.api.EventRegistryProcessingInfo;
 import org.flowable.eventregistry.api.InboundEvent;
 import org.flowable.eventregistry.api.InboundEventProcessor;
@@ -27,11 +28,15 @@ import org.flowable.eventregistry.api.OutboundEventProcessor;
 import org.flowable.eventregistry.api.runtime.EventInstance;
 import org.flowable.eventregistry.model.ChannelModel;
 import org.flowable.eventregistry.model.InboundChannelModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultEventRegistry implements EventRegistry {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected EventRegistryEngineConfiguration engineConfiguration;
 
@@ -80,8 +85,15 @@ public class DefaultEventRegistry implements EventRegistry {
     public void sendEventToConsumers(EventRegistryEvent eventRegistryEvent) {
         Collection<EventRegistryEventConsumer> engineEventRegistryEventConsumers = engineConfiguration.getEventRegistryEventConsumers().values();
         EventRegistryProcessingInfo eventRegistryProcessingInfo = null;
+        boolean debugLoggingEnabled = logger.isDebugEnabled();
         for (EventRegistryEventConsumer eventConsumer : engineEventRegistryEventConsumers) {
+            if (debugLoggingEnabled) {
+                logger.debug("Sending {} to event consumer {}", eventRegistryEvent, eventConsumer);
+            }
             EventRegistryProcessingInfo processingInfo = eventConsumer.eventReceived(eventRegistryEvent);
+            if (debugLoggingEnabled) {
+                logger.debug("Event consumer {} processed event {} with result {}", eventConsumer, eventRegistryEvent, processingInfo);
+            }
             if (processingInfo != null && processingInfo.getEventConsumerInfos() != null && !processingInfo.getEventConsumerInfos().isEmpty()) {
                 if (eventRegistryProcessingInfo == null) {
                     eventRegistryProcessingInfo = new EventRegistryProcessingInfo();
@@ -90,10 +102,19 @@ public class DefaultEventRegistry implements EventRegistry {
             }
         }
         
-        if ((eventRegistryProcessingInfo == null || !eventRegistryProcessingInfo.eventHandled()) && 
-                engineConfiguration.getNonMatchingEventConsumer() != null) {
-            
-            engineConfiguration.getNonMatchingEventConsumer().handleNonMatchingEvent(eventRegistryEvent, eventRegistryProcessingInfo);
+        if (eventRegistryProcessingInfo == null || !eventRegistryProcessingInfo.eventHandled()) {
+
+            EventRegistryNonMatchingEventConsumer nonMatchingEventConsumer = engineConfiguration.getNonMatchingEventConsumer();
+            if (nonMatchingEventConsumer != null) {
+                if (debugLoggingEnabled) {
+                    logger.debug("No event consumer consumed event {}. Handling it with {}", eventRegistryEvent, nonMatchingEventConsumer);
+                }
+                nonMatchingEventConsumer.handleNonMatchingEvent(eventRegistryEvent, eventRegistryProcessingInfo);
+            } else if (debugLoggingEnabled) {
+                logger.debug("No event consumer consumed event {}", eventRegistryEvent);
+            }
+        } else if (debugLoggingEnabled) {
+            logger.debug("{} was consumed with {}", eventRegistryEvent, eventRegistryProcessingInfo);
         }
     }
 

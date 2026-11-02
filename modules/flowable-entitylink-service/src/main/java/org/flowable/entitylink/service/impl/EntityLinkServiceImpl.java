@@ -17,6 +17,7 @@ import java.util.List;
 import org.flowable.common.engine.impl.service.CommonServiceImpl;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.entitylink.api.EntityLinkService;
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
 import org.flowable.entitylink.service.EntityLinkServiceConfiguration;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntity;
 import org.flowable.entitylink.service.impl.persistence.entity.EntityLinkEntityManager;
@@ -31,23 +32,14 @@ public class EntityLinkServiceImpl extends CommonServiceImpl<EntityLinkServiceCo
     }
     
     @Override
-    public List<EntityLink> findEntityLinksByScopeIdAndType(String scopeId, String scopeType, String linkType) {
-        return getEntityLinkEntityManager().findEntityLinksByScopeIdAndType(scopeId, scopeType, linkType);
-    }
-
-    @Override
-    public List<EntityLink> findEntityLinksByRootScopeIdAndRootType(String scopeId, String scopeType) {
-        return getEntityLinkEntityManager().findEntityLinksByRootScopeIdAndRootType(scopeId, scopeType);
-    }
-
-    @Override
     public List<EntityLink> findEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
         return getEntityLinkEntityManager().findEntityLinksWithSameRootScopeForScopeIdAndScopeType(scopeId, scopeType, linkType);
     }
     
     @Override
-    public List<EntityLink> findEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String referenceScopeType, String linkType) {
-        return getEntityLinkEntityManager().findEntityLinksByReferenceScopeIdAndType(referenceScopeId, referenceScopeType, linkType);
+    @SuppressWarnings("unchecked")
+    public InternalEntityLinkQuery<EntityLink> createInternalEntityLinkQuery() {
+        return (InternalEntityLinkQuery) getEntityLinkEntityManager().createInternalEntityLinkQuery();
     }
     
     @Override

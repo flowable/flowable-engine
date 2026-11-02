@@ -17,9 +17,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.common.engine.impl.db.AbstractDataManager;
 import org.flowable.common.engine.impl.db.SingleCachedEntityMatcher;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntity;
 import org.flowable.common.engine.impl.persistence.cache.CachedEntityMatcher;
+import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.variable.service.InternalVariableInstanceQuery;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
@@ -225,6 +227,10 @@ public class InternalVariableInstanceQueryImpl
         return taskIds;
     }
 
+    public List<List<String>> getSafeTaskIds() {
+        return getSafeList(taskIds);
+    }
+
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -235,6 +241,10 @@ public class InternalVariableInstanceQueryImpl
 
     public Collection<String> getExecutionIds() {
         return executionIds;
+    }
+
+    public List<List<String>> getSafeExecutionIds() {
+        return getSafeList(executionIds);
     }
 
     public boolean isWithoutTaskId() {
@@ -249,12 +259,20 @@ public class InternalVariableInstanceQueryImpl
         return scopeIds;
     }
 
+    public List<List<String>> getSafeScopeIds() {
+        return getSafeList(scopeIds);
+    }
+
     public String getSubScopeId() {
         return subScopeId;
     }
 
     public Collection<String> getSubScopeIds() {
         return subScopeIds;
+    }
+
+    public List<List<String>> getSafeSubScopeIds() {
+        return getSafeList(subScopeIds);
     }
 
     public boolean isWithoutSubScopeId() {
@@ -275,6 +293,11 @@ public class InternalVariableInstanceQueryImpl
 
     public Collection<String> getNames() {
         return names;
+    }
+
+    protected List<List<String>> getSafeList(Collection<String> values) {
+        // need to split into different parts due to some dbs not supporting more than MAX_ENTRIES_IN_CLAUSE for in()
+        return CollectionUtil.partition(values, AbstractDataManager.MAX_ENTRIES_IN_CLAUSE);
     }
 
     // This method is needed because we have a different way of querying list and single objects via MyBatis.
@@ -304,7 +327,7 @@ public class InternalVariableInstanceQueryImpl
             return false;
         }
 
-        if (param.scopeIds != null && !param.scopeIds.contains(entity.getScopeId())) {
+        if (param.scopeIds != null && !param.scopeIds.isEmpty() && !param.scopeIds.contains(entity.getScopeId())) {
             return false;
         }
 
@@ -324,7 +347,7 @@ public class InternalVariableInstanceQueryImpl
             return false;
         }
 
-        if (param.subScopeIds != null && !param.subScopeIds.contains(entity.getSubScopeId())) {
+        if (param.subScopeIds != null && !param.subScopeIds.isEmpty() && !param.subScopeIds.contains(entity.getSubScopeId())) {
             return false;
         }
 

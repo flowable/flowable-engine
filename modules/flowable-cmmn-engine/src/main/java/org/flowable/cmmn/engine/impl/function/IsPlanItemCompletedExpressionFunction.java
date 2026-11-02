@@ -71,8 +71,7 @@ public class IsPlanItemCompletedExpressionFunction implements FlowableFunctionDe
     }
 
     public static boolean isPlanItemCompleted(Object object) {
-        if (object instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) object;
+        if (object instanceof PlanItemInstanceEntity planItemInstanceEntity) {
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager().findById(planItemInstanceEntity.getCaseInstanceId());
             List<PlanItemInstanceEntity> planItemInstances = caseInstanceEntity.getChildPlanItemInstances();
             if (planItemInstances == null) {

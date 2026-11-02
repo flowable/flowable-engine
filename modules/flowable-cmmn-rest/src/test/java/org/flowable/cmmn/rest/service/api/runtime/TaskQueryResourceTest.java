@@ -27,9 +27,10 @@ import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Test for all REST-operations related to the Task collection resource.
@@ -41,6 +42,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasks() throws Exception {
         try {
@@ -83,6 +85,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             String url = CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_TASK_QUERY);
             ObjectNode requestNode = objectMapper.createObjectNode();
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), adhocTask.getId());
+
+            // ID filtering
+            requestNode.removeAll();
+            requestNode.put("taskId", adhocTask.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, adhocTask.getId());
 
             // Name filtering
             requestNode.removeAll();
@@ -220,7 +227,11 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
             caseDefinitionKeyIn.add("oneHumanTaskCase");
             caseDefinitionKeyIn.add("another");
             assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
-            
+
+            requestNode.removeAll();
+            requestNode.putArray("scopeIds").add("someId").add(caseInstance.getId());
+            assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
             // Without scope id filtering
             requestNode.removeAll();
             requestNode.put("withoutScopeId", true);
@@ -318,6 +329,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks using task and case variables. GET cmmn-runtime/tasks
      */
+    @Test
     @CmmnDeployment(resources = { "org/flowable/cmmn/rest/service/api/repository/oneHumanTaskCase.cmmn" })
     public void testQueryTasksWithVariables() throws Exception {
         HashMap<String, Object> caseVariables = new HashMap<>();
@@ -335,7 +347,8 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         taskService.setVariablesLocal(caseTask.getId(), variables);
 
         // Additional tasks to confirm it's filtered out
-        runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        CaseInstance caseInstance2 = runtimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        Task caseTask2 = taskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).singleResult();
 
         ObjectNode requestNode = objectMapper.createObjectNode();
         ArrayNode variableArray = objectMapper.createArrayNode();
@@ -458,6 +471,30 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
         variableNode.put("operation", "likeIgnoreCase");
         assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
 
+        // Task variable exists
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId());
+
+        // Task variable exists with non-existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "exists");
+        assertResultsPresentInPostDataResponse(url, requestNode);
+
+        // Task variable not exists
+        variableNode.removeAll();
+        variableNode.put("name", "nonExistingVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask.getId(), caseTask2.getId());
+
+        // Task variable not exists with existing variable
+        variableNode.removeAll();
+        variableNode.put("name", "stringVar");
+        variableNode.put("operation", "notExists");
+        assertResultsPresentInPostDataResponse(url, requestNode, caseTask2.getId());
+
         // Any other operation but equals without value
         variableNode.removeAll();
         variableNode.put("value", "abcdef");
@@ -477,6 +514,7 @@ public class TaskQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying tasks. GET cmmn-runtime/tasks
      */
+    @Test
     public void testQueryTasksWithPaging() throws Exception {
         try {
             Calendar adhocTaskCreate = Calendar.getInstance();

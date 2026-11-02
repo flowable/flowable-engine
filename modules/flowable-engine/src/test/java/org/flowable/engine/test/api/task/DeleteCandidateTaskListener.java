@@ -12,12 +12,34 @@
  */
 package org.flowable.engine.test.api.task;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.service.delegate.DelegateTask;
 
 public class DeleteCandidateTaskListener implements TaskListener {
+    public static final String VARNAME_CANDIDATE_USERS = "candidateUsers";
+    public static final String VARNAME_CANDIDATE_GROUPS = "candidateGroups";
+
     @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.deleteCandidateUser("admin");
+        delegateTask.deleteCandidateGroup("admins");
+
+        Set<IdentityLink> candidates = delegateTask.getCandidates();
+        Set<String> candidateUsers = new HashSet<>();
+        Set<String> candidateGroups = new HashSet<>();
+        for (IdentityLink candidate : candidates) {
+            if (candidate.getUserId() != null) {
+                candidateUsers.add(candidate.getUserId());
+            } else if (candidate.getGroupId() != null) {
+                candidateGroups.add(candidate.getGroupId());
+            }
+        }
+        delegateTask.setVariable(VARNAME_CANDIDATE_USERS, candidateUsers);
+        delegateTask.setVariable(VARNAME_CANDIDATE_GROUPS, candidateGroups);
+
     }
 }

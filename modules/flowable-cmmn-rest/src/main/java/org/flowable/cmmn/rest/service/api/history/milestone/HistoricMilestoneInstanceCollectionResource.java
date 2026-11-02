@@ -18,8 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.api.DataResponse;
 import org.flowable.common.rest.api.RequestUtil;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +38,7 @@ import io.swagger.annotations.Authorization;
  * @author DennisFederico
  */
 @RestController
-@Api(tags = {"History Milestone"}, description = "Manage History Milestone Instances", authorizations = {@Authorization(value = "basicAuth")})
+@Api(tags = {"History Milestone"}, authorizations = {@Authorization(value = "basicAuth")})
 public class HistoricMilestoneInstanceCollectionResource extends HistoricMilestoneInstanceBaseResource {
 
     private static Map<String, BiConsumer<HistoricMilestoneInstanceQueryRequest, String>> mapping = new HashMap<>();
@@ -68,7 +66,7 @@ public class HistoricMilestoneInstanceCollectionResource extends HistoricMilesto
             @ApiResponse(code = 200, message = "Indicates that historic milestone instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.")})
     @GetMapping(value = "/cmmn-history/historic-milestone-instances", produces = "application/json")
-    public DataResponse<HistoricMilestoneInstanceResponse> getHistoricMilestoneInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricMilestoneInstanceResponse> getHistoricMilestoneInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         HistoricMilestoneInstanceQueryRequest queryRequest = new HistoricMilestoneInstanceQueryRequest();
         allRequestParams.forEach((key, value) -> Optional.ofNullable(value).ifPresent(v -> mapping.getOrDefault(key, voidConsumer).accept(queryRequest, v)));
         return getQueryResponse(queryRequest, allRequestParams);

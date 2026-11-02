@@ -17,9 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.bpmn.model.IOParameter;
 import org.flowable.common.engine.api.FlowableException;
-import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.el.ExpressionManager;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
@@ -51,42 +49,13 @@ public class EventSubscriptionUtil {
             
             @SuppressWarnings("unchecked")
             Map<String, Object> payloadMap = (Map<String, Object>) payload;
-            if (currentFlowElement instanceof Event) {
-                Event event = (Event) currentFlowElement;
+            if (currentFlowElement instanceof Event event) {
                 if (event.getInParameters().size() > 0) {
                     
                     VariableContainerWrapper variableWrapper = new VariableContainerWrapper(payloadMap);
                     ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getExpressionManager();
-                    for (IOParameter inParameter : event.getInParameters()) {
+                    IOParameterUtil.processInParameters(event.getInParameters(), variableWrapper, execution, expressionManager);
 
-                        Object value = null;
-                        if (StringUtils.isNotEmpty(inParameter.getSourceExpression())) {
-                            Expression expression = expressionManager.createExpression(inParameter.getSourceExpression().trim());
-                            value = expression.getValue(variableWrapper);
-
-                        } else {
-                            value = variableWrapper.getVariable(inParameter.getSource());
-                        }
-
-                        String variableName = null;
-                        if (StringUtils.isNotEmpty(inParameter.getTargetExpression())) {
-                            Expression expression = expressionManager.createExpression(inParameter.getTargetExpression());
-                            Object variableNameValue = expression.getValue(variableWrapper);
-                            if (variableNameValue != null) {
-                                variableName = variableNameValue.toString();
-                            } else {
-                                LOGGER.warn("In parameter target expression {} did not resolve to a variable name, this is most likely a programmatic error",
-                                    inParameter.getTargetExpression());
-                            }
-
-                        } else if (StringUtils.isNotEmpty(inParameter.getTarget())){
-                            variableName = inParameter.getTarget();
-
-                        }
-                        
-                        execution.setVariable(variableName, value);
-                    }
-                    
                 } else {
                     execution.setVariables(payloadMap);
                 }
@@ -107,7 +76,7 @@ public class EventSubscriptionUtil {
 
         EventHandler eventHandler = processEngineConfiguration.getEventHandler(eventSubscriptionEntity.getEventType());
         if (eventHandler == null) {
-            throw new FlowableException("Could not find eventhandler for event of type '" + eventSubscriptionEntity.getEventType() + "'.");
+            throw new FlowableException("Could not find eventhandler for event of type '" + eventSubscriptionEntity.getEventType() + "' for " + eventSubscriptionEntity);
         }
         eventHandler.handleEvent(eventSubscriptionEntity, payload, CommandContextUtil.getCommandContext());
     }
@@ -129,7 +98,7 @@ public class EventSubscriptionUtil {
             FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();
     
             if (currentFlowElement == null) {
-                throw new FlowableException("Error while sending signal for event subscription '" + eventSubscriptionEntity.getId() + "': " + "no activity associated with event subscription");
+                throw new FlowableException("Error while sending signal for " + eventSubscriptionEntity + " no activity associated with event subscription");
             }
             
             EventSubscriptionUtil.processPayloadMap(payload, execution, currentFlowElement, commandContext);

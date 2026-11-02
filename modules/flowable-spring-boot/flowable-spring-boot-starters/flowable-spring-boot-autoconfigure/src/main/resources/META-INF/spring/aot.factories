@@ -1,0 +1,7 @@
+org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor=\
+org.flowable.spring.boot.aot.cmmn.FlowableCmmnAutoDeployBeanFactoryInitializationAotProcessor,\
+org.flowable.spring.boot.aot.dmn.FlowableDmnAutoDeployBeanFactoryInitializationAotProcessor,\
+org.flowable.spring.boot.aot.process.FlowableProcessAutoDeployBeanFactoryInitializationAotProcessor
+
+org.springframework.aot.hint.RuntimeHintsRegistrar=\
+org.flowable.spring.boot.environment.FlowableDefaultPropertiesLocationRuntimeHints

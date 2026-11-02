@@ -50,7 +50,7 @@ public class CompensationEventHandler implements EventHandler {
 
         String configuration = eventSubscription.getConfiguration();
         if (configuration == null) {
-            throw new FlowableException("Compensating execution not set for compensate event subscription with id " + eventSubscription.getId());
+            throw new FlowableException("Compensating execution not set for " + eventSubscription);
         }
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
@@ -59,7 +59,7 @@ public class CompensationEventHandler implements EventHandler {
         String processDefinitionId = compensatingExecution.getProcessDefinitionId();
         Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         if (process == null) {
-            throw new FlowableException("Cannot start process instance. Process model (id = " + processDefinitionId + ") could not be found");
+            throw new FlowableException("Cannot start process instance. Process model (id = " + processDefinitionId + ") could not be found for " + eventSubscription);
         }
 
         FlowElement flowElement = process.getFlowElement(eventSubscription.getActivityId(), true);
@@ -92,8 +92,7 @@ public class CompensationEventHandler implements EventHandler {
                             List<Association> associations = process.findAssociationsWithSourceRefRecursive(boundaryEvent.getId());
                             for (Association association : associations) {
                                 FlowElement targetElement = process.getFlowElement(association.getTargetRef(), true);
-                                if (targetElement instanceof Activity) {
-                                    Activity targetActivity = (Activity) targetElement;
+                                if (targetElement instanceof Activity targetActivity) {
                                     if (targetActivity.isForCompensation()) {
                                         compensationActivity = targetActivity;
                                         break;

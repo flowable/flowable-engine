@@ -13,8 +13,12 @@
 package org.flowable.cmmn.engine.impl.callback;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
@@ -23,11 +27,16 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManage
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CmmnLoggingSessionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.ExternalWorkerServiceTask;
+import org.flowable.cmmn.model.IOParameter;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.common.engine.api.delegate.Expression;
 import org.flowable.common.engine.impl.context.Context;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.logging.CmmnLoggingSessionConstants;
+import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.ScopeAwareInternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -55,6 +64,39 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     }
 
     @Override
+    public Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job) {
+        String subScopeId = job.getSubScopeId();
+        if (subScopeId != null) {
+            PlanItemInstanceEntity planItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(subScopeId);
+            if (planItemInstanceEntity == null) {
+                return null;
+            }
+            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItemDefinition();
+            if (planItemDefinition instanceof ExternalWorkerServiceTask externalWorkerServiceTask) {
+                List<IOParameter> inParameters = externalWorkerServiceTask.getInParameters();
+                if (inParameters != null && !inParameters.isEmpty()) {
+                    Map<String, Object> variables = new HashMap<>();
+                    for (IOParameter inParameter : inParameters) {
+                        if (inParameter.getSource() != null) {
+                            variables.put(inParameter.getTarget(), planItemInstanceEntity.getVariable(inParameter.getSource()));
+                        } else {
+                            Expression sourceExpression = cmmnEngineConfiguration.getExpressionManager()
+                                    .createExpression(inParameter.getSourceExpression());
+                            Object value = sourceExpression.getValue(planItemInstanceEntity);
+                            variables.put(inParameter.getTarget(), value);
+                        }
+                    }
+                    return variables;
+                } else if (externalWorkerServiceTask.isDoNotIncludeVariables()) {
+                    return Collections.emptyMap();
+                }
+            }
+            return planItemInstanceEntity.getVariables();
+        }
+        return null;
+    }
+
+    @Override
     protected boolean handleJobInsertInternal(Job job) {
         // Currently, nothing extra needed (but counting relationships can be added later here).
         return true;
@@ -68,13 +110,14 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
     @Override
     protected void lockJobScopeInternal(Job job) {
         CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
-        String lockOwner;
-        Date lockExpirationTime;
+        String lockOwner = null;
+        Date lockExpirationTime = null;
 
         if (job instanceof JobInfoEntity) {
             lockOwner = ((JobInfoEntity) job).getLockOwner();
             lockExpirationTime = ((JobInfoEntity) job).getLockExpirationTime();
-        } else {
+        }
+        if (lockOwner == null || lockExpirationTime == null) {
             int lockMillis = cmmnEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis();
             GregorianCalendar lockCal = new GregorianCalendar();
             lockCal.setTime(cmmnEngineConfiguration.getClock().getCurrentTime());
@@ -121,8 +164,7 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
 
         // In CMMN (and contrary to BPMN), when a timer is repeated a new plan item instance needs to be created
         // as the original one is removed when the timer event has occurred.
-        if (variableScope instanceof PlanItemInstanceEntity) {
-            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+        if (variableScope instanceof PlanItemInstanceEntity planItemInstanceEntity) {
 
             PlanItemInstance stagePlanItem = planItemInstanceEntity.getStagePlanItemInstanceEntity();
             if (stagePlanItem == null && planItemInstanceEntity.getStageInstanceId() != null) {
@@ -156,11 +198,11 @@ public class DefaultInternalCmmnJobManager extends ScopeAwareInternalJobManager 
             // Switch job references to new plan item instance
             timerJobEntity.setSubScopeId(newPlanItemInstanceEntity.getId());
 
-            if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof TimerEventListener) {
-               TimerEventListener timerEventListener = (TimerEventListener) planItem.getPlanItemDefinition();
+            if (planItem != null && planItem.getPlanItemDefinition() != null && planItem.getPlanItemDefinition() instanceof TimerEventListener timerEventListener) {
                 timerJobEntity.setElementId(timerEventListener.getId());
                 timerJobEntity.setElementName(timerEventListener.getName());
             }
         }
     }
+
 }

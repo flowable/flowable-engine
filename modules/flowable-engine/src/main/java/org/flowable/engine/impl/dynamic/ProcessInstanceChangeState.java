@@ -33,7 +33,9 @@ public class ProcessInstanceChangeState {
     protected Map<String, Map<String, Object>> localVariables = new HashMap<>();
     protected Map<String, List<ExecutionEntity>> processInstanceActiveEmbeddedExecutions;
     protected List<MoveExecutionEntityContainer> moveExecutionEntityContainers;
+    protected List<EnableActivityContainer> enableActivityContainers;
     protected HashMap<String, ExecutionEntity> createdEmbeddedSubProcess = new HashMap<>();
+    protected HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution = new HashMap<>();
     protected HashMap<StartEvent, ExecutionEntity> pendingEventSubProcessesStartEvents = new HashMap<>();
 
     public ProcessInstanceChangeState() {
@@ -48,8 +50,8 @@ public class ProcessInstanceChangeState {
         return this;
     }
 
-    public Optional<ProcessDefinition> getProcessDefinitionToMigrateTo() {
-        return Optional.ofNullable(processDefinitionToMigrateTo);
+    public ProcessDefinition getProcessDefinitionToMigrateTo() {
+        return processDefinitionToMigrateTo;
     }
 
     public ProcessInstanceChangeState setProcessDefinitionToMigrateTo(ProcessDefinition processDefinitionToMigrateTo) {
@@ -58,7 +60,7 @@ public class ProcessInstanceChangeState {
     }
 
     public boolean isMigrateToProcessDefinition() {
-        return getProcessDefinitionToMigrateTo().isPresent();
+        return processDefinitionToMigrateTo != null;
     }
 
     public Map<String, Object> getProcessInstanceVariables() {
@@ -79,6 +81,15 @@ public class ProcessInstanceChangeState {
         return this;
     }
 
+    public List<EnableActivityContainer> getEnableActivityContainers() {
+        return enableActivityContainers;
+    }
+
+    public ProcessInstanceChangeState setEnableActivityContainers(List<EnableActivityContainer> enableActivityContainers) {
+        this.enableActivityContainers = enableActivityContainers;
+        return this;
+    }
+    
     public List<MoveExecutionEntityContainer> getMoveExecutionEntityContainers() {
         return moveExecutionEntityContainers;
     }
@@ -98,6 +109,18 @@ public class ProcessInstanceChangeState {
 
     public void addCreatedEmbeddedSubProcess(String key, ExecutionEntity executionEntity) {
         this.createdEmbeddedSubProcess.put(key, executionEntity);
+    }
+
+    public HashMap<String, ExecutionEntity> getCreatedMultiInstanceRootExecution() {
+        return createdMultiInstanceRootExecution;
+    }
+
+    public void setCreatedMultiInstanceRootExecution(HashMap<String, ExecutionEntity> createdMultiInstanceRootExecution) {
+        this.createdMultiInstanceRootExecution = createdMultiInstanceRootExecution;
+    }
+    
+    public void addCreatedMultiInstanceRootExecution(String key, ExecutionEntity executionEntity) {
+        this.createdMultiInstanceRootExecution.put(key, executionEntity);
     }
 
     public Map<String, List<ExecutionEntity>> getProcessInstanceActiveEmbeddedExecutions() {

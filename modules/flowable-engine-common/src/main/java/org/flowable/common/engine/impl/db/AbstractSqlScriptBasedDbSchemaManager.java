@@ -24,7 +24,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.FlowableVersion;
 import org.flowable.common.engine.impl.FlowableVersions;
@@ -45,13 +44,16 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
     
     protected static final String PROPERTY_TABLE = "ACT_GE_PROPERTY";
     
-    protected static final String SCHEMA_VERSION_PROPERTY = "schema.version";
-    
+    protected SchemaManagerDatabaseConfiguration getDatabaseConfiguration() {
+        return Context.getCommandContext().getSession(SchemaManagerDatabaseConfiguration.class);
+    }
+
     protected void dbSchemaUpgradeUntil6120(final String component, final int currentDatabaseVersionsIndex, final String dbVersion) {
         FlowableVersion version = FlowableVersions.FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String currentVersion = version.getMainVersion();
         logger.info("upgrading flowable {} schema from {} to {}", component, currentVersion, FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
         
+        SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
         // Actual execution of schema DDL SQL
         for (int i = currentDatabaseVersionsIndex + 1; i < FlowableVersions.getFlowableVersionIndexForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES); i++) {
             String nextVersion = FlowableVersions.FLOWABLE_VERSIONS.get(i).getMainVersion();
@@ -69,7 +71,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             nextVersion = nextVersion.replace(".", "");
             
             logger.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", currentVersion, nextVersion, component);
-            String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+            String databaseType = databaseConfiguration.getDatabaseType();
             executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + currentVersion + ".to." + nextVersion, component, databaseType), true);
             
             // To avoid having too much similar scripts, for upgrades the 'all' database is supported and executed for every database type
@@ -101,7 +103,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             nextVersion = nextVersion.replace(".", "");
             
             logger.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", currentVersion, nextVersion, component);
-            String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+            String databaseType = getDatabaseConfiguration().getDatabaseType();
             
             executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + currentVersion + ".to." + nextVersion, component, databaseType), true);
             
@@ -115,34 +117,22 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
     public boolean isTablePresent(String tableName) {
         // ACT-1610: in case the prefix IS the schema itself, we don't add the
         // prefix, since the check is already aware of the schema
-        DbSqlSession dbSqlSession = getDbSqlSession();
-        DbSqlSessionFactory dbSqlSessionFactory = dbSqlSession.getDbSqlSessionFactory();
-        if (!dbSqlSession.getDbSqlSessionFactory().isTablePrefixIsSchema()) {
+        SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
+        if (!databaseConfiguration.isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
         }
 
         Connection connection = null;
         try {
-            connection = dbSqlSession.getSqlSession().getConnection();
+            connection = databaseConfiguration.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             ResultSet tables = null;
 
-            String catalog = dbSqlSession.getConnectionMetadataDefaultCatalog();
-            if (dbSqlSessionFactory.getDatabaseCatalog() != null && dbSqlSessionFactory.getDatabaseCatalog().length() > 0) {
-                catalog = dbSqlSessionFactory.getDatabaseCatalog();
-            }
+            String catalog = databaseConfiguration.getDatabaseCatalog();
 
-            String schema = dbSqlSession.getConnectionMetadataDefaultSchema();
-            if (dbSqlSessionFactory.getDatabaseSchema() != null && dbSqlSessionFactory.getDatabaseSchema().length() > 0) {
-                schema = dbSqlSessionFactory.getDatabaseSchema();
-            } else if (dbSqlSessionFactory.isTablePrefixIsSchema() && StringUtils.isNotEmpty(dbSqlSessionFactory.getDatabaseTablePrefix())) {
-                schema = dbSqlSessionFactory.getDatabaseTablePrefix();
-                if (StringUtils.isNotEmpty(schema) && schema.endsWith(".")) {
-                    schema = schema.substring(0, schema.length() - 1);
-                }
-            }
+            String schema = databaseConfiguration.getDatabaseSchema();
 
-            String databaseType = dbSqlSessionFactory.getDatabaseType();
+            String databaseType = databaseConfiguration.getDatabaseType();
 
             if ("postgres".equals(databaseType)) {
                 tableName = tableName.toLowerCase();
@@ -178,24 +168,26 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
     }
     
     protected String prependDatabaseTablePrefix(String tableName) {
-        return getDbSqlSession().getDbSqlSessionFactory().getDatabaseTablePrefix() + tableName;
-    }
-    
-    public DbSqlSession getDbSqlSession() {
-        return Context.getCommandContext().getSession(DbSqlSession.class);
+        return getDatabaseConfiguration().getDatabaseTablePrefix() + tableName;
     }
     
     public String getProperty(String propertyName) {
+        return getProperty(propertyName, true);
+    }
+
+    public String getProperty(String propertyName, boolean checkPropertyTablePresent) {
         String tableName = getPropertyTable();
        
-        if (!isTablePresent(tableName)) { // isTablePresent will add the prefix, so adding it later
+        if (checkPropertyTablePresent && !isTablePresent(tableName)) { // isTablePresent will add the prefix, so adding it later
             return null;
         }
         
-        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
+        SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
+
+        if (!databaseConfiguration.isTablePrefixIsSchema()) {
             tableName = prependDatabaseTablePrefix(tableName);
         }
-        try (PreparedStatement statement = getDbSqlSession().getSqlSession().getConnection()
+        try (PreparedStatement statement = databaseConfiguration.getConnection()
                 .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?")) {
 
             statement.setString(1, propertyName);
@@ -206,6 +198,9 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                 return null;
             }
         } catch (SQLException e) {
+            if (!checkPropertyTablePresent && isMissingTablesException(e)) {
+                throw new FlowableException("SQL Exception when getting value. Message: " + e.getMessage(), e);
+            }
             logger.error("Could not get property from table {}", tableName, e);
             return null;
         }
@@ -222,7 +217,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
     protected abstract String getResourcesRootDirectory();
     
     public void executeMandatorySchemaResource(String operation, String component) {
-        String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+        String databaseType = getDatabaseConfiguration().getDatabaseType();
         executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component, databaseType), false);
     }
 
@@ -247,16 +242,17 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
         logger.info("performing {} on {} with resource {}", operation, component, resourceName);
         String sqlStatement = null;
         String exceptionSqlStatement = null;
-        DbSqlSession dbSqlSession = getDbSqlSession();
         try {
-            Connection connection = dbSqlSession.getSqlSession().getConnection();
+            SchemaManagerDatabaseConfiguration databaseConfiguration = getDatabaseConfiguration();
+            Connection connection = databaseConfiguration.getConnection();
             Exception exception = null;
             byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
             String ddlStatements = new String(bytes, StandardCharsets.UTF_8);
 
+            String databaseType = databaseConfiguration.getDatabaseType();
             // Special DDL handling for certain databases
             try {
-                if (dbSqlSession.getDbSqlSessionFactory().isMysql()) {
+                if ("mysql".equals(databaseType)) {
                     DatabaseMetaData databaseMetaData = connection.getMetaData();
                     int majorVersion = databaseMetaData.getDatabaseMajorVersion();
                     int minorVersion = databaseMetaData.getDatabaseMinorVersion();
@@ -306,7 +302,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
 
                 } else if (line.length() > 0) {
 
-                    if (dbSqlSession.getDbSqlSessionFactory().isOracle() && line.startsWith("begin")) {
+                    if ("oracle".equals(databaseType) && line.startsWith("begin")) {
                         inOraclePlsqlBlock = true;
                         sqlStatement = addSqlStatementPiece(sqlStatement, line);
 
@@ -318,12 +314,10 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
                             sqlStatement = addSqlStatementPiece(sqlStatement, line.substring(0, line.length() - 1));
                         }
 
-                        Statement jdbcStatement = connection.createStatement();
-                        try {
+                        try (Statement jdbcStatement = connection.createStatement();) {
 
                             logger.debug("SQL: {}", sqlStatement);
                             jdbcStatement.execute(sqlStatement);
-                            jdbcStatement.close();
                             
                         } catch (Exception e) {
                             if (exception == null) {
@@ -386,6 +380,27 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements SchemaMan
             line = line.trim();
         }
         return line;
+    }
+
+    protected boolean isMissingTablesException(Exception e) {
+        String exceptionMessage = e.getMessage();
+        if (e.getMessage() != null) {
+            // Matches message returned from H2
+            if ((exceptionMessage.contains("Table")) && (exceptionMessage.contains("not found"))) {
+                return true;
+            }
+
+            // Message returned from MySQL and Oracle
+            if ((exceptionMessage.contains("Table") || exceptionMessage.contains("table")) && (exceptionMessage.contains("doesn't exist"))) {
+                return true;
+            }
+
+            // Message returned from Postgres
+            if ((exceptionMessage.contains("relation") || exceptionMessage.contains("table")) && (exceptionMessage.contains("does not exist"))) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

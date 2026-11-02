@@ -64,7 +64,7 @@ public class EventPayloadToXmlStringSerializer implements OutboundEventSerialize
             return writer.toString();
 
         } catch (Exception e) {
-            throw new FlowableException("Could not serialize eventInstance to xml string", e);
+            throw new FlowableException("XML serialization failed for " + eventInstance, e);
         }
     }
 

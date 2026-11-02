@@ -222,6 +222,7 @@ public class BatchQueryImpl extends AbstractQuery<BatchQuery, Batch> implements 
     }
 
     @Override
+    @Deprecated
     public void deleteWithRelatedData() {
         delete();
     }

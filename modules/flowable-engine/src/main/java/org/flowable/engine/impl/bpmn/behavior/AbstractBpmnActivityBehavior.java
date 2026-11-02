@@ -26,6 +26,7 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -38,6 +39,8 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     private static final long serialVersionUID = 1L;
 
     protected MultiInstanceActivityBehavior multiInstanceActivityBehavior;
+    
+    protected Object v5MultiInstanceActivityBehavior;
 
     /**
      * Subclasses that call leave() will first pass through this method, before the regular {@link FlowNodeActivityBehavior#leave(DelegateExecution)} is called. This way, we can check if the activity
@@ -53,7 +56,12 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
         if (!hasLoopCharacteristics()) {
             super.leave(execution);
         } else if (hasMultiInstanceCharacteristics()) {
-            multiInstanceActivityBehavior.leave(execution);
+            if (multiInstanceActivityBehavior != null) {
+                multiInstanceActivityBehavior.leave(execution);
+                
+            } else if (v5MultiInstanceActivityBehavior != null) {
+                Flowable5Util.getFlowable5CompatibilityHandler().leaveMIExecution(execution, v5MultiInstanceActivityBehavior);
+            }
         }
     }
 
@@ -105,7 +113,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
     }
 
     protected boolean hasMultiInstanceCharacteristics() {
-        return multiInstanceActivityBehavior != null;
+        return multiInstanceActivityBehavior != null || v5MultiInstanceActivityBehavior != null;
     }
 
     public MultiInstanceActivityBehavior getMultiInstanceActivityBehavior() {
@@ -116,4 +124,11 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
         this.multiInstanceActivityBehavior = multiInstanceActivityBehavior;
     }
 
+    public Object getV5MultiInstanceActivityBehavior() {
+        return v5MultiInstanceActivityBehavior;
+    }
+
+    public void setV5MultiInstanceActivityBehavior(Object v5MultiInstanceActivityBehavior) {
+        this.v5MultiInstanceActivityBehavior = v5MultiInstanceActivityBehavior;
+    }
 }

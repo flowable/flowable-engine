@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testManualActivation" name="testManualActivation">
+        <casePlanModel id="casePlanModel">
+
+            <planItem id="planItemStage" definitionRef="stage1"/>
+            <planItem id="planItemTaskA" definitionRef="taskA">
+                <itemControl>
+                  <manualActivationRule></manualActivationRule>
+                </itemControl>
+            </planItem>
+
+            <stage id="stage1">
+                <planItem id="planItemTaskB" name="Task B" definitionRef="taskB">
+                    <itemControl>
+                        <manualActivationRule></manualActivationRule>
+                    </itemControl>
+                </planItem>
+
+                <humanTask id="taskB" name="Task B"/>
+            </stage>
+            
+            <humanTask id="taskA" name="Task A" />
+        </casePlanModel>
+    </case>
+</definitions>

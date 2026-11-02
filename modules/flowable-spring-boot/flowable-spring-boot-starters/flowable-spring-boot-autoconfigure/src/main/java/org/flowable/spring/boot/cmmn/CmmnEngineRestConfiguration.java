@@ -12,29 +12,36 @@
  */
 package org.flowable.spring.boot.cmmn;
 
+import java.util.List;
+
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
+import org.flowable.common.rest.variable.RestVariableConverter;
 import org.flowable.spring.boot.DispatcherServletConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.flowable.spring.boot.json.Jackson2JsonRestConverterConfiguration;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Component scan for the CMMN Rest API Configuration.
  *
  * @author Filip Hrisafov
  */
-@Import(DispatcherServletConfiguration.class)
+@Import({
+        DispatcherServletConfiguration.class,
+        Jackson2JsonRestConverterConfiguration.class
+})
 @ComponentScan("org.flowable.cmmn.rest.service.api")
 public class CmmnEngineRestConfiguration {
     
-    @Autowired
-    protected ObjectMapper objectMapper;
-
     @Bean
-    public CmmnRestResponseFactory cmmnRestResponseFactory() {
-        return new CmmnRestResponseFactory(objectMapper);
+    public CmmnRestResponseFactory cmmnRestResponseFactory(ObjectMapper objectMapper, ObjectProvider<RestVariableConverter> variableConverters) {
+        CmmnRestResponseFactory restResponseFactory = new CmmnRestResponseFactory(objectMapper);
+        List<RestVariableConverter> additionalVariableConverters = variableConverters.orderedStream().toList();
+        restResponseFactory.getVariableConverters().addAll(additionalVariableConverters);
+        return restResponseFactory;
     }
 }

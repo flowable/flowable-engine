@@ -13,6 +13,7 @@
 package org.flowable.engine;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,7 +37,11 @@ import org.flowable.engine.runtime.NativeExecutionQuery;
 import org.flowable.engine.runtime.NativeProcessInstanceQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.engine.runtime.ProcessInstanceUpdateBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionDeletionBuilder;
+import org.flowable.engine.runtime.ProcessInstanceStartEventSubscriptionModificationBuilder;
 import org.flowable.engine.task.Event;
 import org.flowable.entitylink.api.EntityLink;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
@@ -60,6 +65,14 @@ public interface RuntimeService {
      * Create a {@link ProcessInstanceBuilder}, that allows to set various options for starting a process instance, as an alternative to the various startProcessInstanceByXX methods.
      */
     ProcessInstanceBuilder createProcessInstanceBuilder();
+
+    /**
+     * Create a {@link ProcessInstanceUpdateBuilder}, that allows to update various properties of a process instance.
+     *
+     * @param processInstanceId
+     *     id of the process instance to update, cannot be null
+     */
+    ProcessInstanceUpdateBuilder createProcessInstanceUpdateBuilder(String processInstanceId);
 
     /**
      * Starts a new process instance in the latest version of the process definition with the given key.
@@ -446,8 +459,67 @@ public interface RuntimeService {
      */
     void updateBusinessStatus(String processInstanceId, String businessStatus);
 
+    /**
+     * Sets the due date for the provided process instance.
+     *
+     * @param processInstanceId
+     *     id of the process instance to set the due date, cannot be null
+     * @param dueDate
+     *     new due date value
+     */
+    void setProcessInstanceDueDate(String processInstanceId, Date dueDate);
+
+    /**
+     * Claims the process instance by setting the given user as the assignee.
+     * When the process instance is already claimed by another user, an exception is thrown.
+     *
+     * @param processInstanceId
+     *     id of the process instance to claim, cannot be null
+     * @param userId
+     *     user id of the user to claim the process instance
+     */
+    void claimProcessInstance(String processInstanceId, String userId);
+
+    /**
+     * Unclaims the process instance by removing the assignee.
+     *
+     * @param processInstanceId
+     *     id of the process instance to unclaim, cannot be null
+     */
+    void unclaimProcessInstance(String processInstanceId);
+
     // Identity Links
     // ///////////////////////////////////////////////////////////////
+
+    /**
+     * Set the new owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new owner
+     * @param userId the id of the user to set as the new owner
+     */
+    void setOwner(String processInstanceId, String userId);
+
+    /**
+     * Removes the owner of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the owner from
+     */
+    void removeOwner(String processInstanceId);
+
+    /**
+     * Set the new assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to set its new assignee
+     * @param userId the id of the user to set as the new assignee
+     */
+    void setAssignee(String processInstanceId, String userId);
+
+    /**
+     * Removes the assignee of a process instance.
+     *
+     * @param processInstanceId the id of the process to remove the assignee from
+     */
+    void removeAssignee(String processInstanceId);
 
     /**
      * Involves a user with a process instance. The type of identity link is defined by the given identityLinkType.
@@ -831,6 +903,59 @@ public interface RuntimeService {
      *     when no execution is found for the given executionId.
      */
     void setVariablesLocal(String executionId, Map<String, ? extends Object> variables);
+    
+    /**
+     * Update or create a variable for an execution asynchronously.
+     *
+     * @param executionId
+     *     id of execution to set variable in, cannot be null.
+     * @param variableName
+     *     name of variable to set, cannot be null.
+     * @param value
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariableAsync(String executionId, String variableName, Object value);
+
+    /**
+     * Update or create a variable for an execution (not considering parent scopes) asynchronously. If the variable is not already existing, it will be created in the given execution.
+     *
+     * @param executionId
+     *     id of execution to set variable in, cannot be null.
+     * @param variableName
+     *     name of variable to set, cannot be null.
+     * @param value
+     *     value to set. When null is passed, the variable is not removed, only it's value will be set to null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariableLocalAsync(String executionId, String variableName, Object value);
+
+    /**
+     * Update or create given variables for an execution (including parent scopes) asynchronously.
+     *
+     * @param executionId
+     *     id of the execution, cannot be null.
+     * @param variables
+     *     map containing name (key) and value of variables, can be null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     * @see VariableScope#setVariables(Map) {@link VariableScope#setVariables(Map)}
+     */
+    void setVariablesAsync(String executionId, Map<String, ?> variables);
+
+    /**
+     * Update or create given variables for an execution (not considering parent scopes) asynchronously. If the variables are not already existing, it will be created in the given execution.
+     *
+     * @param executionId
+     *     id of the execution, cannot be null.
+     * @param variables
+     *     map containing name (key) and value of variables, can be null.
+     * @throws FlowableObjectNotFoundException
+     *     when no execution is found for the given executionId.
+     */
+    void setVariablesLocalAsync(String executionId, Map<String, ?> variables);
 
     /**
      * Removes a variable for an execution.
@@ -1327,6 +1452,34 @@ public interface RuntimeService {
     void addEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
     
     void removeEventRegistryConsumer(EventRegistryEventConsumer eventConsumer);
+
+    /**
+     * Creates a new event subscription builder to register a subscription to start a new process instance based on an event with a particular set of
+     * correlation parameter values. In order for this to work, the process definition needs to have an event-registry based start event with a
+     * dynamic, manual subscription based behavior and the registered correlation parameter values within the builder need to be based on
+     * actual correlation parameter definitions within the event model the start event is based on.
+     * Register one or more correlation parameter value with in the builder before invoking the
+     * {@link ProcessInstanceStartEventSubscriptionBuilder#subscribe()} method to create and register the subscription.
+     *
+     * @return the subscription builder
+     */
+    ProcessInstanceStartEventSubscriptionBuilder createProcessInstanceStartEventSubscriptionBuilder();
+
+    /**
+     * Creates a new event subscription modification builder to modify one or more previously registered process start event subscriptions based
+     * on a particular process definition and with an optional combination of correlation parameter values.
+     *
+     * @return the subscription modification builder
+     */
+    ProcessInstanceStartEventSubscriptionModificationBuilder createProcessInstanceStartEventSubscriptionModificationBuilder();
+
+    /**
+     * Creates a new event subscription deletion builder delete one or more previously registered process start event subscriptions based
+     * on a particular process definition and with an optional combination of correlation parameter values.
+     *
+     * @return the subscription deletion builder
+     */
+    ProcessInstanceStartEventSubscriptionDeletionBuilder createProcessInstanceStartEventSubscriptionDeletionBuilder();
 
     /**
      * Sets the name for the process instance with the given id.

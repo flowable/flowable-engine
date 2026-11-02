@@ -24,7 +24,7 @@ import org.flowable.common.engine.impl.javax.el.ELException;
 
 public class AstUnary extends AstRightValue {
 	public interface Operator {
-		public Object eval(Bindings bindings, ELContext context, AstNode node);		
+		Object eval(Bindings bindings, ELContext context, AstNode node);
 	}
 	public abstract static class SimpleOperator implements Operator {
         @Override
@@ -43,7 +43,7 @@ public class AstUnary extends AstRightValue {
 		@Override public String toString() { return "-"; }
 	};
 	public static final Operator NOT = new SimpleOperator() {
-		@Override public Object apply(TypeConverter converter, Object o) { return !converter.convert(o, Boolean.class); }
+		@Override public Object apply(TypeConverter converter, Object o) { return !converter.convert(o, boolean.class); }
 		@Override public String toString() { return "!"; }
 	};
 

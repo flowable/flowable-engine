@@ -23,12 +23,14 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * @author Tijs Rademakers
  */
 @ContextConfiguration("classpath:flowable-context.xml")
+@DirtiesContext
 public class DecisionTaskWithSpringBeanTest extends SpringDmnFlowableTestCase {
 
     @Test

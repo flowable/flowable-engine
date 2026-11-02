@@ -15,8 +15,6 @@ package org.flowable.app.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.app.api.AppRepositoryService;
 import org.flowable.app.api.repository.AppDeployment;
 import org.flowable.app.rest.AppRestApiInterceptor;
@@ -39,7 +37,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployments" }, description = "Manage App Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResourceCollectionResource {
 
     @Autowired
@@ -61,7 +59,7 @@ public class AppDeploymentResourceCollectionResource {
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @GetMapping(value = "/app-repository/deployments/{deploymentId}/resources", produces = "application/json")
-    public List<AppDeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
+    public List<AppDeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
         // Check if deployment exists
         AppDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
         if (deployment == null) {

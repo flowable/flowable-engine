@@ -29,19 +29,16 @@ import org.flowable.rest.conf.ApplicationWithTaskLogging;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Luis Belloch
  */
+@SpringJUnitWebConfig(ApplicationWithTaskLogging.class)
 public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCase {
-
-    @Override
-    protected Class<?> getConfigurationClass() {
-        return ApplicationWithTaskLogging.class;
-    }
 
     @Test
     @Deployment(resources = { "org/flowable/rest/api/history/HistoricTaskLogCollectionResourceTest.bpmn20.xml" })
@@ -93,6 +90,7 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
     @Deployment(resources = { "org/flowable/rest/api/history/HistoricTaskLogCollectionResourceTest.bpmn20.xml" })
     public void itCanQueryUsingFromToDates() throws IOException {
         Calendar startTime = Calendar.getInstance();
+        startTime.set(Calendar.MILLISECOND, 0);
         processEngineConfiguration.getClock().setCurrentTime(startTime.getTime());
 
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", "testBusinessKey");
@@ -112,14 +110,14 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
         processEngineConfiguration.getClock().reset();
 
         JsonNode listAfter = queryTaskLogEntries(
-                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + dateFormat.format(startTime.getTime()));
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&from=" + getISODateString(startTime.getTime()));
         expectSequence(listAfter,
                 asList(task1.getId()),
                 asList("USER_TASK_OWNER_CHANGED"));
 
         startTime.add(Calendar.DAY_OF_YEAR, -1);
         JsonNode listBefore = queryTaskLogEntries(
-                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + dateFormat.format(startTime.getTime()));
+                "?taskId=" + encode(task1.getId()) + "&sort=logNumber&order=asc&to=" + getISODateString(startTime.getTime()));
         expectSequence(listBefore,
                 asList(task1.getId(), task1.getId()),
                 asList("USER_TASK_CREATED", "USER_TASK_DUEDATE_CHANGED"));
@@ -135,9 +133,9 @@ public class HistoricTaskLogCollectionResourceTest extends BaseSpringRestTestCas
 
     protected void expectSequence(JsonNode list, List<String> ids, List<String> types) {
         assertThat(list).hasSameSizeAs(ids);
-        List<String> resultingIds = list.findValuesAsText("taskId");
+        List<String> resultingIds = list.findValuesAsString("taskId");
         assertThat(resultingIds).isEqualTo(ids);
-        List<String> resultingTypes = list.findValuesAsText("type");
+        List<String> resultingTypes = list.findValuesAsString("type");
         assertThat(resultingTypes).isEqualTo(types);
     }
 }

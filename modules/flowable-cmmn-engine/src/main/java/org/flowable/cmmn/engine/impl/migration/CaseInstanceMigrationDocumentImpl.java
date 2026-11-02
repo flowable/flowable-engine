@@ -15,11 +15,16 @@ package org.flowable.cmmn.engine.impl.migration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.cmmn.api.migration.ActivatePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
+import org.flowable.cmmn.api.migration.ChangePlanItemDefinitionWithNewTargetIdsMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdMapping;
+import org.flowable.cmmn.api.migration.ChangePlanItemIdWithDefinitionIdMapping;
 import org.flowable.cmmn.api.migration.MoveToAvailablePlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.RemoveWaitingForRepetitionPlanItemDefinitionMapping;
 import org.flowable.cmmn.api.migration.TerminatePlanItemDefinitionMapping;
@@ -34,11 +39,18 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     protected String migrateToCaseDefinitionKey;
     protected Integer migrateToCaseDefinitionVersion;
     protected String migrateToCaseDefinitionTenantId;
+    protected Boolean enableAutomaticPlanItemInstanceCreation;
+    protected Set<String> caseInstanceIdsToMigrate = new LinkedHashSet<>();
     protected List<ActivatePlanItemDefinitionMapping> activatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<TerminatePlanItemDefinitionMapping> terminatePlanItemDefinitionMappings = new ArrayList<>();
     protected List<MoveToAvailablePlanItemDefinitionMapping> moveToAvailablePlanItemDefinitionMappings = new ArrayList<>();
     protected List<WaitingForRepetitionPlanItemDefinitionMapping> waitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
     protected List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings = new ArrayList<>();
+    protected List<ChangePlanItemIdMapping> changePlanItemIdMappings = new ArrayList<>();
+    protected List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings = new ArrayList<>();
+    protected List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings = new ArrayList<>();
+    protected String preUpgradeExpression;
+    protected String postUpgradeExpression;    
     protected Map<String, Object> caseInstanceVariables = new HashMap<>();
     protected Map<String, Map<String, Object>> planItemLocalVariables = new HashMap<>();
 
@@ -60,6 +72,15 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
         this.migrateToCaseDefinitionVersion = caseDefinitionVersion;
         this.migrateToCaseDefinitionTenantId = caseDefinitionTenantId;
     }
+    
+    @Override
+    public Set<String> getCaseInstanceIdsToMigrate() {
+        return caseInstanceIdsToMigrate;
+    }
+
+    public void setCaseInstanceIdsToMigrate(Set<String> caseInstanceIdsToMigrate) {
+        this.caseInstanceIdsToMigrate = caseInstanceIdsToMigrate;
+    }
 
     public void setActivatePlanItemDefinitionMappings(List<ActivatePlanItemDefinitionMapping> planItemDefinitionMappings) {
         this.activatePlanItemDefinitionMappings = planItemDefinitionMappings;
@@ -80,9 +101,29 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     public void setRemoveWaitingForRepetitionPlanItemDefinitionMappings(List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> removeWaitingForRepetitionPlanItemDefinitionMappings) {
         this.removeWaitingForRepetitionPlanItemDefinitionMappings = removeWaitingForRepetitionPlanItemDefinitionMappings;
     }
+    
+    public void setChangePlanItemIdMappings(List<ChangePlanItemIdMapping> changePlanItemIdMappings) {
+        this.changePlanItemIdMappings = changePlanItemIdMappings;
+    }
+    
+    public void setChangePlanItemIdWithDefinitionIdMappings(List<ChangePlanItemIdWithDefinitionIdMapping> changePlanItemIdWithDefinitionIdMappings) {
+        this.changePlanItemIdWithDefinitionIdMappings = changePlanItemIdWithDefinitionIdMappings;
+    }
+    
+    public void setChangePlanItemDefinitionWithNewTargetIdsMappings(List<ChangePlanItemDefinitionWithNewTargetIdsMapping> changePlanItemDefinitionWithNewTargetIdsMappings) {
+        this.changePlanItemDefinitionWithNewTargetIdsMappings = changePlanItemDefinitionWithNewTargetIdsMappings;
+    }
 
     public void setCaseInstanceVariables(Map<String, Object> caseInstanceVariables) {
         this.caseInstanceVariables = caseInstanceVariables;
+    }
+
+    public void setPreUpgradeExpression(String preUpgradeExpression) {
+        this.preUpgradeExpression = preUpgradeExpression;
+    }
+
+    public void setPostUpgradeExpression(String postUpgradeExpression) {
+        this.postUpgradeExpression = postUpgradeExpression;
     }
 
     @Override
@@ -106,6 +147,15 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     }
     
     @Override
+    public Boolean getEnableAutomaticPlanItemInstanceCreation() {
+        return enableAutomaticPlanItemInstanceCreation;
+    }
+
+    public void setEnableAutomaticPlanItemInstanceCreation(Boolean enableAutomaticPlanItemInstanceCreation) {
+        this.enableAutomaticPlanItemInstanceCreation = enableAutomaticPlanItemInstanceCreation;
+    }
+
+    @Override
     public List<ActivatePlanItemDefinitionMapping> getActivatePlanItemDefinitionMappings() {
         return activatePlanItemDefinitionMappings;
     }
@@ -128,6 +178,31 @@ public class CaseInstanceMigrationDocumentImpl implements CaseInstanceMigrationD
     @Override
     public List<RemoveWaitingForRepetitionPlanItemDefinitionMapping> getRemoveWaitingForRepetitionPlanItemDefinitionMappings() {
         return removeWaitingForRepetitionPlanItemDefinitionMappings;
+    }
+    
+    @Override
+    public List<ChangePlanItemIdMapping> getChangePlanItemIdMappings() {
+        return changePlanItemIdMappings;
+    }
+
+    @Override
+    public List<ChangePlanItemIdWithDefinitionIdMapping> getChangePlanItemIdWithDefinitionIdMappings() {
+        return changePlanItemIdWithDefinitionIdMappings;
+    }
+
+    @Override
+    public List<ChangePlanItemDefinitionWithNewTargetIdsMapping> getChangePlanItemDefinitionWithNewTargetIdsMappings() {
+        return changePlanItemDefinitionWithNewTargetIdsMappings;
+    }
+
+    @Override
+    public String getPreUpgradeExpression() {
+        return preUpgradeExpression;
+    }
+
+    @Override
+    public String getPostUpgradeExpression() {
+        return postUpgradeExpression;
     }
 
     @Override

@@ -13,8 +13,6 @@
 
 package org.flowable.eventregistry.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.eventregistry.api.EventDefinition;
 import org.flowable.eventregistry.api.EventRepositoryService;
 import org.flowable.eventregistry.impl.EventRegistryEngineConfiguration;
@@ -34,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Definitions" }, description = "Manage Event Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class EventDefinitionResource extends BaseEventDefinitionResource {
     
     @Autowired
@@ -43,13 +41,13 @@ public class EventDefinitionResource extends BaseEventDefinitionResource {
     @Autowired(required=false)
     protected EventRepositoryService eventRepositoryService;
 
-    @ApiOperation(value = "Get an event definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get an event definition", tags = { "Event Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the event definitions are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested event definition was not found.")
     })
     @GetMapping(value = "/event-registry-repository/event-definitions/{eventDefinitionId}", produces = "application/json")
-    public EventDefinitionResponse getEventDefinition(@ApiParam(name = "eventDefinitionId") @PathVariable String eventDefinitionId, HttpServletRequest request) {
+    public EventDefinitionResponse getEventDefinition(@ApiParam(name = "eventDefinitionId") @PathVariable String eventDefinitionId) {
         EventDefinition eventDefinition = getEventDefinitionFromRequest(eventDefinitionId);
 
         return restResponseFactory.createEventDefinitionResponse(eventDefinition);

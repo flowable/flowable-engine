@@ -14,6 +14,7 @@
 package org.flowable.cmmn.rest.service.api.history.planitem;
 
 import java.util.Date;
+import java.util.Set;
 
 import org.flowable.common.rest.api.PaginateRequest;
 
@@ -27,6 +28,7 @@ public class HistoricPlanItemInstanceQueryRequest extends PaginateRequest {
     private String planItemInstanceState;
     private String caseDefinitionId;
     private String caseInstanceId;
+    private Set<String> caseInstanceIds;
     private String stageInstanceId;
     private String elementId;
     private String planItemDefinitionId;
@@ -58,6 +60,8 @@ public class HistoricPlanItemInstanceQueryRequest extends PaginateRequest {
     private String referenceType;
     private String tenantId;
     private Boolean withoutTenantId;
+    private Boolean started;
+    private Boolean includeLocalVariables;
 
     public String getPlanItemInstanceId() {
         return planItemInstanceId;
@@ -345,5 +349,29 @@ public class HistoricPlanItemInstanceQueryRequest extends PaginateRequest {
 
     public void setWithoutTenantId(Boolean withoutTenantId) {
         this.withoutTenantId = withoutTenantId;
+    }
+
+    public Boolean getStarted() {
+        return started;
+    }
+
+    public void setStarted(Boolean started) {
+        this.started = started;
+    }
+
+    public Boolean getIncludeLocalVariables() {
+        return includeLocalVariables;
+    }
+
+    public void setIncludeLocalVariables(Boolean includeLocalVariables) {
+        this.includeLocalVariables = includeLocalVariables;
+    }
+
+    public Set<String> getCaseInstanceIds() {
+        return caseInstanceIds;
+    }
+
+    public void setCaseInstanceIds(Set<String> caseInstanceIds) {
+        this.caseInstanceIds = caseInstanceIds;
     }
 }

@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.history;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -35,13 +36,25 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private String processInstanceNameLikeIgnoreCase;
     private String processBusinessKey;
     private String processBusinessKeyLike;
+    private String processBusinessKeyLikeIgnoreCase;
+    private String processBusinessStatus;
+    private String processBusinessStatusLike;
+    private String processBusinessStatusLikeIgnoreCase;
     private String processDefinitionId;
     private String processDefinitionKey;
+    private String processDefinitionKeyLike;
+    private String processDefinitionKeyLikeIgnoreCase;
+    private List<String> processDefinitionKeys;
+    private List<String> excludeProcessDefinitionKeys;
     private List<String> processDefinitionKeyIn;
     private List<String> processDefinitionKeyNotIn;
     private String processDefinitionName;
+    private String processDefinitionNameLike;
+    private String processDefinitionNameLikeIgnoreCase;
     private Integer processDefinitionVersion;
     private String processDefinitionCategory;
+    private String processDefinitionCategoryLike;
+    private String processDefinitionCategoryLikeIgnoreCase;
     private String deploymentId;
     private List<String> deploymentIdIn;
     private String superProcessInstanceId;
@@ -55,14 +68,24 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     private Date startedAfter;
     private Date startedBefore;
     private String startedBy;
+    private String finishedBy;
+    private String state;
     private Boolean includeProcessVariables;
+    private Collection<String> includeProcessVariablesNames;
     private List<QueryVariable> variables;
     private String callbackId;
+    private Set<String> callbackIds;
     private String callbackType;
+    private String parentCaseInstanceId;
     private Boolean withoutCallbackId;
     private String tenantId;
     private String tenantIdLike;
+    private String tenantIdLikeIgnoreCase;
     private Boolean withoutTenantId;
+    private String rootScopeId;
+    private Set<String> rootScopeIds;
+    private String parentScopeId;
+    private Set<String> parentScopeIds;
 
     public String getProcessInstanceId() {
         return processInstanceId;
@@ -119,6 +142,38 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     public void setProcessBusinessKeyLike(String processBusinessKeyLike) {
         this.processBusinessKeyLike = processBusinessKeyLike;
     }
+    
+    public String getProcessBusinessKeyLikeIgnoreCase() {
+        return processBusinessKeyLikeIgnoreCase;
+    }
+
+    public void setProcessBusinessKeyLikeIgnoreCase(String processBusinessKeyLikeIgnoreCase) {
+        this.processBusinessKeyLikeIgnoreCase = processBusinessKeyLikeIgnoreCase;
+    }
+
+    public String getProcessBusinessStatus() {
+        return processBusinessStatus;
+    }
+
+    public void setProcessBusinessStatus(String processBusinessStatus) {
+        this.processBusinessStatus = processBusinessStatus;
+    }
+
+    public String getProcessBusinessStatusLike() {
+        return processBusinessStatusLike;
+    }
+
+    public void setProcessBusinessStatusLike(String processBusinessStatusLike) {
+        this.processBusinessStatusLike = processBusinessStatusLike;
+    }
+
+    public String getProcessBusinessStatusLikeIgnoreCase() {
+        return processBusinessStatusLikeIgnoreCase;
+    }
+
+    public void setProcessBusinessStatusLikeIgnoreCase(String processBusinessStatusLikeIgnoreCase) {
+        this.processBusinessStatusLikeIgnoreCase = processBusinessStatusLikeIgnoreCase;
+    }
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
@@ -134,6 +189,22 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
+    }
+
+    public List<String> getProcessDefinitionKeys() {
+        return processDefinitionKeys;
+    }
+
+    public void setProcessDefinitionKeys(List<String> processDefinitionKeys) {
+        this.processDefinitionKeys = processDefinitionKeys;
+    }
+
+    public List<String> getExcludeProcessDefinitionKeys() {
+        return excludeProcessDefinitionKeys;
+    }
+
+    public void setExcludeProcessDefinitionKeys(List<String> excludeProcessDefinitionKeys) {
+        this.excludeProcessDefinitionKeys = excludeProcessDefinitionKeys;
     }
 
     public List<String> getProcessDefinitionKeyIn() {
@@ -158,6 +229,54 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
 
     public void setProcessDefinitionName(String processDefinitionName) {
         this.processDefinitionName = processDefinitionName;
+    }
+    
+    public String getProcessDefinitionKeyLike() {
+        return processDefinitionKeyLike;
+    }
+
+    public void setProcessDefinitionKeyLike(String processDefinitionKeyLike) {
+        this.processDefinitionKeyLike = processDefinitionKeyLike;
+    }
+
+    public String getProcessDefinitionKeyLikeIgnoreCase() {
+        return processDefinitionKeyLikeIgnoreCase;
+    }
+
+    public void setProcessDefinitionKeyLikeIgnoreCase(String processDefinitionKeyLikeIgnoreCase) {
+        this.processDefinitionKeyLikeIgnoreCase = processDefinitionKeyLikeIgnoreCase;
+    }
+
+    public String getProcessDefinitionNameLike() {
+        return processDefinitionNameLike;
+    }
+
+    public void setProcessDefinitionNameLike(String processDefinitionNameLike) {
+        this.processDefinitionNameLike = processDefinitionNameLike;
+    }
+
+    public String getProcessDefinitionNameLikeIgnoreCase() {
+        return processDefinitionNameLikeIgnoreCase;
+    }
+
+    public void setProcessDefinitionNameLikeIgnoreCase(String processDefinitionNameLikeIgnoreCase) {
+        this.processDefinitionNameLikeIgnoreCase = processDefinitionNameLikeIgnoreCase;
+    }
+
+    public String getProcessDefinitionCategoryLike() {
+        return processDefinitionCategoryLike;
+    }
+
+    public void setProcessDefinitionCategoryLike(String processDefinitionCategoryLike) {
+        this.processDefinitionCategoryLike = processDefinitionCategoryLike;
+    }
+
+    public String getProcessDefinitionCategoryLikeIgnoreCase() {
+        return processDefinitionCategoryLikeIgnoreCase;
+    }
+
+    public void setProcessDefinitionCategoryLikeIgnoreCase(String processDefinitionCategoryLikeIgnoreCase) {
+        this.processDefinitionCategoryLikeIgnoreCase = processDefinitionCategoryLikeIgnoreCase;
     }
 
     public Integer getProcessDefinitionVersion() {
@@ -280,12 +399,36 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
         this.startedBy = startedBy;
     }
 
+    public String getFinishedBy() {
+        return finishedBy;
+    }
+
+    public void setFinishedBy(String finishedBy) {
+        this.finishedBy = finishedBy;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
+
     public Boolean getIncludeProcessVariables() {
         return includeProcessVariables;
     }
 
     public void setIncludeProcessVariables(Boolean includeProcessVariables) {
         this.includeProcessVariables = includeProcessVariables;
+    }
+
+    public Collection<String> getIncludeProcessVariablesNames() {
+        return includeProcessVariablesNames;
+    }
+
+    public void setIncludeProcessVariablesNames(Collection<String> includeProcessVariablesNames) {
+        this.includeProcessVariablesNames = includeProcessVariablesNames;
     }
 
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
@@ -313,6 +456,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
         this.callbackType = callbackType;
     }
 
+    public String getParentCaseInstanceId() {
+        return parentCaseInstanceId;
+    }
+
+    public void setParentCaseInstanceId(String parentCaseInstanceId) {
+        this.parentCaseInstanceId = parentCaseInstanceId;
+    }
+
     public Boolean getWithoutCallbackId() {
         return withoutCallbackId;
     }
@@ -336,6 +487,14 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
     public void setTenantIdLike(String tenantIdLike) {
         this.tenantIdLike = tenantIdLike;
     }
+    
+    public String getTenantIdLikeIgnoreCase() {
+        return tenantIdLikeIgnoreCase;
+    }
+
+    public void setTenantIdLikeIgnoreCase(String tenantIdLikeIgnoreCase) {
+        this.tenantIdLikeIgnoreCase = tenantIdLikeIgnoreCase;
+    }
 
     public Boolean getWithoutTenantId() {
         return withoutTenantId;
@@ -345,4 +504,43 @@ public class HistoricProcessInstanceQueryRequest extends PaginateRequest {
         this.withoutTenantId = withoutTenantId;
     }
 
+    public String getRootScopeId() {
+        return rootScopeId;
+    }
+
+    public void setRootScopeId(String rootScopeId) {
+        this.rootScopeId = rootScopeId;
+    }
+
+    public Set<String> getRootScopeIds() {
+        return rootScopeIds;
+    }
+
+    public void setRootScopeIds(Set<String> rootScopeIds) {
+        this.rootScopeIds = rootScopeIds;
+    }
+
+    public String getParentScopeId() {
+        return parentScopeId;
+    }
+
+    public void setParentScopeId(String parentScopeId) {
+        this.parentScopeId = parentScopeId;
+    }
+
+    public Set<String> getParentScopeIds() {
+        return parentScopeIds;
+    }
+
+    public void setParentScopeIds(Set<String> parentScopeIds) {
+        this.parentScopeIds = parentScopeIds;
+    }
+
+    public Set<String> getCallbackIds() {
+        return callbackIds;
+    }
+
+    public void setCallbackIds(Set<String> callbackIds) {
+        this.callbackIds = callbackIds;
+    }
 }

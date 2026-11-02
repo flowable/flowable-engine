@@ -26,12 +26,12 @@ import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.api.tenant.ChangeTenantIdResult;
 import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
+class ChangeTenantIdDecisionsTest extends BaseFlowableDmnTest {
 
     private static final String TEST_TENANT_A = "test-tenant-a";
     private static final String TEST_TENANT_B = "test-tenant-b";
@@ -42,7 +42,7 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
     protected String deploymentIdWithTenantC;
     protected String deploymentIdWithoutTenant;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.deploymentIdWithTenantA = repositoryService.createDeployment()
                 .addClasspathResource("org/flowable/dmn/engine/test/tenant/testDecision.dmn").tenantId(TEST_TENANT_A)
@@ -59,7 +59,7 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
                 .deploy().getId();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         repositoryService.deleteDeployment(deploymentIdWithTenantA);
         repositoryService.deleteDeployment(deploymentIdWithTenantB);
@@ -272,7 +272,7 @@ public class ChangeTenantIdDecisionsTest extends AbstractFlowableDmnTest {
     }
 
     protected void checkNumberOfDecisions(String tenantId, int expectedNumberOfDecisions, String moment) {
-        DmnHistoricDecisionExecutionQuery query = dmnHistoryService.createHistoricDecisionExecutionQuery();
+        DmnHistoricDecisionExecutionQuery query = historyService.createHistoricDecisionExecutionQuery();
         if (StringUtils.isNotEmpty(tenantId)) {
             query.tenantId(tenantId);
         } else {

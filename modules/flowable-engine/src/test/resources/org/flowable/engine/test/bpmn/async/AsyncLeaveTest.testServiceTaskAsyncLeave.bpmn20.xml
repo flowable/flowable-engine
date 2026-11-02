@@ -9,7 +9,7 @@
     <startEvent id="theStart" />
     <sequenceFlow sourceRef="theStart" targetRef="service1" />
     
-    <serviceTask id="service1" flowable:expression="${'Hello World'}" flowable:resultVariableName="myResultVar" flowable:asyncLeave="true" />
+    <serviceTask id="service1" flowable:expression="${'Hello World'}" flowable:resultVariableName="myResultVar" flowable:asyncLeave="true" flowable:asyncLeaveExclusive="true" />
     <sequenceFlow sourceRef="service1" targetRef="usertask2" />
 
     <userTask id="usertask2" name="Task B"/>

@@ -13,7 +13,10 @@
 package org.flowable.cmmn.converter.export;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.stream.XMLStreamWriter;
@@ -21,6 +24,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ExtensionAttribute;
 
 public class DefinitionsRootExport implements CmmnXmlConstants {
 
@@ -39,9 +43,12 @@ public class DefinitionsRootExport implements CmmnXmlConstants {
         xtw.writeNamespace(CMMNDI_PREFIX, CMMNDI_NAMESPACE);
         xtw.writeNamespace(OMGDC_PREFIX, OMGDC_NAMESPACE);
         xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
+
+        Set<String> customNamespacePrefixes = new HashSet<>();
         for (String prefix : model.getNamespaces().keySet()) {
             if (!defaultNamespaces.contains(prefix) && StringUtils.isNotEmpty(prefix)) {
                 xtw.writeNamespace(prefix, model.getNamespaces().get(prefix));
+                customNamespacePrefixes.add(prefix);
             }
         }
         if (StringUtils.isNotEmpty(model.getTargetNamespace())) {
@@ -55,6 +62,28 @@ public class DefinitionsRootExport implements CmmnXmlConstants {
         }
         if (StringUtils.isNotEmpty(model.getExporterVersion())) {
             xtw.writeAttribute(CmmnXmlConstants.ATTRIBUTE_EXPORTER_VERSION, model.getExporterVersion());
+        }
+        Map<String, List<ExtensionAttribute>> definitionsAttributes = model.getDefinitionsAttributes();
+        if (definitionsAttributes != null && !definitionsAttributes.isEmpty()) {
+            Collection<List<ExtensionAttribute>> extensionAttributes = definitionsAttributes.values();
+            for (List<ExtensionAttribute> extensionAttributeList : extensionAttributes) {
+                for (ExtensionAttribute attribute : extensionAttributeList) {
+                    String namespacePrefix = attribute.getNamespacePrefix();
+                    if (namespacePrefix == null) {
+                        if (attribute.getNamespace() == null) {
+                            xtw.writeAttribute(attribute.getName(), attribute.getValue());
+                        } else {
+                            xtw.writeAttribute(attribute.getNamespace(), attribute.getName(), attribute.getValue());
+                        }
+                    } else {
+                        if (!defaultNamespaces.contains(namespacePrefix) && !customNamespacePrefixes.contains(namespacePrefix)) {
+                            xtw.writeNamespace(namespacePrefix, attribute.getNamespace());
+                            customNamespacePrefixes.add(namespacePrefix);
+                        }
+                        xtw.writeAttribute(namespacePrefix, attribute.getNamespace(), attribute.getName(), attribute.getValue());
+                    }
+                }
+            }
         }
     }
 }

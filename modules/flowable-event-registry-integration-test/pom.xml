@@ -7,9 +7,9 @@
 
     <parent>
         <groupId>org.flowable</groupId>
-        <artifactId>flowable-root</artifactId>
-        <relativePath>../..</relativePath>
-        <version>6.7.3-SNAPSHOT</version>
+        <artifactId>flowable-parent</artifactId>
+        <version>8.1.0-SNAPSHOT</version>
+        <relativePath>../flowable-parent</relativePath>
     </parent>
 
     <properties>
@@ -20,6 +20,8 @@
         <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,
         </flowable.osgi.import.additional>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skip.test.db.drop>false</skip.test.db.drop>
     </properties>
 
     <dependencies>
@@ -108,25 +110,33 @@
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <artifactId>slf4j-reload4j</artifactId>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-broker</artifactId>
-            <version>5.16.3</version>
+            <artifactId>artemis-jakarta-server</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.json-unit</groupId>
             <artifactId>json-unit-assertj</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-idm-spring-configurator</artifactId>
             <scope>test</scope>
         </dependency>
 

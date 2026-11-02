@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testExitFromFailed" name="Test Exit From Failed">
+        <casePlanModel id="casePlanModel" name="Case plan model" autoComplete="true">
+            <planItem id="planItemStage" name="Stage" definitionRef="stageS">
+                <exitCriterion id="exitStage" sentryRef="sentryExitStage" />
+            </planItem>
+            <planItem id="planItemUserEvent" name="Cancel" definitionRef="userEventListener" />
+            <sentry id="sentryExitStage">
+                <planItemOnPart id="onPartUserEvent" sourceRef="planItemUserEvent">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <stage id="stageS" name="Stage">
+                <planItem id="planItemA" name="A" definitionRef="serviceTaskA" />
+                <planItem id="planItemB" name="B" definitionRef="humanTaskB">
+                    <entryCriterion id="entryB" sentryRef="sentryOnAFault" />
+                </planItem>
+                <sentry id="sentryOnAFault">
+                    <planItemOnPart id="onPartA" sourceRef="planItemA">
+                        <standardEvent>fault</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+                <task id="serviceTaskA" name="A" flowable:type="java" flowable:class="org.flowable.cmmn.test.runtime.ThrowCmmnFaultDelegate" />
+                <humanTask id="humanTaskB" name="B" />
+            </stage>
+            <userEventListener id="userEventListener" name="Cancel" />
+        </casePlanModel>
+    </case>
+</definitions>

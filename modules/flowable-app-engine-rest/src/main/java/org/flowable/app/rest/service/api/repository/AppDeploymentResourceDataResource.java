@@ -15,7 +15,7 @@ package org.flowable.app.rest.service.api.repository;
 import java.io.InputStream;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.app.api.AppRepositoryService;
@@ -41,7 +41,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "App Deployments" }, description = "Manage App Deployments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "App Deployments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class AppDeploymentResourceDataResource {
 
     @Autowired
@@ -81,14 +81,14 @@ public class AppDeploymentResourceDataResource {
         List<String> resourceList = appRepositoryService.getDeploymentResourceNames(deploymentId);
 
         if (resourceList.contains(resourceName)) {
-            final InputStream resourceStream = appRepositoryService.getResourceAsStream(deploymentId, resourceName);
-
             response.setContentType("application/json");
-            try {
+            try (final InputStream resourceStream = appRepositoryService.getResourceAsStream(deploymentId, resourceName)) {
                 return IOUtils.toByteArray(resourceStream);
+                
             } catch (Exception e) {
                 throw new FlowableException("Error converting resource stream", e);
             }
+            
         } else {
             // Resource not found in deployment
             throw new FlowableObjectNotFoundException("Could not find a resource with name '" + resourceName + "' in deployment '" + deploymentId);

@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.tuple;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,13 +27,24 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.BpmnXMLConverter;
+import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.EndEvent;
+import org.flowable.bpmn.model.Process;
+import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
+import org.flowable.bpmn.model.TerminateEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.common.engine.api.io.InputStreamProvider;
 import org.flowable.engine.test.util.TestProcessUtil;
+import org.flowable.validation.ProcessValidationContextImpl;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.validation.ProcessValidatorImpl;
 import org.flowable.validation.ValidationError;
 import org.flowable.validation.validator.Problems;
+import org.flowable.validation.validator.ValidatorSet;
 import org.flowable.validation.validator.ValidatorSetNames;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -260,7 +270,7 @@ public class DefaultProcessValidatorTest {
     }
 
     @Test
-    public void testWarningError() throws UnsupportedEncodingException, XMLStreamException {
+    public void testWarningError() throws XMLStreamException {
         String flowWithoutConditionNoDefaultFlow = "<?xml version='1.0' encoding='UTF-8'?>"
                 + "<definitions id='definitions' xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:activiti='http://activiti.org/bpmn' targetNamespace='Examples'>"
                 + "  <process id='exclusiveGwDefaultSequenceFlow'> " + "    <startEvent id='theStart' /> "
@@ -358,12 +368,82 @@ public class DefaultProcessValidatorTest {
         assertThat(errors).hasSize(1);
         ValidationError error = errors.get(0);
         assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_DEFINITION);
-        assertThat(error.getDefaultDescription()).isEqualTo("start event of event subprocess must be of type 'error', 'timer', 'message' or 'signal'");
+        assertThat(error.getDefaultDescription()).isEqualTo("Unsupported event subprocess start event definition type");
         assertThat(error.getActivityId()).isEqualTo("cancelStartEventSubProcess");
         assertThat(error.getActivityName()).isEqualTo("Cancel Event Sub Process");
         assertThat(error.isWarning()).isFalse();
         assertThat(error.getXmlLineNumber()).isEqualTo(12);
         assertThat(error.getXmlColumnNumber()).isEqualTo(41);
+    }
+
+    @Test
+    void testBoundaryEventWithUnsupportedDefinition() {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process process = new Process();
+        process.setId("boundaryEventWithUnsupportedDefinition");
+        process.setExecutable(true);
+        bpmnModel.addProcess(process);
+
+        StartEvent start = new StartEvent();
+        start.setId("start");
+        process.addFlowElement(start);
+
+        UserTask userTask = new UserTask();
+        userTask.setId("theTask");
+        userTask.setName("The Task");
+        process.addFlowElement(userTask);
+
+        BoundaryEvent boundaryEvent = new BoundaryEvent();
+        boundaryEvent.setId("invalidBoundaryEvent");
+        boundaryEvent.setName("Invalid Boundary Event");
+        boundaryEvent.setAttachedToRef(userTask);
+        boundaryEvent.setAttachedToRefId(userTask.getId());
+        boundaryEvent.addEventDefinition(new TerminateEventDefinition());
+        process.addFlowElement(boundaryEvent);
+
+        EndEvent end = new EndEvent();
+        end.setId("end");
+        process.addFlowElement(end);
+
+        process.addFlowElement(new SequenceFlow("start", "theTask"));
+        process.addFlowElement(new SequenceFlow("theTask", "end"));
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactly(
+                        tuple(Problems.BOUNDARY_EVENT_INVALID_EVENT_DEFINITION, "Invalid or unsupported event definition", "invalidBoundaryEvent", false));
+    }
+
+    @Test
+    void testEndEventWithUnsupportedDefinition() {
+        BpmnModel bpmnModel = new BpmnModel();
+        Process process = new Process();
+        process.setId("endEventWithUnsupportedDefinition");
+        process.setExecutable(true);
+        bpmnModel.addProcess(process);
+
+        StartEvent start = new StartEvent();
+        start.setId("start");
+        process.addFlowElement(start);
+
+        EndEvent end = new EndEvent();
+        end.setId("invalidEndEvent");
+        end.setName("Invalid End Event");
+        TimerEventDefinition timerEventDefinition = new TimerEventDefinition();
+        timerEventDefinition.setTimeDuration("PT5M");
+        end.addEventDefinition(timerEventDefinition);
+        process.addFlowElement(end);
+
+        process.addFlowElement(new SequenceFlow("start", "invalidEndEvent"));
+
+        List<ValidationError> errors = processValidator.validate(bpmnModel);
+
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getDefaultDescription, ValidationError::getActivityId, ValidationError::isWarning)
+                .containsExactly(
+                        tuple(Problems.END_EVENT_INVALID_EVENT_DEFINITION, "Invalid or unsupported event definition", "invalidEndEvent", false));
     }
 
     @Test
@@ -423,6 +503,26 @@ public class DefaultProcessValidatorTest {
                         tuple(Problems.MAIL_TASK_NO_RECIPIENT, "No recipient is defined on the mail activity", "sendMailWithoutanything", false)
                 );
     }
+    
+    @Test
+    public void testEventSubProcessWithoutVariableName() throws Exception {
+
+        InputStream xmlStream = this.getClass().getClassLoader()
+                .getResourceAsStream("org/flowable/engine/test/validation/missingVariableEventListenerVariableName.xml");
+        XMLInputFactory xif = XMLInputFactory.newInstance();
+        InputStreamReader in = new InputStreamReader(xmlStream, StandardCharsets.UTF_8);
+        XMLStreamReader xtr = xif.createXMLStreamReader(in);
+        BpmnModel bpmnModel = new BpmnXMLConverter().convertToBpmnModel(xtr);
+        assertThat(bpmnModel).isNotNull();
+
+        List<ValidationError> allErrors = processValidator.validate(bpmnModel);
+        assertThat(allErrors).hasSize(1);
+        ValidationError error = allErrors.get(0);
+        assertThat(error.getProblem()).isEqualTo(Problems.EVENT_SUBPROCESS_INVALID_START_EVENT_VARIABLE_NAME);
+        assertThat(error.getDefaultDescription()).isEqualTo("variable name is required for variable listener with activity id variableListenerStartEvent");
+
+    }
+
 
     protected void assertCommonProblemFieldForActivity(ValidationError error) {
         assertProcessElementError(error);
@@ -466,6 +566,44 @@ public class DefaultProcessValidatorTest {
             }
         }
         return results;
+    }
+
+    @Test
+    public void testValidateWithSharedContextDoesNotDuplicateErrors() {
+        ProcessValidatorImpl validator = new ProcessValidatorImpl();
+
+        ValidatorSet set1 = new ValidatorSet("set1");
+        set1.addValidator((bpmnModel, validationContext) -> validationContext.addError("PROBLEM_A", "Error from set 1"));
+
+        ValidatorSet set2 = new ValidatorSet("set2");
+        set2.addValidator((bpmnModel, validationContext) -> validationContext.addError("PROBLEM_B", "Error from set 2"));
+
+        validator.addValidatorSet(set1);
+        validator.addValidatorSet(set2);
+
+        BpmnModel bpmnModel = new BpmnModel();
+
+        // Validate with a shared external context
+        ProcessValidationContextImpl sharedContext = new ProcessValidationContextImpl(set1);
+        List<ValidationError> errors = validator.validate(bpmnModel, sharedContext);
+
+        // Must be exactly 2 errors (1 per set), not 3 which would happen
+        // if the cumulative getEntries() list was re-added each iteration
+        assertThat(errors)
+                .extracting(ValidationError::getProblem, ValidationError::getValidatorSetName)
+                .containsExactly(
+                        tuple("PROBLEM_A", "set1"),
+                        tuple("PROBLEM_B", "set2")
+                );
+
+        // Verify no-context path produces the same result count
+        List<ValidationError> errorsWithoutContext = validator.validate(bpmnModel, null);
+        assertThat(errorsWithoutContext)
+                .extracting(ValidationError::getProblem, ValidationError::getValidatorSetName)
+                .containsExactly(
+                        tuple("PROBLEM_A", "set1"),
+                        tuple("PROBLEM_B", "set2")
+                );
     }
 
     protected BpmnModel readBpmnModelFromXml(String resource) {

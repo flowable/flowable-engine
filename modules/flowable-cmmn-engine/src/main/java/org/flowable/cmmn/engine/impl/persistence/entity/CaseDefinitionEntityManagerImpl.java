@@ -21,7 +21,6 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.history.CmmnHistoryHelper;
 import org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
@@ -131,7 +130,8 @@ public class CaseDefinitionEntityManagerImpl
             List<HistoricCaseInstance> historicCaseInstanceEntities = historicCaseInstanceEntityManager
                     .findByCriteria(new HistoricCaseInstanceQueryImpl().caseDefinitionId(caseDefinitionId));
             for (HistoricCaseInstance historicCaseInstanceEntity : historicCaseInstanceEntities) {
-                CmmnHistoryHelper.deleteHistoricCaseInstance(engineConfiguration, historicCaseInstanceEntity.getId());
+                engineConfiguration.getCmmnHistoryManager()
+                        .recordHistoricCaseInstanceDeleted(historicCaseInstanceEntity.getId(), historicCaseInstanceEntity.getTenantId());
             }
         }
         

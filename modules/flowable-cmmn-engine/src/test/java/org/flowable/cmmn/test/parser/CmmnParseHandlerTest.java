@@ -25,22 +25,18 @@ import org.flowable.cmmn.engine.impl.parser.handler.HumanTaskParseHandler;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.test.EngineConfigurer;
 import org.flowable.cmmn.test.impl.CustomCmmnConfigurationFlowableTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
  */
 public class CmmnParseHandlerTest extends CustomCmmnConfigurationFlowableTestCase {
 
-    @Override
-    protected String getEngineName() {
-        return this.getClass().getName();
-    }
-
-    @Override
-    protected void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+    @EngineConfigurer
+    protected static void configureConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
         cmmnEngineConfiguration.setPreCmmnParseHandlers(Collections.singletonList(new TestPreCmmnParseHandler()));
         cmmnEngineConfiguration.setPostCmmnParseHandlers(Collections.singletonList(new TestPostCmmnParseHandler()));
         cmmnEngineConfiguration.setCustomCmmnParseHandlers(Collections.singletonList(new TestCustomCmmnParseHandler()));

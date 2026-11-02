@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -32,7 +32,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionResourceDataResource extends BaseDeploymentResourceDataResource {
 
     @ApiOperation(value = "Get a case definition resource content", tags = { "Case Definitions" })

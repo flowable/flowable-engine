@@ -14,8 +14,6 @@ package org.flowable.identitylink.service.impl.persistence.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 
@@ -43,47 +41,8 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("id", this.id);
-        persistentState.put("type", this.type);
-
-        if (this.userId != null) {
-            persistentState.put("userId", this.userId);
-        }
-
-        if (this.groupId != null) {
-            persistentState.put("groupId", this.groupId);
-        }
-
-        if (this.taskId != null) {
-            persistentState.put("taskId", this.taskId);
-        }
-
-        if (this.processInstanceId != null) {
-            persistentState.put("processInstanceId", this.processInstanceId);
-        }
-        
-        if (this.scopeId != null) {
-            persistentState.put("scopeId", this.scopeId);
-        }
-        
-        if (this.subScopeId != null) {
-            persistentState.put("subScopeId", this.subScopeId);
-        }
-        
-        if (this.scopeType!= null) {
-            persistentState.put("scopeType", this.scopeType);
-        }
-        
-        if (this.scopeDefinitionId != null) {
-            persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
-        }
-
-        if (this.createTime != null) {
-            persistentState.put("createTime", this.createTime);
-        }
-
-        return persistentState;
+        // Historic identity link is immutable
+        return HistoricIdentityLinkEntityImpl.class;
     }
 
     @Override
@@ -200,5 +159,35 @@ public class HistoricIdentityLinkEntityImpl extends AbstractIdentityLinkServiceN
     @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("IdentityLinkEntity[id=").append(id);
+        sb.append(", type=").append(type);
+        if (userId != null) {
+            sb.append(", userId=").append(userId);
+        }
+        if (groupId != null) {
+            sb.append(", groupId=").append(groupId);
+        }
+        if (taskId != null) {
+            sb.append(", taskId=").append(taskId);
+        }
+        if (processInstanceId != null) {
+            sb.append(", processInstanceId=").append(processInstanceId);
+        }
+        if (scopeId != null) {
+            sb.append(", scopeId=").append(scopeId);
+        }
+        if (scopeType != null) {
+            sb.append(", scopeType=").append(scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            sb.append(", scopeDefinitionId=").append(scopeDefinitionId);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 }

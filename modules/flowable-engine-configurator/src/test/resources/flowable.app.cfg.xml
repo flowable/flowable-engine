@@ -36,7 +36,6 @@
             <list>
                 <bean class="org.flowable.engine.configurator.ProcessEngineConfigurator"/>
                 <bean class="org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator"/>
-                <bean class="org.flowable.form.engine.configurator.FormEngineConfigurator"/>
             </list>
         </property>
     </bean>

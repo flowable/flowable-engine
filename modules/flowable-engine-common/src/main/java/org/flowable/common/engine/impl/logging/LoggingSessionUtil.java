@@ -25,8 +25,8 @@ import org.flowable.common.engine.impl.persistence.StrongUuidGenerator;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class LoggingSessionUtil {
     
@@ -70,12 +70,12 @@ public class LoggingSessionUtil {
         if (loggingData != null) {
             for (ObjectNode itemNode : loggingData) {
                 if (itemNode.has("scopeId") && itemNode.has("scopeDefinitionKey")) {
-                    loggingNode.put("scopeId", itemNode.get("scopeId").asText());
-                    loggingNode.put("scopeType", itemNode.get("scopeType").asText());
-                    loggingNode.put("scopeDefinitionId", itemNode.get("scopeDefinitionId").asText());
-                    loggingNode.put("scopeDefinitionKey", itemNode.get("scopeDefinitionKey").asText());
+                    loggingNode.put("scopeId", itemNode.get("scopeId").asString());
+                    loggingNode.put("scopeType", itemNode.get("scopeType").asString());
+                    loggingNode.put("scopeDefinitionId", itemNode.get("scopeDefinitionId").asString());
+                    loggingNode.put("scopeDefinitionKey", itemNode.get("scopeDefinitionKey").asString());
                     if (itemNode.has("scopeDefinitionName") && !itemNode.get("scopeDefinitionName").isNull()) {
-                        loggingNode.put("scopeDefinitionName", itemNode.get("scopeDefinitionName").asText());
+                        loggingNode.put("scopeDefinitionName", itemNode.get("scopeDefinitionName").asString());
                     }
                 }
             }

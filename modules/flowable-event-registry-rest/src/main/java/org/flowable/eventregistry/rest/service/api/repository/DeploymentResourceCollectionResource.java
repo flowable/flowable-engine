@@ -15,8 +15,6 @@ package org.flowable.eventregistry.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.common.rest.resolver.ContentTypeResolver;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -37,7 +35,7 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Event Registry Deployment" }, description = "Manage Event Registry Deployment", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Event Registry Deployment" }, authorizations = { @Authorization(value = "basicAuth") })
 public class DeploymentResourceCollectionResource extends BaseDeploymentResource {
 
     @Autowired
@@ -56,7 +54,7 @@ public class DeploymentResourceCollectionResource extends BaseDeploymentResource
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @GetMapping(value = "/event-registry-repository/deployments/{deploymentId}/resources", produces = "application/json")
-    public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
+    public List<DeploymentResourceResponse> getDeploymentResources(@ApiParam(name = "deploymentId") @PathVariable String deploymentId) {
         // Check if deployment exists
         EventDeployment deployment = getEventDeployment(deploymentId);
 

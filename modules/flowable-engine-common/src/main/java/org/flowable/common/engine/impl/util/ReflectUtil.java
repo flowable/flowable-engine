@@ -91,6 +91,15 @@ public abstract class ReflectUtil {
         return clazz;
     }
 
+    public static boolean isClassPresent(String className) {
+        try {
+            loadClass(className);
+            return true;
+        } catch (FlowableClassLoadingException ignored) {
+            return false;
+        }
+    }
+
     public static InputStream getResourceAsStream(String name) {
         InputStream resourceStream = null;
         ClassLoader classLoader = getCustomClassLoader();
@@ -134,7 +143,7 @@ public abstract class ReflectUtil {
     public static Object instantiate(String className) {
         try {
             Class<?> clazz = loadClass(className);
-            return clazz.newInstance();
+            return clazz.getConstructor().newInstance();
         } catch (Exception e) {
             throw new FlowableException("couldn't instantiate class " + className, e);
         }

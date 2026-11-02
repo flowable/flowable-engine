@@ -13,10 +13,7 @@
 
 package org.flowable.app.api.repository;
 
-import java.util.List;
-
 import org.flowable.app.api.AppRepositoryService;
-import org.flowable.common.engine.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link AppDeployment}s.
@@ -31,88 +28,6 @@ import org.flowable.common.engine.api.query.Query;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface AppDeploymentQuery extends Query<AppDeploymentQuery, AppDeployment> {
-
-    /**
-     * Only select deployments with the given deployment id.
-     */
-    AppDeploymentQuery deploymentId(String deploymentId);
-    
-    /**
-     * Only select deployments with the given deployment ids.
-     */
-    AppDeploymentQuery deploymentIds(List<String> deploymentIds);
-
-    /**
-     * Only select deployments with the given name.
-     */
-    AppDeploymentQuery deploymentName(String name);
-
-    /**
-     * Only select deployments with a name like the given string.
-     */
-    AppDeploymentQuery deploymentNameLike(String nameLike);
-
-    /**
-     * Only select deployments with the given category.
-     * 
-     * @see AppDeploymentBuilder#category(String)
-     */
-    AppDeploymentQuery deploymentCategory(String category);
-
-    /**
-     * Only select deployments that have a different category then the given one.
-     * 
-     * @see AppDeploymentBuilder#category(String)
-     */
-    AppDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
-    
-    /**
-     * Only select deployments with the given key.
-     * 
-     * @see AppDeploymentBuilder#key(String)
-     */
-    AppDeploymentQuery deploymentKey(String key);
-
-    /**
-     * Only select deployment that have the given tenant id.
-     */
-    AppDeploymentQuery deploymentTenantId(String tenantId);
-
-    /**
-     * Only select deployments with a tenant id like the given one.
-     */
-    AppDeploymentQuery deploymentTenantIdLike(String tenantIdLike);
-
-    /**
-     * Only select deployments that do not have a tenant id.
-     */
-    AppDeploymentQuery deploymentWithoutTenantId();
-
-    /**
-     * Only select deployments where the deployment time is the latest value. Can only be used together with the deployment key.
-     */
-    AppDeploymentQuery latest();
-
-    // sorting ////////////////////////////////////////////////////////
-
-    /**
-     * Order by deployment id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    AppDeploymentQuery orderByDeploymentId();
-
-    /**
-     * Order by deployment name (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    AppDeploymentQuery orderByDeploymentName();
-
-    /**
-     * Order by deployment time (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    AppDeploymentQuery orderByDeploymentTime();
-
-    /**
-     * Order by tenant id (needs to be followed by {@link #asc()} or {@link #desc()}).
-     */
-    AppDeploymentQuery orderByTenantId();
+public interface AppDeploymentQuery extends AppDeploymentBaseQuery<AppDeploymentQuery, AppDeployment> {
+    // Add new methods to the AppDefinitionBaseQuery and not here
 }

@@ -42,7 +42,7 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.task.service.delegate.DelegateTask;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Helper class for bpmn constructs that allow class delegation.
@@ -143,7 +143,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
         if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
             if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME)) {
-                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asText();
+                String overrideClassName = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_CLASS_NAME).asString();
                 if (StringUtils.isNotEmpty(overrideClassName) && !overrideClassName.equals(className)) {
                     className = overrideClassName;
                     activityBehaviorInstance = null;

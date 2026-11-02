@@ -44,7 +44,7 @@ import org.flowable.eventregistry.test.ChannelDeploymentAnnotation;
 import org.flowable.eventregistry.test.EventDeploymentAnnotation;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 public class DeploymentTest extends AbstractFlowableEventTest {
 
@@ -58,6 +58,23 @@ public class DeploymentTest extends AbstractFlowableEventTest {
         assertThat(eventDefinition).isNotNull();
         assertThat(eventDefinition.getKey()).isEqualTo("myEvent");
         assertThat(eventDefinition.getVersion()).isEqualTo(1);
+    }
+
+    @Test
+    public void deployChannelDefinitionWithDescriptionLongerThanColumnSize() {
+        String description = "a".repeat(2500) + "b".repeat(2500);
+        EventDeployment deployment = repositoryService.createDeployment()
+                .addString("longDescription.channel", "{\"key\": \"longDescriptionChannel\", \"category\": \"channel\", \"name\": \"Long description channel\","
+                        + " \"description\": \"" + description + "\", \"channelType\": \"inbound\", \"type\": \"jms\", \"destination\": \"testQueue\","
+                        + " \"deserializerType\": \"json\", \"channelEventKeyDetection\": {\"fixedValue\": \"myEvent\"}}")
+                .deploy();
+
+        try {
+            ChannelDefinition channelDefinition = repositoryService.createChannelDefinitionQuery().deploymentId(deployment.getId()).singleResult();
+            assertThat(channelDefinition.getDescription()).isEqualTo(description.substring(0, 4000));
+        } finally {
+            repositoryService.deleteDeployment(deployment.getId());
+        }
     }
 
     @Test
@@ -79,6 +96,31 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             "org/flowable/eventregistry/test/deployment/simpleChannelWithXPathTenant.channel"
     })
     public void deployChannelsWithTenantDetection() {
+        InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
+        assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
+                .isInstanceOf(InboundEventStaticTenantDetector.class);
+
+        InboundChannelModel channel2 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel2");
+        DefaultInboundEventProcessingPipeline inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel2
+                .getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(JsonPointerBasedInboundEventTenantDetector.class);
+        assertThat(((JsonPointerBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getJsonPointerExpression())
+                .isEqualTo("/tenantId");
+
+        InboundChannelModel channel3 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel3");
+        inboundEventProcessingPipeline = (DefaultInboundEventProcessingPipeline) channel3.getInboundEventProcessingPipeline();
+        assertThat(inboundEventProcessingPipeline.getInboundEventTenantDetector()).isInstanceOf(XpathBasedInboundEventTenantDetector.class);
+        assertThat(((XpathBasedInboundEventTenantDetector) inboundEventProcessingPipeline.getInboundEventTenantDetector()).getXpathExpression())
+                .isEqualTo("/data/tenantId");
+    }
+    
+    @Test
+    @ChannelDeploymentAnnotation(resources = {
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithFixedTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithJsonPointerTenant.channel",
+            "org/flowable/eventregistry/test/deployment/simpleChannelWithXmlXPathTenant.channel"
+    })
+    public void deployChannelsWithXmlXpathTenantDetection() {
         InboundChannelModel channel1 = (InboundChannelModel) eventRegistryEngine.getEventRepositoryService().getChannelModelByKey("channel1");
         assertThat(((DefaultInboundEventProcessingPipeline) channel1.getInboundEventProcessingPipeline()).getInboundEventTenantDetector())
                 .isInstanceOf(InboundEventStaticTenantDetector.class);
@@ -660,8 +702,8 @@ public class DeploymentTest extends AbstractFlowableEventTest {
                 .singleResult();
         assertThat(channelDefinition2.getName()).isEqualTo("My channel2");
 
-        assertThat(channelDefinitionCache.size()).isEqualTo(1);
-        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNull();
+        assertThat(channelDefinitionCache.size()).isEqualTo(2);
+        assertThat(channelDefinitionCache.get(channelDefinition1.getId())).isNotNull();
         assertThat(channelDefinitionCache.get(channelDefinition2.getId())).isNotNull();
 
         repositoryService.deleteDeployment(channelDefinition1.getDeploymentId());
@@ -764,7 +806,7 @@ public class DeploymentTest extends AbstractFlowableEventTest {
             super(engineConfiguration);
         }
 
-        protected Map<CacheKey, String> getCache() {
+        protected Map<CacheKey, CacheValue> getCache() {
             return cache;
         }
     }
@@ -780,11 +822,10 @@ public class DeploymentTest extends AbstractFlowableEventTest {
 
         @Override
         protected void registerChannelModel(InboundChannelModel inboundChannelModel,
-                EventRepositoryService eventRepositoryService,
-                ObjectMapper objectMapper, boolean fallbackToDefaultTenant) {
+                EventRepositoryService eventRepositoryService, boolean fallbackToDefaultTenant) {
 
             registeredChannelModels.add(inboundChannelModel);
-            super.registerChannelModel(inboundChannelModel, eventRepositoryService, objectMapper, fallbackToDefaultTenant);
+            super.registerChannelModel(inboundChannelModel, eventRepositoryService, fallbackToDefaultTenant);
         }
 
         @Override

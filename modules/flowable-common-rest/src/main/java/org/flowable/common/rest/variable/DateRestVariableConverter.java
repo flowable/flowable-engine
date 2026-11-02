@@ -13,19 +13,16 @@
 
 package org.flowable.common.rest.variable;
 
-import java.text.ParseException;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
-
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import org.flowable.common.rest.api.RequestUtil;
 
 /**
  * @author Frederik Heremans
  */
 public class DateRestVariableConverter implements RestVariableConverter {
-
-    protected ISO8601DateFormat isoFormatter = new ISO8601DateFormat();
 
     @Override
     public String getRestTypeName() {
@@ -44,8 +41,8 @@ public class DateRestVariableConverter implements RestVariableConverter {
                 throw new FlowableIllegalArgumentException("Converter can only convert string to date");
             }
             try {
-                return isoFormatter.parse((String) result.getValue());
-            } catch (ParseException e) {
+                return RequestUtil.parseLongDate((String) result.getValue());
+            } catch (DateTimeParseException e) {
                 throw new FlowableIllegalArgumentException("The given variable value is not a date: '" + result.getValue() + "'", e);
             }
         }
@@ -55,10 +52,10 @@ public class DateRestVariableConverter implements RestVariableConverter {
     @Override
     public void convertVariableValue(Object variableValue, EngineRestVariable result) {
         if (variableValue != null) {
-            if (!(variableValue instanceof Date)) {
+            if (!(variableValue instanceof Date dateValue)) {
                 throw new FlowableIllegalArgumentException("Converter can only convert booleans");
             }
-            result.setValue(isoFormatter.format(variableValue));
+            result.setValue(dateValue.toInstant().toString());
         } else {
             result.setValue(null);
         }

@@ -50,7 +50,7 @@ public class DeleteHistoricTaskInstanceCmd implements Command<Object>, Serializa
             throw new FlowableObjectNotFoundException("No historic task instance found with id: " + taskId, HistoricTaskInstance.class);
         }
         if (historicTaskInstance.getEndTime() == null) {
-            throw new FlowableException("task does not have an endTime, cannot delete historic task instance: " + taskId);
+            throw new FlowableException("task does not have an endTime, cannot delete " + historicTaskInstance);
         }
 
         CommandContextUtil.getHistoryManager(commandContext).recordHistoricTaskDeleted(historicTaskInstance);

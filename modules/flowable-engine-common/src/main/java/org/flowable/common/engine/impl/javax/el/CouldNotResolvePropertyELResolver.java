@@ -12,9 +12,6 @@
  */
 package org.flowable.common.engine.impl.javax.el;
 
-import java.beans.FeatureDescriptor;
-import java.util.Iterator;
-
 /**
  * Throws an exception in the case when resolver is asked to get/set value.
  * The last resolver in the row, when we can not decide what to do.
@@ -25,11 +22,6 @@ public class CouldNotResolvePropertyELResolver extends ELResolver {
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
         return Object.class;
-    }
-
-    @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-        return null;
     }
 
     @Override

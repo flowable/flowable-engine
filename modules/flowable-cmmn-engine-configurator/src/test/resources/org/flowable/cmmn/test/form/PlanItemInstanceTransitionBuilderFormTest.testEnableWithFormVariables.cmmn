@@ -3,7 +3,7 @@
   <case id="testTransitionBuilder" name="testTransitionBuilder">
     <casePlanModel id="casePlanModel" flowable:formFieldValidation="true" flowable:includeInStageOverview="false">
       <planItem id="planItem1" name="A" definitionRef="sid-40065D22-301C-444E-9E67-0B17773AE93A"></planItem>
-      <planItem id="planItem2" name="B" definitionRef="sid-E4010D91-A35A-4154-9034-492673F863EA">
+      <planItem id="planItem2" name="B" definitionRef="taskB">
         <itemControl>
           <manualActivationRule></manualActivationRule>
         </itemControl>
@@ -24,7 +24,7 @@
         </ifPart>
       </sentry>
       <humanTask id="sid-40065D22-301C-444E-9E67-0B17773AE93A" name="A" flowable:formFieldValidation="true"></humanTask>
-      <humanTask id="sid-E4010D91-A35A-4154-9034-492673F863EA" name="B" flowable:formFieldValidation="true"></humanTask>
+      <humanTask id="taskB" name="B" flowable:formFieldValidation="true"></humanTask>
       <stage id="sid-A87C2CFF-5A9C-46F7-B280-D3F63C2F0C97" name="The Stage">
         <planItem id="planItem3" name="C" definitionRef="sid-A2573258-E441-40BD-9336-2666F2F967A7"></planItem>
         <humanTask id="sid-A2573258-E441-40BD-9336-2666F2F967A7" name="C" flowable:formFieldValidation="true"></humanTask>

@@ -21,6 +21,8 @@
     }
   ],
 
+  "eventFilterDelegateExpression": "testEventFilterExpression",
+
   "deserializerType": "json",
   "channelEventKeyDetection": {
     "jsonField": "eventKey"

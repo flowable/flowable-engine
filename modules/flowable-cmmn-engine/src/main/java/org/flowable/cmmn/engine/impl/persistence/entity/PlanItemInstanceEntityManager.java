@@ -17,7 +17,9 @@ import java.util.List;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
 import org.flowable.common.engine.impl.persistence.entity.EntityManager;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -38,13 +40,26 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     
     List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery);
 
+    List<PlanItemInstance> findWithVariablesByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
+
     List<PlanItemInstanceEntity> findByCaseInstanceId(String caseInstanceId);
 
     List<PlanItemInstanceEntity> findByStagePlanItemInstanceId(String stagePlanItemInstanceId);
     
     List<PlanItemInstanceEntity> findByCaseInstanceIdAndPlanItemId(String caseInstanceId, String planItemId);
+    
+    List<PlanItemInstanceEntity> findByReferenceId(String referenceId);
 
     List<PlanItemInstanceEntity> findByStageInstanceIdAndPlanItemId(String stageInstanceId, String planItemId);
+
+    List<PlanItemInstanceEntity> findByCaseInstanceIdAndTypeAndState(String caseInstanceId, List<String> planItemDefinitionTypes,
+            List<String> states, boolean ended);
+
+    PlanItemInstanceEntity updateHumanTaskPlanItemInstanceAssignee(TaskEntity taskEntity, String assignee);
+
+    PlanItemInstanceEntity updateHumanTaskPlanItemInstanceCompletedBy(TaskEntity taskEntity, String assignee);
+    
+    void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 
     void deleteSentryRelatedData(String planItemId);
 
@@ -54,5 +69,4 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
 
     void deleteByCaseInstanceId(String caseInstanceId);
 
-    void updatePlanItemInstancesCaseDefinitionId(String caseInstanceId, String caseDefinitionId);
 }

@@ -15,7 +15,21 @@
     {
       "fromActivityId": "originalActivity1",
       "toActivityId": "newActivity1",
+      "newName": "New name",
+      "newDueDate": "2040-10-02",
+      "newPriority": "50",
+      "newCategory": "New category",
+      "newFormKey": "NewFormKey",
       "newAssignee": "kermit",
+      "newOwner": "fozzie",
+      "newCandidateUsers": [
+        "kermit",
+        "fozzie"
+      ],
+      "newCandidateGroups": [
+        "users",
+        "admins"
+      ],
       "localVariables": {
         "varForNewActivity1": "varValue"
       }
@@ -43,6 +57,12 @@
         "originalActivity4"
       ],
       "toActivityId": "newActivity3",
+      "newPriority": "99",
+      "newFormKey": "UpdatedFormKey",
+      "newCandidateGroups": [
+        "test",
+        "test2"
+      ],
       "localVariables": {
         "varForNewActivity3": 9876
       }

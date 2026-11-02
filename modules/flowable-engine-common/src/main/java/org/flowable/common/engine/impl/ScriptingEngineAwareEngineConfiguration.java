@@ -15,6 +15,7 @@
  */
 package org.flowable.common.engine.impl;
 
+import org.flowable.common.engine.impl.scripting.FlowableScriptEngine;
 import org.flowable.common.engine.impl.scripting.ScriptingEngines;
 
 /**
@@ -22,6 +23,10 @@ import org.flowable.common.engine.impl.scripting.ScriptingEngines;
  * @author Dennis
  */
 public interface ScriptingEngineAwareEngineConfiguration {
+
+    FlowableScriptEngine getScriptEngine();
+
+    AbstractEngineConfiguration setScriptEngine(FlowableScriptEngine scriptEngine);
 
     ScriptingEngines getScriptingEngines();
 

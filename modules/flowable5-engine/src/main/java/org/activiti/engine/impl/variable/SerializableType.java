@@ -29,6 +29,7 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
 
 /**
  * @author Tom Baeyens
@@ -37,6 +38,10 @@ import org.flowable.variable.service.impl.types.ByteArrayType;
 public class SerializableType extends ByteArrayType {
 
     public static final String TYPE_NAME = "serializable";
+
+    public SerializableType() {
+        super(NoopVariableLengthVerifier.INSTANCE);
+    }
 
     @Override
     public String getTypeName() {

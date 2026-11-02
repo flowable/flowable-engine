@@ -121,7 +121,9 @@ public class MybatisCaseDefinitionDataManager extends AbstractCmmnDataManager<Ca
         if (results.size() == 1) {
             return results.get(0);
         } else if (results.size() > 1) {
-            throw new FlowableException("There are " + results.size() + " case definitions with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion + "'.");
+            throw new FlowableException(
+                    "There are " + results.size() + " case definitions with key = '" + caseDefinitionKey + "' and version = '" + caseDefinitionVersion
+                            + "' in tenant = '" + tenantId + "'.");
         }
         return null;
     }

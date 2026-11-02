@@ -16,7 +16,7 @@ package org.flowable.rest.service.api.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.engine.RuntimeService;
@@ -42,7 +42,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Runtime" }, description = "Manage Runtime", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Runtime" }, authorizations = { @Authorization(value = "basicAuth") })
 public class SignalResource {
 
     @Autowired
@@ -54,7 +54,7 @@ public class SignalResource {
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
-    @ApiOperation(value = "Signal event received", tags = { "Runtime" })
+    @ApiOperation(value = "Signal event received", tags = { "Runtime" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicated signal has been processed and no errors occurred."),
             @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),

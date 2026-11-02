@@ -16,9 +16,9 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.TextMessage;
+import jakarta.jms.JMSException;
+import jakarta.jms.Message;
+import jakarta.jms.TextMessage;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.eventregistry.api.InboundEvent;
@@ -80,5 +80,13 @@ public class JmsMessageInboundEvent implements InboundEvent {
         } else {
             return message.toString();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "JmsMessageInboundEvent{" +
+                "message=" + message +
+                ", headers=" + headers +
+                '}';
     }
 }

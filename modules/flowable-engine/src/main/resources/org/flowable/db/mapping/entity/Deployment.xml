@@ -8,23 +8,23 @@
   
   <insert id="insertDeployment" parameterType="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
     insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_)
-    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{key, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{derivedFrom, jdbcType=VARCHAR}, #{derivedFromRoot, jdbcType=VARCHAR}, #{parentDeploymentId, jdbcType=VARCHAR}, #{engineVersion, jdbcType=VARCHAR})
+    values(#{id, jdbcType=NVARCHAR}, #{name, jdbcType=NVARCHAR}, #{category, jdbcType=NVARCHAR}, #{key, jdbcType=NVARCHAR}, #{tenantId, jdbcType=NVARCHAR}, #{deploymentTime, jdbcType=TIMESTAMP}, #{derivedFrom, jdbcType=NVARCHAR}, #{derivedFromRoot, jdbcType=NVARCHAR}, #{parentDeploymentId, jdbcType=NVARCHAR}, #{engineVersion, jdbcType=NVARCHAR})
   </insert>
 
   <insert id="bulkInsertDeployment" parameterType="java.util.List">
     insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_)
     values
       <foreach collection="list" item="deployment" index="index" separator=",">
-        (#{deployment.id, jdbcType=VARCHAR},
-         #{deployment.name, jdbcType=VARCHAR},
-         #{deployment.category, jdbcType=VARCHAR},
-         #{deployment.key, jdbcType=VARCHAR},
-         #{deployment.tenantId, jdbcType=VARCHAR},
+        (#{deployment.id, jdbcType=NVARCHAR},
+         #{deployment.name, jdbcType=NVARCHAR},
+         #{deployment.category, jdbcType=NVARCHAR},
+         #{deployment.key, jdbcType=NVARCHAR},
+         #{deployment.tenantId, jdbcType=NVARCHAR},
          #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-         #{deployment.derivedFrom, jdbcType=VARCHAR},
-         #{deployment.derivedFromRoot, jdbcType=VARCHAR},
-         #{deployment.parentDeploymentId, jdbcType=VARCHAR},
-         #{deployment.engineVersion, jdbcType=VARCHAR})
+         #{deployment.derivedFrom, jdbcType=NVARCHAR},
+         #{deployment.derivedFromRoot, jdbcType=NVARCHAR},
+         #{deployment.parentDeploymentId, jdbcType=NVARCHAR},
+         #{deployment.engineVersion, jdbcType=NVARCHAR})
       </foreach>
   </insert>
 
@@ -32,16 +32,16 @@
     INSERT ALL 
       <foreach collection="list" item="deployment" index="index">
         into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, DERIVED_FROM_, DERIVED_FROM_ROOT_, PARENT_DEPLOYMENT_ID_, ENGINE_VERSION_) VALUES 
-          (#{deployment.id, jdbcType=VARCHAR},
-           #{deployment.name, jdbcType=VARCHAR},
-           #{deployment.category, jdbcType=VARCHAR},
-           #{deployment.key, jdbcType=VARCHAR},
-           #{deployment.tenantId, jdbcType=VARCHAR},
+          (#{deployment.id, jdbcType=NVARCHAR},
+           #{deployment.name, jdbcType=NVARCHAR},
+           #{deployment.category, jdbcType=NVARCHAR},
+           #{deployment.key, jdbcType=NVARCHAR},
+           #{deployment.tenantId, jdbcType=NVARCHAR},
            #{deployment.deploymentTime, jdbcType=TIMESTAMP},
-           #{deployment.derivedFrom, jdbcType=VARCHAR},
-           #{deployment.derivedFromRoot, jdbcType=VARCHAR},
-           #{deployment.parentDeploymentId, jdbcType=VARCHAR},
-           #{deployment.engineVersion, jdbcType=VARCHAR})
+           #{deployment.derivedFrom, jdbcType=NVARCHAR},
+           #{deployment.derivedFromRoot, jdbcType=NVARCHAR},
+           #{deployment.parentDeploymentId, jdbcType=NVARCHAR},
+           #{deployment.engineVersion, jdbcType=NVARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -52,40 +52,40 @@
     update ${prefix}ACT_RE_DEPLOYMENT
       <set>
           <if test="originalPersistentState.category != category">
-              CATEGORY_ = #{category, jdbcType=VARCHAR},
+              CATEGORY_ = #{category, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.key != key">
-              KEY_ = #{key, jdbcType=VARCHAR},
+              KEY_ = #{key, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.tenantId != tenantId">
-              TENANT_ID_ = #{tenantId, jdbcType=VARCHAR},
+              TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR},
           </if>
           <if test="originalPersistentState.parentDeploymentId != parentDeploymentId">
-              PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=VARCHAR},
+              PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=NVARCHAR},
           </if>
       </set>
-    where ID_ = #{id, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=NVARCHAR}
   </update>
   
   <!-- DEPLOYMENT DELETE -->
   
   <delete id="deleteDeployment" parameterType="string">
-    delete from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
+    delete from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=NVARCHAR}
   </delete>
 
   <!-- DEPLOYMENT RESULTMAP -->
   
   <resultMap id="deploymentResultMap" type="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
-    <result property="key" column="KEY_" jdbcType="VARCHAR" />
-    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="NVARCHAR" />
+    <result property="name" column="NAME_" jdbcType="NVARCHAR" />
+    <result property="category" column="CATEGORY_" jdbcType="NVARCHAR" />
+    <result property="key" column="KEY_" jdbcType="NVARCHAR" />
+    <result property="tenantId" column="TENANT_ID_" jdbcType="NVARCHAR" />
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
-    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="VARCHAR" />
-    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="VARCHAR" />
-    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
-    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="VARCHAR" />
+    <result property="derivedFrom" column="DERIVED_FROM_" jdbcType="NVARCHAR" />
+    <result property="derivedFromRoot" column="DERIVED_FROM_ROOT_" jdbcType="NVARCHAR" />
+    <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="NVARCHAR" />
+    <result property="engineVersion" column="ENGINE_VERSION_" jdbcType="NVARCHAR" />
   </resultMap>
 
   <!-- DEPLOYMENT SELECT -->
@@ -107,87 +107,87 @@
     from ${prefix}ACT_RE_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
-        RES.ID_ = #{deploymentId}
+        RES.ID_ = #{deploymentId, jdbcType=NVARCHAR}
       </if>
       <if test="deploymentIds != null &amp;&amp; !deploymentIds.empty">
         and RES.ID_ IN
         <foreach item="deploymentId" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
-          #{deploymentId}
+          #{deploymentId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="name != null">
-        and RES.NAME_ = #{name}
+        and RES.NAME_ = #{name, jdbcType=NVARCHAR}
       </if>
       <if test="nameLike != null">
-        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+        and RES.NAME_ like #{nameLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="category != null">
-        and RES.CATEGORY_ = #{category}
+        and RES.CATEGORY_ = #{category, jdbcType=NVARCHAR}
       </if>
       <if test="categoryLike != null">
-        and RES.CATEGORY_ like #{categoryLike}${wildcardEscapeClause}
+        and RES.CATEGORY_ like #{categoryLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="categoryNotEquals != null">
-        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+        and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals, jdbcType=NVARCHAR} OR RES.CATEGORY_ is null )
       </if>
       <if test="key != null">
-        and RES.KEY_ = #{key}
+        and RES.KEY_ = #{key, jdbcType=NVARCHAR}
       </if>
       <if test="keyLike != null">
-        and RES.KEY_ like #{keyLike}${wildcardEscapeClause}
+        and RES.KEY_ like #{keyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="tenantId != null">
-        and RES.TENANT_ID_ = #{tenantId}
+        and RES.TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
       </if>
       <if test="tenantIdLike != null">
-        and RES.TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+        and RES.TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="derivedFrom != null">
-        and (RES.DERIVED_FROM_ = #{derivedFrom} or RES.DERIVED_FROM_ROOT_ = #{derivedFrom})
+        and (RES.DERIVED_FROM_ = #{derivedFrom, jdbcType=NVARCHAR} or RES.DERIVED_FROM_ROOT_ = #{derivedFrom, jdbcType=NVARCHAR})
       </if>
       <if test="parentDeploymentId != null">
-        and (RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId})
+        and (RES.PARENT_DEPLOYMENT_ID_ = #{parentDeploymentId, jdbcType=NVARCHAR})
       </if>
       <if test="parentDeploymentIdLike != null">
-        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike}${wildcardEscapeClause}
+        and RES.PARENT_DEPLOYMENT_ID_ like #{parentDeploymentIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
       </if>
       <if test="parentDeploymentIds != null &amp;&amp; !parentDeploymentIds.empty">
         and RES.PARENT_DEPLOYMENT_ID_ IN
         <foreach item="parentDeploymentId" index="index" collection="parentDeploymentIds" 
                  open="(" separator="," close=")">
-          #{parentDeploymentId}
+          #{parentDeploymentId, jdbcType=NVARCHAR}
         </foreach>
       </if>
       <if test="engineVersion != null">
-        and RES.ENGINE_VERSION_ = #{engineVersion}
+        and RES.ENGINE_VERSION_ = #{engineVersion, jdbcType=NVARCHAR}
       </if>
       <if test="processDefinitionKey != null || processDefinitionKeyLike != null">
         and exists(select 1 from ${prefix}ACT_RE_PROCDEF PROCDEF where RES.ID_ = PROCDEF.DEPLOYMENT_ID_ 
             <if test="processDefinitionKey != null">
-              and PROCDEF.KEY_ = #{processDefinitionKey}
+              and PROCDEF.KEY_ = #{processDefinitionKey, jdbcType=NVARCHAR}
             </if>
             <if test="processDefinitionKeyLike != null">
-              and PROCDEF.KEY_ like #{processDefinitionKeyLike}${wildcardEscapeClause}
+              and PROCDEF.KEY_ like #{processDefinitionKeyLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
             </if>
         )
       </if>
       <if test="latest">
         and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_RE_DEPLOYMENT where KEY_ = RES.KEY_ 
              <if test="derivedFrom != null">
-                and (DERIVED_FROM_ = #{derivedFrom} or DERIVED_FROM_ROOT_ = #{derivedFrom})
+                and (DERIVED_FROM_ = #{derivedFrom, jdbcType=NVARCHAR} or DERIVED_FROM_ROOT_ = #{derivedFrom, jdbcType=NVARCHAR})
              </if>
              <if test="derivedFrom == null">
                 and DERIVED_FROM_ is null
              </if>
              <if test="tenantId != null">
-	           and TENANT_ID_ = #{tenantId}
+	           and TENANT_ID_ = #{tenantId, jdbcType=NVARCHAR}
 	         </if>
 	         <if test="tenantIdLike != null">
-	           and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+	           and TENANT_ID_ like #{tenantIdLike, jdbcType=NVARCHAR}${wildcardEscapeClause}
 	         </if>
 	         <if test="withoutTenantId">
 	           and (TENANT_ID_ = '' or TENANT_ID_ is null)
@@ -201,7 +201,7 @@
   </sql>
     
   <select id="selectDeployment" parameterType="string" resultMap="deploymentResultMap">
-    select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id, jdbcType=NVARCHAR}
   </select>
 
   <select id="selectDeploymentByNativeQuery" parameterType="java.util.Map" resultMap="deploymentResultMap">

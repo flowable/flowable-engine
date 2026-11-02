@@ -15,11 +15,6 @@ package org.flowable.common.engine.impl;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,7 +30,6 @@ import java.util.Set;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.builder.xml.XMLConfigBuilder;
 import org.apache.ibatis.builder.xml.XMLMapperBuilder;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
@@ -73,6 +67,8 @@ import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.api.delegate.event.FlowableEventListener;
 import org.flowable.common.engine.api.engine.EngineLifecycleListener;
+import org.flowable.common.engine.api.lock.LockManager;
+import org.flowable.common.engine.impl.agenda.AgendaOperationExecutionListener;
 import org.flowable.common.engine.impl.agenda.AgendaOperationRunner;
 import org.flowable.common.engine.impl.cfg.CommandExecutorImpl;
 import org.flowable.common.engine.impl.cfg.IdGenerator;
@@ -80,10 +76,14 @@ import org.flowable.common.engine.impl.cfg.TransactionContextFactory;
 import org.flowable.common.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.common.engine.impl.db.CommonDbSchemaManager;
 import org.flowable.common.engine.impl.db.DbSqlSessionFactory;
+import org.flowable.common.engine.impl.db.FlowableStringTypeHandler;
 import org.flowable.common.engine.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.common.engine.impl.db.MybatisTypeAliasConfigurator;
 import org.flowable.common.engine.impl.db.MybatisTypeHandlerConfigurator;
 import org.flowable.common.engine.impl.db.SchemaManager;
+import org.flowable.common.engine.impl.db.SchemaManagerDatabaseConfiguration;
+import org.flowable.common.engine.impl.db.SchemaManagerDatabaseConfigurationSessionFactory;
+import org.flowable.common.engine.impl.db.SchemaOperationsEngineBuild;
 import org.flowable.common.engine.impl.event.EventDispatchAction;
 import org.flowable.common.engine.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.common.engine.impl.interceptor.Command;
@@ -97,7 +97,6 @@ import org.flowable.common.engine.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.common.engine.impl.interceptor.LogInterceptor;
 import org.flowable.common.engine.impl.interceptor.SessionFactory;
 import org.flowable.common.engine.impl.interceptor.TransactionContextInterceptor;
-import org.flowable.common.engine.impl.lock.LockManager;
 import org.flowable.common.engine.impl.lock.LockManagerImpl;
 import org.flowable.common.engine.impl.logging.LoggingListener;
 import org.flowable.common.engine.impl.logging.LoggingSession;
@@ -119,15 +118,18 @@ import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisByteA
 import org.flowable.common.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.common.engine.impl.runtime.Clock;
 import org.flowable.common.engine.impl.service.CommonEngineServiceImpl;
+import org.flowable.common.engine.impl.util.DbUtil;
 import org.flowable.common.engine.impl.util.DefaultClockImpl;
 import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
+import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
 import org.flowable.eventregistry.api.EventRegistryEventConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 public abstract class AbstractEngineConfiguration {
 
@@ -170,6 +172,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected Map<String, SchemaManager> additionalSchemaManagers;
     protected SchemaManager commonSchemaManager;
     protected SchemaManager schemaManager;
     protected Command<Void> schemaManagementCmd;
@@ -193,6 +196,7 @@ public abstract class AbstractEngineConfiguration {
     protected CommandInterceptor commandInvoker;
 
     protected AgendaOperationRunner agendaOperationRunner = (commandContext, runnable) -> runnable.run();
+    protected Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners;
 
     protected List<CommandInterceptor> customPreCommandInterceptors;
     protected List<CommandInterceptor> customPostCommandInterceptors;
@@ -377,38 +381,7 @@ public abstract class AbstractEngineConfiguration {
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
 
     public static Properties getDefaultDatabaseTypeMappings() {
-        Properties databaseTypeMappings = new Properties();
-        databaseTypeMappings.setProperty("H2", DATABASE_TYPE_H2);
-        databaseTypeMappings.setProperty("HSQL Database Engine", DATABASE_TYPE_HSQL);
-        databaseTypeMappings.setProperty("MySQL", DATABASE_TYPE_MYSQL);
-        databaseTypeMappings.setProperty("MariaDB", DATABASE_TYPE_MYSQL);
-        databaseTypeMappings.setProperty("Oracle", DATABASE_TYPE_ORACLE);
-        databaseTypeMappings.setProperty(PRODUCT_NAME_POSTGRES, DATABASE_TYPE_POSTGRES);
-        databaseTypeMappings.setProperty("Microsoft SQL Server", DATABASE_TYPE_MSSQL);
-        databaseTypeMappings.setProperty(DATABASE_TYPE_DB2, DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/NT", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/NT64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDP", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUX390", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXX8664", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXZ64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXPPC64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/LINUXPPC64LE", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/400 SQL", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/6000", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDB iSeries", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/AIX64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/HPUX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/HP64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/SUN", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/SUN64", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/PTX", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
-        databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
-        return databaseTypeMappings;
+        return DbUtil.getDefaultDatabaseTypeMappings();
     }
 
     protected Map<Object, Object> beans;
@@ -428,7 +401,15 @@ public abstract class AbstractEngineConfiguration {
      * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
      */
     protected int maxLengthStringVariableType = -1;
-    
+
+    /**
+     * Define variable length for variables that have length, e.g. String, JSON, etc.
+     * The length verifier can be used to throw an exception if the length exceeds a certain threshold and / or it can log a warning.
+     */
+    protected VariableLengthVerifier variableLengthVerifier = NoopVariableLengthVerifier.INSTANCE;
+
+    protected VariableValueConversionHandler variableValueConversionHandler;
+
     protected void initEngineConfigurations() {
         addEngineConfiguration(getEngineCfgKey(), getEngineScopeType(), this);
     }
@@ -493,46 +474,7 @@ public abstract class AbstractEngineConfiguration {
     }
 
     public void initDatabaseType() {
-        Connection connection = null;
-        try {
-            connection = dataSource.getConnection();
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
-            String databaseProductName = databaseMetaData.getDatabaseProductName();
-            logger.debug("database product name: '{}'", databaseProductName);
-
-            // CRDB does not expose the version through the jdbc driver, so we need to fetch it through version().
-            if (PRODUCT_NAME_POSTGRES.equalsIgnoreCase(databaseProductName)) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("select version() as version;");
-                        ResultSet resultSet = preparedStatement.executeQuery()) {
-                    String version = null;
-                    if (resultSet.next()) {
-                        version = resultSet.getString("version");
-                    }
-
-                    if (StringUtils.isNotEmpty(version) && version.toLowerCase().startsWith(PRODUCT_NAME_CRDB.toLowerCase())) {
-                        databaseProductName = PRODUCT_NAME_CRDB;
-                        logger.info("CockroachDB version '{}' detected", version);
-                    }
-                }
-            }
-
-            databaseType = databaseTypeMappings.getProperty(databaseProductName);
-            if (databaseType == null) {
-                throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
-            }
-            logger.debug("using database type: {}", databaseType);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Exception while initializing Database connection", e);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                logger.error("Exception while closing the Database connection", e);
-            }
-        }
+        databaseType = DbUtil.determineDatabaseType(dataSource, logger, databaseTypeMappings);
 
         // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
         // Especially with executions, with 100 as default, this limit is passed.
@@ -545,8 +487,22 @@ public abstract class AbstractEngineConfiguration {
         if (this.commonSchemaManager == null) {
             this.commonSchemaManager = new CommonDbSchemaManager();
         }
+
+        if (this.schemaManager == null) {
+            this.schemaManager = createEngineSchemaManager();
+        }
+
     }
 
+    protected abstract SchemaManager createEngineSchemaManager();
+
+    public void initSchemaManagementCommand() {
+        if (schemaManagementCmd == null) {
+            if (usingRelationalDatabase && databaseSchemaUpdate != null) {
+                this.schemaManagementCmd = new SchemaOperationsEngineBuild(getEngineScopeType());
+            }
+        }
+    }
     // session factories ////////////////////////////////////////////////////////
 
     public void addSessionFactory(SessionFactory sessionFactory) {
@@ -687,10 +643,15 @@ public abstract class AbstractEngineConfiguration {
         }
     }
 
+    public void initVariableValueConversionHandler() {
+        if (variableValueConversionHandler == null) {
+            variableValueConversionHandler = new DefaultVariableValueConversionHandler();
+        }
+    }
+
     public void initObjectMapper() {
         if (objectMapper == null) {
-            objectMapper = new ObjectMapper();
-            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+            objectMapper = JsonMapper.shared();
         }
     }
 
@@ -746,9 +707,10 @@ public abstract class AbstractEngineConfiguration {
 
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
+                initSchemaManagerDatabaseConfigurationSessionFactory();
             }
 
-            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
+            addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl::new));
             
             if (isLoggingSessionEnabled()) {
                 if (!sessionFactories.containsKey(LoggingSession.class)) {
@@ -792,6 +754,12 @@ public abstract class AbstractEngineConfiguration {
         addSessionFactory(dbSqlSessionFactory);
     }
 
+    protected void initSchemaManagerDatabaseConfigurationSessionFactory() {
+        if (!sessionFactories.containsKey(SchemaManagerDatabaseConfiguration.class)) {
+            addSessionFactory(new SchemaManagerDatabaseConfigurationSessionFactory());
+        }
+    }
+
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory(usePrefixId);
     }
@@ -799,6 +767,10 @@ public abstract class AbstractEngineConfiguration {
     protected abstract void initDbSqlSessionFactoryEntitySettings();
 
     protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
+        defaultInitDbSqlSessionFactoryEntitySettings(insertOrder, deleteOrder, Collections.emptyList());
+    }
+
+    protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder, Collection<Class<? extends Entity>> immutableEntities) {
         if (insertOrder != null) {
             for (Class<? extends Entity> clazz : insertOrder) {
                 dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -813,6 +785,10 @@ public abstract class AbstractEngineConfiguration {
             for (Class<? extends Entity> clazz : deleteOrder) {
                 dbSqlSessionFactory.getDeletionOrder().add(clazz);
             }
+        }
+
+        if (immutableEntities != null && !immutableEntities.isEmpty()) {
+            dbSqlSessionFactory.getImmutableEntities().addAll(immutableEntities);
         }
     }
 
@@ -867,6 +843,10 @@ public abstract class AbstractEngineConfiguration {
             } finally {
                 IoUtil.closeSilently(inputStream);
             }
+        } else {
+            // This is needed when the SQL Session Factory is created by another engine.
+            // When custom XML Mappers are registered with this engine they need to be loaded in the configuration as well
+            applyCustomMybatisCustomizations(sqlSessionFactory.getConfiguration());
         }
     }
 
@@ -884,7 +864,6 @@ public abstract class AbstractEngineConfiguration {
 
         configuration.setEnvironment(environment);
 
-        initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
         initCustomMybatisInterceptors(configuration);
         if (isEnableLogSqlExecutionTime()) {
@@ -898,7 +877,9 @@ public abstract class AbstractEngineConfiguration {
     public void initCustomMybatisMappers(Configuration configuration) {
         if (getCustomMybatisMappers() != null) {
             for (Class<?> clazz : getCustomMybatisMappers()) {
-                configuration.addMapper(clazz);
+                if (!configuration.hasMapper(clazz)) {
+                    configuration.addMapper(clazz);
+                }
             }
         }
     }
@@ -925,9 +906,32 @@ public abstract class AbstractEngineConfiguration {
 
         handlerRegistry.register(Object.class, JdbcType.CHAR, new StringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.CLOB, new ClobTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+
+        // For SQL server, the performance difference between using varchar or nvarchar is big.
+        // Using the correct jdbcType is thus very important for SQL server, but in many mappings the type was not set,
+        // which led to defaulting to the regular 'varchar' jdbcType.
+        // Up to the point where the following if was added, none of the MyBatis mappings would use 'nvarchar' as jdbcType.
+        // Together with this check, all mappings were reviewed and the correct type was added.
+        if (databaseType.equals(DATABASE_TYPE_MSSQL)) {
+            handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler()); // Notice the 'N' prefix here
+            handlerRegistry.register(String.class, JdbcType.NVARCHAR, new NStringTypeHandler()); // Notice the 'N' prefix here
+        } else {
+            // However, for other databases, we want to keep the old behavior of always using 'varchar',
+            // thus the same handler is used for both types.
+            handlerRegistry.register(String.class, JdbcType.VARCHAR, new StringTypeHandler());
+            handlerRegistry.register(Object.class, JdbcType.VARCHAR, new StringTypeHandler());
+            if (databaseType.equals(DATABASE_TYPE_DB2)) {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(true)); // Notice: no 'N' prefix here
+            } else {
+                handlerRegistry.register(String.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+                handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new FlowableStringTypeHandler(false)); // Notice: no 'N' prefix here
+            }
+        }
+
         handlerRegistry.register(Object.class, JdbcType.LONGVARCHAR, new StringTypeHandler());
-        handlerRegistry.register(Object.class, JdbcType.NVARCHAR, new NStringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.NCHAR, new NStringTypeHandler());
         handlerRegistry.register(Object.class, JdbcType.NCLOB, new NClobTypeHandler());
 
@@ -964,20 +968,26 @@ public abstract class AbstractEngineConfiguration {
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
         Configuration configuration = parser.parse();
 
+        applyCustomMybatisCustomizations(configuration);
+        return configuration;
+    }
+
+    protected void applyCustomMybatisCustomizations(Configuration configuration) {
+        initCustomMybatisMappers(configuration);
+
         if (dependentEngineMybatisTypeAliasConfigs != null) {
             for (MybatisTypeAliasConfigurator typeAliasConfig : dependentEngineMybatisTypeAliasConfigs) {
-                typeAliasConfig.configure(configuration.getTypeAliasRegistry());
+                typeAliasConfig.configure(this, configuration.getTypeAliasRegistry());
             }
         }
         if (dependentEngineMybatisTypeHandlerConfigs != null) {
             for (MybatisTypeHandlerConfigurator typeHandlerConfig : dependentEngineMybatisTypeHandlerConfigs) {
-                typeHandlerConfig.configure(configuration.getTypeHandlerRegistry());
+                typeHandlerConfig.configure(this, configuration.getTypeHandlerRegistry());
             }
         }
 
         parseDependentEngineMybatisXMLMappers(configuration);
         parseCustomMybatisXMLMappers(configuration);
-        return configuration;
     }
 
     public void parseCustomMybatisXMLMappers(Configuration configuration) {
@@ -1053,7 +1063,7 @@ public abstract class AbstractEngineConfiguration {
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                allConfigurators.sort(new Comparator<EngineConfigurator>() {
+                allConfigurators.sort(new Comparator<>() {
 
                     @Override
                     public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
@@ -1178,6 +1188,18 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setSchemaManager(SchemaManager schemaManager) {
         this.schemaManager = schemaManager;
         return this;
+    }
+
+    public AbstractEngineConfiguration addAdditionalSchemaManager(SchemaManager schemaManager) {
+        if (this.additionalSchemaManagers == null) {
+            this.additionalSchemaManagers = new HashMap<>();
+        }
+        this.additionalSchemaManagers.put(schemaManager.getContext(), schemaManager);
+        return this;
+    }
+
+    public Map<String, SchemaManager> getAdditionalSchemaManagers() {
+        return additionalSchemaManagers;
     }
 
     public SchemaManager getCommonSchemaManager() {
@@ -1414,8 +1436,33 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
+    public Collection<AgendaOperationExecutionListener> getAgendaOperationExecutionListeners() {
+        return agendaOperationExecutionListeners;
+    }
+
+    public AbstractEngineConfiguration addAgendaOperationExecutionListener(AgendaOperationExecutionListener listener) {
+        if (this.agendaOperationExecutionListeners == null) {
+            this.agendaOperationExecutionListeners = new ArrayList<>();
+        }
+        this.agendaOperationExecutionListeners.add(listener);
+        return this;
+    }
+
+    public AbstractEngineConfiguration setAgendaOperationExecutionListeners(Collection<AgendaOperationExecutionListener> agendaOperationExecutionListeners) {
+        this.agendaOperationExecutionListeners = agendaOperationExecutionListeners;
+        return this;
+    }
+
     public List<CommandInterceptor> getCustomPreCommandInterceptors() {
         return customPreCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration addCustomPreCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPreCommandInterceptors == null) {
+            this.customPreCommandInterceptors = new ArrayList<>();
+        }
+        this.customPreCommandInterceptors.add(commandInterceptor);
+        return this;
     }
 
     public AbstractEngineConfiguration setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
@@ -1425,6 +1472,14 @@ public abstract class AbstractEngineConfiguration {
 
     public List<CommandInterceptor> getCustomPostCommandInterceptors() {
         return customPostCommandInterceptors;
+    }
+
+    public AbstractEngineConfiguration addCustomPostCommandInterceptor(CommandInterceptor commandInterceptor) {
+        if (this.customPostCommandInterceptors == null) {
+            this.customPostCommandInterceptors = new ArrayList<>();
+        }
+        this.customPostCommandInterceptors.add(commandInterceptor);
+        return this;
     }
 
     public AbstractEngineConfiguration setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
@@ -1710,15 +1765,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    /**
-     * @return name of the default tenant
-     * @deprecated use {@link AbstractEngineConfiguration#getDefaultTenantProvider()} instead
-     */
-    @Deprecated
-    public String getDefaultTenantValue() {
-        return getDefaultTenantProvider().getDefaultTenant(null, null, null);
-    }
-
     public AbstractEngineConfiguration setDefaultTenantValue(String defaultTenantValue) {
         this.defaultTenantProvider = (tenantId, scope, scopeKey) -> defaultTenantValue;
         return this;
@@ -1901,6 +1947,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+
+    public VariableLengthVerifier getVariableLengthVerifier() {
+        return variableLengthVerifier;
+    }
+
+    public AbstractEngineConfiguration setVariableLengthVerifier(VariableLengthVerifier variableLengthVerifier) {
+        this.variableLengthVerifier = variableLengthVerifier;
+        return this;
+    }
+
+    public VariableValueConversionHandler getVariableValueConversionHandler() {
+        return variableValueConversionHandler;
+    }
+
+    public AbstractEngineConfiguration setVariableValueConversionHandler(VariableValueConversionHandler variableValueConversionHandler) {
+        this.variableValueConversionHandler = variableValueConversionHandler;
         return this;
     }
 

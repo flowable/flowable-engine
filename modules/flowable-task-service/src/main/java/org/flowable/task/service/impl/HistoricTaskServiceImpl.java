@@ -120,8 +120,10 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
     public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity, Date changeTime, AbstractEngineConfiguration engineConfiguration) {
         HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
         if (historicTaskInstance != null) {
+            historicTaskInstance.setState(taskEntity.getState());
             historicTaskInstance.setName(taskEntity.getName());
             historicTaskInstance.setDescription(taskEntity.getDescription());
+            historicTaskInstance.setInProgressStartDueDate(taskEntity.getInProgressStartDueDate());
             historicTaskInstance.setDueDate(taskEntity.getDueDate());
             historicTaskInstance.setPriority(taskEntity.getPriority());
             historicTaskInstance.setCategory(taskEntity.getCategory());
@@ -129,7 +131,12 @@ public class HistoricTaskServiceImpl extends CommonServiceImpl<TaskServiceConfig
             historicTaskInstance.setParentTaskId(taskEntity.getParentTaskId());
             historicTaskInstance.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
             historicTaskInstance.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
+            historicTaskInstance.setInProgressStartTime(taskEntity.getInProgressStartTime());
+            historicTaskInstance.setInProgressStartedBy(taskEntity.getInProgressStartedBy());
             historicTaskInstance.setClaimTime(taskEntity.getClaimTime());
+            historicTaskInstance.setClaimedBy(taskEntity.getClaimedBy());
+            historicTaskInstance.setSuspendedTime(taskEntity.getSuspendedTime());
+            historicTaskInstance.setSuspendedBy(taskEntity.getSuspendedBy());
             historicTaskInstance.setLastUpdateTime(changeTime);
 
             if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {

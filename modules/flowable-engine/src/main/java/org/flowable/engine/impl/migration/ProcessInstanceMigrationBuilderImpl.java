@@ -14,11 +14,13 @@
 package org.flowable.engine.impl.migration;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.batch.api.Batch;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.EnableActivityMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationBuilder;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationValidationResult;
@@ -34,7 +36,14 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     }
 
     @Override
+    public ProcessInstanceMigrationBuilder withProcessInstanceIdsToMigrate(Set<String> processInstanceIds) {
+        this.migrationDocumentBuilder.setProcessInstanceIdsToMigrate(processInstanceIds);
+        return this;
+    }
+
+    @Override
     public ProcessInstanceMigrationBuilder fromProcessInstanceMigrationDocument(ProcessInstanceMigrationDocument document) {
+        migrationDocumentBuilder.setProcessInstanceIdsToMigrate(document.getProcessInstanceIdsToMigrate());
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionId());
         migrationDocumentBuilder.setProcessDefinitionToMigrateTo(document.getMigrateToProcessDefinitionKey(), document.getMigrateToProcessDefinitionVersion());
         migrationDocumentBuilder.setTenantId(document.getMigrateToProcessDefinitionTenantId());
@@ -112,6 +121,12 @@ public class ProcessInstanceMigrationBuilderImpl implements ProcessInstanceMigra
     @Override
     public ProcessInstanceMigrationBuilder addActivityMigrationMapping(ActivityMigrationMapping mapping) {
         this.migrationDocumentBuilder.addActivityMigrationMapping(mapping);
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceMigrationBuilder addEnableEventSubProcessStartEvent(EnableActivityMapping mapping) {
+        this.migrationDocumentBuilder.addEnableActivityMapping(mapping);
         return this;
     }
 

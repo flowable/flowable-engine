@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricPlanItemInstanceQuery;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.history.HistoricPlanItemInstanceQueryProperty;
 import org.flowable.cmmn.rest.service.api.CmmnRestApiInterceptor;
 import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
@@ -48,6 +49,9 @@ public abstract class HistoricPlanItemInstanceBaseResource {
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Autowired
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     
     @Autowired(required=false)
     protected CmmnRestApiInterceptor restApiInterceptor;
@@ -60,6 +64,7 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getPlanItemInstanceState()).ifPresent(query::planItemInstanceState);
         Optional.ofNullable(queryRequest.getCaseDefinitionId()).ifPresent(query::planItemInstanceCaseDefinitionId);
         Optional.ofNullable(queryRequest.getCaseInstanceId()).ifPresent(query::planItemInstanceCaseInstanceId);
+        Optional.ofNullable(queryRequest.getCaseInstanceIds()).ifPresent(query::planItemInstanceCaseInstanceIds);
         Optional.ofNullable(queryRequest.getStageInstanceId()).ifPresent(query::planItemInstanceStageInstanceId);
         Optional.ofNullable(queryRequest.getElementId()).ifPresent(query::planItemInstanceElementId);
         Optional.ofNullable(queryRequest.getPlanItemDefinitionId()).ifPresent(query::planItemInstanceDefinitionId);
@@ -96,13 +101,28 @@ public abstract class HistoricPlanItemInstanceBaseResource {
         Optional.ofNullable(queryRequest.getExitAfter()).ifPresent(query::exitAfter);
         Optional.ofNullable(queryRequest.getEndedBefore()).ifPresent(query::endedBefore);
         Optional.ofNullable(queryRequest.getEndedAfter()).ifPresent(query::endedAfter);
-        
+        Optional.ofNullable(queryRequest.getStarted()).ifPresent(started -> {
+                    if (started) {
+                        query.started();
+                    } else {
+                        query.notStarted();
+                    }
+                }
+        );
+        Optional.ofNullable(queryRequest.getIncludeLocalVariables()).ifPresent(includeLocalVariables -> {
+                    if (includeLocalVariables) {
+                        query.includeLocalVariables(true);
+                    }
+                }
+        );
+
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryPlanItemInfoWithQuery(query, queryRequest);
         }
 
-        return paginateList(allRequestParams, queryRequest, query, "createTime", allowedSortProperties,
-            restResponseFactory::createHistoricPlanItemInstanceResponseList);
+        // The query does not resolve the variable values, they are resolved when the response is created in the same command
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> paginateList(allRequestParams, queryRequest, query, "createTime",
+                allowedSortProperties, restResponseFactory::createHistoricPlanItemInstanceResponseList));
     }
 
 }

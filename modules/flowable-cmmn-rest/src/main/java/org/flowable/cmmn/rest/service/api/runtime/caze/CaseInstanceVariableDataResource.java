@@ -13,8 +13,7 @@
 
 package org.flowable.cmmn.rest.service.api.runtime.caze;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,21 +33,21 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Instance Variables" }, description = "Manage Case Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Instance Variables" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseInstanceVariableDataResource extends BaseVariableResource {
 
     @ApiOperation(value = "Get the binary data for a variable", tags = { "Case Instance Variables" }, nickname = "getCaseInstanceVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variables are returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task does not have a variable with the given name (in the given scope). Status message provides additional information.")
+            @ApiResponse(code = 404, message = "Indicates the requested case was not found or the case does not have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @ResponseBody
     @GetMapping(value = "/cmmn-runtime/case-instances/{caseInstanceId}/variables/{variableName}/data")
     public byte[] getVariableData(@ApiParam(name = "caseInstanceId") @PathVariable("caseInstanceId") String caseInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,
-            HttpServletRequest request, HttpServletResponse response) {
+            HttpServletResponse response) {
 
-        CaseInstance caseInstance = getCaseInstanceFromRequest(caseInstanceId);
+        CaseInstance caseInstance = getCaseInstanceFromRequestWithoutAccessCheck(caseInstanceId);
         return getVariableDataByteArray(caseInstance, variableName, response);
     }
 }

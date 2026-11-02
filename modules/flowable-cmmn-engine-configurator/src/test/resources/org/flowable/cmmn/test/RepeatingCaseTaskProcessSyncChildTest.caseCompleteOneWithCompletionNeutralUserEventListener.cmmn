@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <!--
+         Variant of the repeating-user-event-listener model where the 'Trigger' user event listener is marked
+         completion-neutral. Unlike the plain repeating variant - where the available listener keeps the
+         non-auto-complete stage two open for further triggers - a completion-neutral available listener does
+         NOT block completion. So once a single triggered 'Repeating task' and its case task repetition have
+         finished (leaving only completion-neutral / waiting-for-repetition children), stage two completes and
+         stage three's 'Completed' task is reached, even though the listener is still available.
+    -->
+    <case id="caseCompleteOne" name="Case complete one">
+        <casePlanModel id="cpm" name="Case plan model" flowable:autoComplete="false">
+
+            <planItem id="planItemStart" name="Start" definitionRef="milestoneStart"/>
+
+            <planItem id="planItemStage1" name="Stage one" definitionRef="stage1">
+                <entryCriterion id="ecStage1" flowable:sentryRef="sentryStage1"/>
+            </planItem>
+
+            <planItem id="planItemStage2" name="Stage two" definitionRef="stage2">
+                <entryCriterion id="ecStage2" flowable:sentryRef="sentryStage2"/>
+            </planItem>
+
+            <planItem id="planItemStage3" name="Stage three" definitionRef="stage3">
+                <entryCriterion id="ecStage3" flowable:sentryRef="sentryStage3"/>
+            </planItem>
+
+            <sentry id="sentryStage1">
+                <planItemOnPart id="opStage1" sourceRef="planItemStart">
+                    <standardEvent>occur</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryStage2">
+                <planItemOnPart id="opStage2" sourceRef="planItemStage1">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+            <sentry id="sentryStage3">
+                <planItemOnPart id="opStage3" sourceRef="planItemStage2">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <milestone id="milestoneStart" name="Start"/>
+
+            <stage id="stage1" name="Stage one" flowable:autoComplete="false">
+                <planItem id="planItemHumanTask" name="Human task" definitionRef="humanTask"/>
+                <humanTask id="humanTask" name="Human task"/>
+            </stage>
+
+            <stage id="stage2" name="Stage two" flowable:autoComplete="false">
+
+                <!-- Blocking process task; its synchronous child process produces 'caseList' on stage activation. -->
+                <planItem id="planItemProcessOne" name="Process complete one" definitionRef="processTaskOne"/>
+
+                <!-- Repeating user event listener, but marked completion-neutral: while available it does not, by
+                     itself, keep the non-auto-complete stage open. -->
+                <planItem id="planItemTrigger" name="Trigger" definitionRef="triggerUel">
+                    <itemControl>
+                        <extensionElements>
+                            <flowable:completionNeutralRule/>
+                        </extensionElements>
+                        <repetitionRule></repetitionRule>
+                    </itemControl>
+                </planItem>
+
+                <!-- Repeating human task, activated each time the user event listener occurs. -->
+                <planItem id="planItemRepeatingTask" name="Repeating task" definitionRef="repeatingTask">
+                    <itemControl>
+                        <repetitionRule></repetitionRule>
+                    </itemControl>
+                    <entryCriterion id="ecRepeatingTask" flowable:sentryRef="sentryRepeatingTask"/>
+                </planItem>
+
+                <!-- Collection-repeating case task, gated by a repeating task completing. Its child case completes
+                     synchronously. -->
+                <planItem id="planItemCaseTwo" name="Case complete two" definitionRef="caseTaskTwo">
+                    <itemControl>
+                        <repetitionRule flowable:collectionVariable="caseList"
+                                        flowable:elementVariable="caseItem"></repetitionRule>
+                    </itemControl>
+                    <entryCriterion id="ecCaseTwo" flowable:sentryRef="sentryCaseTwo"/>
+                </planItem>
+
+                <sentry id="sentryRepeatingTask">
+                    <planItemOnPart id="opRepeatingTask" sourceRef="planItemTrigger">
+                        <standardEvent>occur</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <sentry id="sentryCaseTwo">
+                    <planItemOnPart id="opCaseTwo" sourceRef="planItemRepeatingTask">
+                        <standardEvent>complete</standardEvent>
+                    </planItemOnPart>
+                </sentry>
+
+                <processTask id="processTaskOne" name="Process complete one" flowable:fallbackToDefaultTenant="true">
+                    <extensionElements>
+                        <flowable:out source="caseList" target="caseList"/>
+                        <flowable:out source="processOne" target="processOne"/>
+                    </extensionElements>
+                    <processRefExpression><![CDATA[processCompleteOne]]></processRefExpression>
+                </processTask>
+
+                <userEventListener id="triggerUel" name="Trigger"/>
+
+                <humanTask id="repeatingTask" name="Repeating task"/>
+
+                <caseTask id="caseTaskTwo" name="Case complete two" caseRef="caseCompleteTwo" flowable:fallbackToDefaultTenant="true">
+                    <extensionElements>
+                        <flowable:in source="caseItem" target="caseItem"/>
+                    </extensionElements>
+                </caseTask>
+            </stage>
+
+            <stage id="stage3" name="Stage three" flowable:autoComplete="false">
+                <planItem id="planItemCompleted" name="Completed" definitionRef="completedTask"/>
+                <humanTask id="completedTask" name="Completed"/>
+            </stage>
+
+        </casePlanModel>
+    </case>
+
+</definitions>

@@ -14,28 +14,18 @@ package org.flowable.eventregistry.api;
 
 import java.util.Date;
 
+import org.flowable.common.engine.api.repository.FlowableDefinition;
+
 /**
  * An object structure representing a channel definition
  * 
  * @author Tijs Rademakers
  * @author Joram Barez
  */
-public interface ChannelDefinition {
-
-    /** unique identifier */
-    String getId();
+public interface ChannelDefinition extends FlowableDefinition {
 
     /** category name of the channel definition */
     String getCategory();
-
-    /** label used for display purposes */
-    String getName();
-
-    /** unique name for all versions this channel definition */
-    String getKey();
-    
-    /** version of this channel definition */
-    int getVersion();
 
     /** description of this channel definition **/
     String getDescription();
@@ -52,16 +42,7 @@ public interface ChannelDefinition {
      */
     String getImplementation();
 
-    /** name of {@link EventRepositoryService#getResourceAsStream(String, String) the resource} of this channel definition. */
-    String getResourceName();
-
-    /** The deployment in which this channel definition is contained. */
-    String getDeploymentId();
-    
     /** create time for this channel definition */
     Date getCreateTime();
-
-    /** The tenant identifier of this channel definition */
-    String getTenantId();
 
 }

@@ -15,9 +15,6 @@ package org.flowable.cmmn.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.cmmn.rest.service.api.engine.RestIdentityLink;
@@ -29,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -42,52 +40,58 @@ import io.swagger.annotations.Authorization;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Case Definitions" }, description = "Manage Case Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Case Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class CaseDefinitionIdentityLinkResource extends BaseCaseDefinitionResource {
 
-    @ApiOperation(value = "Get a candidate starter from a case definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Get a candidate starter from a case definition", tags = { "Case Definitions" }, nickname = "getIdentityLink")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case definition was found and the identity link was returned."),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found or the case definition does not have an identity-link that matches the url.")
     })
     @GetMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks/{family}/{identityId}", produces = "application/json")
-    public RestIdentityLink getIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable("caseDefinitionId") String caseDefinitionId,
-            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-            HttpServletRequest request) {
+    public RestIdentityLink getIdentityLinkRequest(@ApiParam(name = "caseDefinitionId") @PathVariable("caseDefinitionId") String caseDefinitionId,
+            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to get exists
         IdentityLink link = getIdentityLink(family, identityId, caseDefinition.getId());
 
+        if (restApiInterceptor != null) {
+            restApiInterceptor.accessCaseDefinitionIdentityLink(caseDefinition, link);
+        }
+
         return restResponseFactory.createRestIdentityLink(link);
     }
 
-    @ApiOperation(value = "Delete a candidate starter from a case definition", tags = { "Case Definitions" })
+    @ApiOperation(value = "Delete a candidate starter from a case definition", tags = { "Case Definitions" }, code = 204)
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the case definition was found and the identity link was removed. The response body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested case definition was not found or the case definition does not have an identity-link that matches the url.")
     })
     @DeleteMapping(value = "/cmmn-repository/case-definitions/{caseDefinitionId}/identitylinks/{family}/{identityId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteIdentityLink(@ApiParam(name = "caseDefinitionId") @PathVariable("caseDefinitionId") String caseDefinitionId,
-            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId,
-            HttpServletResponse response) {
+            @ApiParam(name = "family") @PathVariable("family") String family, @ApiParam(name = "identityId") @PathVariable("identityId") String identityId) {
 
-        CaseDefinition caseDefinition = getCaseDefinitionFromRequest(caseDefinitionId);
+        CaseDefinition caseDefinition = getCaseDefinitionFromRequestWithoutAccessCheck(caseDefinitionId);
 
         validateIdentityLinkArguments(family, identityId);
 
         // Check if identitylink to delete exists
         IdentityLink link = getIdentityLink(family, identityId, caseDefinition.getId());
+
+        if (restApiInterceptor != null) {
+            restApiInterceptor.deleteCaseDefinitionIdentityLink(caseDefinition, link);
+        }
+
         if (link.getUserId() != null) {
             repositoryService.deleteCandidateStarterUser(caseDefinition.getId(), link.getUserId());
         } else {
             repositoryService.deleteCandidateStarterGroup(caseDefinition.getId(), link.getGroupId());
         }
-
-        response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
     protected void validateIdentityLinkArguments(String family, String identityId) {

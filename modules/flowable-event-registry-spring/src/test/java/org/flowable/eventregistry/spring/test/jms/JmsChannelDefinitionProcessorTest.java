@@ -21,9 +21,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.flowable.eventregistry.api.EventDeployment;
@@ -491,7 +489,6 @@ class JmsChannelDefinitionProcessorTest {
             .header("testIntHeader", EventPayloadTypes.INTEGER)
             .header("testBooleanHeader", EventPayloadTypes.BOOLEAN)
             .header("testDoubleHeader", EventPayloadTypes.DOUBLE)
-            .header("testCustomerHeader", "custom")
             .deploy();
 
         eventRepositoryService.createInboundChannelModelBuilder()
@@ -504,9 +501,6 @@ class JmsChannelDefinitionProcessorTest {
             .jsonFieldsMapDirectlyToPayload()
             .deploy();
         
-        Map<String, String> customerObj = new HashMap<>();
-        customerObj.put("name", "John Doe");
-
         jmsTemplate.convertAndSend("test-customer", "{"
                 + "    \"eventKey\": \"test\","
                 + "    \"name\": \"Kermit the Frog\""
@@ -517,7 +511,6 @@ class JmsChannelDefinitionProcessorTest {
             messageProcessor.setIntProperty("testIntHeader", 123);
             messageProcessor.setBooleanProperty("testBooleanHeader", true);
             messageProcessor.setDoubleProperty("testDoubleHeader", 12.3);
-            messageProcessor.setObjectProperty("testCustomerHeader", customerObj);
             return messageProcessor;
         });
 
@@ -539,8 +532,7 @@ class JmsChannelDefinitionProcessorTest {
                 tuple("testLongHeader", 123l),
                 tuple("testIntHeader", 123),
                 tuple("testBooleanHeader", true),
-                tuple("testDoubleHeader", 12.3),
-                tuple("testCustomerHeader", customerObj)
+                tuple("testDoubleHeader", 12.3)
             );
         assertThat(kermitEvent.getCorrelationParameterInstances()).isEmpty();
     }
@@ -720,7 +712,7 @@ class JmsChannelDefinitionProcessorTest {
 
         Object message = await("receive message")
                 .atMost(Duration.ofSeconds(10))
-                .until(() -> jmsTemplate.receiveAndConvert("test-combination.test-expression-customer"), Objects::nonNull);;
+                .until(() -> jmsTemplate.receiveAndConvert("test-combination.test-expression-customer"), Objects::nonNull);
         assertThat(message).isNotNull();
         assertThatJson(message)
                 .isEqualTo("{"
@@ -801,6 +793,46 @@ class JmsChannelDefinitionProcessorTest {
                         + "  customer: 'kermit',"
                         + "  name: 'Kermit the Frog'"
                         + "}");
+    }
+
+    @Test
+    void eventShouldBeSendToDeadLetterAfterAnExceptionIsThrown() {
+        eventRepositoryService.createInboundChannelModelBuilder()
+                .key("testChannel")
+                .resourceName("test.channel")
+                .jmsChannelAdapter("test-customer")
+                .eventProcessingPipeline()
+                .jsonDeserializer()
+                .detectEventKeyUsingJsonField("eventKey")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+
+        eventRepositoryService.createEventModelBuilder()
+                .resourceName("testEvent.event")
+                .key("test")
+                .correlationParameter("customer", EventPayloadTypes.STRING)
+                .payload("name", EventPayloadTypes.STRING)
+                .deploy();
+
+        testEventConsumer.setEventConsumer(event -> {
+            throw new RuntimeException("Failed to receive event " + event.getType());
+        });
+
+        jmsTemplate.convertAndSend("test-customer", "{"
+                + "    \"eventKey\": \"test\","
+                + "    \"customer\": \"kermit\","
+                + "    \"name\": \"Kermit the Frog\""
+                + "}");
+
+
+        await("receive dead letter message")
+                .atMost(Duration.ofSeconds(10))
+                .until(() -> jmsTemplate.receiveAndConvert("DLQ.test-customer"), Objects::nonNull);
+
+        assertThat(testEventConsumer.getEvents())
+                .extracting(EventRegistryEvent::getType)
+                .hasSizeGreaterThan(1)
+                .containsOnly("test");
     }
 
 }

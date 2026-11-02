@@ -87,6 +87,11 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
     }
 
     @Override
+    public String getProcessDefinitionCategory() {
+        return null;
+    }
+
+    @Override
     public String getDeploymentId() {
         return activiti5ProcessInstance.getDeploymentId();
     }
@@ -150,6 +155,21 @@ public class Flowable5ProcessInstanceWrapper implements ProcessInstance {
         return null;
     }
     
+    @Override
+    public Date getDueDate() {
+        return null;
+    }
+
+    @Override
+    public Date getClaimTime() {
+        return null;
+    }
+
+    @Override
+    public String getClaimedBy() {
+        return null;
+    }
+
     @Override
     public String getCallbackId() {
         return null;

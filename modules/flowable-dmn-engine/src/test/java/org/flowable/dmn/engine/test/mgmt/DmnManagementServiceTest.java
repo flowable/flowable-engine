@@ -21,10 +21,10 @@ import java.util.Map;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.management.TableMetaData;
 import org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntity;
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
-import org.junit.Test;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.junit.jupiter.api.Test;
 
-public class DmnManagementServiceTest extends AbstractFlowableDmnTest {
+class DmnManagementServiceTest extends BaseFlowableDmnTest {
 
     @Test
     public void testGetMetaDataForUnexistingTable() {
@@ -51,7 +51,7 @@ public class DmnManagementServiceTest extends AbstractFlowableDmnTest {
 
         String tablePrefix = dmnEngineConfiguration.getDatabaseTablePrefix();
 
-        assertThat(tableCount).containsEntry(tablePrefix + "ACT_GE_PROPERTY", 2L);
+        assertThat(tableCount).containsEntry(tablePrefix + "ACT_GE_PROPERTY", 3L);
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DECISION")).isZero();
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DEPLOYMENT")).isZero();
         assertThat(tableCount.get(tablePrefix + "ACT_DMN_DEPLOYMENT_RESOURCE")).isZero();

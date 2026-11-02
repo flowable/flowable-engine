@@ -20,6 +20,7 @@ import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
@@ -29,6 +30,7 @@ import org.springframework.test.context.ContextConfiguration;
  * @author Sang Venkatraman
  */
 @ContextConfiguration("classpath:org/flowable/spring/test/expression/callactivity/testCallActivityByExpression-context.xml")
+@DirtiesContext
 public class CallActivityBasedOnSpringBeansExpressionTest extends SpringFlowableTestCase {
 
     @Test

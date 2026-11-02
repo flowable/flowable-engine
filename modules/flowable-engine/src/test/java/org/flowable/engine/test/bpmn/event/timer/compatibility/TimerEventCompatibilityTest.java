@@ -35,7 +35,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
         CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
         final String finalActivityId = activityId;
-        commandExecutor.execute(config, new Command<Object>() {
+        commandExecutor.execute(config, new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {
@@ -47,7 +47,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
             }
         });
 
-        commandExecutor.execute(config, new Command<Object>() {
+        commandExecutor.execute(config, new Command<>() {
 
             @Override
             public Object execute(CommandContext commandContext) {

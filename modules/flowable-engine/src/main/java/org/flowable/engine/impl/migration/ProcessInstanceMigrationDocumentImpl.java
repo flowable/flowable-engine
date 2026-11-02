@@ -15,19 +15,22 @@ package org.flowable.engine.impl.migration;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.EnableActivityMapping;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
 import org.flowable.engine.migration.Script;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Dennis Federico
@@ -35,11 +38,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigrationDocument {
 
+    protected Set<String> processInstanceIdsToMigrate = new LinkedHashSet<>();
     protected String migrateToProcessDefinitionId;
     protected String migrateToProcessDefinitionKey;
     protected Integer migrateToProcessDefinitionVersion;
     protected String migrateToProcessDefinitionTenantId;
     protected List<ActivityMigrationMapping> activityMigrationMappings;
+    protected List<EnableActivityMapping> enableActivityMappings;
     protected Map<String, Map<String, Object>> activitiesLocalVariables;
     protected Map<String, Object> processInstanceVariables;
     protected Script preUpgradeScript;
@@ -51,6 +56,15 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
 
     public static ProcessInstanceMigrationDocument fromJson(String processInstanceMigrationDocumentJson) {
         return ProcessInstanceMigrationDocumentConverter.convertFromJson(processInstanceMigrationDocumentJson);
+    }
+
+    @Override
+    public Set<String> getProcessInstanceIdsToMigrate() {
+        return processInstanceIdsToMigrate;
+    }
+
+    public void setProcessInstanceIdsToMigrate(Set<String> processInstanceIdsToMigrate) {
+        this.processInstanceIdsToMigrate = processInstanceIdsToMigrate;
     }
 
     public void setMigrateToProcessDefinitionId(String processDefinitionId) {
@@ -199,6 +213,10 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
             throw new FlowableException("From activity '" + Arrays.toString(duplicates.toArray()) + "' is mapped more than once");
         }
     }
+    
+    public void setEnableActivityMappings(List<EnableActivityMapping> enableActivityMappings) {
+        this.enableActivityMappings = enableActivityMappings;
+    }
 
     protected static List<String> findDuplicatedFromActivityIds(List<ActivityMigrationMapping> activityMigrationMappings) {
         //Frequency Map
@@ -244,6 +262,11 @@ public class ProcessInstanceMigrationDocumentImpl implements ProcessInstanceMigr
     @Override
     public List<ActivityMigrationMapping> getActivityMigrationMappings() {
         return activityMigrationMappings;
+    }
+    
+    @Override
+    public List<EnableActivityMapping> getEnableActivityMappings() {
+        return enableActivityMappings;
     }
 
     @Override

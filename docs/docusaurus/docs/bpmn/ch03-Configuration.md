@@ -356,7 +356,7 @@ The managed implementations fall back to their default counterparts if the threa
 
 ## Job executor activation
 
-The AsyncExecutor is a component that manages a thread pool to fire timers and other asynchronous tasks. Other implementations are possible (for example using a message queue, see the advanced section of the user guide).
+The AsyncExecutor is a component that manages a thread pool to fire timers and other asynchronous tasks.
 
 By default, the AsyncExecutor is not activated and not started. With the following configuration the async executor can be started together with the Flowable Engine.
 
@@ -370,16 +370,9 @@ Configuring a mail server is optional. Flowable supports sending e-mails in busi
 
 ## History configuration
 
-Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](bpmn/ch11-History.md#history) of the engine. See [history configuration](bpmn/ch11-History.md#history-configuration) for more details.
+Customizing the configuration of history storage is optional. This allows you to tweak settings that influence the [history capabilities](bpmn/ch10-History.md#history) of the engine. See [history configuration](bpmn/ch10-History.md#history-configuration) for more details.
 
     <property name="history" value="audit" />
-
-## Async history configuration
-
-\[Experimental\] Since Flowable 6.1.0 the async history feature has been added. When async history is enabled, the historic data will be persisted by a history job executor, instead of synchronous persistence as part of the runtime execution persistence.
-See [async history configuration](bpmn/ch11-History.md#async-history-configuration) for more details.
-
-    <property name="asyncHistoryEnabled" value="true" />
 
 ## Exposing configuration beans in expressions and scripts
 
@@ -411,10 +404,10 @@ With Maven, add for example a dependency like this (here using log4j), note that
 
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
+      <artifactId>slf4j-reload4j</artifactId>
     </dependency>
 
-The flowable-ui and flowable-rest webapps are configured to use Log4j-binding. Log4j is also used when running the tests for all the flowable-\* modules.
+The flowable-rest webapp is configured to use Log4j-binding. Log4j is also used when running the tests for all the flowable-\* modules.
 
 **Important note when using a container with commons-logging in the classpath:** In order to route the spring-logging through SLF4J, a bridge is used (see [<http://www.slf4j.org/legacy.html#jclOverSLF4J>](http://www.slf4j.org/legacy.html#jclOverSLF4J)). If your container provides a commons-logging implementation, please follow directions on this page: [<http://www.slf4j.org/codes.html#release>](http://www.slf4j.org/codes.html#release) to ensure stability.
 
@@ -453,7 +446,7 @@ All events dispatched are a subtype of org.flowable.engine.common.api.delegate.e
 
 ### Event listener implementation
 
-The only requirement for an event-listener is to implement org.flowable.engine.delegate.event.FlowableEventListener. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
+The only requirement for an event-listener is to implement org.flowable.common.engine.api.delegate.event.FlowableEventListener. Below is an example implementation of a listener, which outputs all events received to the standard-out, with exception of events related to job-execution:
 
     public class MyEventListener implements FlowableEventListener {
 
@@ -501,7 +494,7 @@ There are a few base implementations provided by Flowable to facilitate common u
 
 If an event-listener is configured in the process engine configuration, it will be active when the process engine starts and will remain active after subsequent reboots of the engine.
 
-The property eventListeners expects a list of org.flowable.engine.delegate.event.FlowableEventListener instances. As usual, you can either declare an inline bean definition or use a ref to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
+The property eventListeners expects a list of org.flowable.common.engine.api.delegate.event.FlowableEventListener instances. As usual, you can either declare an inline bean definition or use a ref to an existing bean instead. The snippet below adds an event-listener to the configuration that is notified when any event is dispatched, regardless of its type:
 
     <bean id="processEngineConfiguration"
         class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
@@ -513,7 +506,7 @@ The property eventListeners expects a list of org.flowable.engine.delegate.event
         </property>
     </bean>
 
-To get notified when certain types of events get dispatched, use the typedEventListeners property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of org.flowable.engine.delegate.event.FlowableEventListener instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
+To get notified when certain types of events get dispatched, use the typedEventListeners property, which expects a map. The key of a map-entry is a comma-separated list of event-names (or a single event-name). The value of a map-entry is a list of org.flowable.common.engine.api.delegate.event.FlowableEventListener instances. The snippet below adds an event-listener to the configuration, that is notified when a job execution was successful or failed:
 
     <bean id="processEngineConfiguration"
         class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
@@ -646,7 +639,7 @@ We opened up the event-dispatching mechanism through the API, to allow you to di
 
 ### Supported event types
 
-Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the org.flowable.engine.common.api.delegate.event.FlowableEventType.
+Listed below are all event types that can occur in the engine. Each type corresponds to an enum value in the org.flowable.common.engine.api.delegate.event.FlowableEventType (or org.flowable.idm.api.event.FlowableIdmEventType for identity management events).
 
 <table>
 <caption>Supported events</caption>
@@ -875,17 +868,17 @@ Listed below are all event types that can occur in the engine. Each type corresp
 </tr>
 <tr class="odd">
 <td><p>MEMBERSHIP_CREATED</p></td>
-<td><p>A user has been added to a group. The event contains the ids of the user and group involved.</p></td>
+<td><p>A user has been added to a group. The event contains the ids of the user and group involved. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 <tr class="even">
 <td><p>MEMBERSHIP_DELETED</p></td>
-<td><p>A user has been removed from a group. The event contains the ids of the user and group involved.</p></td>
+<td><p>A user has been removed from a group. The event contains the ids of the user and group involved. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 <tr class="odd">
 <td><p>MEMBERSHIPS_DELETED</p></td>
-<td><p>All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual MEMBERSHIP_DELETED events will be thrown if all members are deleted at once, for performance reasons.</p></td>
+<td><p>All members will be removed from a group. The event is thrown before the members are removed, so they are still accessible. No individual MEMBERSHIP_DELETED events will be thrown if all members are deleted at once, for performance reasons. This event type is defined in org.flowable.idm.api.event.FlowableIdmEventType.</p></td>
 <td><p>org.flowable...FlowableMembershipEvent</p></td>
 </tr>
 </tbody>

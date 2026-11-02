@@ -16,12 +16,11 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.engine.impl.test.EngineTestCache;
 import org.flowable.eventregistry.api.EventDeployment;
 import org.flowable.eventregistry.api.EventDeploymentBuilder;
 import org.flowable.eventregistry.api.EventRepositoryService;
@@ -41,7 +40,7 @@ public abstract class EventTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, EventRegistryEngine> eventRegistryEngines = new HashMap<>();
+    static final EngineTestCache<EventRegistryEngine> eventRegistryEngines = new EngineTestCache<>();
 
     // Test annotation support /////////////////////////////////////////////
 
@@ -161,23 +160,19 @@ public abstract class EventTestHelper {
     // ///////////////////////////////////////////////////
 
     public static EventRegistryEngine getEventRegistryEngine(String configurationResource) {
-        EventRegistryEngine eventRegistryEngine = eventRegistryEngines.get(configurationResource);
-        if (eventRegistryEngine == null) {
+        return eventRegistryEngines.getOrCreate(configurationResource, resource -> {
             LOGGER.debug("==== BUILDING EVENT REGISTRY ENGINE ========================================================================");
-            eventRegistryEngine = ((EventRegistryEngineConfiguration) EventRegistryEngineConfiguration.createEventRegistryEngineConfigurationFromResource(configurationResource)
+            EventRegistryEngine eventRegistryEngine = ((EventRegistryEngineConfiguration) EventRegistryEngineConfiguration
+                    .createEventRegistryEngineConfigurationFromResource(resource)
                     .setDatabaseSchemaUpdate(EventRegistryEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE))
                     .buildEventRegistryEngine();
             LOGGER.debug("==== EVENT REGISTRY ENGINE CREATED =========================================================================");
-            eventRegistryEngines.put(configurationResource, eventRegistryEngine);
-        }
-        return eventRegistryEngine;
+            return eventRegistryEngine;
+        });
     }
 
     public static void closeEventRegistryEngines() {
-        for (EventRegistryEngine eventRegistryEngine : eventRegistryEngines.values()) {
-            eventRegistryEngine.close();
-        }
-        eventRegistryEngines.clear();
+        eventRegistryEngines.closeAll();
     }
 
     /**

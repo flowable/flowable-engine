@@ -41,8 +41,7 @@ public class CmmnListenerNotificationHelper {
         if (taskEntity.getScopeDefinitionId() != null) {
             CmmnModel cmmnModel = CaseDefinitionUtil.getCmmnModel(taskEntity.getScopeDefinitionId());
             CaseElement caseElement = cmmnModel.getPrimaryCase().getAllCaseElements().get(taskEntity.getTaskDefinitionKey());
-            if (caseElement instanceof HumanTask) {
-                HumanTask humanTask = (HumanTask) caseElement;
+            if (caseElement instanceof HumanTask humanTask) {
                 executeTaskListeners(humanTask, taskEntity, eventType);
             }
         }

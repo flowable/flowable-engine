@@ -28,6 +28,362 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 8.0.0</h3>
+
+<h4>Breaking Changes</h4>
+<ul>
+    <li>Upgrade to Spring Framework 7 and Spring Boot 4. There is no support for Spring Boot 3 anymore.</li>
+    <li>Upgrade to Jackson 3 (see details below). Jackson 2 is still supported via a compatibility layer</li>
+    <li>Remove JUnit 3 and JUnit 4 testing support (deprecated in 7.2.0). Use JUnit 5 (Jupiter) exclusively</li>
+</ul>
+
+<h4>New Features</h4>
+<ul>
+    <li>
+        The method <code>stream()</code> can be used to obtain a <code>java.util.stream.Stream</code> from a collection.
+    </li>
+    <li>
+        Lambda expressions can be used in expressions. e.g. if you have a transient list of customers you can do something like:
+        <code>${customers.stream().filter(customer -> customer.type eq 'premium').toList()}</code> to get a list of premium customers
+        or <code>${customers.stream().map(customer -> customer.name).toList()</code> to get the names of all the customers.
+    </li>
+    <li>
+        The <code>planItemInstances</code> now expose a <code>filter(Predicate&lt;DelegatePlanItemInstance&gt; predicate)</code> method that can be used to provide custom filter options.
+    </li>
+    <li>
+        Date variables will now include the milliseconds when they are returned over REST.
+        E.g., up to now a date variable with the value of <code>2020-05-04T09:25:45.583Z</code> would have been returned as <code>2020-05-04T09:25:45Z</code>.
+        However, now it would be returned as <code>2020-05-04T09:25:45.583Z</code> which is still ISO 8601 compliant.
+    </li>
+    <li>
+        Date properties e.g., Process Instance start time will be returned as an ISO 8601 in the UTC timezone.
+        E.g., if the start time was returned as <code>2025-09-24T09:58:12.609+02:00</code> now it is returned as <code>2025-09-24T07:58:12.609Z</code>.
+    </li>
+    <li>Expressions can now access some of the definition information in expressions resolved during deployment. e.g. in Start Timer expression <code>${variableContainer.definitionKey}</code> to access the definition key</li>
+    <li>Support Java Records in Expressions</li>
+    <li>Support for updating more task properties when doing case and process instance migration</li>
+    <li>Case and process instance migration validation is now available in the REST API</li>
+    <li>Option to automatically create plan item instances for new plan items during case instance migration</li>
+    <li>Added <code>endUserId</code> for historic process/case instances and <code>state</code> for historic process instances</li>
+    <li>Added case and process end interceptor support</li>
+    <li>Dispatch events when updating the business status of a case or process</li>
+    <li>Added hookpoints to event registry for event payload types</li>
+    <li>Added option to disable history persistence when executing DMN decisions</li>
+</ul>
+
+<h4>Performance Improvements</h4>
+<ul>
+    <li>Improve Expression coercion performance</li>
+    <li>Long String variables now store a cached value, avoiding repeated deserialization</li>
+    <li>Reduce unnecessary <code>ObjectMapper</code> instance creation - reuse the one from engine configuration</li>
+</ul>
+
+<h4>Bug Fixes</h4>
+<ul>
+    <li>Fix issue with multiple case reactivations with a parent case instance</li>
+    <li>Fix NPE when having two sentries, and one doesn't have an <code>ifPart</code></li>
+    <li>Fix case / process instance ended invoked twice when undeploying deeply nested app</li>
+    <li>Fix issue with moving parallel multi-instance activities to a single activity</li>
+    <li>Ensure that multiple character events for the same element are handled correctly in XML parsing</li>
+    <li>Make sure that <code>BeanELResolver</code> and DMN Expression resolution propagates the exception cause</li>
+    <li>Avoid 'Invalid reference in diagram interchange definition' warning message in logs when plan items are part of a plan fragment</li>
+    <li>Unlock exclusive jobs when unacquiring all jobs of a worker</li>
+    <li>Unacquiring external worker job should unlock the exclusive scope if the external worker job is exclusive</li>
+    <li>Address security concerns raised via GitHub issue</li>
+</ul>
+
+<h4>Jackson 3</h4>
+<p>
+    <strong>Important:</strong> If you have scripts or expressions that call methods on a <code>JsonNode</code>, you need to carefully check if these work with Jackson 3,
+    as many method signatures have changed (see details below). If you are unsure, we recommend starting with Jackson 2 configured first
+    (<code>flowable.variable-json-mapper=jackson2</code>), and then testing for an upgrade to Jackson 3 over time.
+    We do recommend looking into upgrading to Jackson 3, since Jackson 2 will eventually stop receiving updates.
+    See <a href="https://github.com/FasterXML/jackson/wiki/Jackson-Releases">Jackson Releases</a> for the latest support information.
+</p>
+<ul>
+    <li>
+        Jackson 3 is used for Flowable internal json manipulation.
+        There is still support for Jackson 2 variables.
+        With Spring Boot this can be enabled by setting <code>flowable.variable-json-mapper</code> to <code>jackson2</code>.
+        By default, Jackson 3 is being used for variables.
+        When configuring Flowable without Spring Boot then the <code>variableJsonMapper</code> on the process, cmmn, and app engine configurations
+        should be set to be <code>org.flowable.common.engine.impl.json.jackson2.Jackson2VariableJsonMapper</code>
+        and the <code>org.flowable.common.rest.variable.Jackson2JsonObjectRestVariableConverter</code> should be added to the appropriate rest response factories.
+    </li>
+    <li>
+        Notable changes when using JSON in expressions / scripts:
+        <ul>
+            <li>Packages have changed from <code>com.fasterxml.jackson.databind</code> and <code>com.fasterxml.jackson.core</code> to <code>tools.jackson.databind</code> and <code>tools.jackson.core</code> </li>
+            <li><code>elements()</code> no longer returns <code>Iterator&lt;JsonNode&gt;</code> and instead returns <code>Collection&lt;JsonNode&gt;</code></li>
+            <li><code>values()</code> no longer returns <code>Iterator&lt;JsonNode&gt;</code> and instead returns <code>Collection&lt;JsonNode&gt;</code></li>
+            <li><code>Iterator&lt;String&gt; fieldNames()</code> replaced by <code>Collection&lt;String&gt; propertyNames()</code></li>
+            <li><code>Iterator&lt;Map.Entry&lt;String, JsonNode&gt;&gt; fields()</code> replaced by <code>Set&lt;Map.Entry&lt;String, JsonNode&gt;&gt; properties()</code></li>
+            <li><code>JsonNode with(String)</code> replaced by <code>ObjectNode withObject(String)</code>, and if not using a pointer then it is better to use <code>ObjectNode withProperty(String)</code></li>
+            <li><code>TextNode textNode(String)</code> replaced by <code>StringNode stringNode(String)</code></li>
+            <li><code>List&lt;String&gt; findValuesAsText(String)</code> replaced by <code>List&lt;String&gt; findValuesAsString(String)</code></li>
+            <li><code>List&lt;String&gt; findValuesAsText(String, List&lt;String&gt;)</code> replaced by <code>List&lt;String&gt; findValuesAsString(String, List&lt;String&gt;)</code></li>
+            <li><code>boolean isContainerNode()</code> replaced by <code>boolean isContainer()</code></li>
+            <li><code>boolean isEmpty(SerializerProvider)</code> replaced by <code>boolean isEmpty(SerializationContext)</code></li>
+            <li><code>JsonNode put(String, JsonNode)</code> replaced by <code>JsonNode replace(String, JsonNode)</code></li>
+            <li><code>JsonNode putAll(Map&lt;String, ? extends JsonNode&gt;)</code> replaced by <code>JsonNode setAll(Map&lt;String, ? extends JsonNode&gt;)</code></li>
+            <li><code>JsonNode putAll(ObjectNode)</code> replaced by <code>JsonNode setAll(ObjectNode)></code></li>
+            <li><code>JsonParser traverse()</code> removed without replacement</li>
+            <li><code>JsonParser traverse(ObjectCodec)</code> replaced by <code>JsonParser traverse(ObjectReadContext)</code></li>
+            <li><code>void serialize(JsonGenerator, SerializerProvider)</code> replaced by <code>void serialize(JsonGenerator, SerializationContext)</code></li>
+            <li><code>void serializeWithType(JsonGenerator, SerializerProvider, TypeSerializer)</code> replaced by <code>void serializeWithType(JsonGenerator, SerializationContext, TypeSerializer)</code></li>
+        </ul>
+        Methods deprecated in Jackson 3:
+        <ul>
+            <li><code>String asText()</code> replaced by <code>String asString()</code></li>
+            <li><code>String asText(String)</code> replaced by <code>String asString(String)</code></li>
+            <li><code>boolean isTextual()</code> replaced by <code>boolean isString()</code></li>
+            <li><code>String textValue()</code> replaced by <code>String stringValue()</code></li>
+        </ul>
+        There is also a behaviour change in the different <code>xxxValue</code> and <code>asXXX</code> methods.
+        In Jackson 3 those methods would fail if the node is not of the appropriate type and / or if it cannot coerce the value to the requested type.
+        e.g.
+        <ul>
+            <li>When using <code>stringValue</code> on a non <code>StringNode</code> or <code>NullNode</code> it would fail, in Jackson 2 it would return <code>null</code>.</li>
+            <li>When using <code>asString</code> on a <code>ObjectNode</code> or <code>ArrayNode</code> it would fail, in Jackson 2 it would return an empty string.</li>
+        </ul>
+    </li>
+</ul>
+
+<h4>Dependency Upgrades</h4>
+<ul>
+    <li>Upgrade to Spring Framework 7 / Spring Boot 4</li>
+    <li>Upgrade to Jackson 3 (with Jackson 2 compatibility)</li>
+    <li>Various other dependency updates</li>
+</ul>
+<h3>Release Notes - Flowable - 7.2.0</h3>
+
+<ul>
+    <li>Support for setting Variables asynchronous for BPMN and CMMN</li>
+    <li>Support for Skip Expression for Receive Task and Send Event Task</li>
+    <li>Support for setting local variables when migration case instances</li>
+    <li>Support querying Historic Variables by collection of Case / Process instance ids</li>
+    <li>Support querying Process / Case instances excluding a set of definition keys</li>
+    <li>Support for including only defined variables when querying (Historic) Process / Case instances</li>
+    <li>Support for querying Case instances by parent ID</li>
+    <li>Support Input variables for Script Task</li>
+    <li>Support resolving Case / Plan Item instance in a task listener expression</li>
+    <li>Support DMN rule expressions with logic not at the beginning of the rule</li>
+    <li>Support for using available conditions for Variable Event Listeners</li>
+    <li>Support for secure HTTP Headers in the HTTP Task. When using these headers, then the header values are going to be masked when logging them and / or storing them as variables</li>
+    <li>Support for `BigInteger` and `BigDecimal` as variables</li>
+    <li>Support for configuring the max length for large variables (string, json, serializable, byte array)</li>
+    <li>Remove child deployments when un-deploying an App</li>
+    <li>Add completedBy to Activity Instance</li>
+    <li>Add assignee / completedBy to Plan Item Instance</li>
+    <li>Change REST API Date responses to use UTC instead of Server Timezone</li>
+    <li>Improve REST API to support querying dates without seconds or milliseconds</li>
+    <li>Improve Swagger Docs by including information for start, size, order, and sort in relevant places</li>
+    <li>Improve performance by avoiding dirty checks for Immutable entities</li>
+    <li>Improve BPMN performance for straight through processes by avoiding unnecessary selects during deletion</li>
+    <li>Improve CMMN performance by using a dedicated list for storing the evaluate criteria operations (which are executed once all other operations are done)</li>
+    <li>Improve Housekeeping performance</li>
+    <li>Fix issue when invoking `get` and `path` on `JsonNode` through expressions</li>
+    <li>Fix issue when parsing and validating XML with empty CDATA</li>
+    <li>Fix issue with matching incoming events when having channel definitions in the default tenant</li>
+    <li>Fix issue with optimistic locking for stages with async elements</li>
+    <li>Fix issue when using Apache HttpClient 5, and the response uses a non-compliant HTTP Status code</li>
+    <li>Fix issue when using a DMN Hit Policy Priority and no results</li>
+    <li>Fix issue with boundary events when dynamically moving the current state to the parent process instance</li>
+    <li>Deprecate support for JUnit 3 and JUnit 4</li>
+    <li>Deprecate support for Joda Time</li>
+    <li>Upgrade to Spring Boot 3.5</li>
+</ul>
+
+<h4>Future Plans</h4>
+<p>
+    Our current plan is the next Release (Flowable 8) to be based on Spring 7, Spring Boot 4 and use Jackson 3. We will also support Jackson 2, but by default we would use Jackson 3.
+    See <a href="https://github.com/FasterXML/jackson-future-ideas/discussions/72">Path to Jackson 3.0.0</a> from the Jackson team.
+</p>
+<h3>Release Notes - Flowable - 7.1.0</h3>
+
+<ul>
+	<li>Removed Liquibase from the App, CMMN, DMN and event registry engines and changed it to manual SQL files like it was already done for the BPMN, Common and IDM engines.</li>
+    <li>Improve support for Microsoft SQL Server nvarchar type and making sure that queries can use the correct index type.</li>
+    <li>Added support to reschedule a CMMN timer job or timer event listener in the CmmnManagementService.</li>
+    <li>Added support for multiple variable event listeners in BPMN and CMMN.</li>
+    <li>Fixed issue with event subscriptions using multiple correlation parameters not working with event listeners mapping different correlation parameters.</li>
+    <li>Added support for enabling event sub process start events in the process instance migration logic.</li>
+    <li>Added support for direct migration of async service tasks inh the process migration.</li>
+    <li>Added support for pre and post expressions in the case instance migration builder.</li>
+    <li>Fixed issue with task properties not getting updated in the case instance migration.</li>
+    <li>Added support to terminate sub case instances in the case migration.</li>
+    <li>Fixed issue with repetition counter variables in the case instance migration logic.</li>
+    <li>Added option to change the plan item and definition id in the case migration.</li>
+    <li>Added support for LocalDate and LocalDateTime for time expressions.</li>
+    <li>Added support for UUID variable types in the REST API.</li>
+    <li>Upgrade to Spring Boot 3.3.4</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.1</h3>
+
+<ul>
+    <li>This is a minor release including support for Spring Boot 3.1.6.</li>
+    <li>Add support to dynamically create an event subscription to start a case or process instance.</li>
+    <li>Add support to register a filter class in the inbound channel pipeline that is invoked for all events that are being received through that channel.</li>
+    <li>Added an option to query for parent and root scope ids for (historic) case, process and task instances.</li>
+    <li>Added an option to not create a repetition counter variable for repetition elements in CMMN.</li>
+    <li>Fixed issue with incorrect stages getting activated on case instance migration.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.0</h3>
+
+<ul>
+    <li>This is the first stable release for version 7 of the Flowable Engines focusing on the Spring Boot 3, Spring 6 and Java 17 upgrade.</li>
+    <li>The REST application requires a servlet container / application server that supports Jakarta 9.</li>
+    <li>This release focuses on the main Flowable Engines and REST APIs for the BPMN, CMMN, DMN and event registry engines. This means that there are no UI applications, no content and form engines and the modules for Mule and some others are removed.</li>
+    <li>Blog post with more information about the <a href="https://www.flowable.com/blog/engineering/flowable-open-source-7-0-0-release">Flowable 7 release</a>.</li>
+    <li>Support batch migration for CMMN.</li>
+    <li>Repetition support for case reactivation.</li>
+    <li>Support for stopping housekeeping batch.</li>
+    <li>Support for HTTP HEAD and OPTIONS for the Http Tasks.</li>
+    <li>Remove relocated Spring Boot Starters
+        <ul>
+            <li>flowable-spring-boot-starter-basic - flowable-spring-boot-starter-process should be used instead.</li>
+            <li>flowable-spring-boot-starter-rest-api - flowable-spring-boot-starter-process-rest should be used instead.</li>
+        </ul>
+    </li>
+    <li>Add flowable-bom with all the Flowable artifacts
+    <li>Support for dynamic Kafka message key
+    <li>Add TaskCompletionBuilder to CmmnTaskService
+    <li>Add support for handling custom input parameters for error start and boundary events and for passing additional data in error end events
+    <li>Add ability to store completer of human and user tasks in a variable
+    <li>Support collection of string or json array as mail recipients in Mail Tasks
+    <li>Upgrade to Spring Boot 3.1
+    <li>Upgrade to Camel 4
+    <li>Upgrade to CXF 4
+    <li>Provide an abstraction for sending emails through a FlowableMailClient
+    <li>Use Jakarta Mail instead of Javax Mail and replace Apache Commons Email with Eclipse Angus Mail
+    <li>Remove message based executor
+    <li>Remove some Flowable deprecated code
+        <ul>
+            <li>CmmnRepositoryService#getDecisionTablesForCaseDefinition - use CmmnRepositoryService#getDecisionsForCaseDefinition instead.</li>
+            <li>RepositoryService#getDecisionTablesForProcessDefinition - use RepositoryService#getDecisionsForProcessDefinition instead.</li>
+            <li>HistoricCaseInstanceQuery#limitCaseVariables - no replacement it was a noop.</li>
+            <li>CaseInstanceQuery#limitCaseInstanceVariables - no replacement it was a noop.</li>
+            <li>HistoricProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>ProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>TaskInfoQuery#limitTaskVariables - no replacement it was a noop.</li>
+            <li>Removed query limit configurations from CmmnEngineConfiguration and ProcessEngineConfigurationImpl.</li>
+            <li>Removed HistoryManager#recordActivityEnd - no replacement, Flowable was never calling that method.</li>
+            <li>Removed org.flowable.engine.FlowableTaskAlreadyClaimedException - use org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException instead.</li>
+            <li>Removed org.flowable.engine.cfg.MailServerInfo - use org.flowable.common.engine.impl.cfg.mail.MailServerInfo instead.</li>
+            <li>Removed org.flowable.http.HttpRequest - use org.flowable.http.common.api.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.HttpResponse - use org.flowable.http.common.api.HttpResponse instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpRequestHandler - use org.flowable.http.common.api.delegate.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpResponseHandler - use org.flowable.http.common.api.delegate.HttpResponse instead.</li>
+            <li>Removed org.flowable.identitylink.service.IdentityLinkType - use org.flowable.identitylink.api.IdentityLinkType instead.</li>
+            <li>Removed ManagedAsyncJobExecutor - configure the thread factory in the engine configuration.</li>
+            <li>Removed org.flowable.spring.SpringCallerRunsRejectedJobsHandler - use org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler instead.</li>
+            <li>Removed org.flowable.spring.SpringRejectedJobsHandler - use org.flowable.spring.job.service.SpringRejectedJobsHandler instead.</li>
+        </ul>
+    </li>
+    <li>Remove async history support. In case you were using async history, make sure that you have no async history jobs before starting the new version.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.0.M2</h3>
+
+<ul>
+    <li>Support batch migration for CMMN.</li>
+    <li>Repetition support for case reactivation.</li>
+    <li>Support for stopping housekeeping batch.</li>
+    <li>Support for HTTP HEAD and OPTIONS for the Http Tasks.</li>
+    <li>Remove relocated Spring Boot Starters
+        <ul>
+            <li>flowable-spring-boot-starter-basic - flowable-spring-boot-starter-process should be used instead.</li>
+            <li>flowable-spring-boot-starter-rest-api - flowable-spring-boot-starter-process-rest should be used instead.</li>
+        </ul>
+    </li>
+    <li>Add flowable-bom with all the Flowable artifacts
+    <li>Support for dynamic Kafka message key
+    <li>Add TaskCompletionBuilder to CmmnTaskService
+    <li>Add support for handling custom input parameters for error start and boundary events and for passing additional data in error end events
+    <li>Add ability to store completer of human and user tasks in a variable
+    <li>Support collection of string or json array as mail recipients in Mail Tasks
+    <li>Upgrade to Spring Boot 3.1
+    <li>Upgrade to Camel 4
+    <li>Upgrade to CXF 4
+    <li>Provide an abstraction for sending emails through a FlowableMailClient
+    <li>Use Jakarta Mail instead of Javax Mail and replace Apache Commons Email with Eclipse Angus Mail
+    <li>Remove message based executor
+    <li>Remove some Flowable deprecated code
+        <ul>
+            <li>CmmnRepositoryService#getDecisionTablesForCaseDefinition - use CmmnRepositoryService#getDecisionsForCaseDefinition instead.</li>
+            <li>RepositoryService#getDecisionTablesForProcessDefinition - use RepositoryService#getDecisionsForProcessDefinition instead.</li>
+            <li>HistoricCaseInstanceQuery#limitCaseVariables - no replacement it was a noop.</li>
+            <li>CaseInstanceQuery#limitCaseInstanceVariables - no replacement it was a noop.</li>
+            <li>HistoricProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>ProcessInstanceQuery#limitProcessInstanceVariables - no replacement it was a noop.</li>
+            <li>TaskInfoQuery#limitTaskVariables - no replacement it was a noop.</li>
+            <li>Removed query limit configurations from CmmnEngineConfiguration and ProcessEngineConfigurationImpl.</li>
+            <li>Removed HistoryManager#recordActivityEnd - no replacement, Flowable was never calling that method.</li>
+            <li>Removed org.flowable.engine.FlowableTaskAlreadyClaimedException - use org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException instead.</li>
+            <li>Removed org.flowable.engine.cfg.MailServerInfo - use org.flowable.common.engine.impl.cfg.mail.MailServerInfo instead.</li>
+            <li>Removed org.flowable.http.HttpRequest - use org.flowable.http.common.api.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.HttpResponse - use org.flowable.http.common.api.HttpResponse instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpRequestHandler - use org.flowable.http.common.api.delegate.HttpRequest instead.</li>
+            <li>Removed org.flowable.http.delegate.HttpResponseHandler - use org.flowable.http.common.api.delegate.HttpResponse instead.</li>
+            <li>Removed org.flowable.identitylink.service.IdentityLinkType - use org.flowable.identitylink.api.IdentityLinkType instead.</li>
+            <li>Removed ManagedAsyncJobExecutor - configure the thread factory in the engine configuration.</li>
+            <li>Removed org.flowable.spring.SpringCallerRunsRejectedJobsHandler - use org.flowable.spring.job.service.SpringCallerRunsRejectedJobsHandler instead.</li>
+            <li>Removed org.flowable.spring.SpringRejectedJobsHandler - use org.flowable.spring.job.service.SpringRejectedJobsHandler instead.</li>
+        </ul>
+    </li>
+    <li>Remove async history support. In case you were using async history, make sure that you have no async history jobs before starting the new version.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 7.0.0.M1</h3>
+
+<ul>
+	<li>This is the first milestone for version 7 of the Flowable Engines focusing on the Spring Boot 3, Spring 6 and Java 17 upgrade.</li>
+	<li>The plan forward is to keep maintaining the 6.x and 7.x versions for at least the next year, so we will do both 6.x and 7.x releases.</li>
+	<li>The REST application requires a servlet container / application server that supports Jakarta 9.</li>
+	<li>This release focuses on the main Flowable Engines and REST APIs for the BPMN, CMMN, DMN and event registry engines. This means that there
+	are no UI applications, no content and form engines and the modules for Mule and some others are removed.</li>
+</ul>
+
+
+<h3>Release Notes - Flowable - 6.8.0</h3>
+
+<ul>
+	<li>Added support for using scripts in task and execution listeners and HTTP request and response handlers.</li>
+	<li>Added support for new task and instance history levels to provide more options to reduce the amount of historic data stored.</li>
+	<li>Added support to throw BPMN errors in scripts.</li>
+	<li>Added support for headers in an event model that can be used with event registry events in case and process definitions.</li>
+	<li>Improved support for starting case and process instances with the unique feature enabled on event registry start events.
+	The event subscription for the event registry event is locked while starting the case and process instance to prevent any duplicate instances.</li>
+	<li>Added support for async leave in addition to the already long existing async (before) attribute for async tasks in BPMN and CMMN. 
+	An async job will be created to execute the leave of a task when the async leave attribute is set to true.</li>
+	<li>Improved support for parallel repeatable event listeners in case definitions.</li>
+	<li>Added interface to provide an implementation for non-matching events that are received in the event registry.</li>
+	<li>Added support to query directly on runtime variable instances both in the Java API and REST API.</li>
+	<li>Improved housekeeping logic to reduce the throughput time.</li>
+	<li>Added support for retries in Kafka channels in the event registry.</li>
+	<li>Expose topic, partitions and offset consumer record for inbound Kafka channel and provide custom partition support for outbound Kafka channel.</li>
+	<li>Added bulk support for deleting case and process instances, terminating case instances and moving deadletter jobs to executable.</li>
+	<li>Added activity instance REST API query support.</li>
+	<li>Fixed issue with event listeners in a repeatable stage in a case definition.</li>
+	<li>Fixed issue with having multiple event registry start events in a process definition.</li>
+	<li>Add dedicated task executor for the task invoker. This is fixing an issue with a potential deadlock when using the "true parallel" HTTP task feature.</li>
+	<li>Improved channel definition caching logic to prevent channels from getting unregistered when they should not.</li>
+	<li>Added support for providing an owner and assignee when starting a case or process instance.</li>
+	<li>Upgrade to Spring Boot 2.7.6.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.7.2</h3>
+
+<ul>
+	<li>Fixed issue with vulnerable Log4j dependency. The Flowable apps now use the default Spring Boot logging framework, which is Logback.</li>
+	<li>Added support to execute a decision service in the DMN REST API.</li>
+	<li>Added support to query tasks with case instance variables.</li>
+	<li>Fixed issue with migrating a process instance to a new process definition with a call activity and a new boundary event.</li>
+	<li>Upgraded to Spring boot 2.6.2.</li>
+</ul>
+
 <h3>Release Notes - Flowable - 6.7.1</h3>
 
 <ul>

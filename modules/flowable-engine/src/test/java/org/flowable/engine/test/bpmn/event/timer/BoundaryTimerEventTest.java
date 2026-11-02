@@ -16,8 +16,12 @@ package org.flowable.engine.test.bpmn.event.timer;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -74,6 +78,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
 
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         // After process start, there should be 3 timers created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("multipleTimersOnUserTask");
@@ -170,6 +175,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public void testExpressionOnTimer() {
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", "PT1H");
@@ -188,7 +194,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedStartEvent).isTrue();
         assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
@@ -204,6 +210,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public void testExpressionWithJavaDurationOnTimer() {
         // Set the clock fixed
         Date startTime = new Date();
+        processEngineConfiguration.getClock().setCurrentTime(startTime);
 
         HashMap<String, Object> variables = new HashMap<>();
         variables.put("duration", Duration.ofHours(1));
@@ -222,7 +229,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(jobQuery.count()).isZero();
 
         // start execution listener is not executed
-        assertThat(listenerExecutedStartEvent).isFalse();
+        assertThat(listenerExecutedStartEvent).isTrue();
         assertThat(listenerExecutedEndEvent).isTrue();
 
         // which means the process has ended
@@ -244,7 +251,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("testNullExpressionOnTimer", variables))
                 .as("Expected wrong due date exception")
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("Due date could not be determined for timer job null");
+                .hasMessageStartingWith("Due date could not be determined for timer job null for Execution[")
+                .hasMessageContainingAll(" - definition 'testNullExpressionOnTimer:1:", " - activity 'boundaryTimer'");
     }
     
     @Test
@@ -278,7 +286,8 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThatThrownBy(() -> runtimeService.startProcessInstanceByKey("test-timers", variables).getProcessInstanceId())
                 .as("Expected wrong due date exception")
                 .isInstanceOf(FlowableException.class)
-                .hasMessage("Due date could not be determined for timer job 0 0 0 1 1 ? 2000");
+                .hasMessageStartingWith("Due date could not be determined for timer job 0 0 0 1 1 ? 2000 for Execution[")
+                .hasMessageContainingAll(" - definition 'test-timers:1:", " - activity 'remind-reviewer-event'");
     }
 
     @Test
@@ -999,6 +1008,69 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertThat(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count()).isZero();
         
         processEngineConfiguration.getClock().reset();
+    }
+
+    @Test
+    @Deployment
+    public void testDateTypes() throws ParseException {
+        Date date = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss XXX").parse("30-01-2024 10:28:00 +01:00");
+        Instant instant = date.toInstant();
+        LocalDate localDate = LocalDate.of(2024, 1, 30);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 1, 30, 10, 2);
+        String dateString = "2024-01-30T10:28:00+01:00";
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testTimerEventDateTypes")
+                .variable("taskDate", date)
+                .variable("taskInstant", instant)
+                .variable("taskDateString", localDate)
+                .variable("taskLocalDateTime", localDateTime)
+                .variable("taskLocalDate", dateString)
+                .start();
+
+        List<Job> timers = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timers).hasSize(5);
+        timers.forEach(t -> managementService.moveTimerToExecutableJob(t.getId()));
+
+        List<Job> jobs = managementService.createJobQuery().list();
+        assertThat(jobs).hasSize(5);
+        jobs.forEach(j -> managementService.executeJob(j.getId()));
+
+        // There is one user task, on which 4 boundary timer events are attached, each timer event going to a task with a specific name.
+        // Each timer configuration uses a different type to test the date conversion.
+        // If the task exists, it means the date variable was parsed correctly
+
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("dateTask").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("instantTask").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("dateStringTask").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("localDateTask").singleResult()).isNotNull();
+        assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("localDateTimeTask").singleResult()).isNotNull();
+
+        // After the user task, there's a parallel gateway with 4 intermediary timer events,
+        // each again using a different type of date variable.
+
+        // The actual values don't matter, the important thing is that the date type is supported to be parsed
+        Map<String, Object> taskVariables = new HashMap<>();
+        taskVariables.put("eventDate", date);
+        taskVariables.put("eventInstant", instant);
+        taskVariables.put("eventDateString", dateString);
+        taskVariables.put("eventLocalDate", localDate);
+        taskVariables.put("eventLocalDateTime", localDateTime);
+        taskService.complete(taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskName("User task").singleResult().getId(), taskVariables); // this is the task with the boundary events
+
+        timers = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(timers).hasSize(5);
+        timers.forEach(t -> managementService.moveTimerToExecutableJob(t.getId()));
+
+        jobs = managementService.createJobQuery().list();
+        assertThat(jobs).hasSize(5);
+        jobs.forEach(j -> managementService.executeJob(j.getId()));
+
+        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        assertThat(tasks.stream().filter(t -> t.getName().startsWith("event"))).extracting(Task::getName).containsExactlyInAnyOrder(
+                "eventDate", "eventInstant", "eventDateString", "eventLocalDate", "eventLocalDateTime"
+        );
+
     }
 
 }

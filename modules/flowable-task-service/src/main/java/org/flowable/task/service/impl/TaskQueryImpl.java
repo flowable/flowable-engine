@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -37,6 +38,7 @@ import org.flowable.task.service.impl.util.TaskVariableUtils;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -51,6 +53,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected IdmIdentityService idmIdentityService;
+    protected VariableServiceConfiguration variableServiceConfiguration;
 
     protected String taskId;
     protected Collection<String> taskIds;
@@ -93,14 +96,29 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String executionId;
     protected String scopeId;
     protected String subScopeId;
+    protected Set<String> scopeIds;
+    protected List<List<String>> safeScopeIds;
     protected String scopeType;
     protected String scopeDefinitionId;
     protected String propagatedStageInstanceId;
     protected String processInstanceIdWithChildren;
     protected String caseInstanceIdWithChildren;
+    protected String state;
     protected Date createTime;
     protected Date createTimeBefore;
     protected Date createTimeAfter;
+    protected Date inProgressStartTime;
+    protected Date inProgressStartTimeBefore;
+    protected Date inProgressStartTimeAfter;
+    protected String inProgressStartedBy;
+    protected Date claimTime;
+    protected Date claimTimeBefore;
+    protected Date claimTimeAfter;
+    protected String claimedBy;
+    protected Date suspendedTime;
+    protected Date suspendedTimeBefore;
+    protected Date suspendedTimeAfter;
+    protected String suspendedBy;
     protected String category;
     protected Collection<String> categoryInList;
     protected Collection<String> categoryNotInList;
@@ -131,7 +149,13 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String caseDefinitionKey;
     protected String caseDefinitionKeyLike;
     protected String caseDefinitionKeyLikeIgnoreCase;
+    protected String rootScopeId;
+    protected String parentScopeId;
     protected Collection<String> caseDefinitionKeys;
+    protected Date inProgressStartDueDate;
+    protected Date inProgressStartDueBefore;
+    protected Date inProgressStartDueAfter;
+    protected boolean withoutInProgressStartDueDate;
     protected Date dueDate;
     protected Date dueBefore;
     protected Date dueAfter;
@@ -141,6 +165,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected boolean includeTaskLocalVariables;
     protected boolean includeProcessVariables;
     protected boolean includeCaseVariables;
+    protected boolean excludeVariableInitialization;
     protected boolean includeIdentityLinks;
     protected String userIdForCandidateAndAssignee;
     protected boolean bothCandidateAndAssigned;
@@ -159,6 +184,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandContext, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -167,6 +193,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandExecutor, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
     }
@@ -175,6 +202,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             VariableServiceConfiguration variableServiceConfiguration, IdmIdentityService idmIdentityService) {
         
         super(commandExecutor, variableServiceConfiguration);
+        this.variableServiceConfiguration = variableServiceConfiguration;
         this.databaseType = databaseType;
         this.taskServiceConfiguration = taskServiceConfiguration;
         this.idmIdentityService = idmIdentityService;
@@ -885,6 +913,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
+    public TaskQueryImpl scopeIds(Set<String> scopeIds) {
+        if (orActive) {
+            currentOrQueryObject.scopeIds = scopeIds;
+        } else {
+            this.scopeIds = scopeIds;
+        }
+        return this;
+    }
+
+    @Override
     public TaskQueryImpl subScopeId(String subScopeId) {
         if (orActive) {
             currentOrQueryObject.subScopeId = subScopeId;
@@ -923,6 +961,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    @Override
+    public TaskQuery taskState(String state) {
+        if (orActive) {
+            currentOrQueryObject.state = state;
+        } else {
+            this.state = state;
+        }
+        return this;
+    }
 
     @Override
     public TaskQueryImpl taskCreatedOn(Date createTime) {
@@ -950,6 +998,126 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.createTimeAfter = after;
         } else {
             this.createTimeAfter = after;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl taskInProgressStartTimeOn(Date inProgressStartTime) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartTime = inProgressStartTime;
+        } else {
+            this.inProgressStartTime = inProgressStartTime;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskInProgressStartTimeBefore(Date before) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartTimeBefore = before;
+        } else {
+            this.inProgressStartTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskInProgressStartTimeAfter(Date after) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartTimeAfter = after;
+        } else {
+            this.inProgressStartTimeAfter = after;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskInProgressStartedBy(String startedBy) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartedBy = startedBy;
+        } else {
+            this.inProgressStartedBy = startedBy;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl taskClaimedOn(Date claimTime) {
+        if (orActive) {
+            currentOrQueryObject.claimTime = claimTime;
+        } else {
+            this.claimTime = claimTime;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskClaimedBefore(Date before) {
+        if (orActive) {
+            currentOrQueryObject.claimTimeBefore = before;
+        } else {
+            this.claimTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskClaimedAfter(Date after) {
+        if (orActive) {
+            currentOrQueryObject.claimTimeAfter = after;
+        } else {
+            this.claimTimeAfter = after;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskClaimedBy(String claimedBy) {
+        if (orActive) {
+            currentOrQueryObject.claimedBy = claimedBy;
+        } else {
+            this.claimedBy = claimedBy;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl taskSuspendedOn(Date suspendedTime) {
+        if (orActive) {
+            currentOrQueryObject.suspendedTime = suspendedTime;
+        } else {
+            this.suspendedTime = suspendedTime;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskSuspendedBefore(Date before) {
+        if (orActive) {
+            currentOrQueryObject.suspendedTimeBefore = before;
+        } else {
+            this.suspendedTimeBefore = before;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskSuspendedAfter(Date after) {
+        if (orActive) {
+            currentOrQueryObject.suspendedTimeAfter = after;
+        } else {
+            this.suspendedTimeAfter = after;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskSuspendedBy(String suspendedBy) {
+        if (orActive) {
+            currentOrQueryObject.suspendedBy = suspendedBy;
+        } else {
+            this.suspendedBy = suspendedBy;
         }
         return this;
     }
@@ -1370,7 +1538,6 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
         } else {
             this.scopedVariableValueNotEquals(variableName, variableValue, ScopeTypes.CMMN);
-            ;
         }
         return this;
     }
@@ -1461,6 +1628,32 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.scopedVariableNotExists(name, ScopeTypes.CMMN);
         } else {
             this.scopedVariableNotExists(name, ScopeTypes.CMMN);
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskRootScopeId(String rootScopeId) {
+        if (rootScopeId == null) {
+            throw new FlowableIllegalArgumentException("Task parentScopeId is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.rootScopeId = rootScopeId;
+        } else {
+            this.rootScopeId = rootScopeId;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery taskParentScopeId(String parentScopeId) {
+        if (parentScopeId == null) {
+            throw new FlowableIllegalArgumentException("Task parentScopeId is null");
+        }
+        if (orActive) {
+            currentOrQueryObject.parentScopeId = parentScopeId;
+        } else {
+            this.parentScopeId = parentScopeId;
         }
         return this;
     }
@@ -1690,6 +1883,52 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public TaskQuery withoutTaskDueDate() {
         return withoutDueDate();
     }
+    
+    @Override
+    public TaskQuery taskInProgressStartDueDate(Date dueDate) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartDueDate = dueDate;
+            currentOrQueryObject.withoutInProgressStartDueDate = false;
+        } else {
+            this.inProgressStartDueDate = dueDate;
+            this.withoutInProgressStartDueDate = false;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskInProgressStartDueBefore(Date dueBefore) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartDueBefore = dueBefore;
+            currentOrQueryObject.withoutDueDate = false;
+        } else {
+            this.inProgressStartDueBefore = dueBefore;
+            this.withoutDueDate = false;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskInProgressStartDueAfter(Date dueAfter) {
+        if (orActive) {
+            currentOrQueryObject.inProgressStartDueAfter = dueAfter;
+            currentOrQueryObject.withoutDueDate = false;
+        } else {
+            this.inProgressStartDueAfter = dueAfter;
+            this.withoutDueDate = false;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery withoutTaskInProgressStartDueDate() {
+        if (orActive) {
+            currentOrQueryObject.withoutInProgressStartDueDate = true;
+        } else {
+            this.withoutInProgressStartDueDate = true;
+        }
+        return this;
+    }
 
     @Override
     public TaskQuery excludeSubtasks() {
@@ -1752,7 +1991,23 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
 
     @Override
-    public TaskQuery limitTaskVariables(Integer taskVariablesLimit) {
+    public TaskQuery includeTaskLocalVariables(boolean excludeVariableInitialization) {
+        includeTaskLocalVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public TaskQuery includeProcessVariables(boolean excludeVariableInitialization) {
+        includeProcessVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
+        return this;
+    }
+
+    @Override
+    public TaskQuery includeCaseVariables(boolean excludeVariableInitialization) {
+        includeCaseVariables();
+        this.excludeVariableInitialization = excludeVariableInitialization;
         return this;
     }
 
@@ -1802,7 +2057,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     @Override
     protected void ensureVariablesInitialized() {
         for (QueryVariableValue var : queryVariableValues) {
-            var.initialize(variableServiceConfiguration);
+            var.initialize(variableValueProvider);
         }
 
         for (TaskQueryImpl orQueryObject : orQueryObjects) {
@@ -1938,16 +2193,19 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         if (includeTaskLocalVariables || includeProcessVariables || includeIdentityLinks || includeCaseVariables) {
-            tasks = taskServiceConfiguration.getTaskEntityManager()
-                    .findTasksWithRelatedEntitiesByQueryCriteria(this);
+            tasks = VariableInitializingList.executeQueryIncludingVariables(commandContext, excludeVariableInitialization, () -> {
+                List<Task> tasksWithRelatedEntities = taskServiceConfiguration.getTaskEntityManager()
+                        .findTasksWithRelatedEntitiesByQueryCriteria(this);
 
-            if (taskId != null) {
-                if (includeProcessVariables|| includeCaseVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, false);
-                } else if (includeTaskLocalVariables) {
-                    addCachedVariableForQueryById(commandContext, tasks, true);
+                if (taskId != null) {
+                    if (includeProcessVariables || includeCaseVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, false);
+                    } else if (includeTaskLocalVariables) {
+                        addCachedVariableForQueryById(commandContext, tasksWithRelatedEntities, true);
+                    }
                 }
-            }
+                return tasksWithRelatedEntities;
+            });
 
         } else {
             tasks = taskServiceConfiguration.getTaskEntityManager()
@@ -2094,6 +2352,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     public String getScopeId() {
         return scopeId;
     }
+
+    public Set<String> getScopeIds() {
+        return scopeIds;
+    }
     
     public boolean isWithoutScopeId() {
         return withoutScopeId;
@@ -2117,6 +2379,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public Collection<String> getTaskIds() {
+        return taskIds;
     }
 
     @Override
@@ -2344,6 +2610,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return includeCaseVariables;
     }
 
+    public boolean isExcludeVariableInitialization() {
+        return excludeVariableInitialization;
+    }
+
     public boolean isIncludeIdentityLinks() {
         return includeIdentityLinks;
     }
@@ -2448,5 +2718,13 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public void setSafeInvolvedGroups(List<List<String>> safeInvolvedGroups) {
         this.safeInvolvedGroups = safeInvolvedGroups;
+    }
+
+    public List<List<String>> getSafeScopeIds() {
+        return safeScopeIds;
+    }
+
+    public void setSafeScopeIds(List<List<String>> safeScopeIds) {
+        this.safeScopeIds = safeScopeIds;
     }
 }

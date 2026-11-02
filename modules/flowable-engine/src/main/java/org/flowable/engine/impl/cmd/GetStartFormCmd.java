@@ -52,7 +52,7 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
         FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
         StartFormHandler startFormHandler = formHandlerHelper.getStartFormHandler(commandContext, processDefinition);
         if (startFormHandler == null) {
-            throw new FlowableException("No startFormHandler defined in process '" + processDefinitionId + "'");
+            throw new FlowableException("No startFormHandler defined in process definition '" + processDefinitionId + "'");
         }
 
         return startFormHandler.createStartFormData(processDefinition);

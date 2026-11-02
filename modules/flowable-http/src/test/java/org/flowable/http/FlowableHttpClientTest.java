@@ -1,0 +1,504 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.flowable.http;
+
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+import org.flowable.common.engine.api.FlowableIllegalArgumentException;
+import org.flowable.http.bpmn.HttpServiceTaskTestServer;
+import org.flowable.http.common.api.HttpHeaders;
+import org.flowable.http.common.api.HttpRequest;
+import org.flowable.http.common.api.HttpResponse;
+import org.flowable.http.common.api.MultiValuePart;
+import org.flowable.http.common.api.client.FlowableHttpClient;
+import org.flowable.http.common.impl.HttpClientConfig;
+import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.apache.client5.ApacheHttpComponents5FlowableHttpClient;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.springframework.core.io.ClassPathResource;
+
+import net.javacrumbs.jsonunit.core.Option;
+
+/**
+ * @author Filip Hrisafov
+ */
+class FlowableHttpClientTest {
+
+    @BeforeEach
+    void setUp() {
+        HttpServiceTaskTestServer.setUp();
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void simpleGet(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/test");
+        request.setMethod("GET");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .isEqualTo("{"
+                        + "  name: {"
+                        + "    firstName: 'John',"
+                        + "    lastName: 'Doe'"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void getImage(FlowableHttpClient httpClient) throws IOException {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/resource?resource=org/flowable/http/images/flowable-logo.png");
+        request.setMethod("GET");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        byte[] imageBytes;
+        try (InputStream stream = new ClassPathResource("org/flowable/http/images/flowable-logo.png").getInputStream()) {
+            imageBytes = IOUtils.toByteArray(stream);
+        }
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(imageBytes);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postBinaryBody(FlowableHttpClient httpClient) {
+        // Bytes spanning the full 0-255 range would be corrupted if sent through the textual body.
+        byte[] content = new byte[1024];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = (byte) i;
+        }
+
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/binary");
+        request.setMethod("POST");
+        request.setBodyBytes(content);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Type", "application/pdf");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(content);
+        // The caller-supplied Content-Type header wins over the application/octet-stream default, exactly once.
+        assertThat(response.getHttpHeaders().get("Content-Type")).containsExactly("application/pdf");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void putBinaryBodyWithoutContentTypeDefaultsToOctetStream(FlowableHttpClient httpClient) {
+        byte[] content = { 0, 1, 2, 3, (byte) 200, (byte) 255 };
+
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/binary");
+        request.setMethod("PUT");
+        request.setBodyBytes(content);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getBodyBytes()).isEqualTo(content);
+        assertThat(response.getHttpHeaders().get("Content-Type")).containsExactly("application/octet-stream");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void getWithAllParameters(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test?testArg=testValue");
+        request.setMethod("GET");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test Value");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  args: {"
+                        + "    testArg: [ 'testValue' ]"
+                        + "  },"
+                        + "  headers: {"
+                        + "    X-Test: [ 'Test Value' ]"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithAllParameters(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test?testArg=testPostValue");
+        request.setMethod("POST");
+        request.setBody("{ body: 'kermit' }");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test Post Value");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  body: \"{ body: 'kermit' }\","
+                        + "  args: {"
+                        + "    testArg: [ 'testPostValue' ]"
+                        + "  },"
+                        + "  headers: {"
+                        + "    X-Test: [ 'Test Post Value' ]"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithMultiPart(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartValue");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        request.addMultiValuePart(MultiValuePart.fromFile("document", "kermit document".getBytes(StandardCharsets.UTF_8), "kermit.txt"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Value");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test-multi',"
+                        + "  args: {"
+                        + "    testArg: [ 'testMultiPartValue' ]"
+                        + "  },"
+                        + "  headers: {"
+                        + "    X-Test: [ 'Test MultiPart Value' ]"
+                        + "  },"
+                        + "  parts: {"
+                        + "    name: ["
+                        + "      {"
+                        + "        content: 'kermit'"
+                        + "      }"
+                        + "    ],"
+                        + "    document: ["
+                        + "      {"
+                        + "        content: 'kermit document',"
+                        + "        filename: 'kermit.txt'"
+                        + "      }"
+                        + "    ]"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithMultiPartWithMimeType(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartValueWithMimeType");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromFile("document", "kermit;gonzo".getBytes(StandardCharsets.UTF_8), "kermit.csv", "text/csv"));
+        request.addMultiValuePart(MultiValuePart.fromFile("myJson", "{'value':'kermit'}".getBytes(StandardCharsets.UTF_8), "kermit.json", "application/json"));
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Value With MimeType");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test-multi',"
+                        + "  args: {"
+                        + "    testArg: [ 'testMultiPartValueWithMimeType' ]"
+                        + "  },"
+                        + "  headers: {"
+                        + "    X-Test: [ 'Test MultiPart Value With MimeType' ]"
+                        + "  },"
+                        + "  parts: {"
+                        + "    myJson: ["
+                        + "      {"
+                        + "        content: \"{'value':'kermit'}\","
+                        + "        filename: 'kermit.json',"
+                        + "        contentType: 'application/json'"
+                        + "      }"
+                        + "    ],"
+                        + "    document: ["
+                        + "      {"
+                        + "        content: 'kermit;gonzo',"
+                        + "        filename: 'kermit.csv',"
+                        + "        contentType: 'text/csv'"
+                        + "      }"
+                        + "    ]"
+                        + "  }"
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithMultiPartTextWithMimeType(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartTextWithMimeType");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        request.addMultiValuePart(MultiValuePart.fromText("jsonData", "{\"value\":\"kermit\"}", "application/json"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Text With MimeType");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          args: {
+                            testArg: [ 'testMultiPartTextWithMimeType' ]
+                          },
+                          headers: {
+                            X-Test: [ 'Test MultiPart Text With MimeType' ]
+                          },
+                          parts: {
+                            name: [
+                              {
+                                content: 'kermit'
+                              }
+                            ],
+                            jsonData: [
+                              {
+                                content: '{"value":"kermit"}',
+                                contentType: 'application/json'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void postWithFormParameters(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-form?queryArg=testFormParameters");
+        request.setMethod("POST");
+        request.addFormParameter("name", "kermit");
+        request.addFormParameter("name", "fozzie");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test Form Parameters Value");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-form',
+                          args: {
+                            queryArg: [ 'testFormParameters' ],
+                            name: [ 'kermit', 'fozzie' ]
+                          },
+                          headers: {
+                            X-Test: [ 'Test Form Parameters Value' ],
+                            Content-Type: [ 'application/x-www-form-urlencoded' ]
+                          }
+                        }
+                        """);
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void deleteWithoutBody(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test");
+        request.setMethod("DELETE");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  body: \"\""
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void deleteWithBody(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test");
+        request.setMethod("DELETE");
+        request.setBody("{ body: 'kermit' }");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  url: 'http://localhost:9798/api/test',"
+                        + "  body: \"{ body: 'kermit' }\""
+                        + "}");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Content-Type"))
+                .containsExactly("application/json");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void simpleHead(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/test");
+        request.setMethod("HEAD");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getBody()).isNull();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(FlowableHttpClientArgumentProvider.class)
+    void simpleOptions(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/test");
+        request.setMethod("OPTIONS");
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.getHttpHeaders().get("Allow"))
+                .first()
+                .isEqualTo("GET, HEAD, TRACE, OPTIONS");
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(BrowserCompatibleApacheHttpClientArgumentProvider.class)
+    void postWithMultiPartTextWithMimeTypeWithBrowserCompatibleMode(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartTextBrowserCompat");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromText("name", "kermit"));
+        request.addMultiValuePart(MultiValuePart.fromText("jsonData", "{\"value\":\"kermit\"}", "application/json"));
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("X-Test", "Test MultiPart Text Browser Compatible");
+        request.setHttpHeaders(httpHeaders);
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        // In BROWSER_COMPATIBLE mode, Content-Type headers are not written for text parts (parts without a filename),
+        // so the mime type set on the text part is not sent to the server
+        assertThatJson(response.getBody())
+                .whenIgnoringPaths("args", "code", "delay", "headers", "origin")
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          parts: {
+                            name: [
+                              {
+                                content: 'kermit'
+                              }
+                            ],
+                            jsonData: [
+                              {
+                                content: '{"value":"kermit"}'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @ParameterizedTest
+    @ArgumentsSource(BrowserCompatibleApacheHttpClientArgumentProvider.class)
+    void postWithMultiPartFileMimeTypeWithBrowserCompatibleMode(FlowableHttpClient httpClient) {
+        HttpRequest request = new HttpRequest();
+        request.setUrl("http://localhost:9798/api/test-multi?testArg=testMultiPartFileBrowserCompat");
+        request.setMethod("POST");
+        request.addMultiValuePart(MultiValuePart.fromFile("document", "kermit;gonzo".getBytes(StandardCharsets.UTF_8), "kermit.csv", "text/csv"));
+        request.addMultiValuePart(MultiValuePart.fromFile("myJson", "{'value':'kermit'}".getBytes(StandardCharsets.UTF_8), "kermit.json", "application/json"));
+        HttpResponse response = httpClient.prepareRequest(request).call();
+
+        // In BROWSER_COMPATIBLE mode, Content-Type headers are still written for file parts (parts with a filename)
+        assertThatJson(response.getBody())
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("""
+                        {
+                          url: 'http://localhost:9798/api/test-multi',
+                          parts: {
+                            document: [
+                              {
+                                content: 'kermit;gonzo',
+                                filename: 'kermit.csv',
+                                contentType: 'text/csv'
+                              }
+                            ],
+                            myJson: [
+                              {
+                                content: "{'value':'kermit'}",
+                                filename: 'kermit.json',
+                                contentType: 'application/json'
+                              }
+                            ]
+                          }
+                        }""");
+        assertThat(response.getStatusCode()).isEqualTo(200);
+    }
+
+    @Test
+    void invalidMultipartModeForApacheHttpComponents() {
+        HttpClientConfig config = new HttpClientConfig();
+        config.setMultipartMode("INVALID");
+
+        assertThatThrownBy(() -> new ApacheHttpComponentsFlowableHttpClient(config))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Unsupported multipart mode: INVALID");
+    }
+
+    @Test
+    void invalidMultipartModeForApacheHttpComponents5() {
+        HttpClientConfig config = new HttpClientConfig();
+        config.setMultipartMode("INVALID");
+
+        assertThatThrownBy(() -> new ApacheHttpComponents5FlowableHttpClient(config))
+                .isInstanceOf(FlowableIllegalArgumentException.class)
+                .hasMessageContaining("Unsupported multipart mode: INVALID");
+    }
+
+}

@@ -18,6 +18,7 @@ import java.util.Objects;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.http.common.api.client.FlowableHttpClient;
 import org.flowable.http.common.impl.apache.ApacheHttpComponentsFlowableHttpClient;
+import org.flowable.http.common.impl.apache.client5.ApacheHttpComponents5FlowableHttpClient;
 import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttpClient;
 
 /**
@@ -26,6 +27,7 @@ import org.flowable.http.common.impl.spring.reactive.SpringWebClientFlowableHttp
 public class HttpClientConfig {
 
     protected static final boolean isApacheHttpComponentsPresent;
+    protected static final boolean isApacheHttpComponents5Present;
     protected static final boolean isSpringWebClientPresent;
     protected static final boolean isReactorHttpClientPresent;
 
@@ -39,6 +41,15 @@ public class HttpClientConfig {
         }
 
         isApacheHttpComponentsPresent = httpClientBuilderPresent;
+
+        boolean httpClient5BuilderPresent = false;
+        try {
+            Class.forName("org.apache.hc.client5.http.impl.async.HttpAsyncClientBuilder", false, loader);
+            httpClient5BuilderPresent = true;
+        } catch (ClassNotFoundException e) {
+        }
+
+        isApacheHttpComponents5Present = httpClient5BuilderPresent;
 
         boolean springWebClientBuilderPresent = false;
         try {
@@ -81,7 +92,24 @@ public class HttpClientConfig {
 
     protected boolean useSystemProperties = false;
 
+    /**
+     * The multipart mode to use when building multipart/form-data requests with the Apache HTTP client implementations.
+     * <p>
+     * Supported values:
+     * <ul>
+     *     <li>{@code "STRICT"} - RFC 2046 compliant. Always writes Content-Type headers for all parts,
+     *     including text parts. This is the default and is needed for text parts with a custom mime type to work correctly.</li>
+     *     <li>{@code "BROWSER_COMPATIBLE"} - Mimics browser behavior. Only writes Content-Type headers for parts with a filename.
+     *     This was the default before 8.0. Note that text parts with a custom mime type will not have their Content-Type sent
+     *     in this mode.</li>
+     * </ul>
+     * <p>
+     * This setting has no effect on the Spring WebClient implementation.
+     */
+    protected String multipartMode = "STRICT";
+
     protected FlowableHttpClient httpClient;
+    protected Runnable closeRunnable;
 
     /**
      * How the Http Task should perform the HTTP requests in case no parallelInSameTransaction is defined in the XML.
@@ -136,6 +164,14 @@ public class HttpClientConfig {
         return useSystemProperties;
     }
 
+    public String getMultipartMode() {
+        return multipartMode;
+    }
+
+    public void setMultipartMode(String multipartMode) {
+        this.multipartMode = multipartMode;
+    }
+
     public void merge(HttpClientConfig other) {
         if (this.connectTimeout != other.getConnectTimeout()) {
             setConnectTimeout(other.getConnectTimeout());
@@ -159,6 +195,10 @@ public class HttpClientConfig {
 
         if (this.useSystemProperties != other.isUseSystemProperties()) {
             setUseSystemProperties(other.isUseSystemProperties());
+        }
+
+        if (!Objects.equals(this.multipartMode, other.getMultipartMode())) {
+            setMultipartMode(other.getMultipartMode());
         }
 
         if (!Objects.equals(this.httpClient, other.getHttpClient())) {
@@ -188,6 +228,7 @@ public class HttpClientConfig {
 
     public void setHttpClient(FlowableHttpClient httpClient) {
         this.httpClient = httpClient;
+        this.closeRunnable = null;
     }
 
     public FlowableHttpClient determineHttpClient() {
@@ -200,7 +241,13 @@ public class HttpClientConfig {
         } else if (isSpringWebClientPresent && isReactorHttpClientPresent) {
             this.httpClient = new SpringWebClientFlowableHttpClient(this);
             return httpClient;
-        } else {
+        } else if (isApacheHttpComponents5Present) {
+            ApacheHttpComponents5FlowableHttpClient httpClient = new ApacheHttpComponents5FlowableHttpClient(this);
+            this.httpClient = httpClient;
+            this.closeRunnable = httpClient::close;
+            return this.httpClient;
+        }
+        else {
             throw new FlowableException("Failed to determine FlowableHttpClient");
         }
     }
@@ -211,5 +258,11 @@ public class HttpClientConfig {
 
     public void setDefaultParallelInSameTransaction(boolean defaultParallelInSameTransaction) {
         this.defaultParallelInSameTransaction = defaultParallelInSameTransaction;
+    }
+
+    public void close() {
+        if (closeRunnable != null) {
+            closeRunnable.run();
+        }
     }
 }

@@ -35,6 +35,13 @@
     <receiveTask id="wait" name="Wait"></receiveTask>
     <sequenceFlow id="sid-62E5CF14-207F-40C8-B00D-8571FEBA3947" sourceRef="wait" targetRef="theEnd"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="httpGet" targetRef="wait"></sequenceFlow>
+    <boundaryEvent id="intermediateErrorEventBoundary1" attachedToRef="httpGet">
+      <errorEventDefinition errorRef="HTTP500"></errorEventDefinition>
+    </boundaryEvent>
+    <receiveTask id="waitAfterError" name="Wait after error">
+    </receiveTask>
+    <sequenceFlow id="sequenceFlow4" sourceRef="waitAfterError" targetRef="theEnd"></sequenceFlow>
+    <sequenceFlow id="sequenceFlow5" sourceRef="intermediateErrorEventBoundary1" targetRef="waitAfterError"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_testHttpGet5XX">
     <bpmndi:BPMNPlane bpmnElement="testHttpGet5XX" id="BPMNPlane_testHttpGet5XX">
@@ -50,17 +57,37 @@
       <bpmndi:BPMNShape bpmnElement="wait" id="BPMNShape_wait">
         <omgdc:Bounds height="57.0" width="97.0" x="375.0" y="165.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="129.99960332152105" y="194.8909119758435"></omgdi:waypoint>
-        <omgdi:waypoint x="200.0" y="194.38181818181818"></omgdi:waypoint>
+      <bpmndi:BPMNShape bpmnElement="intermediateErrorEventBoundary1" id="BPMNShape_intermediateErrorEventBoundary1">
+        <omgdc:Bounds height="30.0" width="30.0" x="237.0" y="206.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="waitAfterError" id="BPMNShape_waitAfterError">
+        <omgdc:Bounds height="80.0" width="100.0" x="202.0" y="286.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow5" id="BPMNEdge_sequenceFlow5" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0"
+                       flowable:targetDockerX="50.0" flowable:targetDockerY="40.0">
+        <omgdi:waypoint x="252.0" y="236.44999832698454"></omgdi:waypoint>
+        <omgdi:waypoint x="252.0" y="286.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="305.0" y="193.78739774844092"></omgdi:waypoint>
-        <omgdi:waypoint x="375.0" y="193.50392807969547"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1" flowable:sourceDockerX="15.0" flowable:sourceDockerY="15.0" flowable:targetDockerX="52.5"
+                       flowable:targetDockerY="27.5">
+        <omgdi:waypoint x="129.94961290196528" y="194.89091191558282"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="194.38145454545455"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="sid-62E5CF14-207F-40C8-B00D-8571FEBA3947" id="BPMNEdge_sid-62E5CF14-207F-40C8-B00D-8571FEBA3947">
-        <omgdi:waypoint x="472.0" y="193.68582375478928"></omgdi:waypoint>
-        <omgdi:waypoint x="540.0001027571958" y="193.94636054696244"></omgdi:waypoint>
+      <bpmndi:BPMNEdge bpmnElement="sequenceFlow4" id="BPMNEdge_sequenceFlow4" flowable:sourceDockerX="50.0" flowable:sourceDockerY="40.0"
+                       flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="301.9499999999418" y="326.0"></omgdi:waypoint>
+        <omgdi:waypoint x="554.0" y="326.0"></omgdi:waypoint>
+        <omgdi:waypoint x="554.0" y="207.9499297999798"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2" flowable:sourceDockerX="52.5" flowable:sourceDockerY="27.5" flowable:targetDockerX="48.5"
+                       flowable:targetDockerY="28.5">
+        <omgdi:waypoint x="304.94999999998447" y="193.84649122807016"></omgdi:waypoint>
+        <omgdi:waypoint x="374.9999999999962" y="193.64166666666668"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-62E5CF14-207F-40C8-B00D-8571FEBA3947" id="BPMNEdge_sid-62E5CF14-207F-40C8-B00D-8571FEBA3947"
+                       flowable:sourceDockerX="48.5" flowable:sourceDockerY="28.5" flowable:targetDockerX="14.0" flowable:targetDockerY="14.0">
+        <omgdi:waypoint x="471.95000000000005" y="193.68563218390807"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0000029529443" y="193.94636053883505"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

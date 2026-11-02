@@ -15,6 +15,8 @@ package org.flowable.entitylink.api.history;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.entitylink.api.InternalEntityLinkQuery;
+
 /**
  * Service which provides access to historic entity links.
  * 
@@ -24,15 +26,35 @@ public interface HistoricEntityLinkService {
     
     HistoricEntityLink getHistoricEntityLink(String id);
     
-    List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
+    default List<HistoricEntityLink> findHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType, String linkType) {
+        return createInternalHistoricEntityLinkQuery()
+                .scopeId(scopeId)
+                .scopeType(scopeType)
+                .linkType(linkType)
+                .list();
+    }
 
     List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdAndScopeType(String scopeId, String scopeType, String linkType);
     
     List<HistoricEntityLink> findHistoricEntityLinksWithSameRootScopeForScopeIdsAndScopeType(Collection<String> scopeIds, String scopeType, String linkType);
 
-    List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType);
+    default List<HistoricEntityLink> findHistoricEntityLinksByReferenceScopeIdAndType(String referenceScopeId, String scopeType, String linkType) {
+        return createInternalHistoricEntityLinkQuery()
+                .referenceScopeId(referenceScopeId)
+                .referenceScopeType(scopeType)
+                .linkType(linkType)
+                .list();
+    }
 
-    List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType);
+    default List<HistoricEntityLink> findHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType, String linkType) {
+        return createInternalHistoricEntityLinkQuery()
+                .scopeDefinitionId(scopeDefinitionId)
+                .scopeType(scopeType)
+                .linkType(linkType)
+                .list();
+    }
+
+    InternalEntityLinkQuery<HistoricEntityLink> createInternalHistoricEntityLinkQuery();
 
     HistoricEntityLink createHistoricEntityLink();
     
@@ -44,9 +66,22 @@ public interface HistoricEntityLinkService {
     
     void deleteHistoricEntityLinksByScopeIdAndScopeType(String scopeId, String scopeType);
     
+    /**
+     * Delete every historic entity link where the given id appears as either the scope id
+     * (with the given scope type) or the reference scope id (with the given reference scope type).
+     * Used when an entity is removed from history to ensure no orphan rows are left pointing at it
+     * from either direction.
+     */
+    void deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String id, String scopeType);
+
     void deleteHistoricEntityLinksByScopeDefinitionIdAndScopeType(String scopeDefinitionId, String scopeType);
     
     void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIds(String scopeType, Collection<String> scopeIds);
+
+    /**
+     * Bulk variant of {@link #deleteHistoricEntityLinksByScopeIdOrReferenceScopeIdAndScopeType(String, String)}.
+     */
+    void bulkDeleteHistoricEntityLinksForScopeTypeAndScopeIdsOrReferenceScopeIds(String scopeType, Collection<String> ids);
     
     void deleteHistoricEntityLinksForNonExistingProcessInstances();
     

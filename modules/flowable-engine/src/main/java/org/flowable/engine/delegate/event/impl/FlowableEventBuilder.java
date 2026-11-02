@@ -233,8 +233,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -255,8 +254,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -283,8 +281,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
 
-        if (flowElement instanceof FlowNode) {
-            FlowNode flowNode = (FlowNode) flowElement;
+        if (flowElement instanceof FlowNode flowNode) {
             newEvent.setActivityType(parseActivityType(flowNode));
             Object behaviour = flowNode.getBehavior();
             if (behaviour != null) {
@@ -368,7 +365,7 @@ public class FlowableEventBuilder {
         return newEvent;
     }
     
-    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression,
+    public static FlowableConditionalEvent createConditionalEvent(FlowableEngineEventType type, String activityId, String conditionExpression, String conditionLanguage,
                     String executionId, String processInstanceId, String processDefinitionId) {
         
         FlowableConditionalEventImpl newEvent = new FlowableConditionalEventImpl(type);
@@ -377,6 +374,7 @@ public class FlowableEventBuilder {
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
         newEvent.setConditionExpression(conditionExpression);
+        newEvent.setConditionLanguage(conditionLanguage);
         return newEvent;
     }
     
@@ -405,7 +403,7 @@ public class FlowableEventBuilder {
     }
 
     public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, String executionId,
-            String processInstanceId, String processDefinitionId) {
+            String processInstanceId, String processDefinitionId, String variableInstanceId) {
         FlowableVariableEventImpl newEvent = new FlowableVariableEventImpl(type);
         newEvent.setVariableName(variableName);
         newEvent.setVariableValue(variableValue);
@@ -414,7 +412,12 @@ public class FlowableEventBuilder {
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setVariableInstanceId(variableInstanceId);
         return newEvent;
+    }
+
+    public static FlowableEntityEvent createProcessBusinessStatusUpdatedEvent(ExecutionEntity execution, String oldBusinessStatus, String newBusinessStatus) {
+        return new FlowableProcessBusinessStatusUpdatedEventImpl(execution, oldBusinessStatus, newBusinessStatus);
     }
 
     protected static void populateEventWithCurrentContext(FlowableEngineEventImpl event) {
@@ -430,8 +433,7 @@ public class FlowableEventBuilder {
                 event.setProcessInstanceId(((DelegateExecution) persistedObject).getProcessInstanceId());
                 event.setProcessDefinitionId(((DelegateExecution) persistedObject).getProcessDefinitionId());
                 
-            } else if (persistedObject instanceof IdentityLinkEntity) {
-                IdentityLinkEntity idLink = (IdentityLinkEntity) persistedObject;
+            } else if (persistedObject instanceof IdentityLinkEntity idLink) {
                 if (idLink.getProcessDefinitionId() != null) {
                     event.setProcessDefinitionId(idLink.getProcessDefId());
                     

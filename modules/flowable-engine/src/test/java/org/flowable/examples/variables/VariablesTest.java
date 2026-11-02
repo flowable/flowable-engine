@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,8 +31,8 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 
-import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.DataObject;
@@ -45,7 +46,7 @@ import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -1959,7 +1960,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         String taskId = task.getId();
         try {
             assertThatThrownBy(() -> formService.submitTaskFormData(taskId, new HashMap<>()))
-                    .isExactlyInstanceOf(FlowableException.class);
+                    .isExactlyInstanceOf(FlowableScriptEvaluationException.class);
         } finally {
             runtimeService.deleteProcessInstance(processId, "intentional exception in script task");
         }
@@ -2220,7 +2221,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("emptyCollection");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
 
@@ -2241,7 +2242,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "listVar");
 
         assertThat(variableInstance.getTypeName()).isEqualTo("serializable");
-        assertThat(variableInstance.getValue()).asList().isEmpty();
+        assertThat(variableInstance.getValue()).asInstanceOf(LIST).isEmpty();
 
         variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "setVar");
 

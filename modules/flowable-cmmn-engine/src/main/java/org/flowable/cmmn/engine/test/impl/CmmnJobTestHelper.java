@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
 
+import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.common.engine.api.FlowableException;
@@ -39,12 +40,12 @@ public class CmmnJobTestHelper {
     public static void waitForJobExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
         
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
 
             @Override
             public Boolean call() {
                 return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
-                || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+                        || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
             }
 
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
@@ -53,7 +54,7 @@ public class CmmnJobTestHelper {
     public static void waitForJobExecutorToProcessAllAsyncJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait,
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
 
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<Boolean>() {
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncExecutor(), new Callable<>() {
 
             @Override
             public Boolean call() {
@@ -70,13 +71,13 @@ public class CmmnJobTestHelper {
     public static void waitForAsyncHistoryExecutorToProcessAllJobs(final CmmnEngineConfiguration cmmnEngineConfiguration, final long maxMillisToWait, 
             final long intervalMillis, final boolean shutdownExecutorWhenFinished) {
         
-        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<Boolean>() {
-            
+        waitForExecutorToProcessAllJobs(cmmnEngineConfiguration.getAsyncHistoryExecutor(), new Callable<>() {
+
             @Override
             public Boolean call() {
                 return cmmnEngineConfiguration.getCmmnManagementService().createHistoryJobQuery().count() > 0;
             }
-            
+
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
     }
 
@@ -141,6 +142,10 @@ public class CmmnJobTestHelper {
                 asyncExecutor.shutdown();
             }
         }
+    }
+
+    public static boolean areJobsAvailable(CmmnManagementService managementService) {
+        return !managementService.createJobQuery().list().isEmpty();
     }
 
     public static class InterruptTask extends TimerTask {

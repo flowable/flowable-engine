@@ -67,6 +67,16 @@ public class ExternalWorkerJobEntityManagerImpl
     public List<ExternalWorkerJobEntity> findJobsByScopeIdAndSubScopeId(String scopeId, String subScopeId) {
         return dataManager.findJobsByScopeIdAndSubScopeId(scopeId, subScopeId);
     }
+    
+    @Override
+    public List<ExternalWorkerJobEntity> findJobsByWorkerId(String workerId) {
+        return dataManager.findJobsByWorkerId(workerId);
+    }
+    
+    @Override
+    public List<ExternalWorkerJobEntity> findJobsByWorkerIdAndTenantId(String workerId, String tenantId) {
+        return dataManager.findJobsByWorkerIdAndTenantId(workerId, tenantId);
+    }
 
     @Override
     public List<ExternalWorkerJob> findJobsByQueryCriteria(ExternalWorkerJobQueryImpl jobQuery) {

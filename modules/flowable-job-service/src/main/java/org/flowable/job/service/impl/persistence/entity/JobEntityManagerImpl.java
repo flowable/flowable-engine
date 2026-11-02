@@ -101,4 +101,8 @@ public class JobEntityManagerImpl
         super.delete(entity, fireDeleteEvent);
     }
 
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        dataManager.deleteJobsByExecutionId(executionId);
+    }
 }

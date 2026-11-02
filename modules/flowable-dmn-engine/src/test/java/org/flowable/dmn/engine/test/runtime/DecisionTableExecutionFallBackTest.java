@@ -13,37 +13,30 @@
 package org.flowable.dmn.engine.test.runtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.dmn.api.DmnDeployment;
-import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.flowable.dmn.engine.test.BaseFlowableDmnTest;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * This class tests fallbacks in {@link org.flowable.dmn.engine.impl.cmd.AbstractExecuteDecisionCmd}
  */
-public class
-DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
+class DecisionTableExecutionFallBackTest extends BaseFlowableDmnTest {
 
     public static final String TEST_TENANT_ID = "testTenantId";
     public static final String TEST_PARENT_DEPLOYMENT_ID = "testParentDeploymentId";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     protected DmnDeployment deployment;
 
-    @Before
+    @BeforeEach
     public void createDeployment() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         deployment = dmnEngine.getDmnRepositoryService().createDeployment().
                 addClasspathResource("org/flowable/dmn/engine/test/runtime/StandaloneRuntimeTest.ruleUsageExample.dmn").
                 tenantId(TEST_TENANT_ID).
@@ -51,9 +44,9 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
                 deploy();
     }
 
-    @After
+    @AfterEach
     public void cleanUpDeployment() {
-        flowableDmnRule.getDmnEngine().getDmnRepositoryService().deleteDeployment(deployment.getId());
+        dmnEngine.getDmnRepositoryService().deleteDeployment(deployment.getId());
     }
 
     @Test
@@ -72,24 +65,20 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     @Test
     public void decisionKeyDeploymentIdTenantIdWrongTenantIdThrowsException() {
-        expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("No decision found for key: decision1, parent deployment id testParentDeploymentId and tenant id: WRONG_TENANT_ID.");
-
-        executeDecision("WRONG_TENANT_ID", TEST_PARENT_DEPLOYMENT_ID);
+        assertThatThrownBy(() -> executeDecision("WRONG_TENANT_ID", TEST_PARENT_DEPLOYMENT_ID))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessageContaining("No decision found for key: decision1, parent deployment id testParentDeploymentId and tenant id: WRONG_TENANT_ID.");
     }
 
     @Test
     public void decisionKeyTenantIdWrongTenantIdThrowsException() {
-        expectedException.expect(FlowableObjectNotFoundException.class);
-        expectedException.expectMessage("No decision found for key: decision1");
-        expectedException.expectMessage("and tenantId: WRONG_TENANT_ID");
-
-        executeDecision("WRONG_TENANT_ID", null);
+        assertThatThrownBy(() -> executeDecision("WRONG_TENANT_ID", null))
+                .isInstanceOf(FlowableObjectNotFoundException.class)
+                .hasMessage("No decision found for key: decision1 and tenantId: WRONG_TENANT_ID.");
     }
 
     @Test
     public void decisionKeyDeploymentId() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDeployment localDeployment = dmnEngine.getDmnRepositoryService().createDeployment().
                 addClasspathResource("org/flowable/dmn/engine/test/runtime/StandaloneRuntimeTest.ruleUsageExample.dmn").
                 tenantId(null).
@@ -113,7 +102,6 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     @Test
     public void fallBackDecisionKeyDeploymentId_wrongDeploymentId() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDeployment localDeployment = dmnEngine.getDmnRepositoryService().createDeployment().
                 addClasspathResource("org/flowable/dmn/engine/test/runtime/StandaloneRuntimeTest.ruleUsageExample.dmn").
                 tenantId(null).
@@ -130,7 +118,6 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
 
     @Test
     public void fallBackDecisionKeyDeploymentId_fallbackToDefaultTenant() {
-        DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnDeployment localDeployment = dmnEngine.getDmnRepositoryService().createDeployment().
                 addClasspathResource("org/flowable/dmn/engine/test/runtime/StandaloneRuntimeTest.ruleUsageExample.dmn").
                 tenantId(null).
@@ -141,7 +128,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
             inputVariables.put("inputVariable1", 2);
             inputVariables.put("inputVariable2", "test2");
 
-            Map<String, Object> result = flowableDmnRule.getDmnEngine().getDmnDecisionService().createExecuteDecisionBuilder()
+            Map<String, Object> result = dmnEngine.getDmnDecisionService().createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .tenantId("flowable")
                 .parentDeploymentId(localDeployment.getId())
@@ -160,7 +147,7 @@ DecisionTableExecutionFallBackTest extends AbstractFlowableDmnTest {
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        return flowableDmnRule.getDmnEngine().getDmnDecisionService().createExecuteDecisionBuilder()
+        return dmnEngine.getDmnDecisionService().createExecuteDecisionBuilder()
                 .decisionKey("decision1")
                 .tenantId(tenantId)
                 .parentDeploymentId(parentDeploymentId)

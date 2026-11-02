@@ -43,14 +43,14 @@ import org.flowable.job.api.ExternalWorkerJob;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.resttestclient.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ObjectNode;
 
 import net.javacrumbs.jsonunit.core.Option;
 
@@ -191,7 +191,7 @@ class ExternalWorkerAcquireJobResourceTest {
                         + "      { name: 'shortVar', type: 'short', value: 10 },"
                         + "      { name: 'doubleVar', type: 'double', value: 30.3 },"
                         + "      { name: 'booleanVar', type: 'boolean', value: true },"
-                        + "      { name: 'dateVar', type: 'date', value: '2020-05-04T10:25:45Z' },"
+                        + "      { name: 'dateVar', type: 'date', value: '2020-05-04T10:25:45.583Z' },"
                         + "      { name: 'instantVar', type: 'instant', value: '2020-05-04T09:25:45.583Z' },"
                         + "      { name: 'localDateVar', type: 'localDate', value: '2020-04-20' },"
                         + "      { name: 'localDateTimeVar', type: 'localDateTime', value: '2020-04-20T12:53:10' },"
@@ -255,7 +255,7 @@ class ExternalWorkerAcquireJobResourceTest {
                         + "      { name: 'shortVar', type: 'short', value: 10 },"
                         + "      { name: 'doubleVar', type: 'double', value: 30.3 },"
                         + "      { name: 'booleanVar', type: 'boolean', value: true },"
-                        + "      { name: 'dateVar', type: 'date', value: '2020-05-04T10:25:45Z' },"
+                        + "      { name: 'dateVar', type: 'date', value: '2020-05-04T10:25:45.583Z' },"
                         + "      { name: 'instantVar', type: 'instant', value: '2020-05-04T09:25:45.583Z' },"
                         + "      { name: 'localDateVar', type: 'localDate', value: '2020-04-20' },"
                         + "      { name: 'localDateTimeVar', type: 'localDateTime', value: '2020-04-20T12:53:10' },"

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+    <case id="testCase" name="Sentry If Part Test Case" flowable:initiatorVariableName="initiator">
+        <casePlanModel id="onecaseplanmodel1" name="Case plan model">
+            <planItem id="planItem1" name="Task 1" definitionRef="humanTask1"/>
+            <planItem id="planItem2" name="Task 2" definitionRef="humanTask2">
+                <entryCriterion id="cmmnEntrySentry_1" sentryRef="sentrycmmnEntrySentry"></entryCriterion>
+            </planItem>
+            <sentry id="sentrycmmnEntrySentry">
+                <planItemOnPart id="sentryOnPartcmmnEntrySentry_2" sourceRef="planItem1">
+                  <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+                <ifPart id="ifpart1">
+                  <condition><![CDATA[${vars:equals(var1, 'test')}]]></condition>
+                </ifPart>
+            </sentry>
+            <humanTask id="humanTask1" name="Task 1" flowable:assignee="${initiator}"/>
+            <humanTask id="humanTask2" name="Task 2" flowable:assignee="${initiator}"/>
+        </casePlanModel>
+    </case>
+</definitions>

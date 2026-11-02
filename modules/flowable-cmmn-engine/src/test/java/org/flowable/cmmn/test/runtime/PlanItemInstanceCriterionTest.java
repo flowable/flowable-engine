@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Joram Barrez
@@ -29,7 +29,7 @@ public class PlanItemInstanceCriterionTest extends FlowableCmmnTestCase {
 
     protected CaseInstance caseInstance;
 
-    @Before
+    @BeforeEach
     public void deployTestCaseInstance() {
         addDeploymentForAutoCleanup(cmmnRepositoryService.createDeployment()
             .addClasspathResource("org/flowable/cmmn/test/runtime/PlanItemInstanceCriterionTest.testCriterionSaved.cmmn")

@@ -26,6 +26,9 @@ public interface PrivilegeQuery extends Query<PrivilegeQuery, Privilege> {
 
     /** Only select {@link Privilege}s with the given id/ */
     PrivilegeQuery privilegeId(String id);
+    
+    /** Only select {@link Privilege}s with the given ids/ */
+    PrivilegeQuery privilegeIds(List<String> id);
 
     /** Only select {@link Privilege}s with the given name */
     PrivilegeQuery privilegeName(String name);

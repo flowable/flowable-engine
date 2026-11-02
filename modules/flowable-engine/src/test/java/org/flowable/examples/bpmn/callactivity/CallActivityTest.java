@@ -25,7 +25,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez

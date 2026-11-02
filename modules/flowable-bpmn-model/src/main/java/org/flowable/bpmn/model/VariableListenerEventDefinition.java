@@ -12,10 +12,24 @@
  */
 package org.flowable.bpmn.model;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Set;
+
 /**
  * @author Tijs Rademakers
  */
-public class VariableListenerEventDefinition extends EventDefinition {
+public class VariableListenerEventDefinition extends EventDefinition implements CustomBpmnEventDefinition {
+
+    private static final Set<EventDefinitionLocation> SUPPORTED_LOCATIONS = Collections.unmodifiableSet(EnumSet.of(
+            EventDefinitionLocation.EVENT_SUBPROCESS_START_EVENT,
+            EventDefinitionLocation.INTERMEDIATE_CATCH_EVENT,
+            EventDefinitionLocation.BOUNDARY_EVENT));
+
+    @Override
+    public Set<EventDefinitionLocation> getSupportedLocations() {
+        return SUPPORTED_LOCATIONS;
+    }
 
     public static final String CHANGE_TYPE_ALL = "all";
     public static final String CHANGE_TYPE_UPDATE = "update";

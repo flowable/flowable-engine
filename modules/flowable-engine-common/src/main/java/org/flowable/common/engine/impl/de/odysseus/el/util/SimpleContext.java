@@ -40,6 +40,11 @@ public class SimpleContext extends ELContext {
 			return map.get(prefix + ":" + localName);
 		}
 
+		@Override
+		public void mapFunction(String prefix, String localName, Method method) {
+			setFunction(prefix, localName, method);
+		}
+
 		public void setFunction(String prefix, String localName, Method method) {
 			if (map.isEmpty()) {
 				map = new HashMap<>();

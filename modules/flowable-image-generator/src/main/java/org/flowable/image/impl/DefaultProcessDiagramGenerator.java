@@ -42,7 +42,7 @@ import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
-import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.EventRegistryEventDefinition;
 import org.flowable.bpmn.model.ExternalWorkerServiceTask;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
@@ -117,17 +117,14 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                         processDiagramCanvas.drawSignalStartEvent(graphicInfo, scaleFactor);
                     } else if (eventDefinition instanceof MessageEventDefinition) {
                         processDiagramCanvas.drawMessageStartEvent(graphicInfo, scaleFactor);
-                    } else {
-                        processDiagramCanvas.drawNoneStartEvent(graphicInfo);
-                    }
-                } else {
-                    List<ExtensionElement> eventTypeElements = startEvent.getExtensionElements().get("eventType");
-                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+                    } else if (eventDefinition instanceof EventRegistryEventDefinition) {
                         processDiagramCanvas.drawEventRegistryStartEvent(graphicInfo, scaleFactor);
                         
                     } else {
                         processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                     }
+                } else {
+                    processDiagramCanvas.drawNoneStartEvent(graphicInfo);
                 }
             }
         });
@@ -237,8 +234,6 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                 ServiceTask serviceTask = (ServiceTask) flowNode;
                 if ("camel".equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawCamelTask(serviceTask.getName(), graphicInfo, scaleFactor);
-                } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
-                    processDiagramCanvas.drawMuleTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawHttpTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
@@ -401,11 +396,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
 
                     } else if (eventDefinition instanceof CompensateEventDefinition) {
                         processDiagramCanvas.drawCatchingCompensateEvent(graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
-                    }
-                    
-                } else {
-                    List<ExtensionElement> eventTypeElements = boundaryEvent.getExtensionElements().get("eventType");
-                    if (eventTypeElements != null && eventTypeElements.size() > 0) {
+
+                    } else if (eventDefinition instanceof EventRegistryEventDefinition) {
                         processDiagramCanvas.drawCatchingEventRegistryEvent(flowNode.getName(), graphicInfo, boundaryEvent.isCancelActivity(), scaleFactor);
                     }
                 }
@@ -749,8 +741,7 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
             boolean multiInstanceSequential = false;
             boolean multiInstanceParallel = false;
             boolean collapsed = false;
-            if (flowNode instanceof Activity) {
-                Activity activity = (Activity) flowNode;
+            if (flowNode instanceof Activity activity) {
                 MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = activity.getLoopCharacteristics();
                 if (multiInstanceLoopCharacteristics != null) {
                     multiInstanceSequential = multiInstanceLoopCharacteristics.isSequential();

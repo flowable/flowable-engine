@@ -35,11 +35,14 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.common.engine.api.scope.ScopeTypes;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -66,9 +69,12 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected Date completedTime;
     protected Date occurredTime;
     protected Date terminatedTime;
+    protected Date failedTime;
     protected Date exitTime;
     protected Date endedTime;
     protected String startUserId;
+    protected String assignee;
+    protected String completedBy;
     protected String referenceId;
     protected String referenceType;
     protected boolean completable;
@@ -76,7 +82,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     protected String exitCriterionId;
     protected String extraValue;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
-    
+    protected List<VariableInstanceEntity> queryVariables;
     // Counts
     protected boolean countEnabled;
     protected int variableCount;
@@ -91,6 +97,9 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
 
     protected PlanItemInstanceLifecycleListener currentLifecycleListener; // Only set when executing an plan item lifecycle listener
     protected FlowableListener currentFlowableListener; // Only set when executing an plan item lifecycle listener
+    protected boolean plannedForActivationInMigration;
+
+    protected boolean stateChangeUnprocessed; // only set to true when an agenda operation is planned and this has not been executed yet
 
     public PlanItemInstanceEntityImpl() {
     }
@@ -120,6 +129,8 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         setExitTime(historicPlanItemInstance.getExitTime());
         setEndedTime(historicPlanItemInstance.getEndedTime());
         setStartUserId(historicPlanItemInstance.getStartUserId());
+        setAssignee(historicPlanItemInstance.getAssignee());
+        setCompletedBy(historicPlanItemInstance.getCompletedBy());
         setReferenceId(historicPlanItemInstance.getReferenceId());
         setReferenceType(historicPlanItemInstance.getReferenceType());
         setEntryCriterionId(historicPlanItemInstance.getEntryCriterionId());
@@ -152,12 +163,15 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         persistentState.put("completedTime", completedTime);
         persistentState.put("occurredTime", occurredTime);
         persistentState.put("terminatedTime", terminatedTime);
+        persistentState.put("failedTime", failedTime);
         persistentState.put("exitTime", exitTime);
         persistentState.put("endedTime", endedTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("assignee", assignee);
+        persistentState.put("completedBy", completedBy);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
-        persistentState.put("completeable", completable);
+        persistentState.put("completable", completable);
         persistentState.put("entryCriterionId", entryCriterionId);
         persistentState.put("exitCriterionId", exitCriterionId);
         persistentState.put("extraValue", extraValue);
@@ -361,6 +375,14 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
         this.terminatedTime = terminatedTime;
     }
     @Override
+    public Date getFailedTime() {
+        return failedTime;
+    }
+    @Override
+    public void setFailedTime(Date failedTime) {
+        this.failedTime = failedTime;
+    }
+    @Override
     public Date getExitTime() {
         return exitTime;
     }
@@ -392,6 +414,22 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    @Override
+    public String getCompletedBy() {
+        return completedBy;
+    }
+    @Override
+    public void setCompletedBy(String completedBy) {
+        this.completedBy = completedBy;
+    }
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
+    @Override
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
     }
     @Override
     public String getReferenceId() {
@@ -453,6 +491,7 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     public String getTenantId() {
         return tenantId;
     }
+
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -526,10 +565,11 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
-    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+    protected void initializeVariableInstanceBackPointer(VariableInstance variableInstance) {
         variableInstance.setScopeId(caseInstanceId);
         variableInstance.setSubScopeId(id);
         variableInstance.setScopeType(ScopeTypes.CMMN);
+        variableInstance.setScopeDefinitionId(caseDefinitionId);
     }
 
     @Override
@@ -645,6 +685,51 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
     }
 
     @Override
+    public boolean isPlannedForActivationInMigration() {
+        return plannedForActivationInMigration;
+    }
+
+    @Override
+    public void setPlannedForActivationInMigration(boolean plannedForActivationInMigration) {
+        this.plannedForActivationInMigration = plannedForActivationInMigration;
+    }
+
+    @Override
+    public boolean isStateChangeUnprocessed() {
+        return stateChangeUnprocessed;
+    }
+
+    @Override
+    public void setStateChangeUnprocessed(boolean stateChangeUnprocessed) {
+        this.stateChangeUnprocessed = stateChangeUnprocessed;
+    }
+
+    @Override
+    public Map<String, Object> getPlanItemInstanceLocalVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        if (queryVariables != null) {
+            for (VariableInstance variableInstance : queryVariables) {
+                if (variableInstance.getId() != null && variableInstance.getSubScopeId() != null) {
+                    variables.put(variableInstance.getName(), variableInstance.getValue());
+                }
+            }
+        }
+        return variables;
+    }
+
+    @Override
+    public List<VariableInstanceEntity> getQueryVariables() {
+        if (queryVariables == null && Context.getCommandContext() != null) {
+            queryVariables = new VariableInitializingList();
+        }
+        return queryVariables;
+    }
+
+    public void setQueryVariables(List<VariableInstanceEntity> queryVariables) {
+        this.queryVariables = queryVariables;
+    }
+
+    @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("PlanItemInstance with id: ")
@@ -657,6 +742,20 @@ public class PlanItemInstanceEntityImpl extends AbstractCmmnEngineVariableScopeE
             .append(planItemDefinitionId)
             .append(", state: ")
             .append(state);
+
+        if (elementId != null) {
+            stringBuilder.append(", elementId: ").append(elementId);
+        }
+
+        stringBuilder
+                .append(", caseInstanceId: ")
+                .append(caseInstanceId)
+                .append(", caseDefinitionId: ")
+                .append(caseDefinitionId);
+
+        if (StringUtils.isNotEmpty(tenantId)) {
+            stringBuilder.append(", tenantId=").append(tenantId);
+        }
         return stringBuilder.toString();
     }
 }

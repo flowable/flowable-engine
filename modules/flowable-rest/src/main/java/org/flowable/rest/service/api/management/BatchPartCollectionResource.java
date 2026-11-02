@@ -16,8 +16,6 @@ package org.flowable.rest.service.api.management;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.batch.api.Batch;
 import org.flowable.batch.api.BatchPart;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
@@ -40,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 
 @RestController
-@Api(tags = { "Batch parts" }, description = "Manage Batch parts", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Batch parts" }, authorizations = { @Authorization(value = "basicAuth") })
 public class BatchPartCollectionResource {
 
     @Autowired
@@ -62,7 +60,7 @@ public class BatchPartCollectionResource {
     })
     @GetMapping(value = "/management/batches/{batchId}/batch-parts", produces = "application/json")
     public List<BatchPartResponse> getBatches(@PathVariable String batchId,
-                    @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+                    @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         
         Batch batch = managementService.createBatchQuery().batchId(batchId).singleResult();
         if (batch == null) {

@@ -15,7 +15,7 @@ package org.flowable.rest.service.api.runtime.task;
 
 import java.io.InputStream;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -41,7 +41,7 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Task Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments" }, authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentContentResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get the content for an attachment", tags = { "Task Attachments" },

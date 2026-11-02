@@ -14,8 +14,6 @@ package org.flowable.rest.service.api.repository;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +31,7 @@ import io.swagger.annotations.Authorization;
  * @author Yvo Swillens
  */
 @RestController
-@Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Definitions" }, authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProcessDefinitionResource {
 
     @ApiOperation(value = "List form definitions for a process-definition", nickname = "listProcessDefinitionFormDefinitions", tags = { "Process Definitions" })
@@ -43,8 +41,7 @@ public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProce
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", produces = "application/json")
     public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
-            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
-            HttpServletRequest request) {
+            @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId) {
         
         ProcessDefinition processDefinition = getProcessDefinitionFromRequest(processDefinitionId);
 

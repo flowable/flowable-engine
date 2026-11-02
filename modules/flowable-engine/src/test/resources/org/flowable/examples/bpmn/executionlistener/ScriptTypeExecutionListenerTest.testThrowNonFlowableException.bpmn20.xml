@@ -8,9 +8,8 @@
         <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="endevent1">
             <extensionElements>
                 <flowable:executionListener event="take" type="script">
-                    <flowable:script language="JavaScript" resultVariable="myVar">
-                            var MyError = Packages.java.lang.RuntimeException;
-                            throw new MyError("Illegal argument in listener");
+                    <flowable:script language="JavaScript" resultVariable="myVar"><![CDATA[var MyError = Packages.java.lang.RuntimeException;
+                            throw new MyError("Illegal argument in listener");]]>
                     </flowable:script>
                 </flowable:executionListener>
             </extensionElements>

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMessage;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
@@ -46,8 +46,7 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
     protected void setUp() throws Exception {
         boolean serverUpAndRunning = false;
         while (!serverUpAndRunning) {
-            wiser = new Wiser();
-            wiser.setPort(5025);
+            wiser = Wiser.port(5025);
 
             try {
                 wiser.start();
@@ -129,9 +128,10 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
 
         String from = "ordershipping@flowable.org";
         String recipient = "johndoe@flowable.com";
-        String headers = "X-Attribute1: value1\n"
-            + "X-Attribute2: value2\n"
-            + "X-Attribute3: value3";
+        String headers = """
+                X-Attribute1: value1
+                X-Attribute2: value2
+                X-Attribute3: value3""";
 
         Map<String, Object> vars = new HashMap<>();
         vars.put("sender", from);

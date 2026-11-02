@@ -36,7 +36,7 @@
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteAppResourcesByDeploymentId" parameterType="string">
-    delete from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id}
+    delete from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{id, jdbcType=VARCHAR}
   </delete>
   
   <!-- RESOURCE RESULTMAP -->
@@ -51,17 +51,17 @@
   <!-- RESOURCE SELECT -->
 
   <select id="selectAppResourceNamesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultType="string">
-    select NAME_ from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select NAME_ from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <select id="selectAppResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="appResourceResultMap">
     select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE 
-    where DEPLOYMENT_ID_ = #{deploymentId}
-          AND NAME_ = #{resourceName}
+    where DEPLOYMENT_ID_ = #{deploymentId, jdbcType=VARCHAR}
+          AND NAME_ = #{resourceName, jdbcType=VARCHAR}
   </select>
 
   <select id="selectAppResourcesByDeploymentId" parameterType="org.flowable.common.engine.impl.db.ListQueryParameterObject" resultMap="appResourceResultMap">
-    select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
+    select * from ${prefix}ACT_APP_DEPLOYMENT_RESOURCE where DEPLOYMENT_ID_ = #{parameter, jdbcType=VARCHAR} order by NAME_ asc
   </select>
   
   <update id="updateAppResource" parameterType="org.flowable.app.engine.impl.persistence.entity.AppResourceEntityImpl">

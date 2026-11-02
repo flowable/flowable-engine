@@ -19,15 +19,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.el.DefinitionVariableContainer;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
+import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.EventDefinitionExpressionUtil;
@@ -45,7 +49,7 @@ import org.flowable.eventsubscription.service.impl.persistence.entity.SignalEven
  * 
  * @author Tijs Rademakers
  */
-public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpmnActivityBehavior {
+public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpmnActivityBehavior implements EventSubProcessStartEventActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,6 +59,31 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
     public EventSubProcessSignalStartEventActivityBehavior(SignalEventDefinition signalEventDefinition, Signal signal) {
         this.signalEventDefinition = signalEventDefinition;
         this.signal = signal;
+    }
+
+    @Override
+    public void initializeEventSubProcessStart(EventSubProcessStartEventInitializerContext context) {
+        ExecutionEntity parentExecution = context.getParentExecution();
+        if (signal != null) {
+            signalEventDefinition.setSignalRef(signal.getName());
+        }
+
+        ExecutionEntity signalExecution = context.createEventScopeChildExecution();
+
+        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+        DefinitionVariableContainer definitionVariableContainer = new DefinitionVariableContainer(parentExecution.getProcessDefinitionId(),
+                parentExecution.getProcessDefinitionKey(), parentExecution.getDeploymentId(), ScopeTypes.BPMN, parentExecution.getTenantId());
+        String eventName = EventDefinitionExpressionUtil.determineSignalName(context.getCommandContext(), signalEventDefinition, bpmnModel, definitionVariableContainer);
+
+        EventSubscriptionEntity eventSubscription = (EventSubscriptionEntity) context.createEventSubscriptionBuilder(signalExecution)
+                .eventType(SignalEventSubscriptionEntity.EVENT_TYPE)
+                .eventName(eventName)
+                .signal(signal)
+                .create();
+
+        CountingEntityUtil.handleInsertEventSubscriptionEntityCount(eventSubscription);
+        context.recordWaitingSignalSubscription(eventSubscription);
+        signalExecution.getEventSubscriptions().add(eventSubscription);
     }
 
     @Override
@@ -117,6 +146,9 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         outgoingFlowExecution.setCurrentFlowElement(startEvent);
 
         processEngineConfiguration.getActivityInstanceEntityManager().recordActivityStart(outgoingFlowExecution);
+
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeExecutionListeners(
+                startEvent, outgoingFlowExecution, ExecutionListener.EVENTNAME_START);
 
         leave(outgoingFlowExecution);
     }

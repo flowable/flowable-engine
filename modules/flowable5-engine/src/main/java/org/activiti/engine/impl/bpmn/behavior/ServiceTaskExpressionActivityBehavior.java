@@ -28,7 +28,7 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * {@link ActivityBehavior} that evaluates an expression when executed. Optionally, it sets the result of the expression as a variable on the execution.
@@ -69,7 +69,7 @@ public class ServiceTaskExpressionActivityBehavior extends TaskActivityBehavior 
                 if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
                     ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
                     if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_EXPRESSION)) {
-                        String overrideExpression = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_EXPRESSION).asText();
+                        String overrideExpression = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_EXPRESSION).asString();
                         if (StringUtils.isNotEmpty(overrideExpression) && !overrideExpression.equals(expression.getExpressionText())) {
                             expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(overrideExpression);
                         }

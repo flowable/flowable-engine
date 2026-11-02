@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.activiti.engine.impl.variable.EntityManagerSession;
@@ -888,7 +888,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
             fail("Exception expected when deleting process-instance that is still running");
         } catch (FlowableException ae) {
             // Expected exception
-            assertTextPresent("Process instance is still running, cannot delete historic process instance", ae.getMessage());
+            assertTextPresent("Process instance is still running, cannot delete HistoricProcessInstanceEntity", ae.getMessage());
         }
     }
 

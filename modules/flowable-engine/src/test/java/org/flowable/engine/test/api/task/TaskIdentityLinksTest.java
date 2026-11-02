@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -33,7 +34,7 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tom Baeyens
@@ -321,16 +322,46 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testDeleteCandidateUser.bpmn20.xml")
-    public void testDeleteCandidateUser() {
+    @Deployment(resources = "org/flowable/engine/test/api/task/TaskIdentityLinksTest.testDeleteCandidates.bpmn20.xml")
+    public void testDeleteCandidates() {
         runtimeService.startProcessInstanceByKey("TaskIdentityLinks");
 
         String taskId = taskService.createTaskQuery().singleResult().getId();
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(taskId);
         assertThat(identityLinks)
+                .filteredOn(identityLink -> identityLink.getUserId() != null)
                 .extracting(IdentityLink::getUserId)
                 .containsExactly("user");
+
+        assertThat(identityLinks)
+                .filteredOn(identityLink -> identityLink.getGroupId() != null)
+                .extracting(IdentityLink::getGroupId)
+                .containsExactly("users");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            List<HistoricIdentityLink> historicIdentityLinks = historyService.getHistoricIdentityLinksForTask(taskId);
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getUserId() != null)
+                    .extracting(HistoricIdentityLink::getUserId)
+                    .containsExactly("user");
+
+            assertThat(historicIdentityLinks)
+                    .filteredOn(identityLink -> identityLink.getGroupId() != null)
+                    .extracting(HistoricIdentityLink::getGroupId)
+                    .containsExactly("users");
+        }
+
+        @SuppressWarnings("unchecked")
+        Set<String> candidateUsers = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_USERS);
+        assertThat(candidateUsers)
+                .containsExactly("user");
+
+        @SuppressWarnings("unchecked")
+        Set<String> candidateGroups = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_GROUPS);
+        assertThat(candidateGroups)
+                .containsExactly("users");
     }
 
     @Test
@@ -473,7 +504,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCompleteTaskAndAddGroupIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
-        String taskId = taskService.createTaskQuery().singleResult().getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        String taskId = task.getId();
 
         assertThatThrownBy(() -> managementService.executeCommand(context -> {
             taskService.complete(taskId);
@@ -481,14 +513,16 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
             return null;
         }))
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Task is already deleted");
+                .hasMessage("Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                        + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "] is already deleted");
     }
 
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/task/IdentityLinksProcess.bpmn20.xml")
     public void testCompleteTaskAndAddUserIdentityLinkAfterInSameTransaction() {
         runtimeService.startProcessInstanceByKey("IdentityLinksProcess");
-        String taskId = taskService.createTaskQuery().singleResult().getId();
+        Task task = taskService.createTaskQuery().singleResult();
+        String taskId = task.getId();
 
         assertThatThrownBy(() -> managementService.executeCommand(context -> {
             taskService.complete(taskId);
@@ -496,7 +530,8 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
             return null;
         }))
                 .isInstanceOf(FlowableException.class)
-                .hasMessageContaining("Task is already deleted");
+                .hasMessage("Task[id=" + task.getId() + ", key=theTask, name=my task, processInstanceId=" + task.getProcessInstanceId() + ", executionId="
+                        + task.getExecutionId() + ", processDefinitionId=" + task.getProcessDefinitionId() + "] is already deleted");
     }
 
     private void assertTaskEvent(String taskId, int expectedCount, String expectedAction,

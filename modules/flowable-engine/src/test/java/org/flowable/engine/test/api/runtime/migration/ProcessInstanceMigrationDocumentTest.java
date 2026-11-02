@@ -19,7 +19,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.util.IoUtil;
@@ -27,6 +30,7 @@ import org.flowable.engine.impl.migration.ProcessInstanceMigrationBuilderImpl;
 import org.flowable.engine.impl.migration.ProcessInstanceMigrationDocumentImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.migration.ActivityMigrationMapping;
+import org.flowable.engine.migration.ActivityMigrationMappingOptions.SingleToActivityOptions;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.Script;
 import org.junit.jupiter.api.Test;
@@ -43,40 +47,51 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         ActivityMigrationMapping oneToOneMapping = ActivityMigrationMapping.createMappingFor("originalActivity1", "newActivity1")
                 .withLocalVariable("varForNewActivity1", "varValue")
-                .withNewAssignee("kermit");
+                .withNewName("New name")
+                .withNewDueDate("2040-10-02")
+                .withNewPriority("50")
+                .withNewCategory("New category")
+                .withNewFormKey("NewFormKey")
+                .withNewAssignee("kermit")
+                .withNewOwner("fozzie")
+                .withNewCandidateUsers(Arrays.asList("kermit", "fozzie"))
+                .withNewCandidateGroups(Arrays.asList("users", "admins"));
 
         ActivityMigrationMapping manyToOneMapping = ActivityMigrationMapping
                 .createMappingFor(Arrays.asList("originalActivity3", "originalActivity4"), "newActivity3")
-                .withLocalVariable("varForNewActivity3", 9876);
+                .withLocalVariable("varForNewActivity3", 9876)
+                .withNewPriority("99")
+                .withNewFormKey("UpdatedFormKey")
+                .withNewCandidateGroups(Arrays.asList("test", "test2"));
 
         ActivityMigrationMapping oneToManyMapping = ActivityMigrationMapping
                 .createMappingFor("originalActivity2", Arrays.asList("newActivity2.1", "newActivity2.2"))
                 .withLocalVariableForAllActivities("var1ForNewActivity2.x", "varValue")
                 .withLocalVariableForAllActivities("var2ForNewActivity2.x", 1234.567);
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
                         put("var2ForNewActivity2.x", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
@@ -86,7 +101,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");
@@ -101,12 +116,17 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
-                .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
+        
+        assertActivityMappings(migrationDocument, Arrays.asList(oneToOneMapping, oneToManyMapping, manyToOneMapping));
+
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
-        assertThat(migrationDocument.getPreUpgradeScript()).isEqualToComparingFieldByField(new Script("groovy", "1+1"));
-        assertThat(migrationDocument.getPostUpgradeScript()).isEqualToComparingFieldByField(new Script("groovy", "2+2"));
+        assertThat(migrationDocument.getPreUpgradeScript())
+                .usingRecursiveComparison()
+                .isEqualTo(new Script("groovy", "1+1"));
+        assertThat(migrationDocument.getPostUpgradeScript())
+                .usingRecursiveComparison()
+                .isEqualTo(new Script("groovy", "2+2"));
     }
 
     @Test
@@ -114,29 +134,29 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
 
         String definitionId = "someProcessId";
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.1", "varValue");
                         put("var2ForNewActivity2.1", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.2", "varValue");
@@ -146,7 +166,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        Map<String, Object> varsForNewActivity2_1 = new HashMap<String, Object>() {
+        Map<String, Object> varsForNewActivity2_1 = new HashMap<>() {
 
             {
                 put("var1ForNewActivity2.1", "varValue");
@@ -154,7 +174,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        Map<String, Object> varsForNewActivity2_2 = new HashMap<String, Object>() {
+        Map<String, Object> varsForNewActivity2_2 = new HashMap<>() {
 
             {
                 put("var1ForNewActivity2.2", "varValue");
@@ -162,7 +182,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");
@@ -201,7 +221,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isNull();
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isNull();
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isNull();
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
                 .containsAnyOf(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
@@ -362,7 +382,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
     }
 
     @Test
@@ -376,7 +396,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         ActivityMigrationMapping.OneToOneMapping oneToOne2 = ActivityMigrationMapping.createMappingFor("originalActivity2", "newActivity2")
                 .withLocalVariable("variableDouble", 12345.6789);
 
-        HashMap<String, Object> processInstanceVars = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVars = new HashMap<>() {
 
             {
                 put("instanceVar1", "stringValue");
@@ -406,7 +426,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator().containsExactly(oneToOne1, oneToOne2);
         assertThat(migrationDocument.getActivitiesLocalVariables())
                 .containsKeys("newActivity1", "newActivity2")
                 .containsEntry("newActivity1", (Collections.singletonMap("variableString", "variableValue")))
@@ -444,29 +464,29 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
                 .inSubProcessOfCallActivityId("subProcKey", 2)
                 .inParentProcessOfCallActivityId("someCallActivityId");
 
-        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<String, Map<String, Object>>() {
+        HashMap<String, Map<String, Object>> activityLocalVariables = new HashMap<>() {
 
             {
-                put("newActivity1", new HashMap<String, Object>() {
+                put("newActivity1", new HashMap<>() {
 
                     {
                         put("varForNewActivity1", "varValue");
                     }
                 });
-                put("newActivity3", new HashMap<String, Object>() {
+                put("newActivity3", new HashMap<>() {
 
                     {
                         put("varForNewActivity3", 9876);
                     }
                 });
-                put("newActivity2.1", new HashMap<String, Object>() {
+                put("newActivity2.1", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
                         put("var2ForNewActivity2.x", 1234.567);
                     }
                 });
-                put("newActivity2.2", new HashMap<String, Object>() {
+                put("newActivity2.2", new HashMap<>() {
 
                     {
                         put("var1ForNewActivity2.x", "varValue");
@@ -476,7 +496,7 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
             }
         };
 
-        HashMap<String, Object> processInstanceVariables = new HashMap<String, Object>() {
+        HashMap<String, Object> processInstanceVariables = new HashMap<>() {
 
             {
                 put("processVar1", "varValue1");
@@ -491,9 +511,55 @@ public class ProcessInstanceMigrationDocumentTest extends AbstractTestCase {
         assertThat(migrationDocument.getMigrateToProcessDefinitionKey()).isEqualTo(definitionKey);
         assertThat(migrationDocument.getMigrateToProcessDefinitionVersion()).isEqualTo(definitionVer);
         assertThat(migrationDocument.getMigrateToProcessDefinitionTenantId()).isEqualTo(definitionTenantId);
-        assertThat(migrationDocument.getActivityMigrationMappings()).usingFieldByFieldElementComparator()
+        assertThat(migrationDocument.getActivityMigrationMappings()).usingRecursiveFieldByFieldElementComparator()
                 .containsExactly(oneToOneMapping, oneToManyMapping, manyToOneMapping);
         assertThat(migrationDocument.getActivitiesLocalVariables()).isEqualTo(activityLocalVariables);
         assertThat(migrationDocument.getProcessInstanceVariables()).isEqualTo(processInstanceVariables);
+    }
+    
+    @Test
+    public void testSerializeDeSerializeProcessInstanceIdsToMigrate() {
+        Set<String> processInstanceIds = new LinkedHashSet<>();
+        processInstanceIds.add("procId1");
+        processInstanceIds.add("procId2");
+        processInstanceIds.add("procId3");
+
+        ProcessInstanceMigrationDocument document = new ProcessInstanceMigrationBuilderImpl(null)
+                .migrateToProcessDefinition("targetDefId")
+                .withProcessInstanceIdsToMigrate(processInstanceIds)
+                .addActivityMigrationMapping(ActivityMigrationMapping.createMappingFor("act1", "act2"))
+                .getProcessInstanceMigrationDocument();
+
+        String serializedDocument = document.asJsonString();
+
+        ProcessInstanceMigrationDocument deserialized = ProcessInstanceMigrationDocumentImpl.fromJson(serializedDocument);
+
+        assertThat(deserialized.getProcessInstanceIdsToMigrate()).containsExactly("procId1", "procId2", "procId3");
+        assertThat(deserialized.getMigrateToProcessDefinitionId()).isEqualTo("targetDefId");
+    }
+
+    protected void assertActivityMappings(ProcessInstanceMigrationDocument migrationDocument, List<ActivityMigrationMapping> activityMigrationMappings) {
+        assertThat(migrationDocument.getActivityMigrationMappings()).hasSize(activityMigrationMappings.size());
+        for (int i = 0; i < migrationDocument.getActivityMigrationMappings().size(); i++) {
+            ActivityMigrationMapping documentMapping = migrationDocument.getActivityMigrationMappings().get(i);
+            ActivityMigrationMapping comparisonMapping = activityMigrationMappings.get(i);
+            
+            assertThat(documentMapping.getFromActivityIds()).isEqualTo(comparisonMapping.getFromActivityIds());
+            assertThat(documentMapping.getToActivityIds()).isEqualTo(comparisonMapping.getToActivityIds());
+            
+            if (documentMapping instanceof SingleToActivityOptions) {
+                SingleToActivityOptions<?> documentOptions = (SingleToActivityOptions<?>) documentMapping;
+                SingleToActivityOptions<?> comparisonOptions = (SingleToActivityOptions<?>) comparisonMapping;
+                assertThat(documentOptions.getWithNewName()).isEqualTo(comparisonOptions.getWithNewName());
+                assertThat(documentOptions.getWithNewDueDate()).isEqualTo(comparisonOptions.getWithNewDueDate());
+                assertThat(documentOptions.getWithNewPriority()).isEqualTo(comparisonOptions.getWithNewPriority());
+                assertThat(documentOptions.getWithNewCategory()).isEqualTo(comparisonOptions.getWithNewCategory());
+                assertThat(documentOptions.getWithNewFormKey()).isEqualTo(comparisonOptions.getWithNewFormKey());
+                assertThat(documentOptions.getWithNewAssignee()).isEqualTo(comparisonOptions.getWithNewAssignee());
+                assertThat(documentOptions.getWithNewOwner()).isEqualTo(comparisonOptions.getWithNewOwner());
+                assertThat(documentOptions.getWithNewCandidateUsers()).isEqualTo(comparisonOptions.getWithNewCandidateUsers());
+                assertThat(documentOptions.getWithNewCandidateGroups()).isEqualTo(comparisonOptions.getWithNewCandidateGroups());
+            }
+        }
     }
 }
