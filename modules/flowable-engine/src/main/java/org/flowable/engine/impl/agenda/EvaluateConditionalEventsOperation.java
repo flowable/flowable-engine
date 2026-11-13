@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.debug.ExecutionTreeUtil;
+import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -99,7 +100,8 @@ public class EvaluateConditionalEventsOperation extends AbstractOperation {
                             if (conditionIsTrue) {
                                 ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
                                 if (startEvent.isInterrupting()) {
-                                    executionEntityManager.deleteChildExecutions(parentExecution, null, true);
+                                    executionEntityManager.deleteChildExecutions(parentExecution, null, null,
+                                            DeleteReason.EVENT_SUBPROCESS_INTERRUPTING + "(" + startEvent.getId() + ")", true, startEvent);
                                 }
     
                                 ExecutionEntity eventSubProcessExecution = executionEntityManager.createChildExecution(parentExecution);
