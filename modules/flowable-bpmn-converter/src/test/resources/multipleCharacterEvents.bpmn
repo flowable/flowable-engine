@@ -16,6 +16,14 @@
     <sequenceFlow id="flow2" sourceRef="task" targetRef="end">
       <extensionElements>
         <design:data>a&amp;b&amp;c&amp;d&amp;e&amp;f&amp;g</design:data>
+        <design:data2> a&amp; b&amp; c&amp; d&amp; e&amp; f&amp; g </design:data2>
+        <design:data3></design:data3>
+        <design:data4>  </design:data4>
+        <design:data5><![CDATA[
+        this is
+        multiple lines
+        data
+        ]]></design:data5>
       </extensionElements>
     </sequenceFlow>
   </process>
