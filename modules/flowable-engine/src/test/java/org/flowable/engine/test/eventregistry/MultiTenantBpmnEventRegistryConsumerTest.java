@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.common.engine.impl.DefaultTenantProvider;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -275,6 +276,101 @@ public class MultiTenantBpmnEventRegistryConsumerTest extends FlowableEventRegis
         assertThat(taskService.createTaskQuery().orderByTaskName().asc().list())
             .extracting(Task::getName)
             .containsExactly("task tenant A", "task tenant B", "task tenant B");
+    }
+
+    @Test
+    public void testChannelOfATenantOnlyStartsProcessInstancesInItsTenant() {
+        deployProcessModel("startProcessInstanceSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
+
+        // The channel of tenant A detects the tenant from the event, which can name another tenant, the default tenant or no tenant
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("tenantAJsonPointerChannelAdapter", new TestInboundChannelAdapter(processEngineConfiguration.getObjectMapper()));
+        getEventRepositoryService().createInboundChannelModelBuilder()
+            .key("tenantAJsonPointerChannel")
+            .resourceName("tenantAJsonPointerChannel.channel")
+            .deploymentTenantId(TENANT_A)
+            .channelAdapter("${tenantAJsonPointerChannelAdapter}")
+            .jsonDeserializer()
+            .fixedEventKey("sameKey")
+            .detectEventTenantUsingJsonPointerExpression("/tenantId")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+        TestInboundChannelAdapter channelAdapter = (TestInboundChannelAdapter) ((InboundChannelModel) getEventRepositoryService()
+            .getChannelModelByKey("tenantAJsonPointerChannel", TENANT_A)).getInboundEventChannelAdapter();
+
+        channelAdapter.triggerEventForTenantId("customerA", TENANT_B);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
+
+        channelAdapter.triggerEventForTenantId("customerA", ProcessEngineConfiguration.NO_TENANT_ID);
+        channelAdapter.triggerEventForTenantId("customerA", null);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(3);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
+        assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(3);
+    }
+
+    @Test
+    public void testChannelOfATenantWithoutTenantDetectionOnlyStartsProcessInstancesInItsTenant() {
+        deployProcessModel("startProcessInstanceSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
+
+        // Without the tenant of the channel the event would have no tenant, which correlates it with the event subscriptions of all tenants
+        getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+            .put("tenantANoTenantDetectionChannelAdapter", new TestInboundChannelAdapter(processEngineConfiguration.getObjectMapper()));
+        getEventRepositoryService().createInboundChannelModelBuilder()
+            .key("tenantANoTenantDetectionChannel")
+            .resourceName("tenantANoTenantDetectionChannel.channel")
+            .deploymentTenantId(TENANT_A)
+            .channelAdapter("${tenantANoTenantDetectionChannelAdapter}")
+            .jsonDeserializer()
+            .fixedEventKey("sameKey")
+            .jsonFieldsMapDirectlyToPayload()
+            .deploy();
+        TestInboundChannelAdapter channelAdapter = (TestInboundChannelAdapter) ((InboundChannelModel) getEventRepositoryService()
+            .getChannelModelByKey("tenantANoTenantDetectionChannel", TENANT_A)).getInboundEventChannelAdapter();
+
+        channelAdapter.triggerEventForTenantId("customerA", TENANT_B);
+        channelAdapter.triggerEventWithoutTenantId("customerA");
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(2);
+        assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isZero();
+    }
+
+    @Test
+    public void testChannelOfTheDefaultTenantStartsProcessInstancesInTheDetectedTenant() {
+        deployProcessModel("startProcessInstanceSameKeyTenantA.bpmn20.xml", TENANT_A);
+        deployProcessModel("startProcessInstanceSameKeyTenantB.bpmn20.xml", TENANT_B);
+
+        // A channel in the default tenant is shared with the other tenants, so it gets events for the tenant it detects
+        DefaultTenantProvider originalDefaultTenantProvider = getEventRegistryEngineConfiguration().getDefaultTenantProvider();
+        getEventRegistryEngineConfiguration().setDefaultTenantValue("defaultTenant");
+        try {
+            getEventRegistryEngineConfiguration().getExpressionManager().getBeans()
+                .put("defaultTenantChannelAdapter", new TestInboundChannelAdapter(processEngineConfiguration.getObjectMapper()));
+            getEventRepositoryService().createInboundChannelModelBuilder()
+                .key("defaultTenantChannel")
+                .resourceName("defaultTenantChannel.channel")
+                .deploymentTenantId("defaultTenant")
+                .channelAdapter("${defaultTenantChannelAdapter}")
+                .jsonDeserializer()
+                .fixedEventKey("sameKey")
+                .detectEventTenantUsingJsonPointerExpression("/tenantId")
+                .jsonFieldsMapDirectlyToPayload()
+                .deploy();
+            TestInboundChannelAdapter channelAdapter = (TestInboundChannelAdapter) ((InboundChannelModel) getEventRepositoryService()
+                .getChannelModelByKey("defaultTenantChannel", "defaultTenant")).getInboundEventChannelAdapter();
+
+            channelAdapter.triggerEventForTenantId("customerA", TENANT_B);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isZero();
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1);
+
+            channelAdapter.triggerEventForTenantId("customerA", TENANT_A);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_A).count()).isEqualTo(1);
+            assertThat(runtimeService.createProcessInstanceQuery().processInstanceTenantId(TENANT_B).count()).isEqualTo(1);
+
+        } finally {
+            getEventRegistryEngineConfiguration().setDefaultTenantProvider(originalDefaultTenantProvider);
+        }
     }
 
     @Test
