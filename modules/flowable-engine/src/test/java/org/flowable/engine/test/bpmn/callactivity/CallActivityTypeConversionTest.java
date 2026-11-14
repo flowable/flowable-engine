@@ -14,10 +14,11 @@ package org.flowable.engine.test.bpmn.callactivity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +88,12 @@ public class CallActivityTypeConversionTest extends PluggableFlowableTestCase {
         // Source variables for array conversion
         variables.put("arrayStringVar", "[1,2,3]");
 
+        // The period and duration conversions are relative to the current time of the engine clock.
+        // The next 10 days cross the end of the daylight saving time in Europe and in the US
+        Instant now = Instant.parse("2025-10-24T10:15:30Z");
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
+        ZonedDateTime zonedNow = now.atZone(processEngineConfiguration.getClock().getCurrentTimeZone().toZoneId());
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parentProcess", variables);
 
         // Get the child process instance
@@ -145,16 +152,14 @@ public class CallActivityTypeConversionTest extends PluggableFlowableTestCase {
         assertThat(((Date) instantToDate).toInstant()).isEqualTo(testInstant);
 
         // Verify period/duration to date conversions
-        Date now = new Date();
+        // A period is added in calendar days in the system time zone, so it is not always a multiple of 24 hours (e.g. when crossing a DST change)
         Object periodToDate = runtimeService.getVariable(childProcessInstance.getId(), "periodToDate");
         assertThat(periodToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) periodToDate).toInstant()))
-                .isBetween(Duration.ofDays(9).plusHours(23), Duration.ofDays(10).plusMinutes(1));
+        assertThat(((Date) periodToDate).toInstant()).isEqualTo(zonedNow.plusDays(10).toInstant());
 
         Object durationToDate = runtimeService.getVariable(childProcessInstance.getId(), "durationToDate");
         assertThat(durationToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) durationToDate).toInstant()))
-                .isBetween(Duration.ofHours(9).plusMinutes(59), Duration.ofHours(10).plusMinutes(1));
+        assertThat(((Date) durationToDate).toInstant()).isEqualTo(now.plus(10, ChronoUnit.HOURS));
 
         // Verify localdate conversions
         Object stringToLocalDate = runtimeService.getVariable(childProcessInstance.getId(), "stringToLocalDate");
@@ -167,14 +172,11 @@ public class CallActivityTypeConversionTest extends PluggableFlowableTestCase {
         assertThat(instantToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(testLocalDate);
 
         // Verify period/duration to localdate conversions
-        LocalDate today = LocalDate.now();
         Object periodToLocalDate = runtimeService.getVariable(childProcessInstance.getId(), "periodToLocalDate");
-        assertThat(periodToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(today.plusDays(10));
+        assertThat(periodToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(zonedNow.plusDays(10).toLocalDate());
 
         Object durationToLocalDate = runtimeService.getVariable(childProcessInstance.getId(), "durationToLocalDate");
-        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class);
-        // PT10H from now could be today or tomorrow depending on time of day
-        assertThat((LocalDate) durationToLocalDate).isBetween(today, today.plusDays(1));
+        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(zonedNow.plusHours(10).toLocalDate());
 
         // Verify JSON conversion
         Object stringToJson = runtimeService.getVariable(childProcessInstance.getId(), "stringToJson");

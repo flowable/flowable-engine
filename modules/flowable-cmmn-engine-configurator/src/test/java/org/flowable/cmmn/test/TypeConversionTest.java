@@ -14,8 +14,9 @@ package org.flowable.cmmn.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -52,6 +54,8 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
         variables.put("stringLongVar", "789012345678");
         variables.put("periodVar", "P10D");
         variables.put("durationVar", "PT10H");
+
+        ZonedDateTime now = setClocks();
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("processTaskTypeConversion")
@@ -79,16 +83,12 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
                 .isInstanceOf(Long.class).isEqualTo(789012345678L);
 
         // Verify period/duration conversions
-        Date now = new Date();
         Object periodToDate = processEngine.getRuntimeService().getVariable(processInstance.getId(), "periodToDate");
         assertThat(periodToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) periodToDate).toInstant()))
-                .isBetween(Duration.ofDays(9).plusHours(23), Duration.ofDays(10).plusMinutes(1));
+        assertThat(((Date) periodToDate).toInstant()).isEqualTo(now.plusDays(10).toInstant());
 
         Object durationToLocalDate = processEngine.getRuntimeService().getVariable(processInstance.getId(), "durationToLocalDate");
-        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class);
-        LocalDate today = LocalDate.now();
-        assertThat((LocalDate) durationToLocalDate).isBetween(today, today.plusDays(1));
+        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(now.plusHours(10).toLocalDate());
 
         // Set variables on the process instance for out parameter testing
         processEngine.getRuntimeService().setVariable(processInstance.getId(), "processIntVar", "456");
@@ -120,6 +120,8 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
         variables.put("periodVar", "P10D");
         variables.put("durationVar", "PT10H");
 
+        ZonedDateTime now = setClocks();
+
         CaseInstance parentCaseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("parentCaseTypeConversion")
                 .variables(variables)
@@ -140,16 +142,12 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
                 .isInstanceOf(Boolean.class).isEqualTo(true);
 
         // Verify period/duration conversions
-        Date now = new Date();
         Object periodToDate = cmmnRuntimeService.getVariable(childCaseInstance.getId(), "periodToDate");
         assertThat(periodToDate).isInstanceOf(Date.class);
-        assertThat(Duration.between(now.toInstant(), ((Date) periodToDate).toInstant()))
-                .isBetween(Duration.ofDays(9).plusHours(23), Duration.ofDays(10).plusMinutes(1));
+        assertThat(((Date) periodToDate).toInstant()).isEqualTo(now.plusDays(10).toInstant());
 
         Object durationToLocalDate = cmmnRuntimeService.getVariable(childCaseInstance.getId(), "durationToLocalDate");
-        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class);
-        LocalDate today = LocalDate.now();
-        assertThat((LocalDate) durationToLocalDate).isBetween(today, today.plusDays(1));
+        assertThat(durationToLocalDate).isInstanceOf(LocalDate.class).isEqualTo(now.plusHours(10).toLocalDate());
 
         // Set variables on the child case for out parameter testing
         cmmnRuntimeService.setVariable(childCaseInstance.getId(), "childIntVar", "456");
@@ -223,5 +221,20 @@ public class TypeConversionTest extends AbstractProcessEngineIntegrationTest {
         } finally {
             processEngineRepositoryService.deleteDeployment(deployment.getId(), true);
         }
+    }
+
+    protected ZonedDateTime setClocks() {
+        // The period and duration conversions are relative to the current time of the engine clock.
+        // The next 10 days cross the end of the daylight saving time in Europe and in the US
+        Instant now = Instant.parse("2025-10-24T10:15:30Z");
+        processEngineConfiguration.getClock().setCurrentTime(Date.from(now));
+        cmmnEngineConfiguration.getClock().setCurrentTime(Date.from(now));
+        return now.atZone(cmmnEngineConfiguration.getClock().getCurrentTimeZone().toZoneId());
+    }
+
+    @AfterEach
+    public void resetClocks() {
+        processEngineConfiguration.getClock().reset();
+        cmmnEngineConfiguration.getClock().reset();
     }
 }
