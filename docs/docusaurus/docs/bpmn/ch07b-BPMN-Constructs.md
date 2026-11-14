@@ -3940,6 +3940,8 @@ For example, assuming the myService.getCollectionVariableName() returns a String
       </multiInstanceLoopCharacteristics>
     </userTask>
 
+The collection can also be a JSON array. Elements of a JSON array that are plain values are exposed as plain Java values in the element variable: a JSON string becomes a String, a JSON number becomes a number (e.g. Integer, Long or Double), a JSON boolean becomes a Boolean and a JSON null becomes null. For example, when assigneeList is the JSON array `["kermit", "gonzo"]`, the assignee variable is the String kermit (respectively gonzo), so it can be used directly for the assignee or compared in an expression such as `${assignee == 'kermit'}`. JSON objects and arrays are exposed as JSON. For compatibility, the Jackson accessor methods (e.g. `${assignee.asText()}`, `${assignee.asString()}`, `${assignee.textValue()}`, `${assignee.asInt()}`, `${assignee.booleanValue()}` or `${assignee.isTextual()}`) can still be used on such element variables in expressions.
+
 A multi-instance activity ends when all instances are finished. However, it is possible to specify an expression that is evaluated every time an instance ends. When this expression evaluates to true, all remaining instances are destroyed and the multi-instance activity ends, continuing the process. Such an expression must be defined in the **completionCondition** child element.
 
     <userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">

@@ -141,6 +141,10 @@ public class DefaultExpressionManager implements ExpressionManager {
         if (jsonNodeElResolver != null) {
             elResolvers.add(jsonNodeElResolver);
         }
+        ELResolver jsonValueNodeMethodsElResolver = createJsonValueNodeMethodsElResolver();
+        if (jsonValueNodeMethodsElResolver != null) {
+            elResolvers.add(jsonValueNodeMethodsElResolver);
+        }
         if (preBeanResolvers != null) {
             elResolvers.addAll(preBeanResolvers);
         }
@@ -167,6 +171,11 @@ public class DefaultExpressionManager implements ExpressionManager {
         return jsonNodeResolver == null ? new JsonNodeELResolver() : jsonNodeResolver;
     }
     
+    protected ELResolver createJsonValueNodeMethodsElResolver() {
+        // Supports invoking JSON value node methods (e.g. asText()) on plain String, Number and Boolean values
+        return new JsonValueNodeMethodsELResolver();
+    }
+
     protected ELResolver createBeanElResolver() {
         return beanResolver == null ? new BeanELResolver() : beanResolver;
     }

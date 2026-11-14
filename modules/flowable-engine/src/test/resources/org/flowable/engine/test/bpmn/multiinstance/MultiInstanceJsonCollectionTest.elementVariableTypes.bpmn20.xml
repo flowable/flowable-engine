@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+  <process id="miJsonCollection">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
+
+    <userTask id="miTasks" name="Task ${loopCounter}">
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${items}" flowable:elementVariable="item" />
+    </userTask>
+
+    <sequenceFlow id="flow2" sourceRef="miTasks" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>
