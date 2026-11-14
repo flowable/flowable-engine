@@ -12,7 +12,9 @@
  */
 package org.flowable.dmn.engine.impl.deployer;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
@@ -62,6 +64,13 @@ public class DmnDeployer implements Deployer {
             Map<DecisionEntity, DecisionEntity> mapOfNewDefinitionToPreviousVersion = getPreviousVersionsOfDecisions(parsedDeployment);
             setDecisionVersionsAndIds(parsedDeployment, mapOfNewDefinitionToPreviousVersion);
             persistDecisions(parsedDeployment);
+
+            List<String> decisionKeys = new ArrayList<>();
+            for (DecisionEntity decision : parsedDeployment.getAllDecisions()) {
+                decisionKeys.add(decision.getKey());
+            }
+            CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager()
+                    .evictSameDeploymentDecisions(parsedDeployment.getDeployment().getParentDeploymentId(), decisionKeys);
         } else {
             makeDecisionsConsistentWithPersistedVersions(parsedDeployment);
         }

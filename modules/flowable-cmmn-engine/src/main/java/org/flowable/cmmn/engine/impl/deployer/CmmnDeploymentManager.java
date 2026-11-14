@@ -14,10 +14,12 @@
 package org.flowable.cmmn.engine.impl.deployer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
@@ -35,11 +37,13 @@ import org.flowable.common.engine.api.repository.EngineDeployment;
 import org.flowable.common.engine.impl.EngineDeployer;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
 import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.common.engine.impl.persistence.deploy.AbstractSameDeploymentDefinitionLookup;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 
 public class CmmnDeploymentManager {
 
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+    protected SameDeploymentCaseDefinitionLookup sameDeploymentCaseDefinitionLookup;
     protected List<EngineDeployer> deployers;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnDeploymentEntityManager deploymentEntityManager;
@@ -121,6 +125,32 @@ public class CmmnDeploymentManager {
         return cachedCaseDefinition;
     }
     
+    /**
+     * Returns the case definition with the given key in the deployments of the given parent deployment, or null when
+     * there is none.
+     */
+    public CaseDefinition findCaseDefinitionByParentDeploymentAndKey(String parentDeploymentId, String caseDefinitionKey, String tenantId) {
+        String cacheKey = AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, caseDefinitionKey);
+        return sameDeploymentCaseDefinitionLookup.find(cacheKey, tenantId, sameDeploymentCaseDefinitionLookup.isCacheMisses(), () -> {
+            if (tenantId != null && !CmmnEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                return caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKeyAndTenantId(parentDeploymentId, caseDefinitionKey, tenantId);
+            }
+            return caseDefinitionEntityManager.findCaseDefinitionByParentDeploymentAndKey(parentDeploymentId, caseDefinitionKey);
+        });
+    }
+
+    /**
+     * Removes the cached lookups of the given case definition keys in the given parent deployment.
+     */
+    public void evictSameDeploymentCaseDefinitions(String parentDeploymentId, Collection<String> caseDefinitionKeys) {
+        if (StringUtils.isEmpty(parentDeploymentId)) {
+            return;
+        }
+        for (String caseDefinitionKey : caseDefinitionKeys) {
+            sameDeploymentCaseDefinitionLookup.evict(AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, caseDefinitionKey));
+        }
+    }
+
     public void removeDeployment(String deploymentId) {
         removeDeployment(deploymentId, true);
     }
@@ -143,13 +173,24 @@ public class CmmnDeploymentManager {
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
 
         FlowableEventDispatcher eventDispatcher = cmmnEngineConfiguration.getEventDispatcher();
+        List<String> caseDefinitionKeys = new ArrayList<>();
         for (CaseDefinition caseDefinition : caseDefinitions) {
             caseDefinitionCache.remove(caseDefinition.getId());
+            caseDefinitionKeys.add(caseDefinition.getKey());
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(caseDefinition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
                         EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
             }
         }
+        evictSameDeploymentCaseDefinitions(deployment.getParentDeploymentId(), caseDefinitionKeys);
+    }
+
+    public SameDeploymentCaseDefinitionLookup getSameDeploymentCaseDefinitionLookup() {
+        return sameDeploymentCaseDefinitionLookup;
+    }
+
+    public void setSameDeploymentCaseDefinitionLookup(SameDeploymentCaseDefinitionLookup sameDeploymentCaseDefinitionLookup) {
+        this.sameDeploymentCaseDefinitionLookup = sameDeploymentCaseDefinitionLookup;
     }
 
     public List<EngineDeployer> getDeployers() {

@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -99,7 +100,14 @@ public class BpmnDeployer implements EngineDeployer {
                 setDerivedProcessDefinitionVersionsAndIds(parsedDeployment, mapOfNewProcessDefinitionToPreviousDerivedVersion, deploymentSettings);
                 persistProcessDefinitionsAndAuthorizations(parsedDeployment);
             }
-          
+
+            List<String> processDefinitionKeys = new ArrayList<>();
+            for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
+                processDefinitionKeys.add(processDefinition.getKey());
+            }
+            CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager()
+                    .evictSameDeploymentProcessDefinitions(parsedDeployment.getDeployment().getParentDeploymentId(), processDefinitionKeys);
+
         } else {
             makeProcessDefinitionsConsistentWithPersistedVersions(parsedDeployment);
         }
