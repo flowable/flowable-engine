@@ -12,6 +12,7 @@
  */
 package org.flowable.common.engine.impl.scripting;
 
+import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
@@ -46,6 +48,12 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
 
     protected boolean cacheScriptingEngines = true;
     protected Map<String, ScriptEngine> cachedEngines;
+
+    /**
+     * The writer used by the scripts for their output (e.g. {@code println} in Groovy, {@code out:print} in JUEL).
+     * When not set, the writer of the script engine is used, which is usually {@code System.out}.
+     */
+    protected Writer scriptOutputWriter;
 
     public JSR223FlowableScriptEngine() {
         this(new ScriptEngineManager());
@@ -132,6 +140,18 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
         return scriptEngineManager;
     }
 
+    public Writer getScriptOutputWriter() {
+        return scriptOutputWriter;
+    }
+
+    /**
+     * Set the writer used by the scripts for their output.
+     * Use {@link Writer#nullWriter()} to discard the output, or e.g. a {@link java.io.StringWriter} to keep it in memory.
+     */
+    public void setScriptOutputWriter(Writer scriptOutputWriter) {
+        this.scriptOutputWriter = scriptOutputWriter;
+    }
+
 
     protected class JavaScriptingFlowableScriptEvaluationRequest implements FlowableScriptEvaluationRequest {
 
@@ -197,7 +217,12 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
             ScriptEngine scriptEngine = getEngineByName(language);
             Bindings bindings = createBindings();
             try {
-                Object result = scriptEngine.eval(script, bindings);
+                Object result;
+                if (scriptOutputWriter != null) {
+                    result = scriptEngine.eval(script, createScriptContext(scriptEngine, bindings));
+                } else {
+                    result = scriptEngine.eval(script, bindings);
+                }
                 return new ScriptEvaluationImpl(resolver, result);
             } catch (ScriptException e) {
                 throw new FlowableScriptException(e.getMessage(), e);
@@ -206,6 +231,20 @@ public class JSR223FlowableScriptEngine implements FlowableScriptEngine {
 
         protected Bindings createBindings() {
             return new ScriptBindings(Collections.singletonList(resolver), scopeContainer, inputVariableContainer, storeScriptVariables);
+        }
+
+        /**
+         * Creates the same script context as {@link javax.script.AbstractScriptEngine#eval(String, Bindings)} would, but with the configured script output writer.
+         */
+        protected ScriptContext createScriptContext(ScriptEngine scriptEngine, Bindings bindings) {
+            ScriptContext engineContext = scriptEngine.getContext();
+            ScriptContext scriptContext = new SimpleScriptContext();
+            scriptContext.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+            scriptContext.setBindings(engineContext.getBindings(ScriptContext.GLOBAL_SCOPE), ScriptContext.GLOBAL_SCOPE);
+            scriptContext.setReader(engineContext.getReader());
+            scriptContext.setWriter(scriptOutputWriter);
+            scriptContext.setErrorWriter(engineContext.getErrorWriter());
+            return scriptContext;
         }
     }
 }

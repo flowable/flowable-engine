@@ -31,6 +31,12 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
     private static List<String> extensions;
     private static List<String> mimeTypes;
 
+    /**
+     * Whether the {@code lang:import} function is available in the created engines.
+     * It allows loading any class and calling any of its public static methods, so it is disabled by default.
+     */
+    protected boolean importFunctionEnabled;
+
     static {
         names = Collections.unmodifiableList(Collections.singletonList("juel"));
         extensions = names;
@@ -137,7 +143,15 @@ public class JuelScriptEngineFactory implements ScriptEngineFactory {
 
     @Override
     public ScriptEngine getScriptEngine() {
-        return new JuelScriptEngine(this);
+        return new JuelScriptEngine(this, importFunctionEnabled);
+    }
+
+    public boolean isImportFunctionEnabled() {
+        return importFunctionEnabled;
+    }
+
+    public void setImportFunctionEnabled(boolean importFunctionEnabled) {
+        this.importFunctionEnabled = importFunctionEnabled;
     }
 
 }

@@ -17,12 +17,15 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.scripting.FlowableScriptEvaluationException;
+import org.flowable.common.engine.impl.scripting.JSR223FlowableScriptEngine;
 import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -244,6 +247,21 @@ public class ScriptTaskTest extends PluggableFlowableTestCase {
 
         assertThat(processInstance.getProcessVariables())
                 .containsOnly(entry("persistentResult", "success"));
+    }
+
+    @Test
+    @Deployment
+    public void testScriptOutputWriter() {
+        JSR223FlowableScriptEngine scriptEngine = (JSR223FlowableScriptEngine) processEngineConfiguration.getScriptEngine();
+        StringWriter writer = new StringWriter();
+        scriptEngine.setScriptOutputWriter(writer);
+        try {
+            runtimeService.startProcessInstanceByKey("scriptOutputWriter", Collections.singletonMap("name", "Kermit"));
+
+            assertThat(writer.toString()).isEqualToNormalizingNewlines("Hello Kermit from Groovy\n");
+        } finally {
+            scriptEngine.setScriptOutputWriter(null);
+        }
     }
 
 }
