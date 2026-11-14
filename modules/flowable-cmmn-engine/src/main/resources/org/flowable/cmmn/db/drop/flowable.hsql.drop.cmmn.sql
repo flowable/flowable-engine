@@ -1,13 +1,13 @@
-drop table if exists ACT_CMMN_HI_PLAN_ITEM_INST cascade constraints;
-drop table if exists ACT_CMMN_HI_MIL_INST cascade constraints;
-drop table if exists ACT_CMMN_HI_CASE_INST cascade constraints;
-drop table if exists ACT_CMMN_RU_MIL_INST cascade constraints;
-drop table if exists ACT_CMMN_RU_SENTRY_PART_INST cascade constraints;
-drop table if exists ACT_CMMN_RU_PLAN_ITEM_INST cascade constraints;
-drop table if exists ACT_CMMN_RU_CASE_INST cascade constraints;
-drop table if exists ACT_CMMN_CASEDEF cascade constraints;
-drop table if exists ACT_CMMN_DEPLOYMENT_RESOURCE cascade constraints;
-drop table if exists ACT_CMMN_DEPLOYMENT cascade constraints;
+drop table if exists ACT_CMMN_HI_PLAN_ITEM_INST cascade;
+drop table if exists ACT_CMMN_HI_MIL_INST cascade;
+drop table if exists ACT_CMMN_HI_CASE_INST cascade;
+drop table if exists ACT_CMMN_RU_MIL_INST cascade;
+drop table if exists ACT_CMMN_RU_SENTRY_PART_INST cascade;
+drop table if exists ACT_CMMN_RU_PLAN_ITEM_INST cascade;
+drop table if exists ACT_CMMN_RU_CASE_INST cascade;
+drop table if exists ACT_CMMN_CASEDEF cascade;
+drop table if exists ACT_CMMN_DEPLOYMENT_RESOURCE cascade;
+drop table if exists ACT_CMMN_DEPLOYMENT cascade;
 
 drop index if exists ACT_IDX_HI_PLAN_ITEM_INST_CASE;
 drop index if exists ACT_IDX_HI_PLAN_ITEM_INST_CASE;
