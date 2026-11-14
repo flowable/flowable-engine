@@ -33,10 +33,7 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
 
     @Override
     public void setVariableValue(VariableInstance variableInstance, Object value, String tenantId) {
-        if (JsonUtil.isJsonNode(value)) {
-            // If the value is JSON, we need to transform it to the json type that the variable json mapper understands.
-            value = serviceConfiguration.getVariableJsonMapper().transformToJsonNode(value);
-        }
+        value = transformJsonValue(value);
         if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
             VariableType variableType = determineVariableType(value);
             setVariableType(variableInstanceEntity, variableType);
@@ -49,6 +46,7 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
         /* Always check if the type should be altered. It's possible that the previous type is lower in the type
          * checking chain (e.g. serializable) and will return true on isAbleToStore(), even though another type higher in the chain is eligible for storage.
          */
+        value = transformJsonValue(value);
         if (variableInstance instanceof VariableInstanceEntity variableInstanceEntity) {
             VariableType variableType = determineVariableType(value);
             if (!variableType.equals(variableInstanceEntity.getType())) {
@@ -56,6 +54,14 @@ public class DefaultVariableInstanceValueModifier implements VariableInstanceVal
             }
         }
         variableInstance.setValue(value);
+    }
+
+    protected Object transformJsonValue(Object value) {
+        if (JsonUtil.isJsonNode(value)) {
+            // If the value is JSON, we need to transform it to the json type that the variable json mapper understands.
+            return serviceConfiguration.getVariableJsonMapper().transformToJsonNode(value);
+        }
+        return value;
     }
 
     protected void updateVariableType(VariableInstanceEntity variableInstance, VariableType variableType) {

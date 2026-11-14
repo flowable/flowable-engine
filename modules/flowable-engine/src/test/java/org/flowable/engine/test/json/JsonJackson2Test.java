@@ -20,8 +20,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.flowable.common.engine.api.delegate.Expression;
@@ -1134,6 +1136,66 @@ public class JsonJackson2Test extends ResourceFlowableTestCase {
                 .isEqualTo("""
                         {
                           name: 'Kermit'
+                        }
+                        """);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testUpdateJsonVariableWithJackson3JsonNode() {
+        tools.jackson.databind.ObjectMapper jackson3ObjectMapper = tools.jackson.databind.json.JsonMapper.shared();
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", objectMapper.createObjectNode().put("name", "Kermit"))
+                .start();
+
+        runtimeService.setVariable(processInstance.getId(), "customer", jackson3ObjectMapper.createObjectNode().put("name", "Gonzo"));
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Gonzo'
+                        }
+                        """);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.setVariable(task.getId(), "customer", jackson3ObjectMapper.createObjectNode().put("name", "Fozzie"));
+
+        customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Fozzie'
+                        }
+                        """);
+    }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    void testUpdateSerializableVariableWithJackson3JsonNode() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("customer", new HashSet<>(Set.of("Kermit")))
+                .start();
+
+        assertThat(runtimeService.getVariableInstance(processInstance.getId(), "customer").getTypeName()).isEqualTo("serializable");
+
+        runtimeService.setVariable(processInstance.getId(), "customer",
+                tools.jackson.databind.json.JsonMapper.shared().createObjectNode().put("name", "Gonzo"));
+
+        VariableInstance customerVarInstance = runtimeService.getVariableInstance(processInstance.getId(), "customer");
+        assertThat(customerVarInstance.getTypeName()).isEqualTo(JsonType.TYPE_NAME);
+        assertThat(customerVarInstance.getValue()).isInstanceOf(ObjectNode.class);
+        assertThatJson(customerVarInstance.getValue())
+                .isEqualTo("""
+                        {
+                          name: 'Gonzo'
                         }
                         """);
     }
