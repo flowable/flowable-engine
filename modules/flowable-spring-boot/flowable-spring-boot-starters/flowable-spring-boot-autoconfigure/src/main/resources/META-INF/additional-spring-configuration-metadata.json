@@ -549,6 +549,12 @@
       "description": "The context path for the Process rest servlet."
     },
     {
+      "name": "flowable.rest.table-management.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Whether the database table REST resources (management/tables) of the Process rest API are registered. These resources expose the raw content of the database tables."
+    },
+    {
       "name": "flowable.process.async.executor.default-timer-job-acquire-wait-time-in-millis",
       "type": "java.lang.Integer",
       "deprecation": {

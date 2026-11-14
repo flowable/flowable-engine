@@ -24,7 +24,10 @@ import org.flowable.common.engine.api.FlowableTaskAlreadyClaimedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -137,20 +140,39 @@ public class BaseExceptionHandlerAdvice {
 
     // Fall back
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public ErrorInfo handleOtherException(Exception e, HttpServletRequest request) {
+    public ResponseEntity<ErrorInfo> handleOtherException(Exception e, HttpServletRequest request) {
+        ResponseEntity.BodyBuilder responseBuilder;
+        String message;
+        if (e instanceof ErrorResponse errorResponse) {
+            // Spring MVC exceptions (e.g. no handler found, method not supported) define their own status
+            HttpStatusCode status = errorResponse.getStatusCode();
+            responseBuilder = ResponseEntity.status(status).headers(errorResponse.getHeaders());
+            message = errorResponse.getBody().getTitle();
+            if (status.is4xxClientError()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Spring MVC client error. Message: {}, Request: {} {}", e.getMessage(), request.getMethod(), request.getRequestURI());
+                }
+                // The problem detail is meant for clients, the exception message can contain internal details (e.g. controller method signatures)
+                ErrorInfo errorInfo = new ErrorInfo(message, null);
+                errorInfo.setException(errorResponse.getBody().getDetail());
+                return responseBuilder.body(errorInfo);
+            }
+        } else {
+            responseBuilder = ResponseEntity.internalServerError();
+            message = "Internal server error";
+        }
+
         if (sendFullErrorException) {
             logger.error("Unhandled exception. Request: {} {}", request.getMethod(), request.getRequestURI(), e);
-            return new ErrorInfo("Internal server error", e);
+            return responseBuilder.body(new ErrorInfo(message, e));
         } else {
 
             String errorIdentifier = UUID.randomUUID().toString();
             logger.error("Unhandled exception. Error ID: {}. Request: {} {}", errorIdentifier, request.getMethod(), request.getRequestURI(), e);
-            ErrorInfo errorInfo = new ErrorInfo("Internal server error", e);
+            ErrorInfo errorInfo = new ErrorInfo(message, e);
             errorInfo.setException("Error with ID: " + errorIdentifier);
-            return errorInfo;
+            return responseBuilder.body(errorInfo);
         }
     }
 
