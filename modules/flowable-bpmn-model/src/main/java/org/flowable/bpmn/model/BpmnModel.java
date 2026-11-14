@@ -441,7 +441,15 @@ public class BpmnModel {
         }
         return result;
     }
-    
+
+    /**
+     * Standardize the processing of id/reference values. To do: reconcile #getMessage(String)
+     */
+    public static String normalizeIdValue(String id, BpmnModel model) {
+        if (id == null || model == null || id.contains(":")) return id;
+        return model.getTargetNamespace() + ":" + id;
+    }
+
     public boolean containsMessageId(String messageId) {
         return messageMap.containsKey(messageId);
     }
