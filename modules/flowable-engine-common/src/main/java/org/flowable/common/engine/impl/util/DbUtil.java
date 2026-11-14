@@ -41,6 +41,7 @@ public class DbUtil {
     public static final String DATABASE_TYPE_MSSQL = "mssql";
     public static final String DATABASE_TYPE_DB2 = "db2";
     public static final String DATABASE_TYPE_COCKROACHDB = "cockroachdb";
+    public static final String DATABASE_TYPE_SPANNER = "spanner";
 
     public static Properties getDefaultDatabaseTypeMappings() {
         Properties databaseTypeMappings = new Properties();
@@ -74,6 +75,7 @@ public class DbUtil {
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty(PRODUCT_NAME_CRDB, DATABASE_TYPE_COCKROACHDB);
+        databaseTypeMappings.setProperty("Google Cloud Spanner", DATABASE_TYPE_SPANNER);
         return databaseTypeMappings;
     }
 
@@ -108,7 +110,18 @@ public class DbUtil {
 
             databaseType = databaseTypeMappings.getProperty(databaseProductName);
             if (databaseType == null) {
-                throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+                String url = null;
+                try {
+                    url = databaseMetaData.getURL();
+                } catch (Throwable ignored) {
+                }
+
+                if ((databaseProductName != null && databaseProductName.toLowerCase().contains(DATABASE_TYPE_SPANNER))
+                        || (url != null && url.toLowerCase().startsWith("jdbc:cloudspanner:"))) {
+                    databaseType = DATABASE_TYPE_SPANNER;
+                } else {
+                    throw new FlowableException("couldn't deduct database type from database product name '" + databaseProductName + "'");
+                }
             }
             logger.debug("using database type: {}", databaseType);
 

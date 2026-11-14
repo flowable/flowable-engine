@@ -123,17 +123,19 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
 
     @Override
     public void schemaDrop() {
-        
         try {
             executeMandatorySchemaResource("drop", "engine");
-            if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-                executeMandatorySchemaResource("drop", "history");
-            }
-            
         } catch (Exception e) {
             logger.info("Error dropping engine tables", e);
         }
-        
+
+        if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
+            try {
+                executeMandatorySchemaResource("drop", "history");
+            } catch (Exception e) {
+                logger.info("Error dropping history tables", e);
+            }
+        }
     }
 
     public void dbSchemaPrune() {
