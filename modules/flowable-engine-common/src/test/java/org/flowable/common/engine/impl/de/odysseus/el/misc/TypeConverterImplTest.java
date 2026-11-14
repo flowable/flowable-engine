@@ -278,6 +278,8 @@ class TypeConverterImplTest {
         assertThat(converter.coerceToBigDecimal(99L)).isEqualTo(ninetynine);
         assertThat(converter.coerceToBigDecimal(99F)).isEqualTo(ninetynine);
         assertThat(converter.coerceToBigDecimal(99.0)).isEqualTo(ninetynine);
+        assertThat(converter.coerceToBigDecimal(0.1F)).isEqualTo(new BigDecimal("0.1"));
+        assertThat(converter.coerceToBigDecimal(0.1D)).isEqualTo(new BigDecimal("0.1"));
         assertThat(converter.coerceToBigDecimal(new BigDecimal(99))).isEqualTo(ninetynine);
         assertThat(converter.coerceToBigDecimal(new BigInteger("99"))).isEqualTo(ninetynine);
         assertThat(converter.coerceToBigDecimal(ninetynine.toString())).isEqualTo(ninetynine);
