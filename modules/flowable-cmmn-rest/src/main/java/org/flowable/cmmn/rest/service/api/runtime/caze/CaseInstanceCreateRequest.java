@@ -19,8 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -100,7 +98,6 @@ public class CaseInstanceCreateRequest {
         this.overrideDefinitionTenantId = overrideDefinitionTenantId;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getVariables() {
         return variables;
     }
@@ -109,7 +106,6 @@ public class CaseInstanceCreateRequest {
         this.variables = variables;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getTransientVariables() {
         return transientVariables;
     }
@@ -118,7 +114,6 @@ public class CaseInstanceCreateRequest {
         this.transientVariables = transientVariables;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getStartFormVariables() {
         return startFormVariables;
     }
