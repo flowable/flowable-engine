@@ -247,7 +247,7 @@ public class CaseTaskActivityBehavior extends ChildTaskActivityBehavior implemen
                 CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
                 cmmnEngineConfiguration.getCmmnHistoryManager().recordCaseInstanceEnd(
                         caseInstance, CaseInstanceState.TERMINATED, cmmnEngineConfiguration.getClock().getCurrentTime());
-                caseInstanceEntityManager.delete(caseInstance.getId(), cascade, null);
+                caseInstanceEntityManager.delete(caseInstance.getId(), cascade, "cmmn-state-transition-delete-case");
             }
 
             // This is not the regular termination through the agenda, but the historic plan item state still needs to be correct.

@@ -643,6 +643,69 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseTaskWithChildHumanTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testTerminateCaseInstanceSetsDeleteReasonOnChildCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseTaskWithChildHumanTask").start();
+        Task childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
+        assertThat(childTask.getScopeId()).isNotEqualTo(caseInstance.getId());
+
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicChildTask = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
+            assertThat(historicChildTask.getEndTime()).isNotNull();
+            assertThat(historicChildTask.getDeleteReason()).isEqualTo("cmmn-state-transition-delete-case");
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.caseTaskWithChildHumanTask.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testDeleteCaseInstanceSetsDeleteReasonOnChildCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("caseTaskWithChildHumanTask").start();
+        Task childTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(caseInstance.getId()).singleResult();
+        assertThat(childTask.getScopeId()).isNotEqualTo(caseInstance.getId());
+
+        cmmnRuntimeService.deleteCaseInstance(caseInstance.getId());
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicChildTask = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(childTask.getId()).singleResult();
+            assertThat(historicChildTask.getEndTime()).isNotNull();
+            assertThat(historicChildTask.getDeleteReason()).isEqualTo("cmmn-state-transition-delete-case");
+        }
+    }
+
+    @Test
+    @CmmnDeployment(resources = {
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testThreeLevelRootCase.cmmn",
+            "org/flowable/cmmn/test/runtime/CaseTaskTest.testThreeLevelLevel1Case.cmmn",
+            "org/flowable/cmmn/test/runtime/oneHumanTaskCase.cmmn"
+    })
+    public void testTerminateCaseInstanceSetsDeleteReasonOnGrandchildCaseTask() {
+        CaseInstance rootCase = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("rootCase").start();
+        String level1CaseId = (String) rootCase.getCaseVariables().get("caseIdVariable");
+        String oneHumanTaskCaseId = (String) cmmnRuntimeService.getVariable(level1CaseId, "caseIdVariable");
+        Task grandchildTask = cmmnTaskService.createTaskQuery().caseInstanceIdWithChildren(rootCase.getId()).singleResult();
+        assertThat(grandchildTask.getScopeId()).isEqualTo(oneHumanTaskCaseId);
+
+        cmmnRuntimeService.terminateCaseInstance(rootCase.getId());
+
+        assertThat(cmmnTaskService.createTaskQuery().count()).isZero();
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, cmmnEngineConfiguration)) {
+            HistoricTaskInstance historicGrandchildTask = cmmnHistoryService.createHistoricTaskInstanceQuery().taskId(grandchildTask.getId()).singleResult();
+            assertThat(historicGrandchildTask.getEndTime()).isNotNull();
+            assertThat(historicGrandchildTask.getDeleteReason()).isEqualTo("cmmn-state-transition-delete-case");
+        }
+    }
+
+    @Test
     @CmmnDeployment
     public void testFallbackToDefaultTenant() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()

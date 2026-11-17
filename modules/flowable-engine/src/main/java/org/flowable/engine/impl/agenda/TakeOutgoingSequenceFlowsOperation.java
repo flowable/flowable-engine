@@ -14,6 +14,7 @@ package org.flowable.engine.impl.agenda;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.flowable.bpmn.model.Activity;
@@ -36,6 +37,7 @@ import org.flowable.common.engine.impl.util.CollectionUtil;
 import org.flowable.common.engine.api.delegate.BusinessError;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -299,6 +301,13 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
             if (condition.evaluate(adhocSubProcess.getId(), execution)) {
                 completeAdhocSubProcess = true;
             }
+        }
+
+        if (completeAdhocSubProcess && adhocSubProcess.isCancelRemainingInstances()) {
+            // The remaining activities are cancelled; otherwise EndExecutionOperation deletes them with a null delete reason.
+            // Done before leaving, so the executions of the outgoing sequence flows are kept.
+            CommandContextUtil.getExecutionEntityManager(commandContext).deleteChildExecutions(execution.getParent(),
+                    Collections.singletonList(execution.getId()), null, DeleteReason.ADHOC_SUBPROCESS_COMPLETED, true, flowNode);
         }
 
         if (flowNode.getOutgoingFlows().size() > 0) {
