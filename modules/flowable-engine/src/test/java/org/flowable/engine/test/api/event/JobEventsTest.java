@@ -265,7 +265,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         // no timer jobs will be fired
-        waitForJobExecutorToProcessAllJobs(2000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
         assertThat(listener.getEventsReceived()).isEmpty();
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
         Job firstTimerInstance = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -275,7 +275,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         testClock.setCurrentTime(nowCalendar.getTime());
 
         // the timer job will be fired for the first time now
-        waitForJobExecutorToProcessAllJobs(2000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
 
         // a new timer should be created with the repeat
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isEqualTo(1);
@@ -294,13 +294,13 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         testClock.setCurrentTime(nowCalendar.getTime());
 
         // the second timer job will be fired and no jobs should be remaining
-        waitForJobExecutorToProcessAllJobs(2000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
         nowCalendar.add(Calendar.HOUR, 1);
         nowCalendar.add(Calendar.MINUTE, 5);
         testClock.setCurrentTime(nowCalendar.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 200);
 
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).count()).isZero();
 
@@ -413,7 +413,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         // Check Timer fired event has been dispatched
         assertThat(listener.getEventsReceived()).hasSize(6);
@@ -444,7 +444,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 100);
 
         checkEventCount(1, FlowableEngineEventType.TIMER_SCHEDULED);
         checkEventCount(0, FlowableEngineEventType.JOB_CANCELED);
@@ -550,7 +550,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Calendar later = Calendar.getInstance();
         later.add(Calendar.YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(later.getTime());
-        waitForJobExecutorToProcessAllJobs(10000, 100);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000, 100);
 
         // Process Cancelled event should not be sent for the subprocess
         List<FlowableEvent> eventsReceived = activitiEventListener.getEventsReceived();

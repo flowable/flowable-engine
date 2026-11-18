@@ -217,6 +217,11 @@ public class AllEnginesAutoConfigurationTest {
             assertThat(context.getBean(SpringProcessEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.DISABLED);
             assertThat(context.getBean(SpringAppEngineConfiguration.class).getVariableTypes().getVariableType(SerializableType.TYPE_NAME))
                     .isInstanceOfSatisfying(SerializableType.class, type -> assertThat(type.getMode()).isEqualTo(SerializableVariableTypeMode.DISABLED));
+
+            deleteDeployments(context.getBean(AppEngine.class));
+            deleteDeployments(context.getBean(CmmnEngine.class));
+            deleteDeployments(context.getBean(DmnEngine.class));
+            deleteDeployments(context.getBean(ProcessEngine.class));
         });
     }
 
@@ -230,6 +235,11 @@ public class AllEnginesAutoConfigurationTest {
                     assertThat(context.getBean(SpringProcessEngineConfiguration.class).getSerializableVariableTypeMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY);
                     assertThat(context.getBean(SpringAppEngineConfiguration.class).getVariableTypes().getVariableType(SerializableType.TYPE_NAME))
                             .isInstanceOfSatisfying(SerializableType.class, type -> assertThat(type.getMode()).isEqualTo(SerializableVariableTypeMode.READ_ONLY));
+
+                    deleteDeployments(context.getBean(AppEngine.class));
+                    deleteDeployments(context.getBean(CmmnEngine.class));
+                    deleteDeployments(context.getBean(DmnEngine.class));
+                    deleteDeployments(context.getBean(ProcessEngine.class));
                 });
     }
 

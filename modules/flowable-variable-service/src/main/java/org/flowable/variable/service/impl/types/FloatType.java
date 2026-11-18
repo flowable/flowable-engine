@@ -42,7 +42,18 @@ public class FloatType implements VariableType {
 
     @Override
     public void setValue(Object value, ValueFields valueFields) {
-        valueFields.setDoubleValue(value != null ? ((Float) value).doubleValue() : null);
+        valueFields.setDoubleValue(value != null ? toDouble((Float) value) : null);
+    }
+
+    /**
+     * Converts the float to the double with its shortest decimal representation (e.g. 1.1f becomes 1.1 and not 1.100000023841858).
+     * Otherwise, the value would be rounded by databases that do not store the double column as a binary floating point number
+     * (e.g. Oracle uses NUMBER(*,10)), which makes the stored value different from the one used in queries.
+     */
+    protected double toDouble(Float value) {
+        double doubleValue = Double.parseDouble(value.toString());
+        // This should always be the case, but fall back to the exact conversion if the shortest representation is not the same float
+        return (float) doubleValue == value ? doubleValue : value.doubleValue();
     }
 
     @Override

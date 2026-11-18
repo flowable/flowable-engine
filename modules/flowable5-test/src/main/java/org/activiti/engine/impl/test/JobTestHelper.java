@@ -58,7 +58,9 @@ public class JobTestHelper {
                 while (areJobsAvailable && !task.isTimeLimitExceeded()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = areJobsAvailable(managementService);
+                        // A single check can miss a job when it is moved between the timer and async job tables while the check runs.
+                        // Any job that is still in progress after such a miss is seen by a second check, so only stop when both are empty.
+                        areJobsAvailable = areJobsAvailable(managementService) || areJobsAvailable(managementService);
                     } catch (Throwable t) {
                         // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
                         // isolation level doesn't allow READ of the table
@@ -100,7 +102,9 @@ public class JobTestHelper {
                 while (areJobsAvailable && !task.isTimeLimitExceeded()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = areJobsOrExecutableTimersAvailable(managementService);
+                        // A single check can miss a job when it is moved between the timer and async job tables while the check runs.
+                        // Any job that is still in progress after such a miss is seen by a second check, so only stop when both are empty.
+                        areJobsAvailable = areJobsOrExecutableTimersAvailable(managementService) || areJobsOrExecutableTimersAvailable(managementService);
                     } catch (Throwable t) {
                         // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
                         // isolation level doesn't allow READ of the table
@@ -192,12 +196,11 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
-        if (emptyJobs) {
-            return !managementService.createTimerJobQuery().executable().list().isEmpty();
-        } else {
-            return true;
-        }
+        // The timers are checked before and after the jobs, since a timer can be moved to an async job (or an async job can create a timer)
+        // between the queries
+        return !managementService.createTimerJobQuery().executable().list().isEmpty()
+                || !managementService.createJobQuery().list().isEmpty()
+                || !managementService.createTimerJobQuery().executable().list().isEmpty();
     }
 
     public static boolean areJobsAvailable(org.activiti.engine.ManagementService managementService) {
@@ -205,12 +208,11 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsOrExecutableTimersAvailable(ManagementService managementService) {
-        boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
-        if (emptyJobs) {
-            return !managementService.createTimerJobQuery().executable().list().isEmpty();
-        } else {
-            return true;
-        }
+        // The timers are checked before and after the jobs, since a timer can be moved to an async job (or an async job can create a timer)
+        // between the queries
+        return !managementService.createTimerJobQuery().executable().list().isEmpty()
+                || !managementService.createJobQuery().list().isEmpty()
+                || !managementService.createTimerJobQuery().executable().list().isEmpty();
     }
 
     private static class InterruptTask extends TimerTask {

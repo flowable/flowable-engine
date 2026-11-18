@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assumptions.assumeThat;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -25,11 +26,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.flowable.common.engine.impl.AbstractEngineConfiguration;
-import org.flowable.common.engine.impl.interceptor.Command;
-import org.flowable.common.engine.impl.interceptor.CommandConfig;
-import org.flowable.common.engine.impl.interceptor.CommandExecutor;
+import org.flowable.common.engine.impl.context.Context;
+import org.flowable.common.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.DefaultInternalJobManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandInvoker;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.impl.CustomConfigurationFlowableTestCase;
 import org.flowable.job.api.AcquiredExternalWorkerJob;
@@ -41,7 +41,7 @@ import org.junit.jupiter.api.Test;
  */
 public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigurationFlowableTestCase {
 
-    protected CustomWaitCommandInvoker waitCommandInvoker;
+    protected WaitingInternalJobManager waitingInternalJobManager;
 
     public MultipleExternalWorkerAcquireServiceTaskTest() {
         super("multipleExternalWorkerAcquireTest");
@@ -49,8 +49,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
 
     @Override
     protected void configureConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        waitCommandInvoker = new CustomWaitCommandInvoker();
-        processEngineConfiguration.setCommandInvoker(waitCommandInvoker);
+        waitingInternalJobManager = new WaitingInternalJobManager(processEngineConfiguration);
+        processEngineConfiguration.setInternalJobManager(waitingInternalJobManager);
     }
 
     @Test
@@ -69,8 +69,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .extracting(ExternalWorkerJob::getLockOwner)
                 .containsOnlyNulls();
 
-        waitCommandInvoker.waitLatch = new CountDownLatch(1);
-        waitCommandInvoker.workLatch = new CountDownLatch(1);
+        // Both workers have to query the jobs before any of them locks them
+        waitingInternalJobManager.acquireLatch = new CountDownLatch(2);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -83,9 +83,6 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .supplyAsync(() -> managementService.createExternalWorkerJobAcquireBuilder()
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2"), executorService);
-
-        waitCommandInvoker.workLatch.countDown();
-        waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
         List<AcquiredExternalWorkerJob> worker2Jobs = testWorker2.get();
@@ -120,8 +117,8 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .extracting(ExternalWorkerJob::getLockOwner)
                 .containsOnlyNulls();
 
-        waitCommandInvoker.waitLatch = new CountDownLatch(1);
-        waitCommandInvoker.workLatch = new CountDownLatch(1);
+        // Both workers have to query the jobs before any of them locks them
+        waitingInternalJobManager.acquireLatch = new CountDownLatch(2);
 
         ExecutorService executorService = Executors.newFixedThreadPool(2);
 
@@ -134,9 +131,6 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
                 .supplyAsync(() -> managementService.createExternalWorkerJobAcquireBuilder()
                         .topic("simple", Duration.ofMinutes(30))
                         .acquireAndLock(3, "testWorker2", 1), executorService);
-
-        waitCommandInvoker.workLatch.countDown();
-        waitCommandInvoker.waitLatch.countDown();
 
         List<AcquiredExternalWorkerJob> worker1Jobs = testWorker1.get();
         List<AcquiredExternalWorkerJob> worker2Jobs = testWorker2.get();
@@ -157,36 +151,30 @@ public class MultipleExternalWorkerAcquireServiceTaskTest extends CustomConfigur
 
     }
 
-    private static class CustomWaitCommandInvoker extends CommandInvoker {
+    protected static class WaitingInternalJobManager extends DefaultInternalJobManager {
 
-        protected CountDownLatch workLatch;
-        protected CountDownLatch waitLatch;
+        protected volatile CountDownLatch acquireLatch;
 
-        public CustomWaitCommandInvoker() {
-            super((commandContext, runnable) -> runnable.run(), null);
+        public WaitingInternalJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+            super(processEngineConfiguration);
         }
 
         @Override
-        public <T> T execute(CommandConfig config, Command<T> command, CommandExecutor commandExecutor) {
-
-            if (workLatch != null) {
+        public Map<String, Object> resolveVariablesForExternalWorkerJobInternal(ExternalWorkerJob job) {
+            // This is invoked after the jobs have been queried and before they (and their process instances) get locked.
+            // Every acquire command waits only once (for its first job), a retried acquire does not wait since the latch is already at 0.
+            CountDownLatch latch = acquireLatch;
+            CommandContext commandContext = Context.getCommandContext();
+            if (latch != null && commandContext.getAttribute("waitedForOtherWorker") == null) {
+                commandContext.addAttribute("waitedForOtherWorker", Boolean.TRUE);
+                latch.countDown();
                 try {
-                    workLatch.await(5, TimeUnit.SECONDS);
+                    latch.await(5, TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
-
-            T result = super.execute(config, command, commandExecutor);
-
-            if (waitLatch != null) {
-                try {
-                    waitLatch.await(5, TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-            return result;
+            return super.resolveVariablesForExternalWorkerJobInternal(job);
         }
     }
 }

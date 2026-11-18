@@ -20,6 +20,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -313,7 +314,8 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment(resources = "org/flowable/cmmn/test/runtime/ServiceTaskWithFuturesTest.testDelegateExpressionWithFutureJavaDelegate.cmmn", tenantId = "flowable")
     public void testDelegateExpressionWithMapBasedFutureJavaDelegate() {
-        List<ReadOnlyDelegatePlanItemInstance> delegatePlanItems = new ArrayList<>();
+        // The delegates are executed in parallel, so the list has to be thread safe
+        List<ReadOnlyDelegatePlanItemInstance> delegatePlanItems = Collections.synchronizedList(new ArrayList<>());
         MapBasedFlowablePlanItemFutureJavaDelegate bean = inputData -> {
             delegatePlanItems.add(inputData);
             return Collections.singletonMap(inputData.getPlanItemDefinitionId(), "done");
@@ -335,6 +337,8 @@ public class ServiceTaskWithFuturesTest extends FlowableCmmnTestCase {
                 );
 
         assertCaseInstanceEnded(caseInstance);
+        // The order in which the parallel delegates are executed is not guaranteed
+        delegatePlanItems.sort(Comparator.comparing(ReadOnlyDelegatePlanItemInstance::getPlanItemDefinitionId));
         assertThat(delegatePlanItems)
                 .extracting(ReadOnlyDelegatePlanItemInstance::getPlanItemDefinitionId)
                 .containsExactly("serviceTask1", "serviceTask2");

@@ -44,8 +44,12 @@ public class CmmnJobTestHelper {
 
             @Override
             public Boolean call() {
-                return cmmnEngineConfiguration.getCmmnManagementService().createJobQuery().count() > 0
-                        || cmmnEngineConfiguration.getCmmnManagementService().createTimerJobQuery().count() > 0;
+                // The timers are checked before and after the jobs, since a timer can be moved to an async job (or an async job can create a timer)
+                // between the queries
+                CmmnManagementService managementService = cmmnEngineConfiguration.getCmmnManagementService();
+                return managementService.createTimerJobQuery().count() > 0
+                        || managementService.createJobQuery().count() > 0
+                        || managementService.createTimerJobQuery().count() > 0;
             }
 
         }, maxMillisToWait, intervalMillis, shutdownExecutorWhenFinished);
@@ -123,7 +127,9 @@ public class CmmnJobTestHelper {
                 while (areJobsAvailable && !interruptTask.isTimeLimitExceeded()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = callable.call();
+                        // A single check can miss a job when it is moved between the timer and async job tables while the check runs.
+                        // Any job that is still in progress after such a miss is seen by a second check, so only stop when both are empty.
+                        areJobsAvailable = callable.call() || callable.call();
                     } catch (Throwable t) { 
                         // ignore
                     }
