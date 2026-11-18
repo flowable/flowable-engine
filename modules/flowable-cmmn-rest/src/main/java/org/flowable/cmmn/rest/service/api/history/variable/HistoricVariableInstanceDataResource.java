@@ -64,6 +64,11 @@ public class HistoricVariableInstanceDataResource extends HistoricVariableInstan
         isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
+    @Override
+    protected void validateVariableDataAllowed(String variableTypeName) {
+        SerializableRestVariableUtil.validateSerializableVariableAllowed(variableTypeName, isSerializableVariableAllowed);
+    }
+
     @GetMapping(value = "/cmmn-history/historic-variable-instances/{varInstanceId}/data")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the variable instance was found and the requested variable data is returned."),

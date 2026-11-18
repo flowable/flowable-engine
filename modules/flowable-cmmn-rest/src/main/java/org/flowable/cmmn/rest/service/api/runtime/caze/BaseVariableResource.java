@@ -131,6 +131,9 @@ public class BaseVariableResource extends BaseCaseInstanceResource implements In
         Object value = null;
         boolean valueUnresolvable = false;
         if (variableInstance != null) {
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getTypeName(), isSerializableVariableAllowed);
+            }
             try {
                 value = variableInstance.getValue();
             } catch (RuntimeException e) {

@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.common.rest.variable.SerializableRestVariableUtil;
+import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -62,6 +63,9 @@ public class VariableInstanceDataResource implements InitializingBean {
     @Autowired
     protected RuntimeService runtimeService;
     
+    @Autowired
+    protected ManagementService managementService;
+
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
@@ -108,7 +112,12 @@ public class VariableInstanceDataResource implements InitializingBean {
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {
-        VariableInstance varObject = runtimeService.createVariableInstanceQuery().id(varInstanceId).singleResult();
+        // The value of the variable is resolved in the same command as the query, after validating that its data can be returned
+        return managementService.executeCommand(commandContext -> readVariable(includeBinary, varInstanceId));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String varInstanceId) {
+        VariableInstance varObject = runtimeService.createVariableInstanceQuery().id(varInstanceId).excludeVariableInitialization().singleResult();
 
         if (varObject == null) {
             throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' could not be found.", VariableInstanceEntity.class);
@@ -118,6 +127,9 @@ public class VariableInstanceDataResource implements InitializingBean {
                 restApiInterceptor.accessVariableInfoById(varObject);
             }
             
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(varObject.getTypeName(), isSerializableVariableAllowed);
+            }
             return restResponseFactory.createRestVariable(varObject.getName(), varObject.getValue(), null, varInstanceId, RestResponseFactory.VARIABLE_VARINSTANCE, includeBinary);
         }
     }

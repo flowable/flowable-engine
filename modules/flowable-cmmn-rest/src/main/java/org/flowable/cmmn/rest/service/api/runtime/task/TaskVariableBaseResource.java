@@ -101,6 +101,9 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
         if (variableInstance == null) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' doesn't have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getTypeName(), isSerializableVariableAllowed);
+            }
             // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
             return restResponseFactory.createRestVariable(variableInstance, variableScope, taskId, CmmnRestResponseFactory.VARIABLE_TASK, includeBinary);
         }

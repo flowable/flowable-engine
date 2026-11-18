@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.logging.LoggingSessionUtil;
 import org.flowable.common.engine.impl.util.JsonUtil;
+import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.BigDecimalType;
 import org.flowable.variable.service.impl.types.BigIntegerType;
@@ -33,6 +34,7 @@ import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
@@ -69,16 +71,31 @@ public class VariableLoggingSessionUtil {
             String variableTypeName = variableInstance.getType().getTypeName();
             loggingNode.put("variableType", variableTypeName);
             
-            if (variableInstance.getValue() == null) {
-                loggingNode.putNull("variableRawValue");
-                loggingNode.putNull("variableValue");
-                
-            } else {
-                addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode, objectMapper);
+            if (isValueReadable(variableInstance)) {
+                if (variableInstance.getValue() == null) {
+                    loggingNode.putNull("variableRawValue");
+                    loggingNode.putNull("variableValue");
+
+                } else {
+                    addVariableValue(variableInstance.getValue(), variableTypeName, "variableRawValue", "variableValue", loggingNode, objectMapper);
+                }
             }
         }
         
         return loggingNode;
+    }
+
+    /**
+     * Whether the value of the variable instance can be read for logging purposes.
+     * The value of a serializable variable cannot be read when the serializable variable type is disabled,
+     * such a variable is logged without its value.
+     */
+    public static boolean isValueReadable(VariableInstanceEntity variableInstance) {
+        VariableType variableType = variableInstance.getType();
+        if (variableType instanceof SerializableType serializableType) {
+            return serializableType.getMode().isReadable();
+        }
+        return true;
     }
     
     public static void addVariableValue(Object variableValue, String variableTypeName, String variableRawValueName, String variableValueName,

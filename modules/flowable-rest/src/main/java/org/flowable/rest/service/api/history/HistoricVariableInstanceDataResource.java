@@ -24,6 +24,7 @@ import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -62,6 +63,9 @@ public class HistoricVariableInstanceDataResource implements InitializingBean {
     @Autowired
     protected HistoryService historyService;
     
+    @Autowired
+    protected ManagementService managementService;
+
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
 
@@ -108,7 +112,12 @@ public class HistoricVariableInstanceDataResource implements InitializingBean {
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {
-        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
+        // The value of the variable is resolved in the same command as the query, after validating that its data can be returned
+        return managementService.executeCommand(commandContext -> readVariable(includeBinary, varInstanceId));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String varInstanceId) {
+        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).excludeVariableInitialization().singleResult();
 
         if (varObject == null) {
             throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' could not be found.", VariableInstanceEntity.class);
@@ -118,6 +127,9 @@ public class HistoricVariableInstanceDataResource implements InitializingBean {
                 restApiInterceptor.accessHistoryVariableInfoById(varObject);
             }
             
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(varObject.getVariableTypeName(), isSerializableVariableAllowed);
+            }
             return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, RestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
         }
     }

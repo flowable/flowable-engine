@@ -108,13 +108,16 @@ public class HistoricDetailDataResource extends HistoricDetailBaseResource imple
         Object value = null;
         HistoricVariableUpdate variableUpdate = null;
         HistoricDetail detailObject = historyService.createHistoricDetailQuery().id(detailId).singleResult();
-        if (detailObject instanceof HistoricVariableUpdate) {
-            variableUpdate = (HistoricVariableUpdate) detailObject;
-            value = variableUpdate.getValue();
-        }
-        
         if (restApiInterceptor != null) {
             restApiInterceptor.accessHistoryDetailById(detailObject);
+        }
+
+        if (detailObject instanceof HistoricVariableUpdate) {
+            variableUpdate = (HistoricVariableUpdate) detailObject;
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(variableUpdate.getVariableTypeName(), isSerializableVariableAllowed);
+            }
+            value = variableUpdate.getValue();
         }
 
         if (value == null) {
