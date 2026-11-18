@@ -162,6 +162,9 @@ public class HistoricTaskInstanceVariableDataResource implements InitializingBea
                 variableInstance = getProcessVariable(taskObject, variableName);
             }
         }
+        if (variableInstance != null && includeBinary) {
+            SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getVariableTypeName(), isSerializableVariableAllowed);
+        }
         Object value = variableInstance != null ? variableInstance.getValue() : null;
 
         if (value == null) {

@@ -348,6 +348,9 @@ public class BaseExecutionVariableResource implements InitializingBean {
      * and is marked as having an unresolvable value. When the binary value is requested, a value that cannot be resolved fails instead.
      */
     protected RestVariable constructRestVariable(VariableInstance variableInstance, RestVariableScope variableScope, String executionId, boolean includeBinary) {
+        if (includeBinary) {
+            SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getTypeName(), isSerializableVariableAllowed);
+        }
         Object value;
         try {
             value = variableInstance.getValue();

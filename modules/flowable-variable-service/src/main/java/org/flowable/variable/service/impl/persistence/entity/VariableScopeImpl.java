@@ -844,10 +844,14 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
 
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object newVariableValue) {
 
-        Object oldVariableValue = variableInstance.getValue();
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+        // The old value is only needed for the logging session
+        Object oldVariableValue = null;
+        if (variableServiceConfiguration.isLoggingSessionEnabled() && VariableLoggingSessionUtil.isValueReadable(variableInstance)) {
+            oldVariableValue = variableInstance.getValue();
+        }
         String oldVariableType = variableInstance.getTypeName();
         initializeVariableInstanceBackPointer(variableInstance);
-        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
         variableServiceConfiguration.getVariableInstanceValueModifier().updateVariableValue(variableInstance, newVariableValue, getTenantId());
         if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {

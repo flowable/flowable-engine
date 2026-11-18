@@ -16,8 +16,12 @@ package org.flowable.standalone.jpa;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InvalidClassException;
+import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -34,8 +38,10 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.FlowableUnrecoverableJobException;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -427,6 +433,31 @@ public class JPAVariableTest extends ResourceFlowableTestCase {
     }
 
     // https://activiti.atlassian.net/browse/ACT-995
+    @Test
+    @Deployment(resources = { "org/flowable/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml" })
+    public void testJPAEntityListDoesNotDeserializeNonStringValues() throws Exception {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
+
+        // Simulate tampered bytes in the database
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        try (ObjectOutputStream outputStream = new ObjectOutputStream(buffer)) {
+            outputStream.writeObject(new ArrayList<>(List.of("1")));
+        }
+        managementService.executeCommand(commandContext -> {
+            VariableInstanceEntity variableInstance = (VariableInstanceEntity) runtimeService.getVariableInstance(processInstance.getId(), "list");
+            assertThat(variableInstance.getTypeName()).isEqualTo(JPAEntityListVariableType.TYPE_NAME);
+            variableInstance.setBytes(buffer.toByteArray());
+            return null;
+        });
+
+        assertThatThrownBy(() -> runtimeService.getVariable(processInstance.getId(), "list"))
+                .isInstanceOf(FlowableException.class)
+                .hasMessageContaining("Unexpected exception when deserializing JPA id's")
+                .hasRootCauseInstanceOf(InvalidClassException.class);
+    }
+
     @Test
     @Deployment(resources = "org/flowable/standalone/jpa/JPAVariableTest.testQueryJPAVariable.bpmn20.xml")
     public void testReplaceExistingJPAEntityWithAnotherOfSameType() {

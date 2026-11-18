@@ -62,14 +62,14 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     @Autowired
     protected CmmnHistoryService historyService;
 
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variable data is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @Override
     public void afterPropertiesSet() {
         isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variable data is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested case instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @ApiOperation(value = "Get the binary data for a historic case instance variable", tags = {"History Process" }, nickname = "getHistoricCaseInstanceVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @GetMapping(value = "/cmmn-history/historic-case-instances/{caseInstanceId}/variables/{variableName}/data")
@@ -106,12 +106,22 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName) {
+        // The value of the variable is resolved in the same command as the query, after validating that its data can be returned
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(includeBinary, caseInstanceId, variableName));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String caseInstanceId, String variableName) {
         HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequest(caseInstanceId);
 
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
                         .caseInstanceId(caseObject.getId())
                         .variableName(variableName)
+                        .excludeVariableInitialization()
                         .singleResult();
+
+        if (variable != null && includeBinary) {
+            SerializableRestVariableUtil.validateSerializableVariableAllowed(variable.getVariableTypeName(), isSerializableVariableAllowed);
+        }
 
         if (variable == null || variable.getValue() == null) {
             throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);

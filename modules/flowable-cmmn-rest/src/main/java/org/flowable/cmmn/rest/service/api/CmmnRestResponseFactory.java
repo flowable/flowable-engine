@@ -76,6 +76,7 @@ import org.flowable.common.rest.variable.LocalDateRestVariableConverter;
 import org.flowable.common.rest.variable.LocalDateTimeRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
 import org.flowable.common.rest.variable.UUIDRestVariableConverter;
@@ -479,7 +480,22 @@ public class CmmnRestResponseFactory {
         return restVar;
     }
 
+    /**
+     * Get the value of a variable that is going to be stored.
+     * A JSON object or array is only supported when the json type is provided.
+     */
     public Object getVariableValue(RestVariable restVariable) {
+        return getVariableValue(restVariable, false);
+    }
+
+    /**
+     * Get the value of a transient variable. Since it is not stored, a JSON object or array without a type is supported as well.
+     */
+    public Object getTransientVariableValue(RestVariable restVariable) {
+        return getVariableValue(restVariable, true);
+    }
+
+    protected Object getVariableValue(RestVariable restVariable, boolean allowUntypedJsonValue) {
         Object value = null;
 
         if (restVariable.getType() != null) {
@@ -500,6 +516,9 @@ public class CmmnRestResponseFactory {
             // Revert to type determined by REST-to-Java mapping when no
             // explicit type has been provided
             value = restVariable.getValue();
+            if (!allowUntypedJsonValue) {
+                SerializableRestVariableUtil.validateUntypedVariableValue(restVariable.getName(), value);
+            }
         }
         return value;
     }

@@ -120,6 +120,7 @@ public class SerializableVariablesDisabledTest extends BaseSpringRestTestCase {
         runtimeService.setVariable(caseInstance.getId(), "serializableVariable", serializable);
 
         Task task = taskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        taskService.setVariableLocal(task.getId(), "localSerializableVariable", serializable);
 
         // We have serializable objects disabled in the REST API, we should get a 415.
         assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
@@ -142,6 +143,9 @@ public class SerializableVariablesDisabledTest extends BaseSpringRestTestCase {
                 HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
         assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
                 + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_CASE_INSTANCE_VARIABLE_DATA, caseInstance.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + CmmnRestUrls.createRelativeResourceUrl(CmmnRestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, task.getId(), "localSerializableVariable")),
                 HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 

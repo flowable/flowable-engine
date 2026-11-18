@@ -32,7 +32,8 @@ public enum SerializableVariableTypeMode {
 
     /**
      * Serializable variables can neither be read nor written.
-     * Existing variables of this type can still be loaded (e.g. for deletion), but accessing their value fails.
+     * Existing variables of this type can still be loaded, removed and overwritten with a value of another type,
+     * but accessing their value fails.
      */
     DISABLED;
 

@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.logging.LoggingListener;
+import org.flowable.common.engine.impl.logging.LoggingSessionConstants;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
@@ -40,8 +42,9 @@ import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Filip Hrisafov
@@ -51,23 +54,6 @@ class SerializableVariableTypeModeTest {
     protected static final String JDBC_URL = "jdbc:h2:mem:serializableVariableTypeModeTest";
 
     protected List<ProcessEngine> processEngines = new ArrayList<>();
-
-    // Process engine with serializable variables enabled, used for creating the serializable data
-    protected ProcessEngine enabledProcessEngine;
-    protected ProcessInstance processInstance;
-
-    @BeforeEach
-    void setUp() {
-        enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED, "create-drop");
-        enabledProcessEngine.getRepositoryService().createDeployment()
-                .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
-                .deploy();
-
-        processInstance = enabledProcessEngine.getRuntimeService().createProcessInstanceBuilder()
-                .processDefinitionKey("oneTaskProcess")
-                .variable("serializableVar", new TestSerializableVariable(10))
-                .start();
-    }
 
     @AfterEach
     void tearDown() {
@@ -85,6 +71,8 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void enabledMode() {
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
         RuntimeService runtimeService = enabledProcessEngine.getRuntimeService();
         assertThat(runtimeService.getVariable(processInstance.getId(), "serializableVar", TestSerializableVariable.class))
                 .extracting(TestSerializableVariable::getNumber)
@@ -98,7 +86,9 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void readOnlyMode() {
-        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.READ_ONLY, "false").getRuntimeService();
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.READ_ONLY).getRuntimeService();
 
         assertThat(runtimeService.getVariable(processInstance.getId(), "serializableVar", TestSerializableVariable.class))
                 .extracting(TestSerializableVariable::getNumber)
@@ -127,7 +117,9 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void readOnlyModeDoesNotUpdateTrackedObjects() {
-        ProcessEngine readOnlyProcessEngine = buildProcessEngine(SerializableVariableTypeMode.READ_ONLY, "false");
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        ProcessEngine readOnlyProcessEngine = buildProcessEngine(SerializableVariableTypeMode.READ_ONLY);
 
         readOnlyProcessEngine.getManagementService().executeCommand(commandContext -> {
             TestSerializableVariable value = (TestSerializableVariable) readOnlyProcessEngine.getRuntimeService()
@@ -143,7 +135,9 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void disabledMode() {
-        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED, "false");
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED);
         RuntimeService runtimeService = disabledProcessEngine.getRuntimeService();
 
         assertThatThrownBy(() -> runtimeService.getVariable(processInstance.getId(), "serializableVar"))
@@ -169,8 +163,68 @@ class SerializableVariableTypeModeTest {
     }
 
     @Test
+    void disabledModeVariableCanBeOverwrittenWithAnotherType() {
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.DISABLED).getRuntimeService();
+
+        // The existing value does not need to be read for replacing it with a value of another type
+        runtimeService.setVariable(processInstance.getId(), "serializableVar", "migrated");
+
+        VariableInstance variableInstance = runtimeService.getVariableInstance(processInstance.getId(), "serializableVar");
+        assertThat(variableInstance.getTypeName()).isEqualTo("string");
+        assertThat(variableInstance.getValue()).isEqualTo("migrated");
+    }
+
+    @Test
+    void disabledModeVariableCanBeOverwrittenWithLoggingSession() {
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        List<ObjectNode> loggingNodes = new ArrayList<>();
+        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.DISABLED, loggingNodes::addAll).getRuntimeService();
+
+        runtimeService.setVariable(processInstance.getId(), "serializableVar", "migrated");
+
+        assertThat(runtimeService.getVariable(processInstance.getId(), "serializableVar")).isEqualTo("migrated");
+        // The update is logged without the old serializable value
+        assertThat(loggingNodes)
+                .filteredOn(loggingNode -> LoggingSessionConstants.TYPE_VARIABLE_UPDATE.equals(loggingNode.path("type").asString()))
+                .singleElement()
+                .satisfies(loggingNode -> {
+                    assertThat(loggingNode.path("variableName").asString()).isEqualTo("serializableVar");
+                    assertThat(loggingNode.path("variableType").asString()).isEqualTo("string");
+                    assertThat(loggingNode.path("variableValue").asString()).isEqualTo("migrated");
+                    assertThat(loggingNode.path("oldVariableType").asString()).isEqualTo(SerializableType.TYPE_NAME);
+                    assertThat(loggingNode.has("oldVariableValue")).isFalse();
+                    assertThat(loggingNode.has("oldVariableRawValue")).isFalse();
+                });
+    }
+
+    @Test
+    void disabledModeVariableCanBeRemovedWithLoggingSession() {
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        List<ObjectNode> loggingNodes = new ArrayList<>();
+        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.DISABLED, loggingNodes::addAll).getRuntimeService();
+
+        runtimeService.removeVariable(processInstance.getId(), "serializableVar");
+
+        assertThat(runtimeService.hasVariable(processInstance.getId(), "serializableVar")).isFalse();
+        // The removal is logged without the serializable value
+        assertThat(loggingNodes)
+                .filteredOn(loggingNode -> LoggingSessionConstants.TYPE_VARIABLE_DELETE.equals(loggingNode.path("type").asString()))
+                .singleElement()
+                .satisfies(loggingNode -> {
+                    assertThat(loggingNode.path("variableName").asString()).isEqualTo("serializableVar");
+                    assertThat(loggingNode.path("variableType").asString()).isEqualTo(SerializableType.TYPE_NAME);
+                    assertThat(loggingNode.has("variableValue")).isFalse();
+                    assertThat(loggingNode.has("variableRawValue")).isFalse();
+                });
+    }
+
+    @Test
     void disabledModeFailsJobWithoutRetries() {
-        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED, "false");
+        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED);
         disabledProcessEngine.getRepositoryService().createDeployment()
                 .addClasspathResource("org/flowable/engine/test/api/variables/SerializableVariableTypeModeTest.asyncSerializableVariable.bpmn20.xml")
                 .deploy();
@@ -192,7 +246,9 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void disabledModeProcessInstanceCanBeDeleted() {
-        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED, "false");
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        ProcessEngine disabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.DISABLED);
         RuntimeService runtimeService = disabledProcessEngine.getRuntimeService();
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
@@ -201,7 +257,9 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void longStringVariablesWorkWhenSerializableIsDisabled() {
-        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.DISABLED, "false").getRuntimeService();
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
+        RuntimeService runtimeService = buildProcessEngine(SerializableVariableTypeMode.DISABLED).getRuntimeService();
 
         String longString = "a".repeat(5000);
         runtimeService.setVariable(processInstance.getId(), "longStringVar", longString);
@@ -213,6 +271,8 @@ class SerializableVariableTypeModeTest {
 
     @Test
     void longStringVariableDoesNotDeserializeNonStringValues() throws Exception {
+        ProcessEngine enabledProcessEngine = buildProcessEngine(SerializableVariableTypeMode.ENABLED);
+        ProcessInstance processInstance = startProcessWithSerializableVariable(enabledProcessEngine);
         String longString = "a".repeat(5000);
         RuntimeService runtimeService = enabledProcessEngine.getRuntimeService();
         runtimeService.setVariable(processInstance.getId(), "longStringVar", longString);
@@ -228,19 +288,40 @@ class SerializableVariableTypeModeTest {
             return null;
         });
 
-        RuntimeService otherRuntimeService = buildProcessEngine(SerializableVariableTypeMode.ENABLED, "false").getRuntimeService();
+        RuntimeService otherRuntimeService = buildProcessEngine(SerializableVariableTypeMode.ENABLED).getRuntimeService();
         assertThatThrownBy(() -> otherRuntimeService.getVariable(processInstance.getId(), "longStringVar"))
                 .isInstanceOf(FlowableException.class)
                 .hasMessageContaining("Couldn't deserialize object in variable 'longStringVar'")
                 .hasRootCauseInstanceOf(InvalidClassException.class);
     }
 
-    protected ProcessEngine buildProcessEngine(SerializableVariableTypeMode mode, String databaseSchemaUpdate) {
+    /**
+     * Starts a process instance with a serializable variable, using a process engine that has serializable variables enabled.
+     */
+    protected ProcessInstance startProcessWithSerializableVariable(ProcessEngine enabledProcessEngine) {
+        enabledProcessEngine.getRepositoryService().createDeployment()
+                .addClasspathResource("org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+                .deploy();
+
+        return enabledProcessEngine.getRuntimeService().createProcessInstanceBuilder()
+                .processDefinitionKey("oneTaskProcess")
+                .variable("serializableVar", new TestSerializableVariable(10))
+                .start();
+    }
+
+    protected ProcessEngine buildProcessEngine(SerializableVariableTypeMode mode) {
+        return buildProcessEngine(mode, null);
+    }
+
+    protected ProcessEngine buildProcessEngine(SerializableVariableTypeMode mode, LoggingListener loggingListener) {
+        // The first process engine creates the schema (and drops it when it is closed), the other ones are using the same database
+        String databaseSchemaUpdate = processEngines.isEmpty() ? "create-drop" : "false";
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) new StandaloneInMemProcessEngineConfiguration()
                 .setJdbcUrl(JDBC_URL)
                 .setDatabaseSchemaUpdate(databaseSchemaUpdate)
                 .setEngineName("serializableVariableTypeModeTest" + processEngines.size());
         processEngineConfiguration.setSerializableVariableTypeMode(mode);
+        processEngineConfiguration.setLoggingListener(loggingListener);
         ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
         processEngines.add(processEngine);
         return processEngine;

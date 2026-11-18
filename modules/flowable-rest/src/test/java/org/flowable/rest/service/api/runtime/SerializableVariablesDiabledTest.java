@@ -149,6 +149,15 @@ public class SerializableVariablesDiabledTest extends BaseSpringRestTestCase {
         assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
                 + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_PROCESS_INSTANCE_VARIABLE_DATA, processInstance.getId(), "serializableVariable")),
                 HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_TASK_INSTANCE_VARIABLE_DATA, task.getId(), "serializableVariable")),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+
+        String historicDetailId = historyService.createHistoricDetailQuery().processInstanceId(processInstance.getId())
+                .variableUpdates().singleResult().getId();
+        assertResponseStatus(new HttpGet(SERVER_URL_PREFIX
+                + RestUrls.createRelativeResourceUrl(RestUrls.URL_HISTORIC_DETAIL_VARIABLE_DATA, historicDetailId)),
+                HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE);
     }
 
     public void assertResponseStatus(HttpUriRequest request, int expectedStatusCode) {

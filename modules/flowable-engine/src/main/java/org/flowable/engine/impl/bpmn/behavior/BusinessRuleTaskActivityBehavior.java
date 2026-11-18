@@ -28,8 +28,11 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Activity implementation of the BPMN 2.0 business rule task.
@@ -46,6 +49,8 @@ import org.kie.api.runtime.KieSession;
 public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior implements BusinessRuleTaskDelegate {
 
     private static final long serialVersionUID = 1L;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BusinessRuleTaskActivityBehavior.class);
 
     protected Set<Expression> variablesInputExpressions = new HashSet<>();
     protected Set<Expression> rulesExpressions = new HashSet<>();
@@ -92,6 +97,10 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
                 execution.setVariable(resultVariable, outputVariables);
             } else {
                 // The rule output objects can only be stored using Java serialization
+                LOGGER.warn("The result variable '{}' of business rule task '{}' in process instance '{}' is only stored as a transient variable,"
+                                + " because storing serializable variables is not enabled. It will no longer be available after the next wait state."
+                                + " Use a DMN decision task instead, or set the serializableVariableTypeMode of the process engine configuration to {}.",
+                        resultVariable, execution.getCurrentActivityId(), execution.getProcessInstanceId(), SerializableVariableTypeMode.ENABLED);
                 execution.setTransientVariable(resultVariable, outputVariables);
             }
         }

@@ -197,7 +197,7 @@ Instead of using Java serialization:
 
 The behavior of the *serializable* variable type can be configured through the `serializableVariableTypeMode` property of the engine configuration:
 
--   `DISABLED` (default): serializable variables can neither be written nor read. Existing serializable variables can still be deleted, but reading their value fails.
+-   `DISABLED` (default): serializable variables can neither be written nor read. Existing serializable variables can still be deleted or overwritten with a value of another type, but reading their value fails.
 
 -   `READ_ONLY`: existing serializable variables can be read (and overwritten with a value of another type), but no new serializable values can be stored. Use this mode to migrate existing data away from Java serialization.
 

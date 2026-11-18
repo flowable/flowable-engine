@@ -64,14 +64,14 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
     @Autowired
     protected HistoryService historyService;
 
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variable data is returned."),
-            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @Override
     public void afterPropertiesSet() {
         isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variable data is returned."),
+            @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name or the variable does not have a binary stream available. Status message provides additional information.") })
     @ApiOperation(value = "Get the binary data for a historic process instance variable", tags = {"History Process" }, nickname = "getHistoricProcessInstanceVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/variables/{variableName}/data")
@@ -130,6 +130,9 @@ public class HistoricProcessInstanceVariableDataResource extends HistoricProcess
             if (queryVariable.getId() != null && queryVariable.getTaskId() == null && variableName.equals(queryVariable.getName())) {
                 variableInstance = queryVariable;
             }
+        }
+        if (variableInstance != null && includeBinary) {
+            SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getVariableTypeName(), isSerializableVariableAllowed);
         }
         Object value = variableInstance != null ? variableInstance.getValue() : null;
 
