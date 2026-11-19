@@ -76,6 +76,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -88,12 +89,26 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
 
     private Task task = null;
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private boolean originalProcessEngineTaskRelationshipCounts;
+    private boolean originalTaskServiceTaskRelationshipCounts;
+
+    @BeforeEach
+    public void setUp() {
+        originalProcessEngineTaskRelationshipCounts = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
+        originalTaskServiceTaskRelationshipCounts = getTaskServiceConfiguration().isEnableTaskRelationshipCounts();
+    }
 
     @AfterEach
     public void tearDown() throws Exception {
+        processEngineConfiguration.setEnableTaskRelationshipCounts(originalProcessEngineTaskRelationshipCounts);
+        getTaskServiceConfiguration().setEnableTaskRelationshipCounts(originalTaskServiceTaskRelationshipCounts);
         if (task != null) {
             taskService.deleteTask(task.getId(), true);
         }
+    }
+
+    protected TaskServiceConfiguration getTaskServiceConfiguration() {
+        return (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
 
     @Test
@@ -1320,9 +1335,6 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.deleteGroupIdentityLink(currentTask.getId(), "group01", IdentityLinkType.PARTICIPANT);
         currentTask = taskService.createTaskQuery().singleResult();
         assertThat(((CountingTaskEntity) currentTask).getIdentityLinkCount()).isZero();
-
-        processEngineConfiguration.setEnableTaskRelationshipCounts(false);
-        taskServiceConfiguration.setEnableTaskRelationshipCounts(false);
     }
 
     @Test
@@ -1808,9 +1820,6 @@ public class TaskServiceTest extends PluggableFlowableTestCase {
         taskService.removeVariableLocal(currentTask.getId(), "variable1");
         currentTask = taskService.createTaskQuery().singleResult();
         assertThat(((CountingTaskEntity) currentTask).getVariableCount()).isZero();
-
-        processEngineConfiguration.setEnableTaskRelationshipCounts(false);
-        taskServiceConfiguration.setEnableTaskRelationshipCounts(false);
     }
 
     @Test

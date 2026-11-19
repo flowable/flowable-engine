@@ -52,6 +52,7 @@ public class FlowableRestApplicationWithEnabledJmsKafkaAndRabbitTest {
             .extracting(PropertySource::getName)
             .containsExactly(
                 "configurationProperties",
+                "test",
                 "Inlined Test Properties",
                 "servletConfigInitParams",
                 "servletContextInitParams",
