@@ -1237,8 +1237,17 @@ public class HistoryDataDeleteTest extends FlowableCmmnTestCase {
             assertThat(cmmnHistoryService.createHistoricPlanItemInstanceQuery().count()).isEqualTo(30);
             assertThat(cmmnHistoryService.createHistoricTaskInstanceQuery().count()).isEqualTo(15);
 
+            // The batch deletes the finished case instances without sorting,
+            // so which 5 of the 10 finished ones are deleted depends on the database
+            Set<String> deletedCaseInstanceIds = caseInstanceIds.stream()
+                    .filter(id -> cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(id).count() == 0)
+                    .collect(Collectors.toSet());
+            assertThat(deletedCaseInstanceIds)
+                    .hasSize(5)
+                    .isSubsetOf(caseInstanceIds.subList(0, 10));
+
             for (int i = 0; i < 20; i++) {
-                if (i < 5) {
+                if (deletedCaseInstanceIds.contains(caseInstanceIds.get(i))) {
                     assertThat(cmmnHistoryService.getHistoricIdentityLinksForCaseInstance(caseInstanceIds.get(i))).isEmpty();
                     assertThat(cmmnHistoryService.createHistoricTaskLogEntryQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();
                     assertThat(cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstanceIds.get(i)).count()).isZero();

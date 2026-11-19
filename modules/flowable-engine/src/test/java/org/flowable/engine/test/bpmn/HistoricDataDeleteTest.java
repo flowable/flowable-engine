@@ -1553,8 +1553,17 @@ public class HistoricDataDeleteTest extends PluggableFlowableTestCase {
             assertThat(historyService.createHistoricActivityInstanceQuery().count()).isEqualTo(55);
             assertThat(historyService.createHistoricTaskInstanceQuery().count()).isEqualTo(15);
 
+            // The batch deletes the finished process instances without sorting,
+            // so which 5 of the 10 finished ones are deleted depends on the database
+            Set<String> deletedProcessInstanceIds = processInstanceIds.stream()
+                    .filter(id -> historyService.createHistoricProcessInstanceQuery().processInstanceId(id).count() == 0)
+                    .collect(Collectors.toSet());
+            assertThat(deletedProcessInstanceIds)
+                    .hasSize(5)
+                    .isSubsetOf(processInstanceIds.subList(0, 10));
+
             for (int i = 0; i < 20; i++) {
-                if (i < 5) {
+                if (deletedProcessInstanceIds.contains(processInstanceIds.get(i))) {
                     assertThat(historyService.getHistoricIdentityLinksForProcessInstance(processInstanceIds.get(i))).isEmpty();
                     assertThat(historyService.createHistoricTaskLogEntryQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
                     assertThat(historyService.createHistoricVariableInstanceQuery().processInstanceId(processInstanceIds.get(i)).count()).isZero();
