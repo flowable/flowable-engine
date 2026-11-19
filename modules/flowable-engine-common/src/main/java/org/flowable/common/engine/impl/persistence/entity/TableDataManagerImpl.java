@@ -91,6 +91,8 @@ public class TableDataManagerImpl implements TableDataManager {
         if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
                 || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
             tableNameFilter = databaseTablePrefix + flowableTablePrefix.toLowerCase(Locale.ROOT) + databaseMetaData.getSearchStringEscape() + "_%";
+        } else if ("spanner".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            tableNameFilter = databaseTablePrefix + flowableTablePrefix.toUpperCase(Locale.ROOT) + databaseMetaData.getSearchStringEscape() + "_%";
         } else {
             tableNameFilter = databaseTablePrefix + flowableTablePrefix + databaseMetaData.getSearchStringEscape() + "_%";
         }
@@ -129,6 +131,8 @@ public class TableDataManagerImpl implements TableDataManager {
             } else {
                 schema = engineConfiguration.getDatabaseSchema();
             }
+        } else if ("spanner".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+            schema = "";
         }
 
         return schema;
@@ -161,13 +165,16 @@ public class TableDataManagerImpl implements TableDataManager {
     public TableMetaData getTableMetaData(String tableName) {
         TableMetaData result = new TableMetaData();
         try {
-            result.setTableName(tableName);
-            DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
-
             if ("postgres".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
                     || "cockroachdb".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
                 tableName = tableName.toLowerCase(Locale.ROOT);
+            } else if ("spanner".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())
+                    || "oracle".equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+                tableName = tableName.toUpperCase(Locale.ROOT);
             }
+
+            result.setTableName(tableName);
+            DatabaseMetaData metaData = getDbSqlSession().getSqlSession().getConnection().getMetaData();
 
             String catalog = getDatabaseCatalog();
 

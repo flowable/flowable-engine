@@ -61,6 +61,7 @@
 
         <!-- JDBC Driver dependencies -->
         <db2-jcc.version>12.1.4.0</db2-jcc.version>
+        <google-cloud-spanner-jdbc.version>2.27.0</google-cloud-spanner-jdbc.version>
         <h2.version>2.4.240</h2.version>
         <hsqldb.version>2.7.4</hsqldb.version>
         <mariadb.version>3.5.8</mariadb.version>
@@ -219,6 +220,11 @@
             </dependency>
 
             <!-- JDBC Drivers -->
+            <dependency>
+                <groupId>com.google.cloud</groupId>
+                <artifactId>google-cloud-spanner-jdbc</artifactId>
+                <version>${google-cloud-spanner-jdbc.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>

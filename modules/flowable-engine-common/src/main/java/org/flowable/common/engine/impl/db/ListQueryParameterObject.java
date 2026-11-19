@@ -214,7 +214,8 @@ public class ListQueryParameterObject {
                     || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
-                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
+                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_SPANNER.equals(databaseType)) {
                 return columnAndDirection + " NULLS FIRST";
             } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)
@@ -232,7 +233,8 @@ public class ListQueryParameterObject {
                     || AbstractEngineConfiguration.DATABASE_TYPE_HSQL.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_POSTGRES.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_COCKROACHDB.equals(databaseType)
-                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)) {
+                    || AbstractEngineConfiguration.DATABASE_TYPE_ORACLE.equals(databaseType)
+                    || AbstractEngineConfiguration.DATABASE_TYPE_SPANNER.equals(databaseType)) {
                 return columnAndDirection + " NULLS LAST";
             } else if (AbstractEngineConfiguration.DATABASE_TYPE_DB2.equals(databaseType)
                     || AbstractEngineConfiguration.DATABASE_TYPE_MSSQL.equals(databaseType)

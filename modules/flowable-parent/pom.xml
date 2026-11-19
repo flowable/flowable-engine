@@ -218,6 +218,15 @@
             </dependencies>
         </profile>
         <profile>
+            <id>spanner</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.cloud</groupId>
+                    <artifactId>google-cloud-spanner-jdbc</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>cleanDb</id>
             <build>
                 <plugins>
