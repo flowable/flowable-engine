@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.deployer;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -103,6 +104,7 @@ public class CmmnDeployer implements EngineDeployer {
             Map<CaseDefinitionEntity, CaseDefinitionEntity> mapOfNewCaseDefinitionToPreviousVersion = getPreviousVersionsOfCaseDefinitions(parseResult);
             setCaseDefinitionVersionsAndIds(parseResult, mapOfNewCaseDefinitionToPreviousVersion);
             persistCaseDefinitions(parseResult);
+            evictSameDeploymentCaseDefinitions(parseResult);
             updateEventSubscriptions(parseResult, mapOfNewCaseDefinitionToPreviousVersion);
 
         } else {
@@ -111,6 +113,15 @@ public class CmmnDeployer implements EngineDeployer {
         }
 
         updateCachingAndArtifacts(parseResult);
+    }
+
+    protected void evictSameDeploymentCaseDefinitions(CmmnParseResult parseResult) {
+        List<String> caseDefinitionKeys = new ArrayList<>();
+        for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
+            caseDefinitionKeys.add(caseDefinition.getKey());
+        }
+        cmmnEngineConfiguration.getDeploymentManager()
+                .evictSameDeploymentCaseDefinitions(((CmmnDeploymentEntity) parseResult.getDeployment()).getParentDeploymentId(), caseDefinitionKeys);
     }
 
     public static boolean isCmmnResource(String resourceName) {

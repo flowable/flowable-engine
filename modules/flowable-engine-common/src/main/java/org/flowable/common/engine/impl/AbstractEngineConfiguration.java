@@ -317,6 +317,34 @@ public abstract class AbstractEngineConfiguration {
      * Set to true if the latest version of a definition should be retrieved, ignoring a possible parent deployment id value
      */
     protected boolean alwaysLookupLatestDefinitionVersion;
+
+    /**
+     * Set to true to cache that a parent deployment has no definition with a given key, so that later lookups skip the
+     * parent deployment query and go straight to the latest definition fallback. Found definitions are always cached.
+     * <p>
+     * In a cluster, a node that did not perform the deployment keeps such a cached miss when a new child deployment
+     * with that key is added under an existing parent deployment, until the entry is evicted from the cache or the node
+     * is restarted. A cached definition id is checked against the database on every hit (unless
+     * {@link #verifyCachedSameDeploymentDefinitions} is disabled), a cached miss is never checked again. In a cluster,
+     * only enable this when new child deployments are not added under existing parent deployments.
+     */
+    protected boolean cacheSameDeploymentDefinitionMisses;
+
+    /**
+     * Set to true (the default) to load the definition of a cached id from the database on every hit (one select by id),
+     * so that a definition that was undeployed on another node is detected and the lookup falls back to the query.
+     * <p>
+     * When false, the definition is taken from the definition cache when it is present there (no select), and a
+     * definition that was undeployed on another cluster node is still returned on this node until it is evicted from the
+     * cache or the node is restarted. This happens when a child deployment is deleted while its parent deployment stays.
+     * <p>
+     * The process engine always verifies, as it selects the process definition by id anyway when starting a process
+     * instance.
+     * <p>
+     * In both modes, changing the parent deployment id of a deployment does not evict the cached definitions: the
+     * deployment is still found through its previous parent deployment id until the node is restarted.
+     */
+    protected boolean verifyCachedSameDeploymentDefinitions = true;
     
     /**
      * Set to true if by default lookups should fallback to the default tenant (an empty string by default or a defined tenant value)
@@ -1753,6 +1781,24 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setAlwaysLookupLatestDefinitionVersion(boolean alwaysLookupLatestDefinitionVersion) {
         this.alwaysLookupLatestDefinitionVersion = alwaysLookupLatestDefinitionVersion;
+        return this;
+    }
+
+    public boolean isCacheSameDeploymentDefinitionMisses() {
+        return cacheSameDeploymentDefinitionMisses;
+    }
+
+    public AbstractEngineConfiguration setCacheSameDeploymentDefinitionMisses(boolean cacheSameDeploymentDefinitionMisses) {
+        this.cacheSameDeploymentDefinitionMisses = cacheSameDeploymentDefinitionMisses;
+        return this;
+    }
+
+    public boolean isVerifyCachedSameDeploymentDefinitions() {
+        return verifyCachedSameDeploymentDefinitions;
+    }
+
+    public AbstractEngineConfiguration setVerifyCachedSameDeploymentDefinitions(boolean verifyCachedSameDeploymentDefinitions) {
+        this.verifyCachedSameDeploymentDefinitions = verifyCachedSameDeploymentDefinitions;
         return this;
     }
 
