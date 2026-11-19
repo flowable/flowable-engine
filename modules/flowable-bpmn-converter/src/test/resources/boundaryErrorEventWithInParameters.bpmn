@@ -4,7 +4,7 @@
              id="_1384552647085" name="" targetNamespace="http://sourceforge.net/bpmn/definitions/_1384552647085"
              typeLanguage="http://www.w3.org/2001/XMLSchema"
              xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://bpmn.sourceforge.net/schemas/BPMN20.xsd">
-    <error id="errorOne" name="Error One" errorCode="errorOne"/>
+    <error id="errorOne" name="Error One" errorCode="errorCodeOne"/>
     <process id="testProcess" isExecutable="true" name="Test Process">
         <startEvent id="theStart"/>
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask"/>
