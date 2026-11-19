@@ -80,7 +80,7 @@ public class FlowableRestAppEventRegistryCondition extends SpringBootCondition
         }
 
         if (!rabbitEnabled) {
-            conditions.put("org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration",
+            conditions.put("org.springframework.boot.rabbitmq.autoconfigure.RabbitAutoConfiguration",
                 ConditionOutcome.noMatch("Property flowable.task.app.rabbit-enabled was not set to true")
             );
         }
