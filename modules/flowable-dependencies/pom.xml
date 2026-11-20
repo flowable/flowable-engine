@@ -30,7 +30,7 @@
         <hikari.version>7.0.2</hikari.version>
         <httpclient.version>4.5.14</httpclient.version>
         <httpcore.version>4.4.16</httpcore.version>
-        <httpclient5.version>5.6.1</httpclient5.version>
+        <httpclient5.version>5.6.3</httpclient5.version>
         <jackson.version>2.21.3</jackson.version>
         <jackson3.version>3.1.3</jackson3.version>
         <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
