@@ -498,9 +498,9 @@ public class BpmnModel {
         this.escalationMap = escalationMap;
     }
 
-    public void addEscalation(String escalationRef, String escalationCode, String name) {
-        if (StringUtils.isNotEmpty(escalationRef)) {
-            escalationMap.put(escalationRef, new Escalation(escalationRef, name, escalationCode));
+    public void addEscalation(String id, String escalationCode, String name) {
+        if (StringUtils.isNotEmpty(escalationCode)) {
+            escalationMap.put(escalationCode, new Escalation(id, name, escalationCode));
         }
     }
     
