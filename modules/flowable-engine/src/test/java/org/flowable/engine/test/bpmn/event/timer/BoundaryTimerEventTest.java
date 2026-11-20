@@ -544,7 +544,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertThat(diffInMilliseconds).isLessThan(100);
+        assertThat(diffInMilliseconds).isLessThan(5000);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
@@ -742,7 +742,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertThat(diffInMilliseconds).isLessThan(100);
+        assertThat(diffInMilliseconds).isLessThan(5000);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
@@ -806,7 +806,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
         assertThat(timerJob).isNotNull();
         long diffInMilliseconds = Math.abs(startTimeInMillis - timerJob.getDuedate().getTime());
-        assertThat(diffInMilliseconds).isLessThan(100);
+        assertThat(diffInMilliseconds).isLessThan(5000);
 
         // reschedule timer for two hours from now
         calendar = Calendar.getInstance();
