@@ -747,6 +747,54 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     }
 
     @Test
+    @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
+    public void testStartProcessWithVariablesAndReturnVariablesFalse() throws Exception {
+        ArrayNode variablesNode = objectMapper.createArrayNode();
+
+        // String variable
+        ObjectNode stringVarNode = variablesNode.addObject();
+        stringVarNode.put("name", "stringVariable");
+        stringVarNode.put("value", "simple string value");
+        stringVarNode.put("type", "string");
+
+        ObjectNode integerVarNode = variablesNode.addObject();
+        integerVarNode.put("name", "integerVariable");
+        integerVarNode.put("value", 1234);
+        integerVarNode.put("type", "integer");
+
+        ObjectNode requestNode = objectMapper.createObjectNode();
+
+        // Start using process definition key, passing in variables but returnVariables false
+        requestNode.put("processDefinitionKey", "processOne");
+        requestNode.put("returnVariables", false);
+        requestNode.set("variables", variablesNode);
+
+        HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_COLLECTION));
+        httpPost.setEntity(new StringEntity(requestNode.toString()));
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
+        JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent());
+        closeResponse(response);
+        assertThatJson(responseNode)
+                .when(Option.IGNORING_EXTRA_FIELDS)
+                .isEqualTo("{"
+                        + "  ended: false,"
+                        + "  variables: []"
+                        + "}");
+
+        ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().singleResult();
+        assertThat(processInstance).isNotNull();
+
+        // Check if engine has correct variables set
+        Map<String, Object> processVariables = runtimeService.getVariables(processInstance.getId());
+
+        assertThat(processVariables)
+                .containsOnly(
+                        entry("stringVariable", "simple string value"),
+                        entry("integerVariable", 1234)
+                );
+    }
+
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-with-form.bpmn20.xml" })
     public void testStartProcessWithForm() throws Exception {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionKey("processOne").singleResult();
