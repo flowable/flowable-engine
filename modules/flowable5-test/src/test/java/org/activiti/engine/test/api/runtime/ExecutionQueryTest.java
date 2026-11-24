@@ -1211,7 +1211,6 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     public void testQueryInvalidTypes() throws Exception {
         Map<String, Object> vars = new HashMap<String, Object>();
         vars.put("bytesVar", "test".getBytes());
-        vars.put("serializableVar", new DummySerializable());
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
 

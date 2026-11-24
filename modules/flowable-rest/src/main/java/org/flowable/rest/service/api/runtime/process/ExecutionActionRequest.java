@@ -18,9 +18,6 @@ import java.util.List;
 import org.flowable.rest.service.api.RestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -42,7 +39,6 @@ public class ExecutionActionRequest extends RestActionRequest {
         this.variables = variables;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getVariables() {
         return variables;
     }
@@ -51,7 +47,6 @@ public class ExecutionActionRequest extends RestActionRequest {
         this.transientVariables = transientVariables;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getTransientVariables() {
         return transientVariables;
     }

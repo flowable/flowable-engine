@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.fail;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -121,26 +120,6 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
                         entry("player", "gonzo"),
                         entry("instrument", "trumpet")
                 );
-    }
-
-    @Test
-    public void testSerializableTaskVariable() {
-        org.flowable.task.api.Task task = taskService.newTask();
-        task.setName("MyTask");
-        taskService.saveTask(task);
-
-        // Set variable
-        Map<String, Object> vars = new HashMap<>();
-        MyVariable myVariable = new MyVariable("Hello world");
-        vars.put("theVar", myVariable);
-        taskService.setVariables(task.getId(), vars);
-
-        // Fetch variable
-        MyVariable variable = (MyVariable) taskService.getVariable(task.getId(), "theVar");
-        assertThat(variable.getValue()).isEqualTo("Hello world");
-
-        // Cleanup
-        taskService.deleteTask(task.getId(), true);
     }
 
     @Test
@@ -267,24 +246,6 @@ public class TaskVariablesTest extends PluggableFlowableTestCase {
         assertThat(variableInstances.get(0).getValue()).isEqualTo("taskVar");
         assertThat(variableInstances.get(1).getName()).isEqualTo("taskVar");
         assertThat(variableInstances.get(1).getValue()).isEqualTo("taskVar");
-    }
-
-    public static class MyVariable implements Serializable {
-
-        private String value;
-
-        public MyVariable(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-        }
-
     }
 
 }

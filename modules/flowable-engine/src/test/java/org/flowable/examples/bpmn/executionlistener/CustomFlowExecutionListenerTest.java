@@ -14,14 +14,14 @@ package org.flowable.examples.bpmn.executionlistener;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.Test;
+
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
 
 /**
  * @author Tijs Rademakers
@@ -35,15 +35,16 @@ public class CustomFlowExecutionListenerTest extends ResourceFlowableTestCase {
     @Test
     @Deployment(resources = { "org/flowable/examples/bpmn/executionlistener/CustomFlowExecutionListenerTest.bpmn20.xml" })
     public void testScriptExecutionListener() {
-        Map<String, Object> variableMap = new HashMap<>();
-        variableMap.put("customFlowBean", new CustomFlowBean());
-        runtimeService.startProcessInstanceByKey("scriptExecutionListenerProcess", variableMap);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("scriptExecutionListenerProcess")
+                .transientVariable("customFlowBean", new CustomFlowBean())
+                .start();
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery().variableName("flow1_activiti_conditions").singleResult();
         assertThat(variable).isNotNull();
         assertThat(variable.getVariableName()).isEqualTo("flow1_activiti_conditions");
-        @SuppressWarnings("unchecked")
-        List<String> conditions = (List<String>) variable.getValue();
+        ArrayNode conditions = (ArrayNode) variable.getValue();
         assertThat(conditions)
+                .extracting(JsonNode::asString)
                 .containsExactly("hello", "world");
     }
 }

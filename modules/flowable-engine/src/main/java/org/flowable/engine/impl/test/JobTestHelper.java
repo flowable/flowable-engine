@@ -127,15 +127,12 @@ public class JobTestHelper {
     }
 
     public static boolean areJobsOrExecutableTimersAvailable(ManagementService managementService) {
-        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
-        return managementService.executeCommand(commandContext -> {
-            boolean emptyJobs = managementService.createJobQuery().list().isEmpty();
-            if (emptyJobs) {
-                return !managementService.createTimerJobQuery().executable().list().isEmpty();
-            } else {
-                return true;
-            }
-        });
+        // With READ COMMITTED every query sees the data committed when it runs, so doing the checks in one transaction is not enough.
+        // Checking the timers before the jobs makes sure that a timer moved to an async job in between is seen in one of the queries.
+        // Checking the timers again after the jobs makes sure that a timer created by an async job that completed in between is seen.
+        return !managementService.createTimerJobQuery().executable().list().isEmpty()
+                || !managementService.createJobQuery().list().isEmpty()
+                || !managementService.createTimerJobQuery().executable().list().isEmpty();
     }
 
     /**
@@ -143,15 +140,10 @@ public class JobTestHelper {
      * which only take in account executable timers).
      */
     public static boolean areJobsOrTimersAvailable(ManagementService managementService) {
-        // We have to check in one transaction because it can happen that a timer moves to an async job after the async job is checked
-        return managementService.executeCommand(commandContext -> {
-            boolean emptyJobs = managementService.createJobQuery().count() == 0L;
-            if (emptyJobs) {
-                return !(managementService.createTimerJobQuery().count() == 0L);
-            } else {
-                return true;
-            }
-        });
+        // The timers are checked before and after the jobs, see areJobsOrExecutableTimersAvailable for the reason
+        return managementService.createTimerJobQuery().count() > 0
+                || managementService.createJobQuery().count() > 0
+                || managementService.createTimerJobQuery().count() > 0;
     }
 
     protected static void internalWaitForJobs(ProcessEngineConfiguration processEngineConfiguration, ManagementService managementService,
@@ -169,7 +161,9 @@ public class JobTestHelper {
                 while (areJobsAvailable && !task.isTimeLimitExceeded()) {
                     Thread.sleep(intervalMillis);
                     try {
-                        areJobsAvailable = jobsAvailablePredicate.test(managementService);
+                        // A single check can miss a job when it is moved between the timer and async job tables while the check runs.
+                        // Any job that is still in progress after such a miss is seen by a second check, so only stop when both are empty.
+                        areJobsAvailable = jobsAvailablePredicate.test(managementService) || jobsAvailablePredicate.test(managementService);
                     } catch (Throwable t) {
                         // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
                         // isolation level doesn't allow READ of the table

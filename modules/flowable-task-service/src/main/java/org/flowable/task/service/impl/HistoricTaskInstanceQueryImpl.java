@@ -2508,6 +2508,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         return includeProcessVariables;
     }
 
+    public boolean isIncludeCaseVariables() {
+        return includeCaseVariables;
+    }
+
     public boolean isExcludeVariableInitialization() {
         return excludeVariableInitialization;
     }

@@ -17,6 +17,9 @@ import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
+
+import tools.jackson.databind.node.ArrayNode;
 
 public class CustomSetConditionsExecutionListener implements ExecutionListener {
 
@@ -27,7 +30,10 @@ public class CustomSetConditionsExecutionListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) {
-        execution.setVariable(flowId + "_activiti_conditions", conditions);
+        // The conditions are stored as a JSON array, since Java collections can only be stored as serializable variables
+        ArrayNode conditionsNode = CommandContextUtil.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
+        conditions.forEach(conditionsNode::add);
+        execution.setVariable(flowId + "_activiti_conditions", conditionsNode);
     }
 
     public List<String> getConditions() {

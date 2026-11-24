@@ -218,7 +218,7 @@
     <resultMap id="historicCaseInstanceResultMapWithVariables"
                type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl"
                extends="historicCaseInstanceResultMap">
-        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList"
+        <collection property="queryVariables" column="SCOPE_ID_" javaType="ArrayList" notNullColumn="VAR_ID_"
                     ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
             <id property="id" column="VAR_ID_" jdbcType="NVARCHAR"/>
             <result property="name" column="VAR_NAME_" javaType="String" jdbcType="NVARCHAR"/>
@@ -230,6 +230,7 @@
             <result property="scopeId" column="VAR_SCOPE_ID_" jdbcType="NVARCHAR"/>
             <result property="subScopeId" column="VAR_SUB_SCOPE_ID_" jdbcType="NVARCHAR"/>
             <result property="scopeType" column="VAR_SCOPE_TYPE_" jdbcType="NVARCHAR"/>
+            <result property="scopeDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR"/>
             <result property="metaInfo" column="VAR_META_INFO_" jdbcType="NVARCHAR" />
             <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
             <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE"/>
@@ -1056,34 +1057,31 @@
             </foreach>
             and P.STATE_ = 'active')
         </if>
-        <if test="orQueryObject.involvedUser != null">
-            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and I.USER_ID_ =
-            #{orQueryObject.involvedUser, jdbcType=NVARCHAR})
-        </if>
-        <if test="orQueryObject.involvedUserIdentityLink != null">
-            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
-            I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
-        </if>
-        <if test="orQueryObject.involvedGroups != null">
+        <!-- The involvement checks are combined in a single EXISTS, so databases can turn it into a semi-join when the OR has no other criteria -->
+        <if test="orQueryObject.involvedUser != null || orQueryObject.involvedUserIdentityLink != null || orQueryObject.involvedGroups != null || orQueryObject.involvedGroupIdentityLink != null">
             or EXISTS(
-            select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
-                (
-                <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
-                    <if test="groupIndex &gt; 0">
-                    or
+            select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and
+                <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <if test="orQueryObject.involvedUser != null">
+                        or I.USER_ID_ = #{orQueryObject.involvedUser, jdbcType=NVARCHAR}
                     </if>
-                    I.GROUP_ID_ IN
-                    <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
-                          open="(" separator="," close=")">
-                      #{involvedGroup, jdbcType=NVARCHAR}
-                    </foreach>
-                </foreach>
-                )
+                    <if test="orQueryObject.involvedUserIdentityLink != null">
+                        or (I.USER_ID_ = #{orQueryObject.involvedUserIdentityLink.userId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedUserIdentityLink.type, jdbcType=NVARCHAR})
+                    </if>
+                    <if test="orQueryObject.involvedGroups != null">
+                        <foreach item="involvedGroupListItem" index="groupIndex" collection="orQueryObject.safeInvolvedGroups">
+                            or I.GROUP_ID_ IN
+                            <foreach item="involvedGroup" index="index" collection="involvedGroupListItem"
+                                  open="(" separator="," close=")">
+                              #{involvedGroup, jdbcType=NVARCHAR}
+                            </foreach>
+                        </foreach>
+                    </if>
+                    <if test="orQueryObject.involvedGroupIdentityLink != null">
+                        or (I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
+                    </if>
+                </trim>
             )
-        </if>
-        <if test="orQueryObject.involvedGroupIdentityLink != null">
-            or EXISTS(select ID_ from ${prefix}ACT_HI_IDENTITYLINK I where I.SCOPE_ID_ = ${queryTablePrefix}ID_ and I.SCOPE_TYPE_ = 'cmmn' and 
-            I.GROUP_ID_ = #{orQueryObject.involvedGroupIdentityLink.groupId, jdbcType=NVARCHAR} and I.TYPE_ = #{orQueryObject.involvedGroupIdentityLink.type, jdbcType=NVARCHAR})
         </if>
         <if test="orQueryObject.parentScopeId != null">
             or EXISTS(select 1 from ${prefix}ACT_HI_ENTITYLINK LINK where

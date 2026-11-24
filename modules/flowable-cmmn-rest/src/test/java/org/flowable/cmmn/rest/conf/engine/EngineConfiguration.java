@@ -28,6 +28,7 @@ import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.spring.configurator.SpringIdmEngineConfigurator;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +53,9 @@ public class EngineConfiguration {
 
     @Value("${jdbc.password:}")
     protected String jdbcPassword;
+
+    @Value("${engine.serializable-variable-type-mode:DISABLED}")
+    protected SerializableVariableTypeMode serializableVariableTypeMode;
 
     @Bean
     public DataSource dataSource() {
@@ -88,6 +92,7 @@ public class EngineConfiguration {
         cmmnEngineConfiguration.setAsyncExecutorActivate(false);
         cmmnEngineConfiguration.setHistoryLevel(HistoryLevel.FULL);
         cmmnEngineConfiguration.setEnableEntityLinks(true);
+        cmmnEngineConfiguration.setSerializableVariableTypeMode(serializableVariableTypeMode);
 
         cmmnEngineConfiguration.setIdmEngineConfigurator(springIdmEngineConfigurator);
 

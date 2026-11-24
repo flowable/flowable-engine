@@ -891,4 +891,34 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
                 .extracting(HistoricVariableInstance::getProcessInstanceId)
                 .isEmpty();
     }
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
+    public void testHistoricVariableCreatedAndUpdatedFromRuntimeVariable() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            HistoricVariableInstance createdVariable = managementService.executeCommand(commandContext -> {
+                runtimeService.setVariable(processInstance.getId(), "customer", "Kermit");
+                return getHistoricVariableInstance(processInstance.getId(), "customer");
+            });
+            assertThat(createdVariable)
+                    .extracting(HistoricVariableInstance::getValue, HistoricVariableInstance::getProcessDefinitionId)
+                    .containsExactly("Kermit", processInstance.getProcessDefinitionId());
+
+            HistoricVariableInstance updatedVariable = managementService.executeCommand(commandContext -> {
+                runtimeService.setVariable(processInstance.getId(), "customer", "Gonzo");
+                return getHistoricVariableInstance(processInstance.getId(), "customer");
+            });
+            assertThat(updatedVariable)
+                    .extracting(HistoricVariableInstance::getValue, HistoricVariableInstance::getProcessDefinitionId)
+                    .containsExactly("Gonzo", processInstance.getProcessDefinitionId());
+        }
+    }
+
+    protected HistoricVariableInstance getHistoricVariableInstance(String processInstanceId, String variableName) {
+        // Called in the command that created or updated the variable, so the historic variable is the one from the entity cache
+        String variableId = runtimeService.getVariableInstance(processInstanceId, variableName).getId();
+        return processEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableService().getHistoricVariableInstance(variableId);
+    }
 }

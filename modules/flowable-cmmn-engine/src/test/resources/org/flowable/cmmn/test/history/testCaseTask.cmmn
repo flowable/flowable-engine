@@ -34,7 +34,7 @@
             	<extensionElements>
 	            	<flowable:in source="testVar" target="localString" />
 	        		<flowable:in source="numVar" target="localNumber" />
-	        		<flowable:in source="serializableVar" target="localSerializable" />
+	        		<flowable:in source="byteArrayVar" target="localByteArray" />
 	        	</extensionElements>
         	</caseTask>
             <humanTask id="theTask2" name="The Task2" />

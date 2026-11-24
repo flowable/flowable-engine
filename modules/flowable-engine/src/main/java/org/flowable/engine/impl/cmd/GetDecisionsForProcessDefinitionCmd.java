@@ -31,7 +31,6 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -98,16 +97,11 @@ public class GetDecisionsForProcessDefinitionCmd implements Command<List<DmnDeci
 
     protected void addDecisionToCollection(List<DmnDecision> decisions, String decisionKey, ProcessDefinition processDefinition) {
         DmnDecisionQuery definitionQuery = dmnRepositoryService.createDecisionQuery().decisionKey(decisionKey);
-        Deployment deployment = CommandContextUtil.getDeploymentEntityManager().findById(processDefinition.getDeploymentId());
-        if (deployment.getParentDeploymentId() != null) {
-            List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(deployment.getParentDeploymentId()).list();
-            
-            if (dmnDeployments != null && dmnDeployments.size() > 0) {
-                definitionQuery.deploymentId(dmnDeployments.get(0).getId());
-            } else {
-                definitionQuery.latestVersion();
-            }
-            
+        String parentDeploymentId = ProcessDefinitionUtil.getDefinitionDeploymentId(processDefinition, CommandContextUtil.getProcessEngineConfiguration());
+        List<DmnDeployment> dmnDeployments = dmnRepositoryService.createDeploymentQuery().parentDeploymentId(parentDeploymentId).list();
+
+        if (!dmnDeployments.isEmpty()) {
+            definitionQuery.deploymentId(dmnDeployments.get(0).getId());
         } else {
             definitionQuery.latestVersion();
         }

@@ -15,6 +15,7 @@ package org.flowable.engine.test.api.task;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,6 +171,16 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
                         entry("anotherProcessVar", 123)
                 );
         assertThat(new String((byte[]) task.getProcessVariables().get("binaryVariable"))).isEqualTo("This is a binary process variable");
+        assertThat(((TaskEntity) task).getQueryVariables())
+                .extracting(VariableInstance::getProcessDefinitionId, VariableInstance::getScopeDefinitionId)
+                .hasSize(4)
+                .containsOnly(tuple(task.getProcessDefinitionId(), null));
+
+        String processInstanceWithoutVariablesId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+        task = taskService.createTaskQuery().includeTaskLocalVariables().includeProcessVariables().processInstanceId(processInstanceWithoutVariablesId)
+                .singleResult();
+        assertThat(task.getProcessVariables()).isEmpty();
+        assertThat(((TaskEntity) task).getQueryVariables()).isEmpty();
     }
     
     @Test

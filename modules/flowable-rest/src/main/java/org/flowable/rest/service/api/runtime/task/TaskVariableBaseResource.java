@@ -23,6 +23,7 @@ import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.engine.RuntimeService;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
@@ -51,7 +52,7 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
 
     @Override
     public void afterPropertiesSet() {
-        isSerializableVariableAllowed = env.getProperty("rest.variables.allow.serializable", Boolean.class, true);
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
     }
 
     public RestVariable getVariableFromRequest(String taskId, String variableName, String scope, boolean includeBinary) {
@@ -98,6 +99,9 @@ public class TaskVariableBaseResource extends TaskBaseResource implements Initia
         if (variableInstance == null) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' does not have a variable with name: '" + variableName + "'.", VariableInstanceEntity.class);
         } else {
+            if (includeBinary) {
+                SerializableRestVariableUtil.validateSerializableVariableAllowed(variableInstance.getTypeName(), isSerializableVariableAllowed);
+            }
             // A variable whose value cannot be resolved is returned with a null value and is marked as having an unresolvable value
             return restResponseFactory.createRestVariable(variableInstance, variableScope, taskId, RestResponseFactory.VARIABLE_TASK, includeBinary);
         }

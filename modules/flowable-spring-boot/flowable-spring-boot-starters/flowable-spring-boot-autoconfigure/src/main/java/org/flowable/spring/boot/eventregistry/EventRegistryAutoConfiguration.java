@@ -88,7 +88,7 @@ import tools.jackson.databind.ObjectMapper;
         afterName = {
                 "org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration",
                 "org.springframework.boot.jms.autoconfigure.JmsAutoConfiguration",
-                "org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration"
+                "org.springframework.boot.rabbitmq.autoconfigure.RabbitAutoConfiguration"
 })
 public class EventRegistryAutoConfiguration extends AbstractSpringEngineAutoConfiguration {
 

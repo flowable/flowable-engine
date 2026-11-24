@@ -373,7 +373,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");
                 }
-                transientVariables.put(variable.getName(), restResponseFactory.getVariableValue(variable));
+                transientVariables.put(variable.getName(), restResponseFactory.getTransientVariableValue(variable));
             }
         }
 

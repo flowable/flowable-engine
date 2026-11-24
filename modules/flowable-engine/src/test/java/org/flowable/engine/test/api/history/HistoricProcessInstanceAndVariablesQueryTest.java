@@ -24,11 +24,13 @@ import java.util.Map;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
+import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,6 +92,9 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             Map<String, Object> variableMap = processInstance.getProcessVariables();
             assertThat(variableMap)
                     .containsExactly(entry("anothertest", 123));
+            assertThat(((HistoricProcessInstanceEntity) processInstance).getQueryVariables())
+                    .extracting(HistoricVariableInstance::getProcessDefinitionId)
+                    .containsExactly(processInstance.getProcessDefinitionId());
 
             List<HistoricProcessInstance> instanceList = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().list();
             assertThat(instanceList).hasSize(6);
@@ -202,6 +207,12 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             instanceList = historyService.createHistoricProcessInstanceQuery().variableValueEquals("test", "test").includeProcessVariables()
                     .orderByProcessInstanceId().asc().listPage(0, 50);
             assertThat(instanceList).hasSize(4);
+
+            String processInstanceWithoutVariablesId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2).getId();
+            processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables().processInstanceId(processInstanceWithoutVariablesId)
+                    .singleResult();
+            assertThat(processInstance.getProcessVariables()).isEmpty();
+            assertThat(((HistoricProcessInstanceEntity) processInstance).getQueryVariables()).isEmpty();
         }
     }
     

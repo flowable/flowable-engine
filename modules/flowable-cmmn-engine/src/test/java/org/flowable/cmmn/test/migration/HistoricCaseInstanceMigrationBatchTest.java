@@ -14,7 +14,6 @@ package org.flowable.cmmn.test.migration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.flowable.batch.api.Batch;
@@ -146,11 +145,10 @@ public class HistoricCaseInstanceMigrationBatchTest extends AbstractCaseMigratio
                 .caseDefinitionKey("testCase")
                 .list();
 
-        assertThat(caseDefinitions).hasSize(2);
-        caseDefinitions.sort(Comparator.comparingInt(CaseDefinition::getVersion));
-
-        assertThat(caseDefinitionVersion1.getId()).isEqualTo(caseDefinitions.get(0).getId());
-        assertThat(caseDefinitionVersion2.getId()).isEqualTo(caseDefinitions.get(1).getId());
+        // Both definitions have version 1 since they are in different tenants
+        assertThat(caseDefinitions)
+                .extracting(CaseDefinition::getId)
+                .containsExactlyInAnyOrder(caseDefinitionVersion1.getId(), caseDefinitionVersion2.getId());
 
         HistoricCaseInstanceMigrationDocumentBuilder migrationDoc = new HistoricCaseInstanceMigrationDocumentBuilderImpl()
                 .setCaseDefinitionToMigrateTo(caseDefinitionVersion2.getId());

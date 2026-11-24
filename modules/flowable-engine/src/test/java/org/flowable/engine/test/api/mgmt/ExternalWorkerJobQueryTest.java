@@ -564,7 +564,76 @@ public class ExternalWorkerJobQueryTest extends PluggableFlowableTestCase {
                 .extracting(ExternalWorkerJob::getId)
                 .containsExactlyInAnyOrder(userAndGroupJob.getId());
     }
-    
+
+    @Test
+    @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
+    public void testOrQueryForUserOrGroups() {
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("externalWorkerJobQueryTest")
+                .start();
+
+        List<ExternalWorkerJob> jobs = managementService.createExternalWorkerJobQuery().list();
+        assertThat(jobs).hasSize(4);
+
+        ExternalWorkerJob onlyUserJob = jobs.get(0);
+        ExternalWorkerJob onlyGroupJob = jobs.get(1);
+        ExternalWorkerJob userAndGroupJob = jobs.get(2);
+        ExternalWorkerJob noLinkJob = jobs.get(3);
+
+        addUserIdentityLinkToJob(onlyUserJob, "gonzo");
+        addGroupIdentityLinkToJob(onlyGroupJob, "bears");
+        addGroupIdentityLinkToJob(userAndGroupJob, "frogs");
+        addUserIdentityLinkToJob(userAndGroupJob, "fozzie");
+
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .forUserOrGroups("kermit", Collections.singleton("muppets"))
+                    .jobId("invalid")
+                .endOr()
+                .list())
+                .isEmpty();
+
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .forUserOrGroups("gonzo", Collections.singleton("bears"))
+                    .jobId("invalid")
+                .endOr()
+                .list())
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyUserJob.getId(), onlyGroupJob.getId());
+
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .forUserOrGroups("fozzie", Collections.singleton("bears"))
+                    .jobId(noLinkJob.getId())
+                .endOr()
+                .list())
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyGroupJob.getId(), userAndGroupJob.getId(), noLinkJob.getId());
+
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .forUserOrGroups(null, Collections.singleton("frogs"))
+                    .jobId("invalid")
+                .endOr()
+                .list())
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(userAndGroupJob.getId());
+
+        assertThat(managementService.createExternalWorkerJobQuery()
+                .or()
+                    .forUserOrGroups("gonzo", Collections.emptyList())
+                    .jobId("invalid")
+                .endOr()
+                .list())
+                .extracting(ExternalWorkerJob::getId)
+                .containsExactlyInAnyOrder(onlyUserJob.getId());
+    }
+
     @Test
     @Deployment(resources = "org/flowable/engine/test/api/mgmt/ExternalWorkerJobQueryTest.bpmn20.xml")
     public void testUnaquireWithJobId() {

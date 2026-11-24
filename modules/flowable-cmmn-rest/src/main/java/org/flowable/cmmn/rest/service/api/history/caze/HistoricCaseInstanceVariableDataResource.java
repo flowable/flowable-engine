@@ -25,9 +25,13 @@ import org.flowable.cmmn.rest.service.api.CmmnRestResponseFactory;
 import org.flowable.cmmn.rest.service.api.engine.variable.RestVariable;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
+import org.flowable.common.rest.exception.FlowableContentNotSupportedException;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -45,13 +49,23 @@ import io.swagger.annotations.Authorization;
  */
 @RestController
 @Api(tags = { "History Process" }, authorizations = { @Authorization(value = "basicAuth") })
-public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstanceBaseResource {
+public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstanceBaseResource implements InitializingBean {
+
+    @Autowired
+    protected Environment env;
+
+    protected boolean isSerializableVariableAllowed;
 
     @Autowired
     protected CmmnRestResponseFactory restResponseFactory;
 
     @Autowired
     protected CmmnHistoryService historyService;
+
+    @Override
+    public void afterPropertiesSet() {
+        isSerializableVariableAllowed = SerializableRestVariableUtil.isSerializableVariableAllowed(env);
+    }
 
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the case instance was found and the requested variable data is returned."),
@@ -70,6 +84,9 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
                 response.setContentType("application/octet-stream");
 
             } else if (CmmnRestResponseFactory.SERIALIZABLE_VARIABLE_TYPE.equals(variable.getType())) {
+                if (!isSerializableVariableAllowed) {
+                    throw new FlowableContentNotSupportedException("Serialized objects are not allowed");
+                }
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 ObjectOutputStream outputStream = new ObjectOutputStream(buffer);
                 outputStream.writeObject(variable.getValue());
@@ -89,12 +106,22 @@ public class HistoricCaseInstanceVariableDataResource extends HistoricCaseInstan
     }
 
     public RestVariable getVariableFromRequest(boolean includeBinary, String caseInstanceId, String variableName) {
+        // The value of the variable is resolved in the same command as the query, after validating that its data can be returned
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(includeBinary, caseInstanceId, variableName));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String caseInstanceId, String variableName) {
         HistoricCaseInstance caseObject = getHistoricCaseInstanceFromRequest(caseInstanceId);
 
         HistoricVariableInstance variable = historyService.createHistoricVariableInstanceQuery()
                         .caseInstanceId(caseObject.getId())
                         .variableName(variableName)
+                        .excludeVariableInitialization()
                         .singleResult();
+
+        if (variable != null && includeBinary) {
+            SerializableRestVariableUtil.validateSerializableVariableAllowed(variable.getVariableTypeName(), isSerializableVariableAllowed);
+        }
 
         if (variable == null || variable.getValue() == null) {
             throw new FlowableObjectNotFoundException("Historic case instance '" + caseInstanceId + "' variable value for " + variableName + " couldn't be found.", VariableInstanceEntity.class);

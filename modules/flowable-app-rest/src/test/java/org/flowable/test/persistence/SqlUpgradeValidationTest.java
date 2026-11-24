@@ -35,7 +35,8 @@ class SqlUpgradeValidationTest {
             "7.1.0.2",
             "7.2.0.1",
             "7.2.0.2",
-            "8.1.0.2"
+            "8.1.0.2",
+            "8.1.0.3"
     );
 
     @ParameterizedTest

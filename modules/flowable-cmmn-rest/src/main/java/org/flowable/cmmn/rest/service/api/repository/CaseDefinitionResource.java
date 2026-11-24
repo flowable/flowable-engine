@@ -19,10 +19,10 @@ import org.flowable.cmmn.api.CmmnMigrationService;
 import org.flowable.cmmn.api.migration.CaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.migration.HistoricCaseInstanceMigrationDocument;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.migration.CaseInstanceMigrationDocumentConverter;
 import org.flowable.cmmn.engine.impl.migration.HistoricCaseInstanceMigrationDocumentConverter;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Stage;
@@ -221,9 +221,10 @@ public class CaseDefinitionResource extends BaseCaseDefinitionResource {
         Stage stage = caze.getPlanModel();
         if (StringUtils.isNotEmpty(stage.getFormKey())) {
             if (stage.isSameDeployment()) {
-                CmmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
+                // The case definition comes from the definition cache, which has the parent deployment id
+                String parentDeploymentId = caseDefinition instanceof CaseDefinitionEntity caseDefinitionEntity ? caseDefinitionEntity.getParentDeploymentId() : null;
                 formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(stage.getFormKey(),
-                                deployment.getParentDeploymentId(), caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
+                                parentDeploymentId, caseDefinition.getTenantId(), cmmnEngineConfiguration.isFallbackToDefaultTenant());
             } else {
                 formInfo = formRepositoryService.getFormModelByKey(stage.getFormKey(), caseDefinition.getTenantId(),
                         cmmnEngineConfiguration.isFallbackToDefaultTenant());

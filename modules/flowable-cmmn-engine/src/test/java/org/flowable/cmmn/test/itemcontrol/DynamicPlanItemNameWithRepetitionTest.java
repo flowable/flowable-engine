@@ -37,7 +37,7 @@ public class DynamicPlanItemNameWithRepetitionTest extends FlowableCmmnTestCase 
         List<String> myCollection = Arrays.asList("A", "B", "C");
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("dynamicPlanItemNameTest")
-                .variable("myCollection", myCollection)
+                .transientVariable("myCollection", myCollection)
                 .variable("foo", "FooValue")
                 .start();
 

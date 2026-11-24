@@ -576,6 +576,7 @@ Here is a list of configuration properties that the Flowable Spring Boot support
     flowable.history-level=audit # The history level that needs to be used.
     flowable.process-definition-location-prefix=classpath*:/processes/ # The folder in which processes need to be searched for auto deployment.
     flowable.process-definition-location-suffixes=**.bpmn20.xml,**.bpmn # The suffixes (extensions) of the files that needs to be deployed from the 'processDefinitionLocationPrefix' location.
+    flowable.serializable-variable-type-mode=disabled # How variables of the type 'serializable' (Java serialization) are handled by the engines (disabled, read-only or enabled).
 
     # Process https://github.com/flowable/flowable-engine/tree/main/modules/flowable-spring-boot/flowable-spring-boot-starters/flowable-spring-boot-autoconfigure/src/main/java/org/flowable/spring/boot/process/FlowableProcessProperties.java
     flowable.process.definition-cache-limit=-1 # The maximum amount of process definitions available in the process definition cache. Per default it is -1 (all process definitions).

@@ -19,9 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -82,6 +84,9 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         Map<String, Object> variableMap = processInstance.getProcessVariables();
         assertThat(variableMap)
                 .containsOnly(entry("anothertest", 123));
+        assertThat(((ExecutionEntity) processInstance).getQueryVariables())
+                .extracting(VariableInstance::getProcessDefinitionId)
+                .containsExactly(processInstance.getProcessDefinitionId());
 
         List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().includeProcessVariables().list();
         assertThat(instanceList).hasSize(7);
@@ -154,6 +159,12 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         variableMap = processInstance.getProcessVariables();
         assertThat(variableMap)
                 .containsOnly(entry("test4", "test4"));
+
+        String processInstanceWithoutVariablesId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2).getId();
+        processInstance = runtimeService.createProcessInstanceQuery().includeProcessVariables().processInstanceId(processInstanceWithoutVariablesId)
+                .singleResult();
+        assertThat(processInstance.getProcessVariables()).isEmpty();
+        assertThat(((ExecutionEntity) processInstance).getQueryVariables()).isEmpty();
     }
 
     @Test

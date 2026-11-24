@@ -13,6 +13,7 @@
 
 package org.activiti.examples.bpmn.executionlistener;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,17 +54,18 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertNotNull(varSetInExecutionListener);
         assertEquals("secondValue", varSetInExecutionListener);
 
+        // The pojo is only needed by the execution listener that is invoked when the task is completed
         ExampleExecutionListenerPojo myPojo = new ExampleExecutionListenerPojo();
-        runtimeService.setVariable(processInstance.getId(), "myPojo", myPojo);
+        Map<String, Object> transientVariables = new HashMap<String, Object>();
+        transientVariables.put("myPojo", myPojo);
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
-        taskService.complete(task.getId());
+        taskService.complete(task.getId(), Collections.<String, Object> emptyMap(), transientVariables);
 
         // First usertask uses a method-expression as executionListener: ${myPojo.myMethod(execution.eventName)}
-        ExampleExecutionListenerPojo pojoVariable = (ExampleExecutionListenerPojo) runtimeService.getVariable(processInstance.getId(), "myPojo");
-        assertNotNull(pojoVariable.getReceivedEventName());
-        assertEquals("end", pojoVariable.getReceivedEventName());
+        assertNotNull(myPojo.getReceivedEventName());
+        assertEquals("end", myPojo.getReceivedEventName());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);

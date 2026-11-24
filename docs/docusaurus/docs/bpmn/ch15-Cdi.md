@@ -189,7 +189,9 @@ We can use the same feature to call a business method of an EJB in a service tas
 
 ### Working with @BusinessProcessScoped beans
 
-Using flowable-cdi, the lifecycle of a bean can be bound to a process instance. To this extent, a custom context implementation is provided, namely the BusinessProcessContext. Instances of BusinessProcessScoped beans are stored as process variables in the current process instance. BusinessProcessScoped beans need to be PassivationCapable (for example Serializable). The following is an example of a process scoped bean:
+**Deprecated:** @BusinessProcessScoped beans are deprecated. They are stored using Java serialization and therefore only work when the *serializable* variable type is enabled, which is disabled by default. Store the data in regular process variables (for example as JSON) instead.
+
+Using flowable-cdi, the lifecycle of a bean can be bound to a process instance. To this extent, a custom context implementation is provided, namely the BusinessProcessContext. Instances of BusinessProcessScoped beans are stored as process variables in the current process instance. BusinessProcessScoped beans need to be PassivationCapable (for example Serializable). Since they are stored using Java serialization, the *serializable* variable type needs to be enabled through the `serializableVariableTypeMode` property of the process engine configuration (it is disabled by default), see [Serializable variables](bpmn/ch04-API.md#serializable-variables). The following is an example of a process scoped bean:
 
     @Named
     @BusinessProcessScoped

@@ -234,8 +234,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testParallelUserTasksBasedOnCollection() {
         List<String> assigneeList = Arrays.asList("kermit", "gonzo", "mispiggy", "fozzie", "bubba");
-        String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
-                CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+        String procId = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("miParallelUserTasksBasedOnCollection")
+                .transientVariable("assigneeList", assigneeList)
+                .start()
+                .getId();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();
         assertEquals(5, tasks.size());
@@ -264,10 +267,11 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     private void checkParallelUserTasksCustomExtensions(String processDefinitionKey) {
-        Map<String, Object> vars = new HashMap<String, Object>();
         List<String> assigneeList = Arrays.asList("kermit", "gonzo", "fozzie");
-        vars.put("assigneeList", assigneeList);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey, vars);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey(processDefinitionKey)
+                .transientVariable("assigneeList", assigneeList)
+                .start();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals(3, tasks.size());
@@ -698,40 +702,6 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         assertProcessEnded(procId);
     }
 
-    @Deployment(resources = "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithList.bpmn20.xml")
-    public void testSequentialCallActivityWithList() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("one");
-        list.add("two");
-
-        HashMap<String, Object> variables = new HashMap<String, Object>();
-        variables.put("list", list);
-
-        String procId = runtimeService.startProcessInstanceByKey("parentProcess", variables).getId();
-
-        org.flowable.task.api.Task task1 = taskService.createTaskQuery().processVariableValueEquals("element", "one").singleResult();
-        org.flowable.task.api.Task task2 = taskService.createTaskQuery().processVariableValueEquals("element", "two").singleResult();
-
-        assertNotNull(task1);
-        assertNotNull(task2);
-
-        HashMap<String, Object> subVariables = new HashMap<String, Object>();
-        subVariables.put("x", "y");
-
-        taskService.complete(task1.getId(), subVariables);
-        taskService.complete(task2.getId(), subVariables);
-
-        org.flowable.task.api.Task task3 = taskService.createTaskQuery().processDefinitionKey("midProcess").singleResult();
-        assertNotNull(task3);
-        taskService.complete(task3.getId());
-
-        org.flowable.task.api.Task task4 = taskService.createTaskQuery().processDefinitionKey("parentProcess").singleResult();
-        assertNotNull(task4);
-        taskService.complete(task4.getId());
-
-        assertProcessEnded(procId);
-    }
-
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivityWithTimer.bpmn20.xml",
             "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
     public void testSequentialCallActivityWithTimer() {
@@ -950,9 +920,13 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         Collection<Integer> items = Arrays.asList(1, 2, 3, 4, 5, 6);
         Map<String, Object> vars = new HashMap<String, Object>();
         vars.put("result", 1);
-        vars.put("items", items);
 
-        ProcessInstance procInst = runtimeService.startProcessInstanceByKey("multiInstanceServiceTask", vars);
+        // All sequential service task instances are executed in the start transaction, so the collection can be a transient variable
+        ProcessInstance procInst = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("multiInstanceServiceTask")
+                .variables(vars)
+                .transientVariable("items", items)
+                .start();
         Integer result = (Integer) runtimeService.getVariable(procInst.getId(), "result");
         assertEquals(720, result.intValue());
 
@@ -992,16 +966,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEvent.bpmn20.xml",
             "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
     public void testMultiInstanceCallActivityWithErrorBoundaryEvent() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("assignees", Arrays.asList("kermit", "gonzo"))
+                .start();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
         // finish first call activity with error
-        variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("done", false);
         taskService.complete(tasks.get(0).getId(), variableMap);
 
@@ -1018,16 +992,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEventSequential.bpmn20.xml",
             "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
     public void testSequentialMultiInstanceCallActivityWithErrorBoundaryEvent() {
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("process")
+                .transientVariable("assignees", Arrays.asList("kermit", "gonzo"))
+                .start();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
 
         // finish first call activity with error
-        variableMap = new HashMap<String, Object>();
+        Map<String, Object> variableMap = new HashMap<String, Object>();
         variableMap.put("done", false);
         taskService.complete(tasks.get(0).getId(), variableMap);
 
@@ -1113,11 +1087,14 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     public void testNestedMultiInstanceTasks() {
         List<String> processes = Arrays.asList("process A", "process B");
         List<String> assignees = Arrays.asList("kermit", "gonzo");
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("subProcesses", processes);
-        variableMap.put("assignees", assignees);
+        Map<String, Object> transientVariables = new HashMap<String, Object>();
+        transientVariables.put("subProcesses", processes);
+        transientVariables.put("assignees", assignees);
 
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miNestedMultiInstanceTasks", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("miNestedMultiInstanceTasks")
+                .transientVariables(transientVariables)
+                .start();
 
         List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(processes.size() * assignees.size(), tasks.size());
@@ -1134,9 +1111,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialSubprocessEmptyCollection.bpmn20.xml" })
     public void testSequentialSubprocessEmptyCollection() {
         Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialSubProcessEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialSubProcessEmptyCollection")
+                .transientVariable("collection", collection)
+                .start();
         assertNotNull(processInstance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(task);
@@ -1146,9 +1124,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialEmptyCollection.bpmn20.xml" })
     public void testSequentialEmptyCollection() {
         Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialEmptyCollection")
+                .transientVariable("collection", collection)
+                .start();
         assertNotNull(processInstance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(task);
@@ -1158,9 +1137,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialEmptyCollection.bpmn20.xml" })
     public void testSequentialEmptyCollectionWithNonEmptyCollection() {
         Collection<String> collection = Collections.singleton("Test");
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSequentialEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testSequentialEmptyCollection")
+                .transientVariable("collection", collection)
+                .start();
         assertNotNull(processInstance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
@@ -1171,9 +1151,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelEmptyCollection.bpmn20.xml" })
     public void testParalellEmptyCollection() throws Exception {
         Collection<String> collection = Collections.emptyList();
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testParalellEmptyCollection")
+                .transientVariable("collection", collection)
+                .start();
         assertNotNull(processInstance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(task);
@@ -1183,9 +1164,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/activiti/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelEmptyCollection.bpmn20.xml" })
     public void testParalellEmptyCollectionWithNonEmptyCollection() {
         Collection<String> collection = Collections.singleton("Test");
-        Map<String, Object> variableMap = new HashMap<String, Object>();
-        variableMap.put("collection", collection);
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testParalellEmptyCollection", variableMap);
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("testParalellEmptyCollection")
+                .transientVariable("collection", collection)
+                .start();
         assertNotNull(processInstance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
@@ -1207,9 +1189,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
             newBeans.put("SampleTask", new TestSampleServiceTask());
             activiti5ProcessEngineConfig.getExpressionManager().setBeans(newBeans);
 
-            Map<String, Object> params = new HashMap<String, Object>();
-            params.put("sampleValues", Arrays.asList("eins", "zwei", "drei"));
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("infiniteLoopTest", params);
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("infiniteLoopTest")
+                    .transientVariable("sampleValues", Arrays.asList("eins", "zwei", "drei"))
+                    .start();
             assertNotNull(processInstance);
 
         } finally {
@@ -1222,9 +1205,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnParallelUserTask() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, Object> vars = new HashMap<String, Object>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("parallelUserTaskMi", vars);
+            ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("parallelUserTaskMi")
+                    .transientVariable("messages", Collections.EMPTY_LIST)
+                    .start();
 
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstance.getId()).finished().count());
         }
@@ -1241,9 +1225,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnSequentialEmbeddedSubprocess() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, Object> vars = new HashMap<String, Object>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            runtimeService.startProcessInstanceByKey("sequentialMiSubprocess", vars);
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("sequentialMiSubprocess")
+                    .transientVariable("messages", Collections.EMPTY_LIST)
+                    .start();
 
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
         }
@@ -1252,9 +1237,10 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testEmptyCollectionOnParallelEmbeddedSubprocess() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            Map<String, Object> vars = new HashMap<String, Object>();
-            vars.put("messages", Collections.EMPTY_LIST);
-            runtimeService.startProcessInstanceByKey("parallelMiSubprocess", vars);
+            runtimeService.createProcessInstanceBuilder()
+                    .processDefinitionKey("parallelMiSubprocess")
+                    .transientVariable("messages", Collections.EMPTY_LIST)
+                    .start();
 
             assertEquals(1L, historyService.createHistoricProcessInstanceQuery().finished().count());
         }
@@ -1263,13 +1249,14 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testExecutionListenersOnMultiInstanceSubprocess() {
         resetTestCounts();
-        Map<String, Object> variableMap = new HashMap<String, Object>();
         List<String> assignees = new ArrayList<String>();
         assignees.add("john");
         assignees.add("jane");
         assignees.add("matt");
-        variableMap.put("assignees", assignees);
-        runtimeService.startProcessInstanceByKey("MultiInstanceTest", variableMap);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("MultiInstanceTest")
+                .transientVariable("assignees", assignees)
+                .start();
 
         assertEquals(3, TestStartExecutionListener.countWithLoopCounter.get());
         assertEquals(3, TestEndExecutionListener.countWithLoopCounter.get());
@@ -1361,14 +1348,16 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testChangingCollection() {
-        Map<String, Object> vars = new HashMap<String, Object>();
-        vars.put("multi_users", Collections.singletonList("testuser"));
-        ProcessInstance instance = runtimeService.startProcessInstanceByKey("test_multi", vars);
+        ProcessInstance instance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("test_multi")
+                .transientVariable("multi_users", Collections.singletonList("testuser"))
+                .start();
         assertNotNull(instance);
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("multi", task.getTaskDefinitionKey());
-        vars.put("multi_users", new ArrayList<String>()); // <-- Problem here.
-        taskService.complete(task.getId(), vars);
+        Map<String, Object> transientVars = new HashMap<String, Object>();
+        transientVars.put("multi_users", new ArrayList<String>()); // <-- Problem here.
+        taskService.complete(task.getId(), Collections.<String, Object> emptyMap(), transientVars);
         List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().list();
         assertEquals(0, instances.size());
     }

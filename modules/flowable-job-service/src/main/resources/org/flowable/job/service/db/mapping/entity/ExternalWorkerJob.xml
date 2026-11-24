@@ -86,19 +86,23 @@
                     </otherwise>
                 </choose>
             </if>
-            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
-                <if test="parameter.authorizedUser != null">
-                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{parameter.authorizedUser, jdbcType=NVARCHAR})
-                </if>
-                <if test="parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.empty">
-                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
-                    <foreach item="groupId" index="index" collection="parameter.authorizedGroups"
-                             open="(" separator="," close=")">
-                        #{groupId, jdbcType=NVARCHAR}
-                    </foreach>
-                    )
-                </if>
-            </trim>
+            <!-- The user and groups are combined in a single EXISTS, so databases can turn it into a semi-join -->
+            <if test="parameter.authorizedUser != null || (parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.empty)">
+                and exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and
+                <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <if test="parameter.authorizedUser != null">
+                        IDN.USER_ID_ = #{parameter.authorizedUser, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="parameter.authorizedGroups != null &amp;&amp; !parameter.authorizedGroups.empty">
+                        OR IDN.GROUP_ID_ IN
+                        <foreach item="groupId" index="index" collection="parameter.authorizedGroups"
+                                 open="(" separator="," close=")">
+                            #{groupId, jdbcType=NVARCHAR}
+                        </foreach>
+                    </if>
+                </trim>
+                )
+            </if>
             and LOCK_EXP_TIME_ is null
         </where>
         ${orderBy}
@@ -292,19 +296,23 @@
             <if test="withoutScopeType">
                 and (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
             </if>
-            <trim prefix="AND (" prefixOverrides="OR" suffix=")">
-                <if test="authorizedUser != null">
-                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{authorizedUser, jdbcType=NVARCHAR})
-                </if>
-                <if test="authorizedGroups != null &amp;&amp; !authorizedGroups.empty">
-                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
-                    <foreach item="groupId" index="index" collection="authorizedGroups"
-                             open="(" separator="," close=")">
-                        #{groupId, jdbcType=NVARCHAR}
-                    </foreach>
-                    )
-                </if>
-            </trim>
+            <!-- The user and groups are combined in a single EXISTS, so databases can turn it into a semi-join -->
+            <if test="authorizedUser != null || (authorizedGroups != null &amp;&amp; !authorizedGroups.empty)">
+                and exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and
+                <trim prefix="(" prefixOverrides="OR" suffix=")">
+                    <if test="authorizedUser != null">
+                        IDN.USER_ID_ = #{authorizedUser, jdbcType=NVARCHAR}
+                    </if>
+                    <if test="authorizedGroups != null &amp;&amp; !authorizedGroups.empty">
+                        OR IDN.GROUP_ID_ IN
+                        <foreach item="groupId" index="index" collection="authorizedGroups"
+                                 open="(" separator="," close=")">
+                            #{groupId, jdbcType=NVARCHAR}
+                        </foreach>
+                    </if>
+                </trim>
+                )
+            </if>
             <if test="orQueryObjects != null and orQueryObjects.size > 0">
                 <foreach item="orQueryObject" index="orIndex" collection="orQueryObjects">
                     and
@@ -427,20 +435,20 @@
                             or (RES.SCOPE_TYPE_ = '' or RES.SCOPE_TYPE_ is null)
                         </if>
                         <if test="orQueryObject.authorizedUser != null || (orQueryObject.authorizedGroups != null &amp;&amp; !orQueryObject.authorizedGroups.empty)">
-                            or
+                            or exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and
                             <trim prefix="(" prefixOverrides="OR" suffix=")">
                                 <if test="orQueryObject.authorizedUser != null">
-                                    exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.USER_ID_ = #{orQueryObject.authorizedUser, jdbcType=NVARCHAR})
+                                    IDN.USER_ID_ = #{orQueryObject.authorizedUser, jdbcType=NVARCHAR}
                                 </if>
                                 <if test="orQueryObject.authorizedGroups != null &amp;&amp; !orQueryObject.authorizedGroups.empty">
-                                    OR exists (select ID_ from ${prefix}ACT_RU_IDENTITYLINK IDN where IDN.SCOPE_ID_ = RES.CORRELATION_ID_ and IDN.SCOPE_TYPE_ = 'externalWorker' and IDN.GROUP_ID_ IN
+                                    OR IDN.GROUP_ID_ IN
                                     <foreach item="groupId" index="index" collection="orQueryObject.authorizedGroups"
                                              open="(" separator="," close=")">
                                         #{groupId, jdbcType=NVARCHAR}
                                     </foreach>
-                                    )
                                 </if>
                             </trim>
+                            )
                         </if>
                     </trim>
                 </foreach>

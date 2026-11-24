@@ -2438,6 +2438,8 @@ Alternatively, we can use the simplistic approach that is much more straightforw
 
 #### Description
 
+**Deprecated:** The Drools based Business Rule task is deprecated, use a [DMN decision task](dmn/ch06-DMN-Introduction.md#use-in-a-bpmn20-process) instead.
+
 A Business Rule task is used to synchronously execute one or more rules. Flowable uses Drools Expert, the Drools rule engine to execute business rules. Currently, the .drl files containing the business rules have to be deployed together with the process definition that defines a business rule task to execute those rules. This means that all .drl files that are used in a process have to be packaged in the process BAR file, as for task forms and so on. For more information about creating business rules for Drools Expert, please refer to the Drools documentation at [JBoss Drools](http://www.jboss.org/drools/documentation)
 
 If you want to plug in your own implementation of the rule task, for example, because you want to use Drools differently or you want to use a completely different rule engine, then you can use the class or expression attribute on the BusinessRuleTask and it will behave exactly like a [ServiceTask](bpmn/ch07b-BPMN-Constructs.md#java-service-task)
@@ -2450,7 +2452,7 @@ A Business Rule task is visualized the with a table icon.
 
 #### XML representation
 
-To execute one or more business rules that are deployed in the same BAR file as the process definition, we need to define the input and result variables. For the input variable definition, a list of process variables can be defined separated by a comma. The output variable definition can only contain one variable name that will be used to store the output objects of the executed business rules in a process variable. Note that the result variable will contain a List of objects. If no result variable name is specified by default, org.flowable.engine.rules.OUTPUT is used.
+To execute one or more business rules that are deployed in the same BAR file as the process definition, we need to define the input and result variables. For the input variable definition, a list of process variables can be defined separated by a comma. The output variable definition can only contain one variable name that will be used to store the output objects of the executed business rules in a process variable. Note that the result variable will contain a List of objects. If no result variable name is specified by default, org.flowable.engine.rules.OUTPUT is used. The output objects are stored using Java serialization, therefore the result variable is only stored as a regular process variable when the *serializable* variable type is enabled (see [Serializable variables](bpmn/ch04-API.md#serializable-variables)). Otherwise, the result variable is stored as a [transient variable](bpmn/ch04-API.md#transient-variables), which is only available until the next wait state.
 
 The following business rule task executes all business rules deployed with the process definition:
 
@@ -3939,6 +3941,8 @@ For example, assuming the myService.getCollectionVariableName() returns a String
          flowable:collection="${myService.getCollectionVariableName()}" flowable:elementVariable="assignee" >
       </multiInstanceLoopCharacteristics>
     </userTask>
+
+The collection can also be a JSON array. Elements of a JSON array that are plain values are exposed as plain Java values in the element variable: a JSON string becomes a String, a JSON number becomes a number (e.g. Integer, Long or Double), a JSON boolean becomes a Boolean and a JSON null becomes null. For example, when assigneeList is the JSON array `["kermit", "gonzo"]`, the assignee variable is the String kermit (respectively gonzo), so it can be used directly for the assignee or compared in an expression such as `${assignee == 'kermit'}`. JSON objects and arrays are exposed as JSON. For compatibility, the Jackson accessor methods (e.g. `${assignee.asText()}`, `${assignee.asString()}`, `${assignee.textValue()}`, `${assignee.asInt()}`, `${assignee.booleanValue()}` or `${assignee.isTextual()}`) can still be used on such element variables in expressions.
 
 A multi-instance activity ends when all instances are finished. However, it is possible to specify an expression that is evaluated every time an instance ends. When this expression evaluates to true, all remaining instances are destroyed and the multi-instance activity ends, continuing the process. Such an expression must be defined in the **completionCondition** child element.
 

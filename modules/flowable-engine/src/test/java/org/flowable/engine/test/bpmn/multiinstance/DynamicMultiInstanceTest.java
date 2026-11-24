@@ -16,8 +16,6 @@ package org.flowable.engine.test.bpmn.multiinstance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +32,7 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 /**
@@ -81,7 +80,7 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
     public void testAddSequentialUserTaskWithCollection() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             Map<String, Object> variableMap = new HashMap<>();
-            ArrayList<String> userList = new ArrayList<>();
+            ArrayNode userList = processEngineConfiguration.getObjectMapper().createArrayNode();
             userList.add("admin");
             variableMap.put("taskUserList", userList);
             String procId = runtimeService.startProcessInstanceByKey("miSequentialUserTasks", variableMap).getId();
@@ -214,7 +213,8 @@ public class DynamicMultiInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testParallelUserTasksBasedOnCollection() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
-            List<String> assigneeList = Arrays.asList("kermit", "gonzo", "mispiggy", "fozzie", "bubba");
+            ArrayNode assigneeList = processEngineConfiguration.getObjectMapper().createArrayNode()
+                    .add("kermit").add("gonzo").add("mispiggy").add("fozzie").add("bubba");
             String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection", CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
         
             List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskAssignee().asc().list();

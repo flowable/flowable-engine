@@ -42,7 +42,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.variable.BpmnAggregatedVariableType;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.api.variables.VariablesTest;
 import org.flowable.eventsubscription.api.EventSubscription;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
@@ -453,7 +452,8 @@ public class MultiInstanceVariableAggregationTest extends PluggableFlowableTestC
         variables.put("score", 10);
         variables.put("passed", true);
         variables.put("location", "Springfield");
-        variables.put("startTime", new VariablesTest.TestSerializableVariable(19));
+        // An empty collection can be stored as a variable, but it is not supported by the JSON variable aggregation
+        variables.put("startTime", Collections.emptyList());
 
         assertThatThrownBy(() -> taskService.complete(tasks.get(0).getId(), variables))
             .isExactlyInstanceOf(FlowableException.class)

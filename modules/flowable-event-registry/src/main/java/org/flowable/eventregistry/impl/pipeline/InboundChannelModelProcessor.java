@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.api.scope.ScopeTypes;
 import org.flowable.common.engine.impl.el.VariableContainerWrapper;
 import org.flowable.eventregistry.api.ChannelModelProcessor;
 import org.flowable.eventregistry.api.EventRegistry;
@@ -39,6 +40,7 @@ import org.flowable.eventregistry.impl.payload.JsonFieldToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.payload.XmlElementsToMapPayloadExtractor;
 import org.flowable.eventregistry.impl.serialization.StringToJsonDeserializer;
 import org.flowable.eventregistry.impl.serialization.StringToXmlDocumentDeserializer;
+import org.flowable.eventregistry.impl.tenantdetector.ChannelTenantInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.InboundEventStaticTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.JsonPointerBasedInboundEventTenantDetector;
 import org.flowable.eventregistry.impl.tenantdetector.XpathBasedInboundEventTenantDetector;
@@ -81,8 +83,43 @@ public class InboundChannelModelProcessor implements ChannelModelProcessor {
             EventRepositoryService eventRepositoryService,
             boolean fallbackToDefaultTenant) {
         
-        if (channelModel instanceof InboundChannelModel) {
-            registerChannelModel((InboundChannelModel) channelModel, eventRepositoryService, fallbackToDefaultTenant);
+        if (channelModel instanceof InboundChannelModel inboundChannelModel) {
+            registerChannelModel(inboundChannelModel, eventRepositoryService, fallbackToDefaultTenant);
+
+            // A custom pipeline is responsible for the tenant of its events itself
+            if (StringUtils.isEmpty(inboundChannelModel.getPipelineDelegateExpression())
+                    && inboundChannelModel.getInboundEventProcessingPipeline() instanceof DefaultInboundEventProcessingPipeline<?> eventProcessingPipeline
+                    && isTenantSpecificChannel(inboundChannelModel, tenantId, fallbackToDefaultTenant)) {
+                restrictToChannelTenant(eventProcessingPipeline, inboundChannelModel, tenantId);
+            }
+        }
+    }
+
+    /**
+     * Whether the channel is deployed in a specific tenant, which only gets events for its own tenant. A channel without a tenant
+     * or in the default tenant, which is shared with the other tenants, gets events for the tenant detected by its tenant detection.
+     */
+    protected boolean isTenantSpecificChannel(InboundChannelModel inboundChannelModel, String tenantId, boolean fallbackToDefaultTenant) {
+        if (StringUtils.isEmpty(tenantId)) {
+            return false;
+        }
+
+        if (fallbackToDefaultTenant) {
+            String defaultTenantId = engineConfiguration.getDefaultTenantProvider()
+                    .getDefaultTenant(tenantId, ScopeTypes.EVENT_REGISTRY, inboundChannelModel.getKey());
+            return !tenantId.equals(defaultTenantId);
+        }
+
+        return true;
+    }
+
+    protected <T> void restrictToChannelTenant(DefaultInboundEventProcessingPipeline<T> eventProcessingPipeline, InboundChannelModel inboundChannelModel,
+            String tenantId) {
+
+        // The pipeline is created once for a channel model, which can be registered again
+        if (!(eventProcessingPipeline.getInboundEventTenantDetector() instanceof ChannelTenantInboundEventTenantDetector)) {
+            eventProcessingPipeline.setInboundEventTenantDetector(new ChannelTenantInboundEventTenantDetector<>(inboundChannelModel.getKey(), tenantId,
+                    eventProcessingPipeline.getInboundEventTenantDetector()));
         }
     }
 

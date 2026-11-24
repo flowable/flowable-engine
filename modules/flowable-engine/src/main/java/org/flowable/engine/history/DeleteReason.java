@@ -29,4 +29,6 @@ public interface DeleteReason {
 
     String TRANSACTION_CANCELED = "transaction canceled";
 
+    String ADHOC_SUBPROCESS_COMPLETED = "adhoc subprocess completed";
+
 }

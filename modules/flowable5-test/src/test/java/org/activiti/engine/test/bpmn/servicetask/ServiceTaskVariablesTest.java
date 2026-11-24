@@ -15,7 +15,7 @@ package org.activiti.engine.test.bpmn.servicetask;
 
 import java.io.Serializable;
 
-import org.activiti.engine.impl.test.PluggableFlowableTestCase;
+import org.activiti.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.test.Deployment;
@@ -24,10 +24,15 @@ import org.flowable.engine.test.Deployment;
  *
  * @author Daniel Meyer
  */
-public class ServiceTaskVariablesTest extends PluggableFlowableTestCase {
+public class ServiceTaskVariablesTest extends ResourceFlowableTestCase {
 
     static boolean isNullInDelegate2;
     static boolean isNullInDelegate3;
+
+    public ServiceTaskVariablesTest() {
+        // The tests verify that changes to serialized variables are tracked between service tasks
+        super("org/activiti/engine/test/serializable-variables.flowable.cfg.xml");
+    }
 
     public static class Variable implements Serializable {
         private static final long serialVersionUID = 1L;

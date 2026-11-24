@@ -106,7 +106,12 @@ public class HistoricVariableInstanceBaseResource {
     }
     
     public RestVariable getVariableFromRequest(boolean includeBinary, String varInstanceId) {
-        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).singleResult();
+        // The value of the variable is resolved in the same command as the query, after validating that its data can be returned
+        return cmmnEngineConfiguration.getCommandExecutor().execute(commandContext -> readVariable(includeBinary, varInstanceId));
+    }
+
+    protected RestVariable readVariable(boolean includeBinary, String varInstanceId) {
+        HistoricVariableInstance varObject = historyService.createHistoricVariableInstanceQuery().id(varInstanceId).excludeVariableInitialization().singleResult();
 
         if (varObject == null) {
             throw new FlowableObjectNotFoundException("Historic variable instance '" + varInstanceId + "' couldn't be found.", VariableInstanceEntity.class);
@@ -114,8 +119,18 @@ public class HistoricVariableInstanceBaseResource {
             if (restApiInterceptor != null) {
                 restApiInterceptor.accessHistoryVariableInfoById(varObject);
             }
+            if (includeBinary) {
+                validateVariableDataAllowed(varObject.getVariableTypeName());
+            }
             return restResponseFactory.createRestVariable(varObject.getVariableName(), varObject.getValue(), null, varInstanceId, CmmnRestResponseFactory.VARIABLE_HISTORY_VARINSTANCE, includeBinary);
         }
+    }
+
+    /**
+     * Validates that the binary data of a variable with the given type can be returned, before the value of the variable is resolved.
+     */
+    protected void validateVariableDataAllowed(String variableTypeName) {
+        // Nothing to validate by default
     }
 
     protected void addVariables(HistoricVariableInstanceQuery variableInstanceQuery, List<QueryVariable> variables) {

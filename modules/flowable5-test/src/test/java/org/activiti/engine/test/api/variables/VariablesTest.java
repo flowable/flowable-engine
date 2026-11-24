@@ -12,7 +12,6 @@
  */
 package org.activiti.engine.test.api.variables;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,6 +22,8 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
+
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * Testing various constructs with variables. Created to test the changes done in https://activiti.atlassian.net/browse/ACT-1900.
@@ -70,9 +71,9 @@ public class VariablesTest extends PluggableFlowableTestCase {
             vars.put("booleanValue" + i, (i % 2 == 0));
         }
 
-        // 10 Serializables
+        // 10 JSON objects
         for (int i = 0; i < 10; i++) {
-            vars.put("serializableValue" + i, new TestSerializableVariable(i));
+            vars.put("jsonVar" + i, processEngineConfiguration.getObjectMapper().createObjectNode().put("number", i));
         }
         return vars;
     }
@@ -96,7 +97,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfInts = 0;
         int nrOfDates = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -107,8 +108,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -116,7 +117,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -132,7 +133,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         nrOfInts = 0;
         nrOfDates = 0;
         nrOfBooleans = 0;
-        nrOfSerializable = 0;
+        nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -143,8 +144,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -152,7 +153,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
     }
 
@@ -165,7 +166,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfInts = 0;
         int nrOfDates = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -176,8 +177,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -185,7 +186,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -229,7 +230,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfInts = 0;
         int nrOfDates = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -240,8 +241,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -249,7 +250,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
         assertEquals("stringVarValue-1", vars.get("stringVar1"));
         assertEquals("stringVarValue-2", vars.get("stringVar2"));
@@ -263,7 +264,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         nrOfInts = 0;
         nrOfDates = 0;
         nrOfBooleans = 0;
-        nrOfSerializable = 0;
+        nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -274,8 +275,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -283,7 +284,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
         assertEquals("hello", vars.get("stringVar1"));
         assertEquals("world", vars.get("stringVar2"));
@@ -399,7 +400,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfInts = 0;
         int nrOfDates = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -410,8 +411,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBooleans++;
             } else if (variableValue instanceof Date) {
                 nrOfDates++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -419,7 +420,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfBooleans);
         assertEquals(10, nrOfDates);
         assertEquals(10, nrOfInts);
-        assertEquals(10, nrOfSerializable);
+        assertEquals(10, nrOfJson);
 
         // Get variables local
         assertEquals(0, taskService.getVariablesLocal(task.getId()).size());
@@ -441,26 +442,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(0, taskService.getVariablesLocal(task.getId(), Arrays.asList("intVar2", "intVar5")).size());
         assertEquals("localTaskVarValue", taskService.getVariable(task.getId(), "localTaskVar"));
         assertEquals("localTaskVarValue", taskService.getVariableLocal(task.getId(), "localTaskVar"));
-    }
-
-    // Class to test variable serialization
-    public static class TestSerializableVariable implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-        private int number;
-
-        public TestSerializableVariable(int number) {
-            this.number = number;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public void setNumber(int number) {
-            this.number = number;
-        }
-
     }
 
     // Test delegates

@@ -40,6 +40,10 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     protected String subScopeId;
     protected String scopeType;
 
+    // Not persisted, only set when the variable is fetched by a query that includes variables or copied from the runtime variable
+    protected String processDefinitionId;
+    protected String scopeDefinitionId;
+
     protected Date createTime;
     protected Date lastUpdatedTime;
 
@@ -205,6 +209,16 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     }
 
     @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
+
+    @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -277,6 +291,16 @@ public class HistoricVariableInstanceEntityImpl extends AbstractVariableServiceE
     @Override
     public void setScopeType(String scopeType) {
         this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

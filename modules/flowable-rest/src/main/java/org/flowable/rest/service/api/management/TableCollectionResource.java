@@ -18,7 +18,11 @@ import java.util.List;
 import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.BpmnRestApiInterceptor;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,8 +36,11 @@ import io.swagger.annotations.Authorization;
  * @author Frederik Heremans
  */
 @RestController
+@Conditional(TableManagementEnabledCondition.class)
 @Api(tags = { "Database tables" }, authorizations = { @Authorization(value = "basicAuth") })
-public class TableCollectionResource {
+public class TableCollectionResource implements InitializingBean {
+
+    protected static final Logger LOGGER = LoggerFactory.getLogger(TableCollectionResource.class);
 
     @Autowired
     protected RestResponseFactory restResponseFactory;
@@ -43,6 +50,13 @@ public class TableCollectionResource {
     
     @Autowired(required=false)
     protected BpmnRestApiInterceptor restApiInterceptor;
+
+    @Override
+    public void afterPropertiesSet() {
+        LOGGER.warn("The database table REST resources (management/tables) are enabled through '{}'. "
+                + "They expose the raw content of the Flowable database tables and should only be enabled when needed, with access restricted to administrators.",
+                TableManagementEnabledCondition.PROPERTY_NAME);
+    }
 
     @ApiOperation(value = " List tables", tags = { "Database tables" }, nickname = "listTables")
     @ApiResponses(value = {

@@ -70,13 +70,13 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
-                .variable("myVar", Arrays.asList(2, 3, 4))
+                .transientVariable("myVar", Arrays.asList(2, 3, 4))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
-                .variable("myVar", Arrays.asList(1, 2, 3, 4))
+                .transientVariable("myVar", Arrays.asList(1, 2, 3, 4))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }
@@ -89,19 +89,19 @@ public class VariableExpressionFunctionsTest extends PluggableFlowableTestCase{
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
-                .variable("myVar", Arrays.asList(3, 4))
+                .transientVariable("myVar", Arrays.asList(3, 4))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("B");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
-                .variable("myVar", Arrays.asList(2, 3, 4))
+                .transientVariable("myVar", Arrays.asList(2, 3, 4))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
         
         processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("testExpressionFunction")
-                .variable("myVar", Arrays.asList(1, 2, 3, 4))
+                .transientVariable("myVar", Arrays.asList(1, 2, 3, 4))
                 .start();
         assertThat(taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult().getName()).isEqualTo("A");
     }

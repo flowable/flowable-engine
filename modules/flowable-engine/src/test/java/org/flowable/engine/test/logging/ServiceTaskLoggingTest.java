@@ -365,7 +365,8 @@ public class ServiceTaskLoggingTest extends ResourceFlowableTestCase {
         assertThat(newJobNumber).isGreaterThan(beforeJobNumber);
         assertThat(loggingNode.get(LoggingSessionUtil.TIMESTAMP).asString()).isNotNull();
 
-        JobTestHelper.waitForJobExecutorToProcessAllJobs(processEngineConfiguration, managementService, 5000, 200);
+        // The async executor has been shut down by the wait above, so the failed job is not retried (it would add more logging nodes).
+        // Starting the executor again would execute the retry, since the failed job wait time is only 1 second.
         assertThat(FlowableLoggingListener.TEST_LOGGING_NODES).hasSize(8);
 
         loggingNode = FlowableLoggingListener.TEST_LOGGING_NODES.get(0);

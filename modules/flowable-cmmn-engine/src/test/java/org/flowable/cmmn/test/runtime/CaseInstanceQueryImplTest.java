@@ -50,6 +50,7 @@ import org.flowable.common.engine.impl.interceptor.CommandContext;
 import org.flowable.common.engine.impl.interceptor.CommandExecutor;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -1397,6 +1398,59 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByOrInvolvedUsersAndGroupsWithIdentityLinkTypes() {
+        CaseInstance userTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addUserIdentityLink(userTypeInstance.getId(), "kermit", "specialLink");
+        CaseInstance userOtherTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addUserIdentityLink(userOtherTypeInstance.getId(), "kermit", "otherLink");
+        CaseInstance groupTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupTypeInstance.getId(), "sales", "specialLink");
+        CaseInstance groupOtherTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupOtherTypeInstance.getId(), "sales", "otherLink");
+        CaseInstance groupsInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupsInstance.getId(), "testGroup", "otherLink");
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroup("sales", "specialLink").endOr()
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupTypeInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupsInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or().involvedUser("kermit").involvedGroup("sales", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(CaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), userOtherTypeInstance.getId(), groupTypeInstance.getId(), groupsInstance.getId());
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .involvedGroup("sales", "specialLink")
+                .involvedGroups(Set.of("testGroup"))
+                .caseInstanceId(groupOtherTypeInstance.getId())
+                .endOr()
+                .count())
+                .isEqualTo(4);
+
+        assertThat(cmmnRuntimeService.createCaseInstanceQuery()
+                .or().involvedUser("kermit", "wrongType").involvedGroup("sales", "wrongType").endOr()
+                .count())
+                .isZero();
+    }
+
+    protected CaseInstance startOneTaskCase() {
+        return cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+    }
+
+    @Test
     public void getCaseInstanceByInvolvedGroupOrUser() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
@@ -1968,6 +2022,17 @@ public class CaseInstanceQueryImplTest extends FlowableCmmnTestCase {
         assertThat(caseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar","test")
         );
+        assertThat(((CaseInstanceEntity) caseInstance).getQueryVariables())
+                .extracting(VariableInstance::getScopeDefinitionId)
+                .containsExactly(caseInstance.getCaseDefinitionId());
+
+        String caseInstanceWithoutVariablesId = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start().getId();
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery()
+                .caseInstanceId(caseInstanceWithoutVariablesId)
+                .includeCaseVariables()
+                .singleResult();
+        assertThat(caseInstance.getCaseVariables()).isEmpty();
+        assertThat(((CaseInstanceEntity) caseInstance).getQueryVariables()).isEmpty();
     }
 
 

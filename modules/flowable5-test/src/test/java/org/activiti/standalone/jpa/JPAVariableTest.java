@@ -14,7 +14,6 @@ package org.activiti.standalone.jpa;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -394,55 +393,6 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
         assertEquals(3L, list.size());
         assertTrue(list.get(0) instanceof SubclassPropertyAccessJPAEntity);
         assertEquals(((SubclassPropertyAccessJPAEntity) list.get(0)).getId(), simpleEntityPropertyAccess.getId());
-    }
-
-    @Deployment(resources = {
-            "org/activiti/standalone/jpa/JPAVariableTest.testStoreJPAEntityAsVariable.bpmn20.xml"
-    })
-    public void testStoreJPAEntityListAsVariableEdgeCases() {
-        setupJPAEntities();
-
-        // Test using mixed JPA-entities which are not serializable, should not be picked up by JPA list type en therefor fail
-        // due to serialization error
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("simpleEntityFieldAccess", Arrays.asList(simpleEntityFieldAccess, simpleEntityPropertyAccess));
-
-        try {
-            runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
-            fail("Exception expected");
-        } catch (FlowableException ae) {
-            // Expected
-        }
-
-        // Test updating value to an empty list and back
-        variables = new HashMap<String, Object>();
-        variables.put("list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables);
-
-        runtimeService.setVariable(processInstance.getId(), "list", new ArrayList<String>());
-        assertEquals(0L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-
-        runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
-
-        // Test updating to list of Strings
-        runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList("TEST", "TESTING"));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof String);
-
-        runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
-
-        // Test updating to null
-        runtimeService.setVariable(processInstance.getId(), "list", null);
-        assertNull(runtimeService.getVariable(processInstance.getId(), "list"));
-
-        runtimeService.setVariable(processInstance.getId(), "list", Arrays.asList(simpleEntityFieldAccess, simpleEntityFieldAccess));
-        assertEquals(2L, ((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).size());
-        assertTrue(((List<?>) runtimeService.getVariable(processInstance.getId(), "list")).get(0) instanceof FieldAccessJPAEntity);
     }
 
     // https://activiti.atlassian.net/browse/ACT-995

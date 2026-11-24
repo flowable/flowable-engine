@@ -18,9 +18,6 @@ import java.util.List;
 import org.flowable.cmmn.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.common.rest.api.PaginateRequest;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-
 /**
  * @author Tijs Rademakers
  */
@@ -84,7 +81,6 @@ public class VariableInstanceQueryRequest extends PaginateRequest {
         this.variableNameLike = variableNameLike;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = QueryVariable.class)
     public List<QueryVariable> getVariables() {
         return variables;
     }

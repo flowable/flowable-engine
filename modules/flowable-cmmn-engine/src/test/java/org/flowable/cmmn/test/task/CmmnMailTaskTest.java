@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -153,10 +152,11 @@ public class CmmnMailTaskTest extends CmmnEmailTestCase {
     private void testDynamicRecipientsInternal(Object recipients) throws MessagingException {
         cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testMail")
-                .variable("toVar", recipients)
+                // The recipients are passed as transient variables, since they can be a Java collection, which cannot be stored as a variable
+                .transientVariable("toVar", recipients)
                 .variable("fromVar", "from@flowable.org")
-                .variable("ccVar", recipients)
-                .variable("bccVar", recipients)
+                .transientVariable("ccVar", recipients)
+                .transientVariable("bccVar", recipients)
                 .variable("subjectVar", "Testing")
                 .variable("bodyVar", "The test body")
                 .start();
@@ -195,7 +195,7 @@ public class CmmnMailTaskTest extends CmmnEmailTestCase {
     public void testHtmlMailWithFileAttachment() throws Exception {
         cmmnRuntimeService.createCaseInstanceBuilder()
             .caseDefinitionKey("testMail")
-            .variable("attachmentsBean", new TestAttachmentBean())
+            .transientVariable("attachmentsBean", new TestAttachmentBean())
             .variable("gender", "male")
             .start();
 
@@ -258,7 +258,7 @@ public class CmmnMailTaskTest extends CmmnEmailTestCase {
         }
     }
 
-    public static class TestAttachmentBean implements Serializable {
+    public static class TestAttachmentBean {
         public File getFile() {
             String fileName = "src/test/resources/org/flowable/cmmn/test/task/CmmnMailTaskTest.testTextMailExpressions.cmmn";
             File file = new File(fileName);

@@ -13,9 +13,11 @@
 
 package org.flowable.standalone.history;
 
+import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -40,8 +42,6 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.api.runtime.DummySerializable;
-import org.flowable.engine.test.history.SerializableVariable;
 import org.flowable.standalone.jpa.FieldAccessJPAEntity;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
@@ -392,11 +392,11 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         assertThat(dateVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
         assertThat(dateVariable.getTime()).isEqualTo(updatedDate);
 
-        HistoricVariableUpdate serializableVariable = (HistoricVariableUpdate) details.get(7);
-        assertThat(serializableVariable.getVariableName()).isEqualTo("gVariable");
-        assertThat(serializableVariable.getValue()).isEqualTo(new SerializableVariable("hello hello"));
-        assertThat(serializableVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
-        assertThat(serializableVariable.getTime()).isEqualTo(updatedDate);
+        HistoricVariableUpdate jsonVariable = (HistoricVariableUpdate) details.get(7);
+        assertThat(jsonVariable.getVariableName()).isEqualTo("gVariable");
+        assertThatJson(jsonVariable.getValue()).isEqualTo("{ value: 'hello hello' }");
+        assertThat(jsonVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
+        assertThat(jsonVariable.getTime()).isEqualTo(updatedDate);
 
         HistoricVariableUpdate byteArrayVariable = (HistoricVariableUpdate) details.get(8);
         assertThat(byteArrayVariable.getVariableName()).isEqualTo("hVariable");
@@ -450,7 +450,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
 
         historicVariable = historicVariables.get(6);
         assertThat(historicVariable.getVariableName()).isEqualTo("gVariable");
-        assertThat(historicVariable.getValue()).isEqualTo(new SerializableVariable("hello hello"));
+        assertThatJson(historicVariable.getValue()).isEqualTo("{ value: 'hello hello' }");
         assertThat(historicVariable.getProcessInstanceId()).isEqualTo(processInstance.getId());
 
         historicVariable = historicVariables.get(7);
@@ -810,7 +810,7 @@ public class FullHistoryTest extends ResourceFlowableTestCase {
         // Start process-instance with some variables set
         Map<String, Object> vars = new HashMap<>();
         vars.put("processVar", 123L);
-        vars.put("anotherProcessVar", new DummySerializable());
+        vars.put("anotherProcessVar", "another value".getBytes(StandardCharsets.UTF_8));
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest", vars);
         assertThat(processInstance).isNotNull();

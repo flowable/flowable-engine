@@ -40,7 +40,11 @@ import jakarta.enterprise.inject.spi.PassivationCapable;
  * </pre>
  * 
  * @author Daniel Meyer
+ * @deprecated BusinessProcessScoped beans are stored as process variables using Java serialization.
+ *             They only work when serializable variables are enabled (see the serializableVariableTypeMode of the process engine configuration),
+ *             which is disabled by default since deserializing Java objects is a security risk. Store the data in regular process variables (e.g. JSON) instead.
  */
+@Deprecated
 @Target({ ElementType.TYPE, ElementType.FIELD, ElementType.METHOD })
 @Retention(value = RetentionPolicy.RUNTIME)
 public @interface BusinessProcessScoped {

@@ -30,9 +30,12 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.api.runtime.UserEventListenerInstance;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -1638,6 +1641,10 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .includeCaseVariables()
                 .includeTaskLocalVariables()
                 .singleResult();
+        assertThat(((TaskEntity) task).getQueryVariables())
+                .extracting(VariableInstance::getScopeDefinitionId, VariableInstance::getProcessDefinitionId)
+                .isNotEmpty()
+                .containsOnly(tuple(task.getScopeDefinitionId(), null));
 
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(0).getId()).singleResult();
         assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
@@ -1647,6 +1654,13 @@ public class PlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).containsOnly(
                 entry("localVar", "someValue")
         );
+        assertThat(((PlanItemInstanceEntity) planItemInstance).getQueryVariables())
+                .extracting(VariableInstance::getScopeDefinitionId)
+                .containsExactly(planItemInstance.getCaseDefinitionId());
+
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(1).getId()).includeLocalVariables().singleResult();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
+        assertThat(((PlanItemInstanceEntity) planItemInstance).getQueryVariables()).isEmpty();
     }
 
     @Test

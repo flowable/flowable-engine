@@ -26,6 +26,7 @@ import org.flowable.rest.service.api.RestUrls;
 import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.TestPropertySource;
 
 import tools.jackson.databind.JsonNode;
 
@@ -36,6 +37,7 @@ import net.javacrumbs.jsonunit.core.Option;
  * 
  * @author Frederik Heremans
  */
+@TestPropertySource(properties = "flowable.rest.table-management.enabled=true")
 public class TableDataResourceTest extends BaseSpringRestTestCase {
 
     /**

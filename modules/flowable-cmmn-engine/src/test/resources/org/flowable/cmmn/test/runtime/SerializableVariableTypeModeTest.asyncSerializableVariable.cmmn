@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="asyncSerializableVariable">
+        <casePlanModel id="casePlanModel">
+            <planItem id="planItem1" name="The Task" definitionRef="theTask"/>
+            <planItem id="planItem2" name="Async service task" definitionRef="asyncServiceTask"/>
+            <humanTask id="theTask" name="The Task"/>
+            <task id="asyncServiceTask" name="Async service task" isBlocking="false" flowable:async="true" flowable:type="java"
+                  flowable:class="org.flowable.cmmn.test.runtime.SerializableVariableTypeModeTest$SetSerializableVariableDelegate"/>
+        </casePlanModel>
+    </case>
+</definitions>

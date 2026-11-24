@@ -201,13 +201,17 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "other value");
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
-        // Collection
+        // Collection (transient, since Java collections cannot be stored as variables without serialization)
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIsEmptyFunction")
-                .variable("myVar", Arrays.asList("one", "two"))
+                .transientVariable("myVar", Arrays.asList("one", "two"))
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", new ArrayList<>());
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsEmptyFunction")
+                .transientVariable("myVar", new ArrayList<>())
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
@@ -252,13 +256,17 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", "");
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
 
-        // Collection
+        // Collection (transient, since Java collections cannot be stored as variables without serialization)
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIsNotEmptyFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("one", "two"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testIsNotEmptyFunction")
+                .transientVariable("myVar", Arrays.asList("one", "two"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
@@ -296,13 +304,17 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
-        // Collection
+        // Collection (transient, since Java collections cannot be stored as variables without serialization)
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("a", "hello world", "b"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsFunction")
+                .transientVariable("myVar", Arrays.asList("a", "hello world", "b"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
@@ -345,28 +357,46 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testVariableContainsAllCollection() {
+        // Transient variables are used, since Java collections cannot be stored as variables without serialization
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList(1, 3, 4, 6));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsFunction")
+                .transientVariable("myVar", Arrays.asList(1, 3, 4, 6))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList(1, 2, 3, 4, 5, 6));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsFunction")
+                .transientVariable("myVar", Arrays.asList(1, 2, 3, 4, 5, 6))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
     }
 
     @Test
     @CmmnDeployment
     public void testVariableContainsAllCollection2() {
+        // Transient variables are used, since Java collections cannot be stored as variables without serialization
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("a"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsFunction")
+                .transientVariable("myVar", Arrays.asList("a"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsFunction")
+                .transientVariable("myVar", Arrays.asList("a", "b", "c", "d", "e", "f", "g"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
     }
 
@@ -413,13 +443,17 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
-        // Collection
+        // Collection (transient, since Java collections cannot be stored as variables without serialization)
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsAnyFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("a", "world", "b"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .transientVariable("myVar", Arrays.asList("a", "world", "b"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
 
         // ArrayNode
@@ -462,14 +496,23 @@ public class VariableFunctionDelegatesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testVariableContainsAnyCollection() {
+        // Transient variables are used, since Java collections cannot be stored as variables without serialization
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testContainsAnyFunction")
-                .variable("myVar", new ArrayList<>())
+                .transientVariable("myVar", new ArrayList<>())
                 .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("c"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .transientVariable("myVar", Arrays.asList("c"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(1);
-        cmmnRuntimeService.setVariable(caseInstance.getId(), "myVar", Arrays.asList("a", "b", "c", "d", "e", "f", "g"));
+
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testContainsAnyFunction")
+                .transientVariable("myVar", Arrays.asList("a", "b", "c", "d", "e", "f", "g"))
+                .start();
         assertThat(cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count()).isEqualTo(2);
     }
 

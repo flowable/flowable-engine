@@ -27,9 +27,9 @@ import org.flowable.common.engine.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.common.rest.exception.FlowableConflictException;
 import org.flowable.engine.ProcessMigrationService;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocument;
 import org.flowable.engine.migration.ProcessInstanceMigrationDocumentConverter;
-import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormInfo;
@@ -204,9 +204,11 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
                 if (startEvent.isSameDeployment()) {
-                    Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(processDefinition.getDeploymentId()).singleResult();
+                    // The process definition comes from the definition cache, which has the parent deployment id
+                    String parentDeploymentId = processDefinition instanceof ProcessDefinitionEntity processDefinitionEntity
+                            ? processDefinitionEntity.getParentDeploymentId() : null;
                     formInfo = formRepositoryService.getFormModelByKeyAndParentDeploymentId(startEvent.getFormKey(),
-                    		deployment.getParentDeploymentId(), processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
+                            parentDeploymentId, processDefinition.getTenantId(), processEngineConfiguration.isFallbackToDefaultTenant());
                     
                 } else {
                     formInfo = formRepositoryService.getFormModelByKey(startEvent.getFormKey(), processDefinition.getTenantId(),

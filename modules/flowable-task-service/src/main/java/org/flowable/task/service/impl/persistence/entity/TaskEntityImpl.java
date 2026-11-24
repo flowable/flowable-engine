@@ -237,6 +237,7 @@ public class TaskEntityImpl extends AbstractTaskServiceVariableScopeEntity imple
             variableInstance.setScopeId(this.scopeId);
             variableInstance.setScopeType(this.scopeType);
             variableInstance.setSubScopeId(this.subScopeId);
+            variableInstance.setScopeDefinitionId(this.scopeDefinitionId);
         } else {
             variableInstance.setExecutionId(this.executionId);
             variableInstance.setProcessInstanceId(this.processInstanceId);

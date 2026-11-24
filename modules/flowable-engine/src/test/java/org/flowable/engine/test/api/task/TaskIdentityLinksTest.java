@@ -19,7 +19,6 @@ import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
@@ -34,6 +33,7 @@ import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
+import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ArrayNode;
 
 /**
@@ -353,14 +353,14 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
                     .containsExactly("users");
         }
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateUsers = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_USERS);
+        ArrayNode candidateUsers = (ArrayNode) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_USERS);
         assertThat(candidateUsers)
+                .extracting(JsonNode::asString)
                 .containsExactly("user");
 
-        @SuppressWarnings("unchecked")
-        Set<String> candidateGroups = (Set<String>) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_GROUPS);
+        ArrayNode candidateGroups = (ArrayNode) taskService.getVariable(taskId, DeleteCandidateTaskListener.VARNAME_CANDIDATE_GROUPS);
         assertThat(candidateGroups)
+                .extracting(JsonNode::asString)
                 .containsExactly("users");
     }
 

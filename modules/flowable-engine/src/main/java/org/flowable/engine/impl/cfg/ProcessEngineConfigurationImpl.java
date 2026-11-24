@@ -293,6 +293,7 @@ import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
+import org.flowable.engine.impl.persistence.deploy.SameDeploymentProcessDefinitionLookup;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
@@ -423,6 +424,7 @@ import org.flowable.variable.service.impl.types.DoubleType;
 import org.flowable.variable.service.impl.types.EmptyCollectionType;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.flowable.variable.service.impl.types.FloatType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
@@ -436,6 +438,7 @@ import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
 import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
@@ -572,6 +575,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected int processDefinitionCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ProcessDefinitionCacheEntry> processDefinitionCache;
+    protected DeploymentCache<String> sameDeploymentDefinitionCache;
 
     protected int processDefinitionInfoCacheLimit = -1; // By default, no limit
     protected DeploymentCache<ProcessDefinitionInfoCacheObject> processDefinitionInfoCache;
@@ -730,6 +734,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * By default true for backwards compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+
+    /**
+     * Determines how variables of the type 'serializable' (Java serialization) are handled:
+     * <ul>
+     *     <li>{@link SerializableVariableTypeMode#ENABLED} - serializable variables can be read and written</li>
+     *     <li>{@link SerializableVariableTypeMode#READ_ONLY} - existing serializable variables can be read, but no new ones can be written</li>
+     *     <li>{@link SerializableVariableTypeMode#DISABLED} - serializable variables can neither be read nor written</li>
+     * </ul>
+     * By default {@link SerializableVariableTypeMode#DISABLED}, since deserializing Java objects is a security risk.
+     */
+    protected SerializableVariableTypeMode serializableVariableTypeMode = SerializableVariableTypeMode.DISABLED;
 
     /**
      * This flag determines whether variables of the type 'json' and 'longJson' will be tracked.
@@ -1670,6 +1685,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 processDefinitionCache = new DefaultDeploymentCache<>(processDefinitionCacheLimit);
             }
         }
+        if (sameDeploymentDefinitionCache == null) {
+            if (processDefinitionCacheLimit <= 0) {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>();
+            } else {
+                sameDeploymentDefinitionCache = new DefaultDeploymentCache<>(processDefinitionCacheLimit);
+            }
+        }
     }
 
     public void initProcessDefinitionInfoCache() {
@@ -1725,6 +1747,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             deploymentManager.setProcessEngineConfiguration(this);
             deploymentManager.setProcessDefinitionEntityManager(processDefinitionEntityManager);
             deploymentManager.setDeploymentEntityManager(deploymentEntityManager);
+        }
+
+        if (deploymentManager.getSameDeploymentProcessDefinitionLookup() == null) {
+            deploymentManager.setSameDeploymentProcessDefinitionLookup(new SameDeploymentProcessDefinitionLookup(sameDeploymentDefinitionCache, this));
         }
 
         if (appResourceConverter == null) {
@@ -2225,6 +2251,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new JodaDateType());
             variableTypes.addType(new JodaDateTimeType());
             variableTypes.addType(new DoubleType());
+            variableTypes.addType(new FloatType());
             variableTypes.addType(new BigDecimalType());
             variableTypes.addType(new BigIntegerType());
             variableTypes.addType(new UUIDType());
@@ -2235,7 +2262,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new BpmnAggregatedVariableType(this));
             variableTypes.addType(new ByteArrayType(variableLengthVerifier));
             variableTypes.addType(new EmptyCollectionType());
-            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier));
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects, variableLengthVerifier, serializableVariableTypeMode));
+            if (serializableVariableTypeMode != SerializableVariableTypeMode.DISABLED) {
+                logger.warn("Serializable variables are {} (serializableVariableTypeMode is {}). Deserializing Java objects is a security risk,"
+                        + " only use this when the data in the database and the classes on the classpath are fully trusted.",
+                        serializableVariableTypeMode == SerializableVariableTypeMode.ENABLED ? "enabled" : "readable", serializableVariableTypeMode);
+            }
 
         } else {
             if (customPreVariableTypes != null) {
@@ -3259,6 +3291,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
     }
 
+    public SerializableVariableTypeMode getSerializableVariableTypeMode() {
+        return serializableVariableTypeMode;
+    }
+
+    public ProcessEngineConfigurationImpl setSerializableVariableTypeMode(SerializableVariableTypeMode serializableVariableTypeMode) {
+        this.serializableVariableTypeMode = serializableVariableTypeMode;
+        return this;
+    }
+
     public boolean isJsonVariableTypeTrackObjects() {
         return jsonVariableTypeTrackObjects;
     }
@@ -3893,6 +3934,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionCacheLimit(int processDefinitionCacheLimit) {
         this.processDefinitionCacheLimit = processDefinitionCacheLimit;
+        return this;
+    }
+
+    public DeploymentCache<String> getSameDeploymentDefinitionCache() {
+        return sameDeploymentDefinitionCache;
+    }
+
+    public ProcessEngineConfigurationImpl setSameDeploymentDefinitionCache(DeploymentCache<String> sameDeploymentDefinitionCache) {
+        this.sameDeploymentDefinitionCache = sameDeploymentDefinitionCache;
         return this;
     }
 

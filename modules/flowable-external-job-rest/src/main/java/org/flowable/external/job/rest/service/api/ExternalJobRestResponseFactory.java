@@ -26,6 +26,7 @@ import org.flowable.common.rest.variable.BooleanRestVariableConverter;
 import org.flowable.common.rest.variable.DateRestVariableConverter;
 import org.flowable.common.rest.variable.DoubleRestVariableConverter;
 import org.flowable.common.rest.variable.EngineRestVariable;
+import org.flowable.common.rest.variable.FloatRestVariableConverter;
 import org.flowable.common.rest.variable.InstantRestVariableConverter;
 import org.flowable.common.rest.variable.IntegerRestVariableConverter;
 import org.flowable.common.rest.variable.JsonObjectRestVariableConverter;
@@ -33,6 +34,7 @@ import org.flowable.common.rest.variable.LocalDateRestVariableConverter;
 import org.flowable.common.rest.variable.LocalDateTimeRestVariableConverter;
 import org.flowable.common.rest.variable.LongRestVariableConverter;
 import org.flowable.common.rest.variable.RestVariableConverter;
+import org.flowable.common.rest.variable.SerializableRestVariableUtil;
 import org.flowable.common.rest.variable.ShortRestVariableConverter;
 import org.flowable.common.rest.variable.StringRestVariableConverter;
 import org.flowable.external.job.rest.service.api.acquire.AcquiredExternalWorkerJobResponse;
@@ -153,6 +155,10 @@ public class ExternalJobRestResponseFactory {
         return restVariable;
     }
 
+    /**
+     * Get the value of a variable that is going to be stored.
+     * A JSON object or array is only supported when the json type is provided.
+     */
     public Object getVariableValue(EngineRestVariable restVariable) {
         Object value;
 
@@ -174,6 +180,7 @@ public class ExternalJobRestResponseFactory {
             // Revert to type determined by REST-to-Java mapping when no
             // explicit type has been provided
             value = restVariable.getValue();
+            SerializableRestVariableUtil.validateUntypedVariableValue(restVariable.getName(), value);
         }
         return value;
     }
@@ -188,6 +195,7 @@ public class ExternalJobRestResponseFactory {
         variableConverters.add(new LongRestVariableConverter());
         variableConverters.add(new ShortRestVariableConverter());
         variableConverters.add(new DoubleRestVariableConverter());
+        variableConverters.add(new FloatRestVariableConverter());
         variableConverters.add(new BigDecimalRestVariableConverter());
         variableConverters.add(new BigIntegerRestVariableConverter());
         variableConverters.add(new BooleanRestVariableConverter());

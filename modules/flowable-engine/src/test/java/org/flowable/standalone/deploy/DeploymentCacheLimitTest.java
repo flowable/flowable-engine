@@ -16,11 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.flowable.common.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -55,6 +58,49 @@ public class DeploymentCacheLimitTest extends ResourceFlowableTestCase {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);
         }
+    }
+
+    @Test
+    public void testSameDeploymentDefinitionCacheLimit() throws IOException {
+        int processDefinitionCacheLimit = 3; // This is set in the configuration above
+
+        DefaultDeploymentCache<String> sameDeploymentDefinitionCache = (DefaultDeploymentCache<String>) processEngineConfiguration
+                .getSameDeploymentDefinitionCache();
+        assertThat(sameDeploymentDefinitionCache.size()).isZero();
+
+        String processDefinitionTemplate = DeploymentCacheTestUtil.readTemplateFile("/org/flowable/standalone/deploy/deploymentCacheTest.bpmn20.xml");
+        List<Deployment> deployments = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            Deployment deployment = repositoryService.createDeployment()
+                    .addString("Process " + i + ".bpmn20.xml", MessageFormat.format(processDefinitionTemplate, i))
+                    .deploy();
+            deployments.add(deployment);
+
+            startProcessInstanceWithParentDeploymentId("myProcess" + i, deployment);
+
+            if (i < processDefinitionCacheLimit) {
+                assertThat(sameDeploymentDefinitionCache.size()).isEqualTo(i);
+            } else {
+                assertThat(sameDeploymentDefinitionCache.size()).isEqualTo(processDefinitionCacheLimit);
+            }
+        }
+
+        // The entry of the first deployment has been evicted, the lookup still resolves its process definition
+        startProcessInstanceWithParentDeploymentId("myProcess1", deployments.get(0));
+        assertThat(sameDeploymentDefinitionCache.size()).isEqualTo(processDefinitionCacheLimit);
+
+        // Cleanup
+        for (Deployment deployment : deployments) {
+            repositoryService.deleteDeployment(deployment.getId(), true);
+        }
+    }
+
+    protected void startProcessInstanceWithParentDeploymentId(String processDefinitionKey, Deployment deployment) {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey(processDefinitionKey)
+                .processDefinitionParentDeploymentId(deployment.getId())
+                .start();
+        assertThat(repositoryService.getProcessDefinition(processInstance.getProcessDefinitionId()).getDeploymentId()).isEqualTo(deployment.getId());
     }
 
 }

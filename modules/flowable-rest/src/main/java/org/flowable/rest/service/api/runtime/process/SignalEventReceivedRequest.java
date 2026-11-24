@@ -18,8 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 
 import io.swagger.annotations.ApiModelProperty;
 
@@ -39,7 +37,6 @@ public class SignalEventReceivedRequest {
         return tenantId;
     }
 
-    @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     @ApiModelProperty(value = "Array of variables (in the general variables format) to use as payload to pass along with the signal. Cannot be used in case async is set to true, this will result in an error.")
     public List<RestVariable> getVariables() {
         return variables;

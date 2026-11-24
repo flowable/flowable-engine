@@ -18,7 +18,7 @@
       <extensionElements>
         <flowable:in source="testString" target="localString" />
         <flowable:in source="testNumber" target="localNumber" />
-        <flowable:in source="testSerializable" target="localSerializable" />
+        <flowable:in source="testPayload" target="localPayload" />
       </extensionElements>
     </callActivity>
       

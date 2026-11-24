@@ -12,18 +12,24 @@
  */
 package org.flowable.dmn.engine.impl.persistence.deploy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableObjectNotFoundException;
 import org.flowable.common.engine.api.delegate.event.FlowableEngineEventType;
 import org.flowable.common.engine.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.common.engine.impl.event.FlowableEntityEventImpl;
+import org.flowable.common.engine.impl.persistence.deploy.AbstractSameDeploymentDefinitionLookup;
 import org.flowable.common.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.api.DmnDecision;
+import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionQueryImpl;
+import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
@@ -43,10 +49,41 @@ public class DeploymentManager {
     protected List<Deployer> deployers;
     protected DecisionEntityManager decisionEntityManager;
     protected DmnDeploymentEntityManager deploymentEntityManager;
+    protected SameDeploymentDecisionLookup sameDeploymentDecisionLookup;
 
     public DeploymentManager(DeploymentCache<DecisionCacheEntry> decisionCache, DmnEngineConfiguration engineConfig) {
         this.decisionCache = decisionCache;
         this.engineConfig = engineConfig;
+    }
+
+    /**
+     * Returns the decision with the given key in the first deployment of the given parent deployment, or null when there is none.
+     */
+    public DecisionEntity findDecisionByParentDeploymentAndKey(String parentDeploymentId, String decisionKey, String tenantId) {
+        String cacheKey = AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, decisionKey);
+        return sameDeploymentDecisionLookup.find(cacheKey, tenantId, sameDeploymentDecisionLookup.isCacheMisses(), () -> {
+            List<DmnDeployment> dmnDeployments = deploymentEntityManager.findDeploymentsByQueryCriteria(
+                    new DmnDeploymentQueryImpl().parentDeploymentId(parentDeploymentId));
+            if (dmnDeployments == null || dmnDeployments.isEmpty()) {
+                return null;
+            }
+            if (StringUtils.isNotEmpty(tenantId)) {
+                return decisionEntityManager.findDecisionByDeploymentAndKeyAndTenantId(dmnDeployments.get(0).getId(), decisionKey, tenantId);
+            }
+            return decisionEntityManager.findDecisionByDeploymentAndKey(dmnDeployments.get(0).getId(), decisionKey);
+        });
+    }
+
+    /**
+     * Removes the cached lookups of the given decision keys for the given parent deployment.
+     */
+    public void evictSameDeploymentDecisions(String parentDeploymentId, Collection<String> decisionKeys) {
+        if (StringUtils.isEmpty(parentDeploymentId)) {
+            return;
+        }
+        for (String decisionKey : decisionKeys) {
+            sameDeploymentDecisionLookup.evict(AbstractSameDeploymentDefinitionLookup.parentDeploymentKey(parentDeploymentId, decisionKey));
+        }
     }
 
     public void deploy(DmnDeploymentEntity deployment) {
@@ -173,13 +210,16 @@ public class DeploymentManager {
         deploymentEntityManager.deleteDeployment(deploymentId);
 
         FlowableEventDispatcher eventDispatcher = engineConfig.getEventDispatcher();
+        List<String> decisionKeys = new ArrayList<>();
         for (DmnDecision definition : definitions) {
             decisionCache.remove(definition.getId());
+            decisionKeys.add(definition.getKey());
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(new FlowableEntityEventImpl(definition, FlowableEngineEventType.DEFINITION_UNDEPLOYED),
                         engineConfig.getEngineCfgKey());
             }
         }
+        evictSameDeploymentDecisions(deployment.getParentDeploymentId(), decisionKeys);
     }
 
     public List<Deployer> getDeployers() {
@@ -196,6 +236,14 @@ public class DeploymentManager {
 
     public void setDecisionCache(DeploymentCache<DecisionCacheEntry> decisionCache) {
         this.decisionCache = decisionCache;
+    }
+
+    public SameDeploymentDecisionLookup getSameDeploymentDecisionLookup() {
+        return sameDeploymentDecisionLookup;
+    }
+
+    public void setSameDeploymentDecisionLookup(SameDeploymentDecisionLookup sameDeploymentDecisionLookup) {
+        this.sameDeploymentDecisionLookup = sameDeploymentDecisionLookup;
     }
 
     public DecisionEntityManager getDecisionEntityManager() {

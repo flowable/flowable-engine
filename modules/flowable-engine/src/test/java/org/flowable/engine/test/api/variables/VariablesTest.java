@@ -15,7 +15,6 @@ package org.flowable.engine.test.api.variables;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -114,9 +113,9 @@ public class VariablesTest extends PluggableFlowableTestCase {
             vars.put("booleanValue" + i, (i % 2 == 0));
         }
 
-        // 10 Serializables
+        // 10 JSON objects
         for (int i = 0; i < 10; i++) {
-            vars.put("serializableValue" + i, new TestSerializableVariable(i));
+            vars.put("jsonVar" + i, processEngineConfiguration.getObjectMapper().createObjectNode().put("number", i));
         }
         return vars;
     }
@@ -138,7 +137,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfLocalDates = 0;
         int nrOfDateTimes = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -153,8 +152,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfLocalDates++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -164,7 +163,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfLocalDates).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -182,7 +181,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         nrOfLocalDates = 0;
         nrOfDateTimes = 0;
         nrOfBooleans = 0;
-        nrOfSerializable = 0;
+        nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -197,8 +196,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfLocalDates++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -208,7 +207,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfLocalDates).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
     }
 
     @Test
@@ -227,7 +226,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfLocalDates = 0;
         int nrOfDateTimes = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -242,8 +241,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfLocalDates++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -253,7 +252,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfLocalDates).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
 
         // Trying the same after moving the process
         org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
@@ -312,7 +311,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfBigIntegers = 0;
         int nrOfDateTimes = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -331,8 +330,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBigIntegers++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -344,7 +343,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfBigIntegers).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
 
         assertThat(vars)
                 .contains(
@@ -365,7 +364,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         nrOfBigIntegers = 0;
         nrOfDateTimes = 0;
         nrOfBooleans = 0;
-        nrOfSerializable = 0;
+        nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -384,8 +383,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfBigIntegers++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -397,7 +396,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfBigIntegers).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
 
         assertThat(vars)
                 .contains(
@@ -533,7 +532,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         int nrOfLocalDates = 0;
         int nrOfDateTimes = 0;
         int nrOfBooleans = 0;
-        int nrOfSerializable = 0;
+        int nrOfJson = 0;
         for (String variableName : vars.keySet()) {
             Object variableValue = vars.get(variableName);
             if (variableValue instanceof String) {
@@ -548,8 +547,8 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 nrOfLocalDates++;
             } else if (variableValue instanceof DateTime) {
                 nrOfDateTimes++;
-            } else if (variableValue instanceof TestSerializableVariable) {
-                nrOfSerializable++;
+            } else if (variableValue instanceof ObjectNode) {
+                nrOfJson++;
             }
         }
 
@@ -559,7 +558,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertThat(nrOfLocalDates).isEqualTo(10);
         assertThat(nrOfDateTimes).isEqualTo(10);
         assertThat(nrOfInts).isEqualTo(10);
-        assertThat(nrOfSerializable).isEqualTo(10);
+        assertThat(nrOfJson).isEqualTo(10);
 
         // Get variables local
         assertThat(taskService.getVariablesLocal(task.getId())).isEmpty();
@@ -901,26 +900,6 @@ public class VariablesTest extends PluggableFlowableTestCase {
                 Arguments.of("biginteger", BigInteger.valueOf(1450), BigInteger.valueOf(9568)),
                 Arguments.of("bigdecimal", BigDecimal.valueOf(5896.48), BigDecimal.valueOf(4886.79))
         );
-    }
-
-    // Class to test variable serialization
-    public static class TestSerializableVariable implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-        private int number;
-
-        public TestSerializableVariable(int number) {
-            this.number = number;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public void setNumber(int number) {
-            this.number = number;
-        }
-
     }
 
     // Test delegates

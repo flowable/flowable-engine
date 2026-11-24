@@ -36,6 +36,7 @@ import org.flowable.common.engine.impl.util.IoUtil;
 import org.flowable.common.engine.impl.util.ReflectUtil;
 import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
 import org.flowable.common.engine.impl.variable.VariableLengthVerifier;
+import org.flowable.job.api.FlowableUnrecoverableJobException;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -49,6 +50,8 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     public static final String TYPE_NAME = "serializable";
 
     protected boolean trackDeserializedObjects;
+
+    protected SerializableVariableTypeMode mode;
 
     @Override
     public String getTypeName() {
@@ -64,8 +67,13 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     }
 
     public SerializableType(boolean trackDeserializedObjects, VariableLengthVerifier lengthVerifier) {
+        this(trackDeserializedObjects, lengthVerifier, SerializableVariableTypeMode.ENABLED);
+    }
+
+    public SerializableType(boolean trackDeserializedObjects, VariableLengthVerifier lengthVerifier, SerializableVariableTypeMode mode) {
         super(lengthVerifier);
         this.trackDeserializedObjects = trackDeserializedObjects;
+        this.mode = mode;
     }
 
     @Override
@@ -77,6 +85,12 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
 
         byte[] bytes = (byte[]) super.getValue(valueFields);
         if (bytes != null) {
+            if (!mode.isReadable()) {
+                // Retrying (e.g. an async job) will not help, it can only succeed after the configuration has been changed
+                throw new FlowableUnrecoverableJobException("Reading the value of serializable variable '" + valueFields.getName()
+                        + "' is not allowed, because serializable variables are disabled. Set the serializable variable type mode to "
+                        + SerializableVariableTypeMode.READ_ONLY + " in the engine configuration to be able to read existing serializable variables.");
+            }
 
             Object deserializedObject = deserialize(bytes, valueFields);
             valueFields.setCachedValue(deserializedObject);
@@ -90,6 +104,12 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
 
     @Override
     public void setValue(Object value, ValueFields valueFields) {
+        // Setting null is always allowed, it is used when deleting the variable or changing its type
+        if (value != null && !mode.isWritable()) {
+            throw new FlowableUnrecoverableJobException("Storing the value of variable '" + valueFields.getName() + "' of type " + value.getClass().getName()
+                    + " is not allowed, because serializable variables are disabled. Use a different variable type (e.g. JSON) or set the serializable variable type mode to "
+                    + SerializableVariableTypeMode.ENABLED + " in the engine configuration.");
+        }
         byte[] bytes = serialize(value, valueFields);
         valueFields.setCachedValue(value);
 
@@ -99,7 +119,7 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
     }
 
     protected void traceValue(Object value, byte[] valueBytes, ValueFields valueFields) {
-        if (trackDeserializedObjects && valueFields instanceof VariableInstanceEntity) {
+        if (trackDeserializedObjects && mode.isWritable() && valueFields instanceof VariableInstanceEntity) {
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext != null) {
                 VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(valueFields);
@@ -189,6 +209,10 @@ public class SerializableType extends ByteArrayType implements MutableVariableTy
         } else {
             return ScopeTypes.BPMN;
         }
+    }
+
+    public SerializableVariableTypeMode getMode() {
+        return mode;
     }
 
     @Override

@@ -30,6 +30,7 @@ import org.activiti.engine.impl.util.ReflectUtil;
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.common.engine.impl.variable.NoopVariableLengthVerifier;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 
 /**
  * @author Tom Baeyens
@@ -39,8 +40,15 @@ public class SerializableType extends ByteArrayType {
 
     public static final String TYPE_NAME = "serializable";
 
+    protected SerializableVariableTypeMode mode;
+
     public SerializableType() {
+        this(SerializableVariableTypeMode.ENABLED);
+    }
+
+    public SerializableType(SerializableVariableTypeMode mode) {
         super(NoopVariableLengthVerifier.INSTANCE);
+        this.mode = mode;
     }
 
     @Override
@@ -57,11 +65,17 @@ public class SerializableType extends ByteArrayType {
 
         byte[] bytes = (byte[]) super.getValue(valueFields);
         if (bytes != null) {
+            if (!mode.isReadable()) {
+                throw new ActivitiException("Reading the value of serializable variable '" + valueFields.getName()
+                        + "' is not allowed, because serializable variables are disabled. Set the serializable variable type mode to "
+                        + SerializableVariableTypeMode.READ_ONLY + " in the engine configuration to be able to read existing serializable variables.");
+            }
+
             Object deserializedObject = deserialize(bytes, valueFields);
 
             valueFields.setCachedValue(deserializedObject);
 
-            if (valueFields instanceof VariableInstanceEntity) {
+            if (mode.isWritable() && valueFields instanceof VariableInstanceEntity) {
                 // we need to register the deserialized object for dirty checking,
                 // so that it can be serialized again if it was changed.
                 Context.getCommandContext()
@@ -76,6 +90,12 @@ public class SerializableType extends ByteArrayType {
 
     @Override
     public void setValue(Object value, ValueFields valueFields) {
+        // Setting null is always allowed, it is used when deleting the variable or changing its type
+        if (value != null && !mode.isWritable()) {
+            throw new ActivitiException("Storing the value of variable '" + valueFields.getName() + "' of type " + value.getClass().getName()
+                    + " is not allowed, because serializable variables are disabled. Use a different variable type (e.g. JSON) or set the serializable variable type mode to "
+                    + SerializableVariableTypeMode.ENABLED + " in the engine configuration.");
+        }
         byte[] byteArray = serialize(value, valueFields);
         valueFields.setCachedValue(value);
 
@@ -121,6 +141,10 @@ public class SerializableType extends ByteArrayType {
         } finally {
             IoUtil.closeSilently(bais);
         }
+    }
+
+    public SerializableVariableTypeMode getMode() {
+        return mode;
     }
 
     @Override

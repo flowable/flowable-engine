@@ -24,6 +24,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
+import org.flowable.cmmn.rest.conf.ObjectVariableSerializationEnabledApplicationConfiguration;
 import org.flowable.cmmn.rest.service.BaseSpringRestTestCase;
 import org.flowable.cmmn.rest.service.api.CmmnRestUrls;
 import org.flowable.common.engine.impl.persistence.entity.ByteArrayEntity;
@@ -31,12 +32,14 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 
 import tools.jackson.databind.JsonNode;
 
 /**
  * A variable whose value cannot be resolved is returned without a value and with a valueUnresolvable marker, instead of failing the whole response.
  */
+@SpringJUnitWebConfig(ObjectVariableSerializationEnabledApplicationConfiguration.class)
 public class UnresolvableVariableValueResourceTest extends BaseSpringRestTestCase {
 
     @Test

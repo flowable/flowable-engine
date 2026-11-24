@@ -23,6 +23,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.TestPropertySource;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -32,6 +33,7 @@ import tools.jackson.databind.node.ObjectNode;
  * 
  * @author Frederik Heremans
  */
+@TestPropertySource(properties = "flowable.rest.table-management.enabled=true")
 public class TableResourceTest extends BaseSpringRestTestCase {
 
     /**

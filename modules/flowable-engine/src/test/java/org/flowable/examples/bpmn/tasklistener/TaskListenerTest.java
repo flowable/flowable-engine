@@ -16,7 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -494,7 +493,7 @@ public class TaskListenerTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
                 .processDefinitionKey("errorHandlingProcess")
                 .variable("throwErrorCodeTaskListenerComplete", "MY_ERROR_CODE")
-                .variable("elements", Arrays.asList("1", "2", "3"))
+                .variable("elements", processEngineConfiguration.getObjectMapper().createArrayNode().add("1").add("2").add("3"))
                 .start();
 
         assertThat(processInstance.getProcessVariables())

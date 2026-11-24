@@ -37,6 +37,7 @@ import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.DateType;
 import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.FloatType;
 import org.flowable.variable.service.impl.types.InstantType;
 import org.flowable.variable.service.impl.types.IntegerType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
@@ -124,6 +125,9 @@ public class JsonPlanItemVariableAggregator implements PlanItemVariableAggregato
                             break;
                         case DoubleType.TYPE_NAME:
                             objectNode.put(targetVarName, (Double) varInstance.getValue());
+                            break;
+                        case FloatType.TYPE_NAME:
+                            objectNode.put(targetVarName, (Float) varInstance.getValue());
                             break;
                         case BigDecimalType.TYPE_NAME:
                             objectNode.put(targetVarName, (BigDecimal) varInstance.getValue());

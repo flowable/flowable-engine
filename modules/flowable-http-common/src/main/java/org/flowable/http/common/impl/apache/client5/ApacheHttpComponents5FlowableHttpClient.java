@@ -45,6 +45,7 @@ import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.DefaultClientTlsStrategy;
+import org.apache.hc.client5.http.ssl.HostnameVerificationPolicy;
 import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
 import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
 import org.apache.hc.core5.concurrent.FutureCallback;
@@ -114,7 +115,7 @@ public class ApacheHttpComponents5FlowableHttpClient implements FlowableAsyncHtt
             try {
                 SSLContextBuilder builder = SSLContextBuilder.create();
                 builder.loadTrustMaterial(null, TrustSelfSignedStrategy.INSTANCE);
-                managerBuilder.setTlsStrategy(new DefaultClientTlsStrategy(builder.build(), NoopHostnameVerifier.INSTANCE));
+                managerBuilder.setTlsStrategy(new DefaultClientTlsStrategy(builder.build(), HostnameVerificationPolicy.CLIENT, NoopHostnameVerifier.INSTANCE));
 
             } catch (Exception e) {
                 logger.error("Could not configure HTTP client SSL self signed strategy", e);

@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.flowable.common.engine.api.FlowableException;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
@@ -897,6 +898,52 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
                 assertThat(
                         historyService.createHistoricTaskInstanceQuery().or().taskOwner("kermit").taskInvolvedGroups(Collections.singleton("testGroup")).endOr()
                                 .count()).isEqualTo(2);
+            }
+
+        } finally {
+            deleteAllTasks();
+        }
+    }
+
+    @Test
+    public void testQueryByOrInvolvedUserOrInvolvedGroups() {
+        try {
+            Task userLinkTask = taskService.newTask();
+            taskService.saveTask(userLinkTask);
+            taskService.addUserIdentityLink(userLinkTask.getId(), "involvedUser", IdentityLinkType.PARTICIPANT);
+            Task groupLinkTask = taskService.newTask();
+            taskService.saveTask(groupLinkTask);
+            taskService.addGroupIdentityLink(groupLinkTask.getId(), "involvedGroup2", IdentityLinkType.CANDIDATE);
+            Task assigneeTask = taskService.newTask();
+            assigneeTask.setAssignee("involvedUser");
+            taskService.saveTask(assigneeTask);
+            Task ownerTask = taskService.newTask();
+            ownerTask.setOwner("involvedUser");
+            taskService.saveTask(ownerTask);
+            Task otherTask = taskService.newTask();
+            taskService.saveTask(otherTask);
+            taskService.addUserIdentityLink(otherTask.getId(), "otherUser", IdentityLinkType.PARTICIPANT);
+            taskService.addGroupIdentityLink(otherTask.getId(), "otherGroup", IdentityLinkType.CANDIDATE);
+
+            Set<String> groups = Set.of("involvedGroup1", "involvedGroup2");
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().list())
+                    .extracting(Task::getId)
+                    .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId());
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().count())
+                    .isEqualTo(4);
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).taskId(otherTask.getId()).endOr().list())
+                    .extracting(Task::getId)
+                    .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId(), otherTask.getId());
+            assertThat(taskService.createTaskQuery().or().taskInvolvedUser("unknownUser").taskInvolvedGroups(Set.of("unknownGroup")).endOr().count())
+                    .isZero();
+
+            if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+                assertThat(historyService.createHistoricTaskInstanceQuery().or().taskInvolvedUser("involvedUser").taskInvolvedGroups(groups).endOr().list())
+                        .extracting(HistoricTaskInstance::getId)
+                        .containsExactlyInAnyOrder(userLinkTask.getId(), groupLinkTask.getId(), assigneeTask.getId(), ownerTask.getId());
+                assertThat(historyService.createHistoricTaskInstanceQuery().or().taskInvolvedUser("unknownUser").taskInvolvedGroups(Set.of("unknownGroup"))
+                        .endOr().count())
+                        .isZero();
             }
 
         } finally {

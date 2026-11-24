@@ -31,6 +31,7 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CaseLocalizationManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
@@ -39,6 +40,7 @@ import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.common.engine.impl.identity.Authentication;
 import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -1739,6 +1741,61 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
     }
 
     @Test
+    public void getCaseInstanceByOrInvolvedUsersAndGroupsWithIdentityLinkTypes() {
+        CaseInstance userTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addUserIdentityLink(userTypeInstance.getId(), "kermit", "specialLink");
+        CaseInstance userOtherTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addUserIdentityLink(userOtherTypeInstance.getId(), "kermit", "otherLink");
+        CaseInstance groupTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupTypeInstance.getId(), "sales", "specialLink");
+        CaseInstance groupOtherTypeInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupOtherTypeInstance.getId(), "sales", "otherLink");
+        CaseInstance groupsInstance = startOneTaskCase();
+        cmmnRuntimeService.addGroupIdentityLink(groupsInstance.getId(), "testGroup", "otherLink");
+
+        if (CmmnHistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, cmmnEngineConfiguration)) {
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroup("sales", "specialLink").endOr()
+                .list())
+                .extracting(HistoricCaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupTypeInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or().involvedUser("kermit", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(HistoricCaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), groupsInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or().involvedUser("kermit").involvedGroup("sales", "specialLink").involvedGroups(Set.of("testGroup")).endOr()
+                .list())
+                .extracting(HistoricCaseInstance::getId)
+                .containsExactlyInAnyOrder(userTypeInstance.getId(), userOtherTypeInstance.getId(), groupTypeInstance.getId(), groupsInstance.getId());
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or()
+                .involvedUser("kermit", "specialLink")
+                .involvedGroup("sales", "specialLink")
+                .involvedGroups(Set.of("testGroup"))
+                .caseInstanceId(groupOtherTypeInstance.getId())
+                .endOr()
+                .count())
+                .isEqualTo(4);
+
+            assertThat(cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .or().involvedUser("kermit", "wrongType").involvedGroup("sales", "wrongType").endOr()
+                .count())
+                .isZero();
+        }
+    }
+
+    protected CaseInstance startOneTaskCase() {
+        return cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("oneTaskCase")
+                .start();
+    }
+
+    @Test
     public void getCaseInstanceByInvolvedGroupOrUser() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("oneTaskCase")
@@ -1954,6 +2011,17 @@ public class HistoricCaseInstanceQueryImplTest extends FlowableCmmnTestCase {
             assertThat(historicCaseInstance.getCaseVariables()).containsOnly(
                 entry("stringVar", "test")
             );
+            assertThat(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables())
+                    .extracting(HistoricVariableInstance::getScopeDefinitionId)
+                    .containsExactly(historicCaseInstance.getCaseDefinitionId());
+
+            String caseInstanceWithoutVariablesId = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneTaskCase").start().getId();
+            historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                    .caseInstanceId(caseInstanceWithoutVariablesId)
+                    .includeCaseVariables()
+                    .singleResult();
+            assertThat(historicCaseInstance.getCaseVariables()).isEmpty();
+            assertThat(((HistoricCaseInstanceEntity) historicCaseInstance).getQueryVariables()).isEmpty();
         }
     }
 

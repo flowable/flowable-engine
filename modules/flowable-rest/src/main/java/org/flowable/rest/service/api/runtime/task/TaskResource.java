@@ -220,7 +220,7 @@ public class TaskResource extends TaskBaseResource {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");
                 }
 
-                Object actualVariableValue = restResponseFactory.getVariableValue(var);
+                Object actualVariableValue = restResponseFactory.getTransientVariableValue(var);
                 if (var.getVariableScope() != null && RestVariable.RestVariableScope.LOCAL.equals(var.getVariableScope())) {
                     taskCompletionBuilder.transientVariableLocal(var.getName(), actualVariableValue);
                 } else {

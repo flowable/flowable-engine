@@ -11,6 +11,8 @@
           <flowable:string><![CDATA[http://nohost:9798/api]]></flowable:string>
         </flowable:field>
         <flowable:mapException errorCode="errorCode" includeChildExceptions="true" rootCause="io.netty.resolver.dns.DnsErrorCauseException"/>
+        <!-- Netty only attaches a DnsErrorCauseException for NXDOMAIN and SERVFAIL responses, other DNS response codes (e.g. REFUSED) result in a plain UnknownHostException -->
+        <flowable:mapException errorCode="errorCode" includeChildExceptions="true" rootCause="java.net.UnknownHostException"/>
       </extensionElements>
     </serviceTask>
     <endEvent id="theEnd" name="theEnd"></endEvent>

@@ -14,7 +14,6 @@
 package org.activiti.examples.groovy;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
@@ -26,7 +25,10 @@ public class GroovyScriptTest extends PluggableFlowableTestCase {
     @Deployment
     public void testScriptExecution() {
         int[] inputArray = new int[] { 1, 2, 3, 4, 5 };
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("scriptExecution", CollectionUtil.singletonMap("inputArray", inputArray));
+        ProcessInstance pi = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("scriptExecution")
+                .transientVariable("inputArray", inputArray)
+                .start();
 
         Integer result = (Integer) runtimeService.getVariable(pi.getId(), "sum");
         assertEquals(15, result.intValue());

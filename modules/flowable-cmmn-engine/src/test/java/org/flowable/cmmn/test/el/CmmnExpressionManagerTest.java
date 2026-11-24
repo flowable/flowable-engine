@@ -113,12 +113,9 @@ public class CmmnExpressionManagerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testPlanItemInstanceAvailable() {
-        Map<String, Object> vars = new HashMap<>();
-
-        vars.put("myVar", new PlanItemInstanceTestVariable());
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testPlanItemInstanceAvailableCase")
-                .variables(vars)
+                .transientVariable("myVar", new PlanItemInstanceTestVariable())
                 .start();
 
         // Check of the testMethod has been called with the current planItemInstance

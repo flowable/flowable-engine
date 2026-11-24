@@ -47,7 +47,6 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.EntityLinkUtil;
@@ -311,15 +310,12 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         String tenantId = execution.getTenantId();
 
         ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
-        ProcessDefinitionEntity processDefinition;
+        ProcessDefinition processDefinition;
 
         if (isSameDeployment) {
             String deploymentId = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId()).getDeploymentId();
-            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
-                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
-            } else {
-                processDefinition = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
-            }
+            processDefinition = processEngineConfiguration.getDeploymentManager()
+                    .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey, tenantId);
 
             if (processDefinition != null) {
                 return processDefinition;

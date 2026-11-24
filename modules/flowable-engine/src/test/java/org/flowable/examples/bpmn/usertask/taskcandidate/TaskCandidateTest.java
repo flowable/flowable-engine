@@ -15,9 +15,7 @@ package org.flowable.examples.bpmn.usertask.taskcandidate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -194,10 +192,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCandidateExpressionOneParam() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("testBean", new TestBean());
-
-        runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateWithExpression")
+                .transientVariable("testBean", new TestBean())
+                .start();
         assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).list()).hasSize(1);
 
     }
@@ -207,10 +205,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
     @Test
     @Deployment
     public void testCandidateExpressionTwoParams() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("testBean", new TestBean());
-
-        runtimeService.startProcessInstanceByKey("candidateWithExpression", params);
+        runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("candidateWithExpression")
+                .transientVariable("testBean", new TestBean())
+                .start();
         assertThat(taskService.createTaskQuery().taskCandidateUser(KERMIT).count()).isEqualTo(1);
         assertThat(taskService.createTaskQuery().taskCandidateGroup("sales").count()).isEqualTo(1);
     }

@@ -20,6 +20,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.STRING;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -312,7 +313,8 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
     @Test
     @Deployment(resources = "org/flowable/engine/test/bpmn/servicetask/ServiceTaskWithFuturesTest.testDelegateExpressionWithFutureJavaDelegate.bpmn20.xml", tenantId = "flowable")
     void testDelegateExpressionWithMapBasedFutureJavaDelegate() {
-        List<ReadOnlyDelegateExecution> delegateExecutions = new ArrayList<>();
+        // The delegates are executed in parallel, so the list has to be thread safe
+        List<ReadOnlyDelegateExecution> delegateExecutions = Collections.synchronizedList(new ArrayList<>());
         MapBasedFlowableFutureJavaDelegate bean = inputData -> {
             delegateExecutions.add(inputData);
             return Collections.singletonMap(inputData.getCurrentActivityId(), "done");
@@ -334,6 +336,8 @@ class ServiceTaskWithFuturesTest extends PluggableFlowableTestCase {
                 );
 
         assertProcessEnded(processInstance.getId());
+        // The order in which the parallel delegates are executed is not guaranteed
+        delegateExecutions.sort(Comparator.comparing(ReadOnlyDelegateExecution::getCurrentActivityId));
         assertThat(delegateExecutions)
                 .extracting(ReadOnlyDelegateExecution::getCurrentActivityId)
                 .containsExactly("serviceTask1", "serviceTask2");

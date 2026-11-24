@@ -35,6 +35,8 @@ import org.flowable.identitylink.api.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -173,6 +175,10 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                             entry("processVar", true),
                             entry("anotherProcessVar", 123)
                     );
+            assertThat(((HistoricTaskInstanceEntity) task).getQueryVariables())
+                    .extracting(HistoricVariableInstance::getProcessDefinitionId, HistoricVariableInstance::getScopeDefinitionId)
+                    .hasSize(3)
+                    .containsOnly(tuple(task.getProcessDefinitionId(), null));
 
             task = historyService.createHistoricTaskInstanceQuery().taskAssignee("gonzo").singleResult();
             taskService.complete(task.getId());
@@ -197,6 +203,12 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .or().taskInvolvedGroups(Collections.singleton("testGroup")).taskInvolvedUser("kermit").endOr().count()).isEqualTo(3);
             assertThat(historyService.createHistoricTaskInstanceQuery()
                     .or().taskInvolvedGroups(Collections.singleton("testGroup")).processInstanceId("undefined").endOr().count()).isEqualTo(1);
+
+            String processInstanceWithoutVariablesId = runtimeService.startProcessInstanceByKey("oneTaskProcess").getId();
+            task = historyService.createHistoricTaskInstanceQuery().includeTaskLocalVariables().includeProcessVariables()
+                    .processInstanceId(processInstanceWithoutVariablesId).singleResult();
+            assertThat(task.getProcessVariables()).isEmpty();
+            assertThat(((HistoricTaskInstanceEntity) task).getQueryVariables()).isEmpty();
         }
     }
 

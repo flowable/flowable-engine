@@ -19,9 +19,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.impl.types.SerializableVariableTypeMode;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -31,6 +34,13 @@ public class RulesDeployerTest extends ResourceFlowableTestCase {
 
     public RulesDeployerTest() {
         super("org/flowable/standalone/rules/rules.flowable.cfg.xml");
+    }
+
+    @Override
+    protected void additionalConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
+        // The order and the output of the business rule task (a collection of the rule facts) are Java objects,
+        // which can only be stored as serializable variables
+        ((ProcessEngineConfigurationImpl) processEngineConfiguration).setSerializableVariableTypeMode(SerializableVariableTypeMode.ENABLED);
     }
 
     @SuppressWarnings("unchecked")

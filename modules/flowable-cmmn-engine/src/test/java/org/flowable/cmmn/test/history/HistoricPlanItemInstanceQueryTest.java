@@ -15,6 +15,7 @@ package org.flowable.cmmn.test.history;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,12 +31,16 @@ import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.PlanItemLocalizationManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnHistoryTestHelper;
 import org.flowable.cmmn.test.FlowableCmmnTestCase;
 import org.flowable.common.engine.api.FlowableIllegalArgumentException;
 import org.flowable.common.engine.impl.history.HistoryLevel;
 import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -359,6 +364,16 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
                 .singleResult();
 
         cmmnTaskService.complete(task.getId());
+        HistoricTaskInstance historicTask = cmmnHistoryService.createHistoricTaskInstanceQuery()
+                .taskId(task.getId())
+                .includeCaseVariables()
+                .includeTaskLocalVariables()
+                .singleResult();
+        assertThat(((HistoricTaskInstanceEntity) historicTask).getQueryVariables())
+                .extracting(HistoricVariableInstance::getScopeDefinitionId, HistoricVariableInstance::getProcessDefinitionId)
+                .isNotEmpty()
+                .containsOnly(tuple(historicTask.getScopeDefinitionId(), null));
+
         HistoricPlanItemInstance planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery()
                 .planItemInstanceId(planItemInstances.get(0).getId()).singleResult();
         assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
@@ -370,6 +385,14 @@ public class HistoricPlanItemInstanceQueryTest extends FlowableCmmnTestCase {
         assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).containsOnly(
                 entry("localVar", "someValue")
         );
+        assertThat(((HistoricPlanItemInstanceEntity) planItemInstance).getQueryVariables())
+                .extracting(HistoricVariableInstance::getScopeDefinitionId)
+                .containsExactly(planItemInstance.getCaseDefinitionId());
+
+        planItemInstance = cmmnHistoryService.createHistoricPlanItemInstanceQuery().planItemInstanceId(planItemInstances.get(1).getId()).includeLocalVariables()
+                .singleResult();
+        assertThat(planItemInstance.getPlanItemInstanceLocalVariables()).isEmpty();
+        assertThat(((HistoricPlanItemInstanceEntity) planItemInstance).getQueryVariables()).isEmpty();
     }
 
     @Test

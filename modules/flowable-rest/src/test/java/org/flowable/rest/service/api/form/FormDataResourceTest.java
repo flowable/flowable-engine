@@ -51,7 +51,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     public void testGetFormData() throws Exception {
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("SpeakerName", "John Doe");
-        Address address = new Address();
+        ObjectNode address = objectMapper.createObjectNode();
         variableMap.put("address", address);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -196,7 +196,7 @@ public class FormDataResourceTest extends BaseSpringRestTestCase {
     public void testSubmitFormData() throws Exception {
         Map<String, Object> variableMap = new HashMap<>();
         variableMap.put("SpeakerName", "John Doe");
-        Address address = new Address();
+        ObjectNode address = objectMapper.createObjectNode();
         variableMap.put("address", address);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
         String processInstanceId = processInstance.getId();
