@@ -78,6 +78,12 @@ public class TypeConverterImpl implements TypeConverter {
 		if (value instanceof BigInteger) {
 			return new BigDecimal((BigInteger)value);
 		}
+		if (value instanceof Double || value instanceof Float) {
+			double doubleValue = ((Number)value).doubleValue();
+			if (doubleValue != Math.rint(doubleValue)) {
+				return new BigDecimal(value.toString());
+			}
+		}
 		if (value instanceof Number) {
 			return new BigDecimal(((Number)value).doubleValue());
 		}

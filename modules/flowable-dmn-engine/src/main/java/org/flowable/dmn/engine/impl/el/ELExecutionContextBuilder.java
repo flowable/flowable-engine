@@ -134,12 +134,8 @@ public class ELExecutionContextBuilder {
                 } else if (inputVariableValue instanceof Long || inputVariableValue instanceof Integer) {
                     BigInteger transformedNumber = new BigInteger(inputVariableValue.toString());
                     inputVariables.put(inputVariableName, transformedNumber);
-                } else if (inputVariableValue instanceof Double ) {
-                    BigDecimal transformedNumber = new BigDecimal((Double) inputVariableValue);
-                    inputVariables.put(inputVariableName, transformedNumber);
-                } else if (inputVariableValue instanceof Float) {
-                    double doubleValue = Double.parseDouble(inputVariableValue.toString());
-                    BigDecimal transformedNumber = new BigDecimal(doubleValue);
+                } else if (inputVariableValue instanceof Double || inputVariableValue instanceof Float) {
+                    BigDecimal transformedNumber = new BigDecimal(inputVariableValue.toString());
                     inputVariables.put(inputVariableName, transformedNumber);
                 }
             } catch (Exception ex) {
