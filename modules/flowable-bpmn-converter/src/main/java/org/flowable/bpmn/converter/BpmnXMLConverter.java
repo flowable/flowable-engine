@@ -46,6 +46,7 @@ import org.flowable.bpmn.converter.export.BPMNDIExport;
 import org.flowable.bpmn.converter.export.CollaborationExport;
 import org.flowable.bpmn.converter.export.DataStoreExport;
 import org.flowable.bpmn.converter.export.DefinitionsRootExport;
+import org.flowable.bpmn.converter.export.ErrorDefinitionExport;
 import org.flowable.bpmn.converter.export.EscalationDefinitionExport;
 import org.flowable.bpmn.converter.export.FlowableListenerExport;
 import org.flowable.bpmn.converter.export.MultiInstanceExport;
@@ -567,6 +568,7 @@ public class BpmnXMLConverter implements BpmnXMLConstants {
             CollaborationExport.writePools(model, xtw);
             DataStoreExport.writeDataStores(model, xtw);
             SignalAndMessageDefinitionExport.writeSignalsAndMessages(model, xtw);
+            ErrorDefinitionExport.writeErrors(model, xtw);
             EscalationDefinitionExport.writeEscalations(model, xtw);
 
             for (Process process : model.getProcesses()) {

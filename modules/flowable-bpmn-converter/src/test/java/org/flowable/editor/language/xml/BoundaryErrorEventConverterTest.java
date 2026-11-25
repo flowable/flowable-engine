@@ -13,6 +13,7 @@
 package org.flowable.editor.language.xml;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import static org.assertj.core.api.Assertions.tuple;
 
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -28,6 +29,8 @@ class BoundaryErrorEventConverterTest {
 
     @BpmnXmlConverterTest("boundaryErrorEventWithInParameters.bpmn")
     void validateErrorBoundaryWithInParameters(BpmnModel model) {
+        assertThat(model.getErrors()).containsExactly(entry("errorOne", "errorCodeOne"));
+
         FlowElement flowElement = model.getFlowElement("theErrorBoundary");
         assertThat(flowElement).isInstanceOfSatisfying(BoundaryEvent.class, event -> {
             assertThat(event.getInParameters())
