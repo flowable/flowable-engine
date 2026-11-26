@@ -440,7 +440,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
                 });
 
             } else {
-                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance);
+                processInstanceResponse = restResponseFactory.createProcessInstanceResponse(instance, false, null, null);
             }
             
             ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processInstanceResponse.getProcessDefinitionId()).singleResult();
