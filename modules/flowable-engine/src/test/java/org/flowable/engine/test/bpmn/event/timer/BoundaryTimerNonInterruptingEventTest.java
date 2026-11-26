@@ -15,12 +15,17 @@ package org.flowable.engine.test.bpmn.event.timer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.flowable.common.engine.api.FlowableException;
+import org.flowable.common.engine.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -219,6 +224,44 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertThatCode(() -> { waitForJobExecutorToProcessAllJobs(2000, 100); })
                 .as("No more jobs since the user completed the task")
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    @Deployment
+    public void testTimerRetriedAfterFailure() {
+        ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionKey("nonInterruptingTimerRetry")
+                .variable("failTimer", true)
+                .start();
+
+        Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        managementService.moveTimerToExecutableJob(timerJob.getId());
+        assertThatThrownBy(() -> managementService.executeJob(timerJob.getId()))
+                .isInstanceOf(FlowableException.class)
+                .hasStackTraceContaining("Timer failed");
+
+        Job retriedTimerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertThat(retriedTimerJob.getRetries()).isEqualTo(2);
+
+        runtimeService.setVariable(processInstance.getId(), "failTimer", false);
+        managementService.moveTimerToExecutableJob(retriedTimerJob.getId());
+        managementService.executeJob(retriedTimerJob.getId());
+
+        assertThat(runtimeService.getActiveActivityIds(processInstance.getId())).containsExactlyInAnyOrder("task", "timer");
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+        assertProcessEnded(processInstance.getId());
+
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            assertThat(historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(processInstance.getId())
+                    .activityId("timer")
+                    .list())
+                    .extracting(HistoricActivityInstance::getEndTime)
+                    .hasSize(2)
+                    .doesNotContainNull();
+        }
     }
 
     /*
