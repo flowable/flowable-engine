@@ -51,6 +51,7 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
+import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -649,8 +650,8 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
                 assertThat(varInstance.getValue()).isEqualTo(10);
             }
     
-            // When a job fails it is moved to the timer jobs, so it can be executed later
-            waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(10000L, 200);
+            // When a job fails it is moved to the timer jobs with a due date in the future, so it can be executed later
+            JobTestHelper.waitForJobExecutorToProcessAllJobsAndTimerJobs(processEngineConfiguration, managementService, 10000L, 200);
             jobs = managementService.createJobQuery().list();
             assertThat(jobs).isEmpty();
             List<Job> timerJobs = managementService.createTimerJobQuery().list();

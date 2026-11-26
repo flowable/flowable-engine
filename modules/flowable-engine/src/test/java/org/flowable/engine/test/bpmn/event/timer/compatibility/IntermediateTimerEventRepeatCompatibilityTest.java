@@ -66,14 +66,14 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
         // not reached but it will be executed according to the expression)
         taskService.complete(tasks.get(0).getId());
 
-        waitForJobExecutorToProcessAllJobs(2000, 500);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 500);
         // Expected that job isn't executed because the timer is in t0
         assertThat(managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult()).isNotNull();
 
         nextTimeInstant = nextTimeInstant.plus(1, ChronoUnit.HOURS); // after 1 hour the event must be triggered and the flow will go to the next step
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
-        waitForJobExecutorToProcessAllJobs(2000, 500);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 500);
         // expect to execute because the time is reached.
 
         List<Job> jobs = managementService.createJobQuery().list();
@@ -89,7 +89,7 @@ public class IntermediateTimerEventRepeatCompatibilityTest extends TimerEventCom
         nextTimeInstant = nextTimeInstant.plus(1, ChronoUnit.HOURS); // after 1H 40 minutes from process start, the timer will trigger because of the endDate
         processEngineConfiguration.getClock().setCurrentTime(Date.from(nextTimeInstant));
 
-        waitForJobExecutorToProcessAllJobs(2000, 500);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(2000, 500);
         // expect to execute because the end time is reached.
 
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
