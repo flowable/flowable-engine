@@ -80,8 +80,6 @@ public class JobRetryCmd implements Command<Object> {
         }
 
         if (executionEntity != null) {
-            executionEntity.setActive(false);
-
             if (StringUtils.isNotEmpty(failedJobRetryTimeCycleValue)) {
                 ExpressionManager expressionManager = processEngineConfig.getExpressionManager();
                 if (expressionManager != null) {
