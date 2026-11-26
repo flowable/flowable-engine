@@ -100,6 +100,15 @@ public class DeployCmd implements Command<CmmnDeployment> {
         Map<String, EngineResource> resources = deployment.getResources();
         Map<String, EngineResource> savedResources = saved.getResources();
 
+        // Check if any non-generated resource was removed in the new deployment (Modern Java Functional Stream)
+        boolean hasRemovedResource = savedResources.entrySet().stream()
+                .filter(entry -> entry.getValue() != null && !entry.getValue().isGenerated())
+                .anyMatch(entry -> !resources.containsKey(entry.getKey()));
+
+        if (hasRemovedResource) {
+            return true;
+        }
+
         for (String resourceName : resources.keySet()) {
             EngineResource savedResource = savedResources.get(resourceName);
 

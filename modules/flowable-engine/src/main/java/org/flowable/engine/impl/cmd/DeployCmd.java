@@ -164,6 +164,16 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         Map<String, EngineResource> resources = deployment.getResources();
         Map<String, EngineResource> savedResources = saved.getResources();
 
+        // Check if any non-generated resource was removed in the new deployment
+        for (String savedResourceName : savedResources.keySet()) {
+            EngineResource savedResource = savedResources.get(savedResourceName);
+            if (savedResource != null && !savedResource.isGenerated()) {
+                if (!resources.containsKey(savedResourceName)) {
+                    return true;
+                }
+            }
+        }
+
         for (String resourceName : resources.keySet()) {
             EngineResource savedResource = savedResources.get(resourceName);
 
