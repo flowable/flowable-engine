@@ -84,6 +84,15 @@ public class DeploymentManager {
                 throw new FlowableObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
             }
             processDefinition = resolveProcessDefinition(processDefinition).getProcessDefinition();
+        } else {
+            // Stale cache check: in multi-node scenarios, another node may have deleted the
+            // process definition without this node's cache being invalidated.
+            // Verify the definition still exists in the database
+            if (processDefinitionEntityManager.findById(processDefinitionId) == null) {
+                processDefinitionCache.remove(processDefinitionId);
+                processDefinitionInfoCache.remove(processDefinitionId);
+                throw new FlowableObjectNotFoundException("no deployed process definition found with id '" + processDefinitionId + "'", ProcessDefinition.class);
+            }
         }
         return processDefinition;
     }
@@ -257,15 +266,11 @@ public class DeploymentManager {
             }
         }
 
-        // Delete data
-        deploymentEntityManager.deleteDeployment(deploymentId, cascade);
-
-        // Since we use a delete by query, delete-events are not automatically dispatched
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment),
-                    processEngineConfiguration.getEngineCfgKey());
-        }
-
+        // Clear caches BEFORE deleting from the database.
+        // This prevents a window between DB deletion and cache eviction where concurrent threads
+        // could read stale cache entries for already-deleted process definitions.
+        // In multi-node deployments, each node's local cache is cleared independently;
+        // a second-level distributed cache or TTL mechanism is recommended for full cross-node consistency.
         List<String> processDefinitionKeys = new ArrayList<>(processDefinitions.size());
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionCache.remove(processDefinition.getId());
@@ -279,6 +284,15 @@ public class DeploymentManager {
 
         appResourceCache.remove(deploymentId);
         knowledgeBaseCache.remove(deploymentId);
+
+        // Delete data
+        deploymentEntityManager.deleteDeployment(deploymentId, cascade);
+
+        // Since we use a delete by query, delete-events are not automatically dispatched
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment),
+                    processEngineConfiguration.getEngineCfgKey());
+        }
     }
 
     // getters and setters
