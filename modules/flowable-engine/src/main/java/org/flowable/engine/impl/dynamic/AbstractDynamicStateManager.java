@@ -574,7 +574,20 @@ public abstract class AbstractDynamicStateManager {
             if (moveExecutionContainer.isMoveToSubProcessInstance()) {
                 CallActivity callActivity = moveExecutionContainer.getCallActivity();
                 Process subProcess = moveExecutionContainer.getSubProcessModel().getProcessById(moveExecutionContainer.getSubProcessDefKey());
-                ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), subProcess.getInitialFlowElement().getId(), commandContext);
+                if (subProcess == null) {
+                    throw new FlowableException("Could not find sub process with key '" + moveExecutionContainer.getSubProcessDefKey()
+                            + "' in the sub process model. Call activity '" + callActivity.getId() + "' references a sub process that could not be resolved.");
+                }
+                FlowElement initialFlowElement = subProcess.getInitialFlowElement();
+                if (initialFlowElement == null) {
+                    throw new FlowableException("No initial flow element found in sub process '" + subProcess.getId()
+                            + "'. The sub process definition may be missing a start event.");
+                }
+                if (newChildExecutions.isEmpty()) {
+                    throw new FlowableException("No child executions were created for the sub process instance move to call activity '"
+                            + callActivity.getId() + "'.");
+                }
+                ExecutionEntity callActivityInstanceExecution = createCallActivityInstance(callActivity, moveExecutionContainer.getSubProcessDefinition(), newChildExecutions.get(0), initialFlowElement.getId(), commandContext);
                 List<ExecutionEntity> moveExecutions = moveExecutionContainer.getExecutions();
                 
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(moveExecutions, 
@@ -849,6 +862,10 @@ public abstract class AbstractDynamicStateManager {
 
         // The default parent execution is retrieved from the match with the first source execution
         ExecutionEntity defaultContinueParentExecution = moveExecutionEntityContainer.getContinueParentExecution(movingExecutions.get(0).getId());
+        if (defaultContinueParentExecution == null) {
+            throw new FlowableException("No continue parent execution found for execution '" + movingExecutions.get(0).getId()
+                    + "'. This may indicate that the parent execution could not be resolved during the state change.");
+        }
         Set<String> movingExecutionIds = movingExecutions.stream().map(ExecutionEntity::getId).collect(Collectors.toSet());
 
         // Build the subProcess hierarchy
